@@ -14,10 +14,10 @@ Getting up and running is as easy as 1-2-3!
 
 ```bash
 # Install dependencies
-npm/yarn/pnpm/bun install
+bun install
 
 # Start development server
-npm/yarn/pnpm/bun install
+bun run dev
 
 ```
 
