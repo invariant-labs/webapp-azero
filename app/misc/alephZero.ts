@@ -1,11 +1,11 @@
-import { ApiPromise, WsProvider } from '@polkadot/api'
+import { ApiPromise, WsProvider } from "@polkadot/api";
 
-let _alephZero: ApiPromise | undefined
+let _alephZero: ApiPromise | undefined;
 export const getAlephZero = async () => {
-  if (_alephZero) return _alephZero
-  const provider = new WsProvider('wss://ws.azero.dev/')
+  if (_alephZero) return _alephZero;
+  const provider = new WsProvider("wss://ws.test.azero.dev");
   _alephZero = await ApiPromise.create({
     provider,
-  })
-  return _alephZero
-}
+  });
+  return _alephZero;
+};
