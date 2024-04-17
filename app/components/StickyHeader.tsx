@@ -8,11 +8,11 @@ import ActionStarryButton from "./ActionStarryButton";
 import StarryButton from "./StarryButton";
 
 const StickyHeader: React.FC = () => {
-  const [address, setAddress] = React.useState<string>("");
+  const [address, setAddress] = React.useState<string | undefined>();
   const [receiverAddress, setReceiverAddress] = React.useState<string>(
     "5EnRWxJwqLuexBZtbJVTmfAzzc6Fwpw2Gv9AYs1gYHsgvzfH"
   );
-
+  console.log(address);
   useEffect(() => {
     const init = async () => {
       const adapter = await getAdapter();
@@ -68,7 +68,7 @@ const StickyHeader: React.FC = () => {
               try {
                 const adapter = await getAdapter();
                 await adapter.disconnect();
-                setAddress("");
+                setAddress(undefined);
               } catch (error) {
                 console.log(error);
               }
