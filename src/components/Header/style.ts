@@ -62,7 +62,7 @@ const useStyles = makeStyles()((theme: Theme) => {
         marginLeft: 0
       },
 
-      [theme.breakpoints.down('md')]: {
+      [theme.breakpoints.down('lg')]: {
         justifyContent: 'center'
       }
     },

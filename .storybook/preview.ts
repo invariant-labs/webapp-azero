@@ -1,5 +1,8 @@
-import { l } from '@polkadot/api/util'
 import type { Preview } from '@storybook/react'
+
+import { ThemeProvider, CssBaseline } from '@mui/material'
+import { withThemeFromJSXProvider } from '@storybook/addon-themes'
+import { theme } from '../src/static/theme'
 
 const customViewports = {
   sx375: {
@@ -52,8 +55,33 @@ const preview: Preview = {
         ...customViewports
       }
     },
-    layout: 'centered'
-  }
+    layout: 'centered',
+    backgrounds: {
+      default: 'dark',
+      values: [
+        {
+          name: 'dark',
+          value: '#202020'
+        },
+        {
+          name: 'light',
+          value: '#FFFFFF'
+        }
+      ]
+    }
+  },
+
+  decorators: [
+    withThemeFromJSXProvider({
+      GlobalStyles: CssBaseline,
+      Provider: ThemeProvider,
+      themes: {
+        dark: theme
+      },
+
+      defaultTheme: 'dark'
+    })
+  ]
 }
 
 export default preview
