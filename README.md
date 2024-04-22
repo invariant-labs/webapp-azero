@@ -1,39 +1,30 @@
-# 🌟 Aleph Zero Web3 Template 🌟
+# React + TypeScript + Vite
 
-Elevate your Aleph Zero blockchain development experience with this robust template powered by Next.js and integrated with [Nightly Connect](https://connect.nightly.app/docs/) for seamless wallet management. This template provides you with the core building blocks to jump-start your Aleph Zero project!
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-![Discord](https://img.shields.io/discord/7nhFHA6yZq?color=7389D8&logo=discord&logoColor=ffffff)
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)
+Currently, two official plugins are available:
 
----
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## 🚀 Quick Start
+## Expanding the ESLint configuration
 
-Getting up and running is as easy as 1-2-3!
+If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
 
-```bash
-# Install dependencies
-bun install
+- Configure the top-level `parserOptions` property like this:
 
-# Start development server
-bun run dev
-
+```js
+export default {
+  // other rules...
+  parserOptions: {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+    project: ['./tsconfig.json', './tsconfig.node.json'],
+    tsconfigRootDir: __dirname
+  }
+}
 ```
 
-Now, open your browser and navigate to [http://localhost:3000](http://localhost:3000) to see your blazing fast Aleph Zero app in action!
-
----
-
-## 🎨 Features
-
-- 🛠 **Next.js Framework**: Build your dApp using the versatile and powerful Next.js.
-- 🎨 **Tailwind**: A best-in-class CSS framework that turns styling into an art.
-- 🔐 **Nightly Connect Integration**: Seamless wallet selection integrated for easy transactions.
-- 📋 **Prebuilt Flows**: This template comes with prebuilt flows for wallet connection and sample requests.
-
----
-
-## 🎉 Have Fun and Happy Coding!
-
-Use this template to build something incredible! Enjoy coding!
+- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
+- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
+- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
