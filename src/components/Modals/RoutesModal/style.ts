@@ -23,7 +23,8 @@ const useStyles = makeStyles()(() => {
       },
       '&:hover': {
         background: colors.invariant.light,
-        '& $name': {
+
+        '& p': {
           color: colors.white.main,
           ...typography.heading4
         }
