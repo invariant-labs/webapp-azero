@@ -1,19 +1,53 @@
-import { Box, Button, CardMedia, Grid } from '@mui/material'
+import { Box, CardMedia, Grid, IconButton } from '@mui/material'
 import { Link } from 'react-router-dom'
 import useStyles from './style'
 import { useState } from 'react'
 import NavbarButton from '@components/common/Navbar/Button'
 import icons from '@static/icons'
+import RoutesModal from '@components/Modals/RoutesModal'
+import Hamburger from '@static/svg/Hamburger.svg'
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord'
+import { blurContent, unblurContent } from '@utils/uiUtils'
+import ChangeWalletButton from './HeaderButton/ChangeWalletButton'
 
-export interface IHeader {}
+export interface IHeader {
+  // address: PublicKey
+  // onNetworkSelect: (networkType: NetworkType, rpcAddress: string, rpcName?: string) => void
+  onConnectWallet: () => void
+  walletConnected: boolean
+  // landing: string
+  // typeOfNetwork: NetworkType
+  // rpc: string
+  // onFaucet?: () => void
+  onDisconnectWallet: () => void
+  // defaultMainnetRPC: string
+  // recentPriorityFee: string
+  // onPrioritySave: () => void
+}
 
-export const Header: React.FC<IHeader> = () => {
+export const Header: React.FC<IHeader> = ({
+  // // address,
+  // // onNetworkSelect,
+  onConnectWallet,
+  walletConnected,
+  // // landing,
+  // // typeOfNetwork,
+  // // rpc,
+  // // onFaucet,
+  onDisconnectWallet
+  // // defaultMainnetRPC,
+  // // recentPriorityFee,
+  // // onPrioritySave
+}) => {
   const { classes } = useStyles()
 
-  // const [activePath, setActive] = useState(landing)
-  const [activePath, setActive] = useState('')
-
   const routes = ['swap', 'pool', 'stats']
+
+  const [activePath, setActive] = useState('swap')
+
+  const [routesModalOpen, setRoutesModalOpen] = useState(false)
+
+  const [routesModalAnchor, setRoutesModalAnchor] = useState<HTMLButtonElement | null>(null)
 
   return (
     <Grid container>
@@ -28,33 +62,36 @@ export const Header: React.FC<IHeader> = () => {
             <CardMedia className={classes.logo} image={icons.LogoTitle} />
           </Grid>
         </Grid>
+        <Box>
+          <Grid
+            container
+            item
+            className={classes.leftSide}
+            justifyContent='flex-start'
+            sx={{ display: { xs: 'block', lg: 'none' } }}>
+            <Grid container>
+              <CardMedia className={classes.logoShort} image={icons.LogoShort} />
+            </Grid>
+          </Grid>
+        </Box>
         <Grid
           container
           item
-          className={classes.leftSide}
-          justifyContent='flex-start'
-          sx={{ display: { xs: 'block', lg: 'none' } }}>
-          <Grid container>
-            <CardMedia className={classes.logoShort} image={icons.LogoShort} />
-          </Grid>
+          className={classes.routers}
+          wrap='nowrap'
+          sx={{ display: { xs: 'none', lg: 'block' } }}>
+          {routes.map(path => (
+            <Link key={`path-${path}`} to={`/${path}`} className={classes.link}>
+              <NavbarButton
+                name={path}
+                onClick={() => {
+                  setActive(path)
+                }}
+                active={path === activePath}
+              />
+            </Link>
+          ))}
         </Grid>
-
-        {/* <Box sx={{ display: { xs: 'none', lg: 'block' } }}> */}
-        <Box>
-          <Grid container item className={classes.routers} wrap='nowrap'>
-            {routes.map(path => (
-              <Link key={`path-${path}`} to={`/${path}`} className={classes.link}>
-                <NavbarButton
-                  name={path}
-                  onClick={() => {
-                    setActive(path)
-                  }}
-                  active={path === activePath}
-                />
-              </Link>
-            ))}
-          </Grid>
-        </Box>
 
         <Grid container item className={classes.buttons} wrap='nowrap'>
           {/* <Hidden xsDown>
@@ -94,35 +131,31 @@ export const Header: React.FC<IHeader> = () => {
             ]}
             onSelect={onNetworkSelect}
           /> */}
-          {/* <ChangeWalletButton
-            name={
-              walletConnected
-                ? `${address.toString().slice(0, 4)}...${
-                    !isXsDown
-                      ? address
-                          .toString()
-                          .slice(address.toString().length - 4, address.toString().length)
-                      : ''
-                  }`
-                : 'Connect wallet'
-            }
+          <ChangeWalletButton
+            name='Connect wallet Mock'
+            // name={
+            //   walletConnected
+            //     ? `${address.toString().slice(0, 4)}...${
+            //         !isXsDown
+            //           ? address
+            //               .toString()
+            //               .slice(address.toString().length - 4, address.toString().length)
+            //           : ''
+            //       }`
+            //     : 'Connect wallet'
+            // }
             onConnect={onConnectWallet}
             connected={walletConnected}
             onDisconnect={onDisconnectWallet}
             startIcon={
-              walletConnected ? <DotIcon className={classes.connectedWalletIcon} /> : undefined
+              walletConnected ? (
+                <FiberManualRecordIcon className={classes.connectedWalletIcon} />
+              ) : undefined
             }
-          /> */}
-          <Button
-            variant='contained'
-            onClick={() => {
-              'wallet connected'
-            }}>
-            Mock button
-          </Button>
+          />
         </Grid>
 
-        {/* <Hidden lgUp>
+        <Grid sx={{ display: { xs: 'block', lg: 'none' } }}>
           <IconButton
             className={classes.menuButton}
             onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
@@ -144,32 +177,32 @@ export const Header: React.FC<IHeader> = () => {
             }}
             handleClose={() => {
               setRoutesModalOpen(false)
-              unblurContent()
+              // unblurContent()
             }}
-            onFaucet={
-              (typeOfNetwork === NetworkType.DEVNET || typeOfNetwork === NetworkType.TESTNET) &&
-              isXsDown
-                ? onFaucet
-                : undefined
-            }
-            onRPC={
-              typeOfNetwork === NetworkType.MAINNET && isXsDown
-                ? () => {
-                    setRoutesModalOpen(false)
-                    setMainnetRpcsOpen(true)
-                  }
-                : undefined
-            }
-            onPriority={
-              typeOfNetwork === NetworkType.MAINNET && isXsDown
-                ? () => {
-                    setRoutesModalOpen(false)
-                    setPriorityModal(true)
-                  }
-                : undefined
-            }
+            // onFaucet={
+            //   (typeOfNetwork === NetworkType.DEVNET || typeOfNetwork === NetworkType.TESTNET) &&
+            //   isXsDown
+            //     ? onFaucet
+            //     : undefined
+            // }
+            // onRPC={
+            //   typeOfNetwork === NetworkType.MAINNET && isXsDown
+            //     ? () => {
+            //         setRoutesModalOpen(false)
+            //         setMainnetRpcsOpen(true)
+            //       }
+            //     : undefined
+            // }
+            // onPriority={
+            //   typeOfNetwork === NetworkType.MAINNET && isXsDown
+            //     ? () => {
+            //         setRoutesModalOpen(false)
+            //         setPriorityModal(true)
+            //       }
+            //     : undefined
+            // }
           />
-          {typeOfNetwork === NetworkType.MAINNET ? (
+          {/* {typeOfNetwork === NetworkType.MAINNET ? (
             <Priority
               open={priorityModal}
               anchorEl={routesModalAnchor}
@@ -193,8 +226,8 @@ export const Header: React.FC<IHeader> = () => {
               }}
               activeRPC={rpc}
             />
-          ) : null}
-        </Hidden> */}
+          ) : null} */}
+        </Grid>
       </Grid>
     </Grid>
   )

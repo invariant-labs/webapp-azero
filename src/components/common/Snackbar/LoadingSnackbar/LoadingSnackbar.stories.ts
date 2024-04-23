@@ -2,17 +2,10 @@ import type { Meta, StoryObj } from '@storybook/react'
 import LoadingSnackbar from '.'
 
 const meta = {
-  title: 'Example/LoadingSnackbar',
+  title: 'Snackbar/LoadingSnackbar',
   component: LoadingSnackbar,
-  // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
-  tags: ['autodocs'],
-  parameters: {
-    // More on how to position stories at: https://storybook.js.org/docs/configure/story-layout
-    layout: 'fullscreen'
-  },
   args: {
     variant: 'pending',
-
     hideIconVariant: false,
     iconVariant: {},
     message: 'Loading...',
