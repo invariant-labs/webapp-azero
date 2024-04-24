@@ -1,53 +1,80 @@
-import { Box, CardMedia, Grid, IconButton } from '@mui/material'
+import { Box, Button, CardMedia, Grid, IconButton, useMediaQuery } from '@mui/material'
 import { Link } from 'react-router-dom'
 import useStyles from './style'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import NavbarButton from '@components/common/Navbar/Button'
 import icons from '@static/icons'
 import RoutesModal from '@components/Modals/RoutesModal'
 import Hamburger from '@static/svg/Hamburger.svg'
-import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord'
+import DotIcon from '@mui/icons-material/FiberManualRecordRounded'
 import { blurContent, unblurContent } from '@utils/uiUtils'
 import ChangeWalletButton from './HeaderButton/ChangeWalletButton'
+import { AlephZeroNetworks, NetworkType } from '@store/consts/static'
+import SelectNetworkButton from './HeaderButton/SelectNetworkButton'
+import { AddressOrPair } from '@polkadot/api-base/types'
+import SelectRPCButton from './HeaderButton/SelectRPCButton'
+import useButtonStyles from './HeaderButton/style'
+import { theme } from '@static/theme'
+import SelectMainnetRPC from '@components/Modals/SelectMainnetRPC/SelectMainnetRPC'
+
+import SelectPriorityButton from './HeaderButton/SelectPriorityButton'
+import Priority from '@components/Modals/Priority'
 
 export interface IHeader {
-  // address: PublicKey
-  // onNetworkSelect: (networkType: NetworkType, rpcAddress: string, rpcName?: string) => void
+  address: AddressOrPair
+  onNetworkSelect: (networkType: NetworkType, rpcAddress: string, rpcName?: string) => void
   onConnectWallet: () => void
   walletConnected: boolean
-  // landing: string
-  // typeOfNetwork: NetworkType
-  // rpc: string
-  // onFaucet?: () => void
+  landing: string
+  typeOfNetwork: NetworkType
+  rpc: string
+  onFaucet?: () => void
   onDisconnectWallet: () => void
-  // defaultMainnetRPC: string
-  // recentPriorityFee: string
-  // onPrioritySave: () => void
+  defaultTestnetRPC: string
+  recentPriorityFee: string
+  onPrioritySave: () => void
 }
 
 export const Header: React.FC<IHeader> = ({
-  // // address,
-  // // onNetworkSelect,
+  address,
+  onNetworkSelect,
   onConnectWallet,
   walletConnected,
-  // // landing,
-  // // typeOfNetwork,
-  // // rpc,
-  // // onFaucet,
-  onDisconnectWallet
-  // // defaultMainnetRPC,
-  // // recentPriorityFee,
-  // // onPrioritySave
+  landing,
+  typeOfNetwork,
+  rpc,
+  onFaucet,
+  onDisconnectWallet,
+  defaultTestnetRPC,
+  recentPriorityFee,
+  onPrioritySave
 }) => {
   const { classes } = useStyles()
+  const buttonStyles = useButtonStyles()
 
-  const routes = ['swap', 'pool', 'stats']
+  const isXsDown = useMediaQuery(theme.breakpoints.down('sm'))
+
+  const routes = ['swap', 'pool'] // TODO add 'stats' later
 
   const [activePath, setActive] = useState('swap')
 
   const [routesModalOpen, setRoutesModalOpen] = useState(false)
-
+  const [testnetRpcsOpen, setTestnetRpcsOpen] = useState(false)
   const [routesModalAnchor, setRoutesModalAnchor] = useState<HTMLButtonElement | null>(null)
+  const [priorityModal, setPriorityModal] = useState<boolean>(false)
+
+  useEffect(() => {
+    // if there will be no redirects, get rid of this
+    setActive(landing)
+  }, [landing])
+
+  const testnetRPCs = [
+    {
+      networkType: NetworkType.TESTNET,
+      rpc: AlephZeroNetworks.TEST,
+      rpcName: 'Aleph zero'
+    }
+  ]
 
   return (
     <Grid container>
@@ -93,64 +120,60 @@ export const Header: React.FC<IHeader> = ({
           ))}
         </Grid>
 
-        <Grid container item className={classes.buttons} wrap='nowrap'>
-          {/* <Hidden xsDown>
-            {typeOfNetwork === NetworkType.DEVNET || typeOfNetwork === NetworkType.TESTNET ? (
+        <Grid container item className={classes.buttons} wrap='nowrap' gap={1.5}>
+          {typeOfNetwork === NetworkType.DEVNET || typeOfNetwork === NetworkType.TESTNET ? (
+            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
               <Button
-                className={buttonClasses.headerButton}
+                className={buttonStyles.classes.headerButton}
                 variant='contained'
-                classes={{ label: buttonClasses.label }}
+                sx={{ '& .MuiButton-label': buttonStyles.classes.label }}
                 onClick={onFaucet}>
                 Faucet
               </Button>
-            ) : null}
-          </Hidden>
-          <Hidden xsDown>
-            {typeOfNetwork === NetworkType.MAINNET ? (
+            </Box>
+          ) : null}
+          {typeOfNetwork === NetworkType.MAINNET ? (
+            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
               <SelectPriorityButton
                 recentPriorityFee={recentPriorityFee}
                 onPrioritySave={onPrioritySave}
               />
-            ) : null}
-          </Hidden>
-          <Hidden xsDown>
-            {typeOfNetwork === NetworkType.MAINNET ? (
-              <SelectRPCButton rpc={rpc} networks={mainnetRPCs} onSelect={onNetworkSelect} />
-            ) : null}
-          </Hidden>
+            </Box>
+          ) : null}
+          {typeOfNetwork === NetworkType.TESTNET ? (
+            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+              <SelectRPCButton rpc={rpc} networks={testnetRPCs} onSelect={onNetworkSelect} />
+            </Box>
+          ) : null}
           <SelectNetworkButton
             name={typeOfNetwork}
             networks={[
               {
-                networkType: NetworkType.MAINNET,
-                rpc: defaultMainnetRPC,
+                networkType: NetworkType.TESTNET,
+                rpc: defaultTestnetRPC,
                 rpcName:
-                  mainnetRPCs.find(data => data.rpc === defaultMainnetRPC)?.rpcName ?? 'Custom'
-              },
-              { networkType: NetworkType.DEVNET, rpc: SolanaNetworks.DEV }
+                  testnetRPCs.find(data => data.rpc === defaultTestnetRPC)?.rpcName ?? 'Custom'
+              }
             ]}
             onSelect={onNetworkSelect}
-          /> */}
+          />
           <ChangeWalletButton
-            name='Connect wallet Mock'
-            // name={
-            //   walletConnected
-            //     ? `${address.toString().slice(0, 4)}...${
-            //         !isXsDown
-            //           ? address
-            //               .toString()
-            //               .slice(address.toString().length - 4, address.toString().length)
-            //           : ''
-            //       }`
-            //     : 'Connect wallet'
-            // }
+            name={
+              walletConnected
+                ? `${address.toString().slice(0, 4)}...${
+                    !isXsDown
+                      ? address
+                          .toString()
+                          .slice(address.toString().length - 4, address.toString().length)
+                      : ''
+                  }`
+                : 'Connect wallet'
+            }
             onConnect={onConnectWallet}
             connected={walletConnected}
             onDisconnect={onDisconnectWallet}
             startIcon={
-              walletConnected ? (
-                <FiberManualRecordIcon className={classes.connectedWalletIcon} />
-              ) : undefined
+              walletConnected ? <DotIcon className={classes.connectedWalletIcon} /> : undefined
             }
           />
         </Grid>
@@ -177,32 +200,32 @@ export const Header: React.FC<IHeader> = ({
             }}
             handleClose={() => {
               setRoutesModalOpen(false)
-              // unblurContent()
+              unblurContent()
             }}
-            // onFaucet={
-            //   (typeOfNetwork === NetworkType.DEVNET || typeOfNetwork === NetworkType.TESTNET) &&
-            //   isXsDown
-            //     ? onFaucet
-            //     : undefined
-            // }
-            // onRPC={
-            //   typeOfNetwork === NetworkType.MAINNET && isXsDown
-            //     ? () => {
-            //         setRoutesModalOpen(false)
-            //         setMainnetRpcsOpen(true)
-            //       }
-            //     : undefined
-            // }
-            // onPriority={
-            //   typeOfNetwork === NetworkType.MAINNET && isXsDown
-            //     ? () => {
-            //         setRoutesModalOpen(false)
-            //         setPriorityModal(true)
-            //       }
-            //     : undefined
-            // }
+            onFaucet={
+              (typeOfNetwork === NetworkType.DEVNET || typeOfNetwork === NetworkType.TESTNET) &&
+              isXsDown
+                ? onFaucet
+                : undefined
+            }
+            onRPC={
+              typeOfNetwork === NetworkType.TESTNET && isXsDown
+                ? () => {
+                    setRoutesModalOpen(false)
+                    setTestnetRpcsOpen(true)
+                  }
+                : undefined
+            }
+            onPriority={
+              typeOfNetwork === NetworkType.MAINNET && isXsDown
+                ? () => {
+                    setRoutesModalOpen(false)
+                    setPriorityModal(true)
+                  }
+                : undefined
+            }
           />
-          {/* {typeOfNetwork === NetworkType.MAINNET ? (
+          {typeOfNetwork === NetworkType.MAINNET ? (
             <Priority
               open={priorityModal}
               anchorEl={routesModalAnchor}
@@ -214,19 +237,19 @@ export const Header: React.FC<IHeader> = ({
               onPrioritySave={onPrioritySave}
             />
           ) : null}
-          {typeOfNetwork === NetworkType.MAINNET ? (
+          {typeOfNetwork === NetworkType.TESTNET ? (
             <SelectMainnetRPC
-              networks={mainnetRPCs}
-              open={mainnetRpcsOpen}
+              networks={testnetRPCs}
+              open={testnetRpcsOpen}
               anchorEl={routesModalAnchor}
               onSelect={onNetworkSelect}
               handleClose={() => {
-                setMainnetRpcsOpen(false)
+                setTestnetRpcsOpen(false)
                 unblurContent()
               }}
               activeRPC={rpc}
             />
-          ) : null} */}
+          ) : null}
         </Grid>
       </Grid>
     </Grid>

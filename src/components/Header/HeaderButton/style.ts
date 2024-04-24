@@ -14,10 +14,6 @@ const useStyles = makeStyles()((theme: Theme) => {
       lineHeight: '22px',
       height: 40,
 
-      '&:not(:last-child)': {
-        marginRight: 12
-      },
-
       '&:hover': {
         background: colors.blue.deep
       },
@@ -43,10 +39,6 @@ const useStyles = makeStyles()((theme: Theme) => {
       [theme.breakpoints.down('xs')]: {
         minWidth: 100,
         width: 130
-      },
-
-      '&:not(:last-child)': {
-        marginRight: 12
       },
 
       '&:hover': {

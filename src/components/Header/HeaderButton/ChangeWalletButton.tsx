@@ -64,8 +64,8 @@ export const ChangeWalletButton: React.FC<IProps> = ({
           disabled: classes.disabled,
           startIcon: classes.startIcon,
           endIcon: classes.innerEndIcon
-          //   label: classes.label,
         }}
+        sx={{ '& .MuiButton-label': classes.label }}
         onClick={handleClick}
         startIcon={startIcon}
         endIcon={

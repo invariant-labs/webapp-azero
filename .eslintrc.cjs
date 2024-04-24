@@ -1,7 +1,12 @@
 module.exports = {
   root: true,
   env: { browser: true, es2020: true },
-  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'plugin:react-hooks/recommended', 'plugin:storybook/recommended'],
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:react-hooks/recommended',
+    'plugin:storybook/recommended'
+  ],
   ignorePatterns: ['dist', '.eslintrc.cjs'],
   parserOptions: {
     project: './tsconfig.json'
@@ -21,10 +26,10 @@ module.exports = {
     // '@typescript-eslint/space-before-function-paren': 'off',
     // '@typescript-eslint/prefer-nullish-coalescing': 'off',
     // '@typescript-eslint/member-delimiter-style': 'off',
-    '@typescript-eslint/no-explicit-any': 'off'
+    '@typescript-eslint/no-explicit-any': 'off',
     // 'generator-star-spacing': ['error', { before: false, after: true }],
     // 'yield-star-spacing': ['error', { before: false, after: true }],
-    // 'react-hooks/exhaustive-deps': 'off',
+    'react-hooks/exhaustive-deps': 'off'
     // 'react-hooks/rules-of-hooks': 'error'
   }
 }

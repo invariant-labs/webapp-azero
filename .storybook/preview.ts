@@ -1,8 +1,13 @@
 import type { Preview } from '@storybook/react'
-
+import {
+  reactRouterParameters,
+  reactRouterOutlet,
+  withRouter
+} from 'storybook-addon-remix-react-router'
 import { ThemeProvider, CssBaseline } from '@mui/material'
 import { withThemeFromJSXProvider } from '@storybook/addon-themes'
 import { theme } from '../src/static/theme'
+import { createBrowserRouter } from 'react-router-dom'
 
 const customViewports = {
   sx375: {
@@ -68,7 +73,8 @@ const preview: Preview = {
           value: '#FFFFFF'
         }
       ]
-    }
+    },
+    createBrowserRouter: { withRouter }
   },
 
   decorators: [
@@ -80,7 +86,8 @@ const preview: Preview = {
       },
 
       defaultTheme: 'dark'
-    })
+    }),
+    withRouter
   ]
 }
 
