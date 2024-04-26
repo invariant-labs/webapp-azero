@@ -1,4 +1,4 @@
-import EmptyPlaceholder from './EmptyPlaceholder'
+import { EmptyPlaceholder } from './EmptyPlaceholder'
 
 import type { Meta, StoryObj } from '@storybook/react'
 

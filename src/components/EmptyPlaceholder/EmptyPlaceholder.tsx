@@ -2,15 +2,15 @@ import { Grid, Typography } from '@mui/material'
 import empty from '@static/svg/empty.svg'
 import classNames from 'classnames'
 import React from 'react'
-import { useStyles } from './styles'
+import { useStyles } from './style'
 
-export interface IProps {
+export interface IEmptyPlaceholder {
   desc: string
   className?: string
   style?: React.CSSProperties
 }
 
-export const EmptyPlaceholder: React.FC<IProps> = ({ desc, className, style }) => {
+export const EmptyPlaceholder: React.FC<IEmptyPlaceholder> = ({ desc, className, style }) => {
   const { classes } = useStyles()
 
   return (
@@ -26,5 +26,3 @@ export const EmptyPlaceholder: React.FC<IProps> = ({ desc, className, style }) =
     </Grid>
   )
 }
-
-export default EmptyPlaceholder
