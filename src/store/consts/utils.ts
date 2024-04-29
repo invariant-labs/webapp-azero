@@ -90,3 +90,41 @@ export const formatNumbers =
 
     return num < 0 && threshold ? '-' + formatted : formatted
   }
+
+export const printAmount = (amount: string, decimals: number): string => {
+  const isNegative = amount.length > 0 && amount[0] === '-'
+
+  const balanceString = isNegative ? amount.slice(1) : amount
+
+  if (balanceString.length <= decimals) {
+    return (
+      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+      (isNegative ? '-' : '') + '0.' + '0'.repeat(decimals - balanceString.length) + balanceString
+    )
+  } else {
+    return (
+      (isNegative ? '-' : '') +
+      trimZeros(
+        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+        balanceString.substring(0, balanceString.length - decimals) +
+          '.' +
+          balanceString.substring(balanceString.length - decimals)
+      )
+    )
+  }
+}
+
+export const trimZeros = (numStr: string): string => {
+  numStr = numStr.replace(/(\.\d*?)0+$/, '$1')
+
+  return numStr
+}
+
+export const PRICE_DECIMAL = 24
+
+export const calcYPerXPrice = (sqrtPrice: string, xDecimal: number, yDecimal: number): number => {
+  const sqrt = +printAmount(sqrtPrice, PRICE_DECIMAL)
+  const proportion = sqrt * sqrt
+
+  return proportion / 10 ** (yDecimal - xDecimal)
+}
