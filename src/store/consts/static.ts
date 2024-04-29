@@ -1,3 +1,5 @@
+import { Keyring } from '@polkadot/api'
+
 export enum NetworkType {
   DEVNET = 'Devnet',
   TESTNET = 'Testnet',
@@ -6,6 +8,8 @@ export enum NetworkType {
 }
 
 export enum AlephZeroNetworks {
-  TEST = 'https://test.azero.dev/',
-  DEV = 'https://azero.dev/'
+  TEST = 'wss://ws.test.azero.dev',
+  DEV = 'wss://ws.dev.azero.dev'
 }
+
+export const DEFAULT_PUBLICKEY = new Keyring({ type: 'ecdsa' })

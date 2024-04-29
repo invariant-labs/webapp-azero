@@ -1,10 +1,12 @@
 import { Button, Grid, TextField, Typography } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import ConnectButton from './ConnectButton'
 import { AddressOrPair } from '@polkadot/api-base/types'
-import { getAdapter, getAlephZero } from '@utils/web3'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { useDispatch } from 'react-redux'
+import { nightlyConnectAdapter } from '@utils/web3/selector'
+import { getAlephZeroConnection } from '@utils/web3/connection'
+import { AlephZeroNetworks } from '@store/consts/static'
 
 export interface ISwap {}
 
@@ -14,46 +16,22 @@ export const Swap: React.FC<ISwap> = () => {
   const dispatch = useDispatch()
   const [receiverAddress, setReceiverAddress] = useState<string>(RECEIVER)
 
-  useEffect(() => {
-    const init = async () => {
-      const adapter = await getAdapter()
-      // Eager connect
-      if (await adapter.canEagerConnect()) {
-        try {
-          await adapter.connect()
-          const publicKey = await adapter.accounts.get()
-          if (publicKey.length > 0) {
-            setAddress(publicKey[0].address)
-          }
-        } catch (error) {
-          await adapter.disconnect().catch(() => {})
-          console.log(error)
-        }
-      }
-    }
-    if (!address) init()
-
-    // Try eagerly connect
-  }, [address])
-
   const signTransaction = async () => {
     try {
+      const api = await getAlephZeroConnection(AlephZeroNetworks.TEST)
+
+      const adapter = await nightlyConnectAdapter()
+
+      const tx = api.tx.balances.transferAllowDeath(receiverAddress, 5_000_000_000)
+
       if (!address) {
         return
       }
-      const api = await getAlephZero()
-      const adapter = await getAdapter()
-
-      const tx = await api.tx.balances.transferAllowDeath(receiverAddress, 5_000_000_000)
-
       const signedTx = await tx.signAsync(address, {
         signer: adapter.signer as any
       })
       const txId = await signedTx.send()
 
-      console.log(
-        `Transaction successful,  https://alephzero-testnet.subscan.io/extrinsic/${txId.toString()}`
-      )
       dispatch(
         snackbarsActions.add({
           message: 'Successful send transaction',
@@ -83,13 +61,12 @@ export const Swap: React.FC<ISwap> = () => {
         <ConnectButton
           connected={address !== undefined}
           onConnect={async () => {
-            const adapter = await getAdapter()
+            const adapter = await nightlyConnectAdapter()
             try {
               await adapter.connect()
               const publicKey = await adapter.accounts.get()
               if (publicKey.length > 0) {
                 setAddress(publicKey[0].address)
-                console.log(publicKey[0].address)
               }
             } catch (error) {
               await adapter.disconnect().catch(() => {})
@@ -98,7 +75,7 @@ export const Swap: React.FC<ISwap> = () => {
           }}
           onDisconnect={async () => {
             try {
-              const adapter = await getAdapter()
+              const adapter = await nightlyConnectAdapter()
               await adapter.disconnect()
               setAddress(undefined)
             } catch (error) {
