@@ -10,7 +10,6 @@ const meta = {
     open: true,
     current: 'swap',
     onFaucet: () => {},
-    onPriority: () => {},
     onRPC: () => {},
     onSelect: () => {},
     routes: ['swap', 'pool']

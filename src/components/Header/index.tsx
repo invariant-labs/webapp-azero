@@ -17,9 +17,6 @@ import useButtonStyles from './HeaderButton/style'
 import { theme } from '@static/theme'
 import SelectMainnetRPC from '@components/Modals/SelectMainnetRPC/SelectMainnetRPC'
 
-import SelectPriorityButton from './HeaderButton/SelectPriorityButton'
-import Priority from '@components/Modals/Priority'
-
 export interface IHeader {
   address: AddressOrPair
   onNetworkSelect: (networkType: NetworkType, rpcAddress: string, rpcName?: string) => void
@@ -31,8 +28,6 @@ export interface IHeader {
   onFaucet?: () => void
   onDisconnectWallet: () => void
   defaultTestnetRPC: string
-  recentPriorityFee: string
-  onPrioritySave: () => void
 }
 
 export const Header: React.FC<IHeader> = ({
@@ -45,9 +40,7 @@ export const Header: React.FC<IHeader> = ({
   rpc,
   onFaucet,
   onDisconnectWallet,
-  defaultTestnetRPC,
-  recentPriorityFee,
-  onPrioritySave
+  defaultTestnetRPC
 }) => {
   const { classes } = useStyles()
   const buttonStyles = useButtonStyles()
@@ -61,7 +54,6 @@ export const Header: React.FC<IHeader> = ({
   const [routesModalOpen, setRoutesModalOpen] = useState(false)
   const [testnetRpcsOpen, setTestnetRpcsOpen] = useState(false)
   const [routesModalAnchor, setRoutesModalAnchor] = useState<HTMLButtonElement | null>(null)
-  const [priorityModal, setPriorityModal] = useState<boolean>(false)
 
   useEffect(() => {
     // if there will be no redirects, get rid of this
@@ -130,14 +122,6 @@ export const Header: React.FC<IHeader> = ({
                 onClick={onFaucet}>
                 Faucet
               </Button>
-            </Box>
-          ) : null}
-          {typeOfNetwork === NetworkType.MAINNET ? (
-            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-              <SelectPriorityButton
-                recentPriorityFee={recentPriorityFee}
-                onPrioritySave={onPrioritySave}
-              />
             </Box>
           ) : null}
           {typeOfNetwork === NetworkType.TESTNET ? (
@@ -216,27 +200,7 @@ export const Header: React.FC<IHeader> = ({
                   }
                 : undefined
             }
-            onPriority={
-              typeOfNetwork === NetworkType.MAINNET && isXsDown
-                ? () => {
-                    setRoutesModalOpen(false)
-                    setPriorityModal(true)
-                  }
-                : undefined
-            }
           />
-          {typeOfNetwork === NetworkType.MAINNET ? (
-            <Priority
-              open={priorityModal}
-              anchorEl={routesModalAnchor}
-              recentPriorityFee={recentPriorityFee}
-              handleClose={() => {
-                unblurContent()
-                setPriorityModal(false)
-              }}
-              onPrioritySave={onPrioritySave}
-            />
-          ) : null}
           {typeOfNetwork === NetworkType.TESTNET ? (
             <SelectMainnetRPC
               networks={testnetRPCs}
