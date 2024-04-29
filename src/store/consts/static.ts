@@ -12,4 +12,6 @@ export enum AlephZeroNetworks {
   DEV = 'wss://ws.dev.azero.dev'
 }
 
+export const STABLECOIN_ADDRESSES: string[] = []
+
 export const DEFAULT_PUBLICKEY = new Keyring({ type: 'ecdsa' })
