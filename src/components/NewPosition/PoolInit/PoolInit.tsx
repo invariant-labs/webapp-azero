@@ -1,0 +1,222 @@
+import React, { useState, useEffect, useMemo } from 'react'
+
+import useStyles from './style'
+import { toMaxNumericPlaces } from '@store/consts/utils'
+import { Button, Grid, Typography } from '@mui/material'
+
+export interface IPoolInit {
+  tokenASymbol: string
+  tokenBSymbol: string
+  onChangeRange: (leftIndex: number, rightIndex: number) => void
+  isXtoY: boolean
+  xDecimal: number
+  yDecimal: number
+  tickSpacing: number
+  midPrice: number
+  onChangeMidPrice: (mid: number) => void
+  currentPairReversed: boolean | null
+  globalPrice?: number
+}
+
+export const PoolInit: React.FC<IPoolInit> = ({
+  tokenASymbol,
+  tokenBSymbol,
+  onChangeRange,
+  isXtoY,
+  xDecimal,
+  yDecimal,
+  tickSpacing,
+  midPrice,
+  onChangeMidPrice,
+  currentPairReversed,
+  globalPrice
+}) => {
+  const { classes } = useStyles()
+
+  const [leftRange, setLeftRange] = useState(tickSpacing * 10 * (isXtoY ? -1 : 1))
+  const [rightRange, setRightRange] = useState(tickSpacing * 10 * (isXtoY ? 1 : -1))
+
+  // const [leftInput, setLeftInput] = useState(
+  //   calcPrice(leftRange, isXtoY, xDecimal, yDecimal).toString()
+  // )
+  // const [rightInput, setRightInput] = useState(
+  //   calcPrice(rightRange, isXtoY, xDecimal, yDecimal).toString()
+  // )
+  // const [midPriceInput, setMidPriceInput] = useState(
+  //   calcPrice(midPrice, isXtoY, xDecimal, yDecimal).toString()
+  // )
+  const [leftInput, setLeftInput] = useState('')
+  const [rightInput, setRightInput] = useState('')
+  const [midPriceInput, setMidPriceInput] = useState('')
+
+  const [leftInputRounded, setLeftInputRounded] = useState((+leftInput).toFixed(12))
+  const [rightInputRounded, setRightInputRounded] = useState((+rightInput).toFixed(12))
+
+  // useEffect(() => {
+  //   onChangeMidPrice(nearestTickIndex(+midPriceInput, tickSpacing, isXtoY, xDecimal, yDecimal))
+  // }, [midPriceInput])
+
+  const setLeftInputValues = (val: string) => {
+    setLeftInput(val)
+    setLeftInputRounded(toMaxNumericPlaces(+val, 5))
+  }
+
+  const setRightInputValues = (val: string) => {
+    setRightInput(val)
+    setRightInputRounded(toMaxNumericPlaces(+val, 5))
+  }
+
+  const onLeftInputChange = (val: string) => {
+    setLeftInput(val)
+    setLeftInputRounded(val)
+  }
+
+  const onRightInputChange = (val: string) => {
+    setRightInput(val)
+    setRightInputRounded(val)
+  }
+
+  const changeRangeHandler = (left: number, right: number) => {
+    setLeftRange(left)
+    setRightRange(right)
+
+    // setLeftInputValues(calcPrice(left, isXtoY, xDecimal, yDecimal).toString())
+    // setRightInputValues(calcPrice(right, isXtoY, xDecimal, yDecimal).toString())
+
+    onChangeRange(left, right)
+  }
+
+  const resetRange = () => {
+    changeRangeHandler(tickSpacing * 10 * (isXtoY ? -1 : 1), tickSpacing * 10 * (isXtoY ? 1 : -1))
+  }
+
+  useEffect(() => {
+    changeRangeHandler(leftRange, rightRange)
+  }, [midPrice])
+
+  const validateMidPriceInput = (midPriceInput: string) => {
+    // const minTick = getMinTick(tickSpacing)
+    // const maxTick = getMaxTick(tickSpacing)
+    // const minPrice = isXtoY
+    //   ? calcPrice(minTick, isXtoY, xDecimal, yDecimal)
+    //   : calcPrice(maxTick, isXtoY, xDecimal, yDecimal)
+    // const maxPrice = isXtoY
+    //   ? calcPrice(maxTick, isXtoY, xDecimal, yDecimal)
+    //   : calcPrice(minTick, isXtoY, xDecimal, yDecimal)
+    // const numericMidPriceInput = parseFloat(midPriceInput)
+    // const validatedMidPrice = Math.min(Math.max(numericMidPriceInput, minPrice), maxPrice)
+    // return toMaxNumericPlaces(validatedMidPrice, 5)
+  }
+
+  useEffect(() => {
+    if (currentPairReversed !== null) {
+      // const validatedMidPrice = validateMidPriceInput((1 / +midPriceInput).toString())
+
+      // setMidPriceInput(validatedMidPrice)
+      changeRangeHandler(rightRange, leftRange)
+    }
+  }, [currentPairReversed])
+
+  // const price = useMemo(
+  //   () => calcPrice(midPrice, isXtoY, xDecimal, yDecimal),
+  //   [midPrice, isXtoY, xDecimal, yDecimal]
+  // )
+  const price = 12345
+  return (
+    <Grid container direction='column' className={classes.wrapper}>
+      <Grid
+        container
+        className={classes.innerWrapper}
+        direction='column'
+        justifyContent='flex-start'>
+        <Grid className={classes.topInnerWrapper}>
+          <Typography className={classes.header}>Starting price</Typography>
+          <Grid className={classes.infoWrapper}>
+            <Typography className={classes.info}>
+              This pool does not exist yet. To create it, select the fee tier, initial price, and
+              enter the amount of tokens. The estimated cost of creating a pool is 0.1 SOL.
+            </Typography>
+          </Grid>
+
+          {/* <SimpleInput
+            setValue={setMidPriceInput}
+            value={midPriceInput}
+            decimal={isXtoY ? xDecimal : yDecimal}
+            className={classes.midPrice}
+            placeholder='0.0'
+            globalPrice={globalPrice}
+            onBlur={e => {
+              setMidPriceInput(validateMidPriceInput(e.target.value))
+            }}
+          /> */}
+
+          <Grid
+            className={classes.priceWrapper}
+            container
+            justifyContent='space-between'
+            alignItems='center'>
+            <Typography className={classes.priceLabel}>{tokenASymbol} starting price: </Typography>
+            <Typography className={classes.priceValue}>
+              {/* <AnimatedNumber
+                value={price.toFixed(isXtoY ? xDecimal : yDecimal)}
+                duration={300}
+                formatValue={formatNumbers()}
+              />
+              {showPrefix(price)} {tokenBSymbol} */}
+            </Typography>
+          </Grid>
+        </Grid>
+        <Typography className={classes.subheader}>Set price range</Typography>
+        <Grid container className={classes.inputs}>
+          {/* <RangeInput
+            className={classes.input}
+            label='Min price'
+            tokenFromSymbol={tokenASymbol}
+            tokenToSymbol={tokenBSymbol}
+            currentValue={leftInputRounded}
+            setValue={onLeftInputChange}
+            decreaseValue={() => {}}
+            increaseValue={() => {
+              const newLeft = isXtoY
+                ? Math.min(rightRange - tickSpacing, leftRange + tickSpacing)
+                : Math.max(rightRange + tickSpacing, leftRange - tickSpacing)
+
+              changeRangeHandler(newLeft, rightRange)
+            }}
+            onBlur={() => {}}
+            diffLabel='Min - Current price'
+            percentDiff={((+leftInput - price) / price) * 100}
+          />
+          <RangeInput
+            className={classes.input}
+            label='Max price'
+            tokenFromSymbol={tokenASymbol}
+            tokenToSymbol={tokenBSymbol}
+            currentValue={rightInputRounded}
+            setValue={onRightInputChange}
+            decreaseValue={() => {
+              const newRight = isXtoY
+                ? Math.max(rightRange - tickSpacing, leftRange + tickSpacing)
+                : Math.min(rightRange + tickSpacing, leftRange - tickSpacing)
+              changeRangeHandler(leftRange, newRight)
+            }}
+            increaseValue={() => {}}
+            onBlur={() => {}}
+            diffLabel='Max - Current price'
+            percentDiff={((+rightInput - price) / price) * 100}
+          /> */}
+        </Grid>
+        <Grid container className={classes.buttons}>
+          <Button className={classes.button} onClick={resetRange}>
+            Reset range
+          </Button>
+          <Button className={classes.button} onClick={() => {}}>
+            Set full range
+          </Button>
+        </Grid>
+      </Grid>
+    </Grid>
+  )
+}
+
+export default PoolInit

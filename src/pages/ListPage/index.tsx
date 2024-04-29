@@ -2,7 +2,7 @@ import WrappedPositionsList from '@containers/WrappedPositionsList/WrappedPositi
 import { Grid } from '@mui/material'
 import useStyles from './styles'
 
-export const ListPage: React.FC = () => {
+const ListPage: React.FC = () => {
   const { classes } = useStyles()
   return (
     <Grid container className={classes.container}>
@@ -10,3 +10,5 @@ export const ListPage: React.FC = () => {
     </Grid>
   )
 }
+
+export default ListPage

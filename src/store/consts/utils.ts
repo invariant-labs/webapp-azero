@@ -128,3 +128,50 @@ export const calcYPerXPrice = (sqrtPrice: string, xDecimal: number, yDecimal: nu
 
   return proportion / 10 ** (yDecimal - xDecimal)
 }
+
+export const trimLeadingZeros = (amount: string): string => {
+  const amountParts = amount.split('.')
+
+  if (!amountParts.length) {
+    return '0'
+  }
+
+  if (amountParts.length === 1) {
+    return amountParts[0]
+  }
+
+  const reversedDec = Array.from(amountParts[1]).reverse()
+  const firstNonZero = reversedDec.findIndex(char => char !== '0')
+
+  if (firstNonZero === -1) {
+    return amountParts[0]
+  }
+
+  const trimmed = reversedDec.slice(firstNonZero, reversedDec.length).reverse().join('')
+
+  return `${amountParts[0]}.${trimmed}`
+}
+
+export const getScaleFromString = (value: string): number => {
+  const parts = value.split('.')
+
+  if ((parts?.length ?? 0) < 2) {
+    return 0
+  }
+
+  return parts[1]?.length ?? 0
+}
+
+export const toMaxNumericPlaces = (num: number, places: number): string => {
+  const log = Math.floor(Math.log10(num))
+
+  if (log >= places) {
+    return num.toFixed(0)
+  }
+
+  if (log >= 0) {
+    return num.toFixed(places - log - 1)
+  }
+
+  return num.toFixed(places + Math.abs(log) - 1)
+}
