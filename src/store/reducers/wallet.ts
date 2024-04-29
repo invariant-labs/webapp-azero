@@ -3,6 +3,7 @@ import { PayloadType } from '@store/consts/types'
 import { BN } from '@polkadot/util'
 import { AddressOrPair } from '@polkadot/api-base/types'
 import { Keyring } from '@polkadot/keyring'
+
 export enum Status {
   Uninitialized = 'uninitialized',
   Init = 'init',
@@ -74,6 +75,13 @@ const walletSlice = createSlice({
     },
     setIsBalanceLoading(state, action: PayloadAction<boolean>) {
       action.payload ? (state.balanceLoading = true) : (state.balanceLoading = false)
+      return state
+    },
+    initTestTransaction(
+      state,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      _action: PayloadAction<{ receiverAddress: AddressOrPair; amount: number }>
+    ) {
       return state
     },
     // addTokenAccount(state, action: PayloadAction<ITokenAccount>) {

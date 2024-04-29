@@ -2,7 +2,6 @@ import Header from '@components/Header'
 import { AlephZeroNetworks, NetworkType } from '@store/consts/static'
 import React, { useEffect, useMemo } from 'react'
 import { useLocation } from 'react-router-dom'
-import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { actions } from '@store/reducers/connection'
 import { Status, actions as walletActions } from '@store/reducers/wallet'
 import { useDispatch, useSelector } from 'react-redux'
@@ -10,12 +9,6 @@ import { status, address } from '@store/selectors/wallet'
 import { network, rpcAddress } from '@store/selectors/connection'
 import { openWalletSelectorModal } from '@utils/web3/selector'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
-export interface IPriorityFeeOptions {
-  label: string
-  value: number
-  saveValue: number
-  description: string
-}
 
 export const HeaderWrapper: React.FC = () => {
   const dispatch = useDispatch()
@@ -58,12 +51,6 @@ export const HeaderWrapper: React.FC = () => {
     return lastRPC === null ? AlephZeroNetworks.TEST : lastRPC
   }, [])
 
-  const recentPriorityFee = useMemo(() => {
-    const lastFee = localStorage.getItem('INVARIANT_MAINNET_PRIORITY_FEE')
-
-    return lastFee === null ? '' : lastFee
-  }, [])
-
   return (
     <Header
       address={walletAddress}
@@ -89,16 +76,6 @@ export const HeaderWrapper: React.FC = () => {
       typeOfNetwork={currentNetwork}
       rpc={currentRpc}
       defaultTestnetRPC={defaultTestnetRPC}
-      recentPriorityFee={recentPriorityFee}
-      onPrioritySave={() => {
-        dispatch(
-          snackbarsActions.add({
-            message: 'Priority fee updated',
-            variant: 'success',
-            persist: false
-          })
-        )
-      }}
     />
   )
 }

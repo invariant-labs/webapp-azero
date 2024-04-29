@@ -21,7 +21,7 @@ const getAlephZeroConnection = async (url: string) => {
 //       return Network.DEV
 //     case NetworkType.LOCALNET:
 //       return Network.LOCAL
-//     // case SolanaNetworks.TEST:
+//     // case AlephZeroNetworks.TEST:
 //     //   return StakerNetwork.TEST
 //     case NetworkType.MAINNET:
 //       return Network.MAIN
@@ -36,7 +36,7 @@ const getAlephZeroConnection = async (url: string) => {
 //       return StakerNetwork.DEV
 //     case NetworkType.LOCALNET:
 //       return StakerNetwork.LOCAL
-//     // case SolanaNetworks.TEST:
+//     // case AlephZeroNetworks.TEST:
 //     //   return StakerNetwork.TEST
 //     case NetworkType.MAINNET:
 //       return StakerNetwork.MAIN
@@ -51,7 +51,7 @@ const getAlephZeroConnection = async (url: string) => {
 //       return BondsNetwork.DEV
 //     case NetworkType.LOCALNET:
 //       return BondsNetwork.LOCAL
-//     // case SolanaNetworks.TEST:
+//     // case AlephZeroNetworks.TEST:
 //     //   return StakerNetwork.TEST
 //     // case NetworkType.MAINNET:
 //     //   return BondsNetwork.MAIN
@@ -66,7 +66,7 @@ const getCurrentAlephZeroConnection = (): ApiPromise | undefined => {
 
 export {
   getAlephZeroConnection,
-  //   SolanaNetworks,
+  //   AlephZeroNetworks,
   getCurrentAlephZeroConnection
   //   networkTypetoStakerNetwork,
   //   networkTypetoProgramNetwork,

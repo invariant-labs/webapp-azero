@@ -8,19 +8,19 @@ export enum Status {
   Error = 'error',
   Initialized = 'initalized'
 }
-export interface ISolanaConnectionStore {
+export interface IAlephZeroConnectionStore {
   status: Status
   message: string
   network: NetworkType
-  slot: number
+  blockNumber: number
   rpcAddress: string
 }
 
-export const defaultState: ISolanaConnectionStore = {
+export const defaultState: IAlephZeroConnectionStore = {
   status: Status.Uninitialized,
   message: '',
   network: NetworkType.TESTNET,
-  slot: 0,
+  blockNumber: 0,
   rpcAddress: AlephZeroNetworks.TEST
 }
 export const connectionSliceName = 'connection'
@@ -56,7 +56,7 @@ const connectionSlice = createSlice({
       return state
     },
     setSlot(state, action: PayloadAction<number>) {
-      state.slot = action.payload
+      state.blockNumber = action.payload
       return state
     }
   }

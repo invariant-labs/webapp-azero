@@ -2,7 +2,7 @@ import { IAlephZeroWallet, ITokenAccount, walletSliceName } from '@store/reducer
 import { keySelectors, AnyProps } from './helpers'
 import { BN } from '@polkadot/util'
 import { createSelector } from '@reduxjs/toolkit'
-import { Keyring } from '@polkadot/keyring'
+import { AddressOrPair } from '@polkadot/api/types'
 const store = (s: AnyProps) => s[walletSliceName] as IAlephZeroWallet
 
 export const { address, balance, accounts, status, balanceLoading } = keySelectors(store, [
@@ -27,7 +27,8 @@ export const { address, balance, accounts, status, balanceLoading } = keySelecto
 //       }
 //     }
 //   })
-export const tokenAccount = (tokenAddress: Keyring) =>
+
+export const tokenAccount = (tokenAddress: AddressOrPair) =>
   createSelector(accounts, tokensAccounts => {
     if (tokensAccounts[tokenAddress.toString()]) {
       return tokensAccounts[tokenAddress.toString()]
@@ -45,7 +46,7 @@ export interface SwapToken {
   balance: string
   decimals: number
   symbol: string
-  assetAddress: Keyring
+  assetAddress: AddressOrPair
   name: string
   logoURI: string
   isUnknown?: boolean
@@ -104,7 +105,7 @@ export type TokenAccounts = ITokenAccount & {
   assetDecimals: number
 }
 
-export const solanaWalletSelectors = {
+export const alephZeroWalletSelectors = {
   address,
   balance,
   accounts,
@@ -112,4 +113,4 @@ export const solanaWalletSelectors = {
   tokenAccount,
   balanceLoading
 }
-export default solanaWalletSelectors
+export default alephZeroWalletSelectors

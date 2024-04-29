@@ -13,9 +13,12 @@ import { getConnection } from './connection'
 import { getAlephZeroWallet, disconnectWallet } from '@utils/web3/wallet'
 import { NightlyConnectAdapter } from '@nightlylabs/wallet-selector-polkadot'
 import { AddressOrPair, SubmittableExtrinsic } from '@polkadot/api/types'
-import { status } from '@store/selectors/wallet'
+import { address, status } from '@store/selectors/wallet'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { SignerOptions } from '@polkadot/api/types/submittable'
+import { createLoaderKey } from '@store/consts/utils'
+import { closeSnackbar } from 'notistack'
+import { PayloadAction } from '@reduxjs/toolkit'
 
 export function* getWallet(): SagaGenerator<NightlyConnectAdapter> {
   const wallet = yield* call(getAlephZeroWallet)
@@ -212,6 +215,58 @@ export function* handleBalance(): Generator {
 //   return balance
 // }
 
+export function* testTransaction(
+  action: PayloadAction<{ receiverAddress: AddressOrPair; amount: number }>
+): Generator {
+  const loaderKey = createLoaderKey()
+
+  try {
+    const { amount, receiverAddress } = action.payload
+    const walletAddress = yield* select(address)
+
+    if (!walletAddress) {
+      yield put(
+        snackbarsActions.add({
+          message: 'Please connect your wallet first.',
+          variant: 'error',
+          persist: false
+        })
+      )
+      return
+    }
+    yield put(
+      snackbarsActions.add({
+        message: 'Processing transaction...',
+        variant: 'pending',
+        persist: true,
+        key: loaderKey
+      })
+    )
+
+    const walletAdapter = yield* call(getWallet)
+    const connection = yield* call(getConnection)
+
+    const tx = connection.tx.balances.transferAllowDeath(receiverAddress, amount)
+    const signedTx = yield* call(signAndSend, walletAdapter, tx, walletAddress)
+
+    closeSnackbar(loaderKey)
+    yield put(snackbarsActions.remove(loaderKey))
+
+    yield put(
+      snackbarsActions.add({
+        message: 'Successful send transaction',
+        variant: 'success',
+        persist: false,
+        txid: signedTx
+      })
+    )
+  } catch (error) {
+    console.log(error)
+    closeSnackbar(loaderKey)
+    yield put(snackbarsActions.remove(loaderKey))
+  }
+}
+
 export function* signAndSend(
   walletAdapter: NightlyConnectAdapter,
   tx: SubmittableExtrinsic<'promise', any>,
@@ -302,7 +357,9 @@ export function* initSaga(): Generator {
 // export function* handleBalanceSaga(): Generator {
 //   yield takeLeading(actions.getBalance, handleBalance)
 // }
-
+export function* handleTestTransaction(): Generator {
+  yield takeLeading(actions.initTestTransaction, testTransaction)
+}
 export function* walletSaga(): Generator {
-  yield all([initSaga, connectHandler, disconnectHandler].map(spawn))
+  yield all([initSaga, connectHandler, disconnectHandler, handleTestTransaction].map(spawn))
 }

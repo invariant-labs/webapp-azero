@@ -29,7 +29,7 @@ export function* initConnection(): Generator {
     yield* put(actions.setStatus(Status.Error))
     yield put(
       snackbarsActions.add({
-        message: 'Failed to connect to Solana network',
+        message: 'Failed to connect to Aleph-Zero network',
         variant: 'error',
         persist: false
       })
