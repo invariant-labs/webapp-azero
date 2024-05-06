@@ -2,11 +2,12 @@ import { Typography } from '@mui/material'
 import React from 'react'
 import { useLabelStyles } from './style'
 import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined'
+import { VariantType } from 'notistack'
 
 export interface IProps {
   displayLength: number
   marketId: string
-  copyPoolAddressHandler: (message: string, variant: string) => void
+  copyPoolAddressHandler: (message: string, variant: VariantType) => void
   style?: React.CSSProperties
 }
 

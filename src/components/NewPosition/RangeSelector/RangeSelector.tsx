@@ -11,7 +11,6 @@ export interface IRangeSelector {
   data: any[]
   // midPrice: TickPlotPositionData
   midPrice: any
-  globalPrice?: number
   tokenASymbol: string
   tokenBSymbol: string
   onChangeRange: (leftIndex: number, rightIndex: number) => void
@@ -50,7 +49,6 @@ export interface IRangeSelector {
 export const RangeSelector: React.FC<IRangeSelector> = ({
   data,
   midPrice,
-  globalPrice,
   tokenASymbol,
   tokenBSymbol,
   onChangeRange,
@@ -190,7 +188,6 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
           </Tooltip>
           <Grid>
             <Typography className={classes.currentPrice}>Current price</Typography>
-            <Typography className={classes.globalPrice}>Global price</Typography>
           </Grid>
         </Grid>
       </Grid>
@@ -216,7 +213,6 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
             x: 12
           }}
           midPrice={midPrice}
-          globalPrice={globalPrice}
           plotMin={plotMin}
           plotMax={plotMax}
           zoomMinus={zoomMinus}

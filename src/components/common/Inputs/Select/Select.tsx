@@ -5,21 +5,22 @@ import useStyles from './style'
 import { blurContent, unblurContent } from '@utils/uiUtils'
 import { Button } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import { SwapToken } from '@store/selectors/wallet'
+import SelectTokenModal from '@components/Modals/SelectModals/SelectTokenModal/SelectTokenModal'
+import { AddressOrPair } from '@polkadot/api/types'
 
 export interface ISelectModal {
   name?: string
   centered?: boolean
-  // current: SwapToken | null
+  current: SwapToken | null
   // tokens: SwapToken[]
-  current: null
   tokens: any[]
   onSelect: (index: number) => void
   className?: string
   hideBalancesInModal?: boolean
   handleAddToken: (address: string) => void
   sliceName?: boolean
-  // commonTokens: PublicKey[]
-  commonTokens: any[]
+  commonTokens: AddressOrPair[]
   initialHideUnknownTokensValue: boolean
   onHideUnknownTokensChange: (val: boolean) => void
 }
@@ -53,8 +54,8 @@ export const Select: React.FC<ISelectModal> = ({
     setOpen(false)
   }
 
-  // const displayName = !current ? name : current.symbol
-  const displayName = 'mockName'
+  const displayName = !current ? name : current.symbol
+
   return (
     <>
       <Button
@@ -62,10 +63,9 @@ export const Select: React.FC<ISelectModal> = ({
         color='primary'
         variant='contained'
         onClick={handleClick}
-        // startIcon={
-        //   !current ? null : <img className={classes.icon} src={current.logoURI ?? icons.SNY} />
-        // }
-        startIcon={!current ? null : <img className={classes.icon} src={icons.SNY} />}
+        startIcon={
+          !current ? null : <img className={classes.icon} src={current.logoURI ?? icons.SNY} />
+        }
         endIcon={<ExpandMoreIcon className={classes.endIcon} />}
         classes={{
           endIcon: 'selectArrow'
@@ -75,7 +75,7 @@ export const Select: React.FC<ISelectModal> = ({
           {sliceName && displayName.length > 10 ? displayName.slice(0, 8) + '...' : displayName}
         </span>
       </Button>
-      {/* <SelectTokenModal
+      <SelectTokenModal
         tokens={tokens}
         // commonTokens={tokens ? tokens.slice(0, 4)
         //   : [{ symbol: 'SOL', name: 'Solana', logoURI: 'solana' }]}
@@ -89,7 +89,7 @@ export const Select: React.FC<ISelectModal> = ({
         commonTokens={commonTokens}
         initialHideUnknownTokensValue={initialHideUnknownTokensValue}
         onHideUnknownTokensChange={onHideUnknownTokensChange}
-      /> */}
+      />
     </>
   )
 }

@@ -10,12 +10,14 @@ import RangeSelector from './RangeSelector/RangeSelector'
 import useStyles from './style'
 import { Button, Grid, Typography } from '@mui/material'
 import { SwapToken } from '@store/selectors/wallet'
-import { PlotTickData } from '@store/reducers/positions'
-import { PositionOpeningMethod, TokenPriceData } from '@store/consts/static'
+import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
+import { BestTier, PositionOpeningMethod, TokenPriceData } from '@store/consts/static'
 import { NoConnected } from '@components/NoConnected/NoConnected'
 import Slippage from '@components/Modals/Slippage/Slippage'
 import { blurContent, unblurContent } from '@utils/uiUtils'
 import { addressToTicker } from '@store/consts/uiUtiils'
+import { VariantType } from 'notistack'
+import { Percentage, TokenAmount } from '@invariant-labs/a0-sdk/src'
 
 export interface INewPosition {
   initialTokenFrom: string
@@ -23,20 +25,18 @@ export interface INewPosition {
   initialFee: string
   poolAddress: string
   calculatePoolAddress: () => Promise<string>
-  copyPoolAddressHandler: (message: string, variant: string) => void
+  copyPoolAddressHandler: (message: string, variant: VariantType) => void
   tokens: SwapToken[]
   data: PlotTickData[]
-  // midPrice: TickPlotPositionData
-  // setMidPrice: (mid: TickPlotPositionData) => void
-  midPrice: any
-  setMidPrice: (mid: any) => void
-  // addLiquidityHandler: (
-  //   leftTickIndex: number,
-  //   rightTickIndex: number,
-  //   xAmount: number,
-  //   yAmount: number,
-  //   slippage: Decimal
-  // ) => void
+  midPrice: TickPlotPositionData
+  setMidPrice: (mid: TickPlotPositionData) => void
+  addLiquidityHandler: (
+    leftTickIndex: number,
+    rightTickIndex: number,
+    xAmount: number,
+    yAmount: number,
+    slippage: Percentage
+  ) => void
   onChangePositionTokens: (
     tokenAIndex: number | null,
     tokenBindex: number | null,
@@ -64,12 +64,10 @@ export interface INewPosition {
   isWaitingForNewPool: boolean
   poolIndex: number | null
   currentPairReversed: boolean | null
-  // bestTiers: BestTier[]
-  bestTiers: any[]
+  bestTiers: BestTier[]
   initialIsDiscreteValue: boolean
   onDiscreteChange: (val: boolean) => void
-  // currentPriceSqrt: BN
-  currentPriceSqrt: string
+  currentPriceSqrt: TokenAmount
   canCreateNewPool: boolean
   canCreateNewPosition: boolean
   handleAddToken: (address: string) => void
@@ -92,7 +90,6 @@ export interface INewPosition {
   currentFeeIndex: number
   onSlippageChange: (slippage: string) => void
   initialSlippage: string
-  globalPrice?: number
 }
 
 export const NewPosition: React.FC<INewPosition> = ({
@@ -138,8 +135,7 @@ export const NewPosition: React.FC<INewPosition> = ({
   plotVolumeRange,
   currentFeeIndex,
   onSlippageChange,
-  initialSlippage,
-  globalPrice
+  initialSlippage
 }) => {
   // TODO delete mock data below
   const getMinTick = (a: number) => 145
@@ -323,16 +319,16 @@ export const NewPosition: React.FC<INewPosition> = ({
   const onChangeMidPrice = (mid: number) => {
     console.log(mid)
   }
-  const bestTierIndex =
-    tokenAIndex === null || tokenBIndex === null
-      ? undefined
-      : bestTiers.find(
-          tier =>
-            (tier.tokenX.equals(tokens[tokenAIndex].assetAddress) &&
-              tier.tokenY.equals(tokens[tokenBIndex].assetAddress)) ||
-            (tier.tokenX.equals(tokens[tokenBIndex].assetAddress) &&
-              tier.tokenY.equals(tokens[tokenAIndex].assetAddress))
-        )?.bestTierIndex ?? undefined
+  // const bestTierIndex =
+  //   tokenAIndex === null || tokenBIndex === null
+  //     ? undefined
+  //     : bestTiers.find(
+  //         tier =>
+  //           (tier.tokenX.equals(tokens[tokenAIndex].assetAddress) &&
+  //             tier.tokenY.equals(tokens[tokenBIndex].assetAddress)) ||
+  //           (tier.tokenX.equals(tokens[tokenBIndex].assetAddress) &&
+  //             tier.tokenY.equals(tokens[tokenAIndex].assetAddress))
+  //       )?.bestTierIndex ?? undefined
 
   // const getMinSliderIndex = () => {
   //   let minimumSliderIndex = 0
@@ -518,7 +514,7 @@ export const NewPosition: React.FC<INewPosition> = ({
             updatePath(tokenBIndex, tokenAIndex, currentFeeIndex)
           }}
           poolIndex={poolIndex}
-          bestTierIndex={bestTierIndex}
+          bestTierIndex={1} // TODO add real data
           canCreateNewPool={canCreateNewPool}
           canCreateNewPosition={canCreateNewPosition}
           handleAddToken={handleAddToken}
@@ -561,7 +557,6 @@ export const NewPosition: React.FC<INewPosition> = ({
               : {
                   data,
                   midPrice,
-                  globalPrice,
                   tokenASymbol: tokens[tokenAIndex].symbol,
                   tokenBSymbol: tokens[tokenBIndex].symbol
                 })}
@@ -595,7 +590,6 @@ export const NewPosition: React.FC<INewPosition> = ({
             midPrice={midPrice.index}
             onChangeMidPrice={onChangeMidPrice}
             currentPairReversed={currentPairReversed}
-            globalPrice={globalPrice}
           />
         )}
       </Grid>

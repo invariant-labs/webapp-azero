@@ -6,7 +6,7 @@ import { useStyles } from './style'
 import AnimatedButton, { ProgressState } from '@components/common/AnimatedButton'
 import { PositionOpeningMethod } from '@store/consts/static'
 import { Grid, Typography } from '@mui/material'
-import { getScaleFromString } from '@store/consts/utils'
+import { getScaleFromString, printBN } from '@store/consts/utils'
 import DepositAmountInput from '@components/common/Inputs/DepositAmountInput/DepositAmountInput'
 import Select from '@components/common/Inputs/Select/Select'
 
@@ -253,7 +253,11 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
           currencyIconSrc={tokenAIndex !== null ? tokens[tokenAIndex].logoURI : undefined}
           placeholder='0.0'
           onMaxClick={() => {}}
-          balanceValue={''}
+          balanceValue={
+            tokenAIndex !== null
+              ? printBN(tokens[tokenAIndex].balance, tokens[tokenAIndex].decimals)
+              : ''
+          }
           style={{
             marginBottom: 10
           }}
@@ -276,7 +280,11 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
           currencyIconSrc={tokenBIndex !== null ? tokens[tokenBIndex].logoURI : undefined}
           placeholder='0.0'
           onMaxClick={() => {}}
-          balanceValue={'123'}
+          balanceValue={
+            tokenBIndex !== null
+              ? printBN(tokens[tokenBIndex].balance, tokens[tokenBIndex].decimals)
+              : ''
+          }
           onBlur={() => {
             if (
               tokenAIndex !== null &&

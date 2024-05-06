@@ -15,7 +15,6 @@ export interface IPoolInit {
   midPrice: number
   onChangeMidPrice: (mid: number) => void
   currentPairReversed: boolean | null
-  globalPrice?: number
 }
 
 export const PoolInit: React.FC<IPoolInit> = ({
@@ -28,8 +27,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
   tickSpacing,
   midPrice,
   onChangeMidPrice,
-  currentPairReversed,
-  globalPrice
+  currentPairReversed
 }) => {
   const { classes } = useStyles()
 
@@ -144,7 +142,6 @@ export const PoolInit: React.FC<IPoolInit> = ({
             decimal={isXtoY ? xDecimal : yDecimal}
             className={classes.midPrice}
             placeholder='0.0'
-            globalPrice={globalPrice}
             onBlur={e => {
               setMidPriceInput(validateMidPriceInput(e.target.value))
             }}

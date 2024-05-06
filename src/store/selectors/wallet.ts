@@ -3,6 +3,10 @@ import { keySelectors, AnyProps } from './helpers'
 import { BN } from '@polkadot/util'
 import { createSelector } from '@reduxjs/toolkit'
 import { AddressOrPair } from '@polkadot/api/types'
+import { tokens } from './pools'
+import { TESTNET_WAZERO_ADDRESS, TokenAmount } from '@invariant-labs/a0-sdk/src'
+import { NetworkType } from '@store/consts/static'
+
 const store = (s: AnyProps) => s[walletSliceName] as IAlephZeroWallet
 
 export const { address, balance, accounts, status, balanceLoading } = keySelectors(store, [
@@ -43,7 +47,7 @@ export const tokenAccountsAddress = () =>
   })
 
 export interface SwapToken {
-  balance: string
+  balance: TokenAmount
   decimals: number
   symbol: string
   assetAddress: AddressOrPair
@@ -53,51 +57,72 @@ export interface SwapToken {
   coingeckoId?: string
 }
 
-// export const swapTokens = createSelector(
-//   accounts,
-//   tokens,
-//   balance,
-//   (allAccounts, tokens, solBalance) => {
-//     return Object.values(tokens).map(token => ({
-//       ...token,
-//       assetAddress: token.address,
-//       balance:
-//         token.address.toString() === WRAPPED_SOL_ADDRESS
-//           ? solBalance
-//           : allAccounts[token.address.toString()]?.balance ?? new BN(0)
-//     }))
-//   }
-// )
+export const swapTokens = createSelector(
+  accounts,
+  tokens,
+  balance,
+  (allAccounts, tokens, a0Balance) => {
+    return Object.values(tokens).map(token => ({
+      ...token,
+      assetAddress: token.address,
+      balance:
+        token.address.toString() === TESTNET_WAZERO_ADDRESS
+          ? a0Balance
+          : allAccounts[token.address.toString()]?.balance ?? BigInt(0)
+    }))
+  }
+)
 
-// export const swapTokensDict = createSelector(
-//   accounts,
-//   tokens,
-//   balance,
-//   (allAccounts, tokens, solBalance) => {
-//     const swapTokens: Record<string, SwapToken> = {}
+export const swapTokensDict = createSelector(
+  accounts,
+  tokens,
+  balance,
+  (allAccounts, tokens, a0Balance) => {
+    const swapTokens: Record<string, SwapToken> = {}
+    //Check if this is correct
+    Object.entries(tokens).forEach(([key, val]) => {
+      swapTokens[key] = {
+        ...val,
+        assetAddress: val.address,
+        balance:
+          val.address.toString() === TESTNET_WAZERO_ADDRESS
+            ? BigInt(a0Balance)
+            : allAccounts[val.address.toString()]?.balance ?? BigInt(0)
+      }
+    })
 
-//     Object.entries(tokens).forEach(([key, val]) => {
-//       swapTokens[key] = {
-//         ...val,
-//         assetAddress: val.address,
-//         balance:
-//           val.address.toString() === WRAPPED_SOL_ADDRESS
-//             ? solBalance
-//             : allAccounts[val.address.toString()]?.balance ?? new BN(0)
-//       }
-//     })
+    return swapTokens
+  }
+)
 
-//     return swapTokens
-//   }
-// )
-
-// export const canCreateNewPool = createSelector(balance, solBalance =>
-//   solBalance.gte(WSOL_POOL_INIT_LAMPORTS)
-// )
-
-// export const canCreateNewPosition = createSelector(balance, solBalance =>
-//   solBalance.gte(WSOL_POSITION_INIT_LAMPORTS)
-// )
+export const canCreateNewPool = (network: NetworkType) =>
+  createSelector(balance, ethBalance => {
+    // switch (network) {
+    //   case NetworkType.DEVNET:
+    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS)
+    //   case NetworkType.TESTNET:
+    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS_TEST)
+    //   case NetworkType.MAINNET:
+    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS)
+    //   default:
+    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS)
+    // }
+    return true
+  })
+export const canCreateNewPosition = (network: NetworkType) =>
+  createSelector(balance, ethBalance => {
+    // switch (network) {
+    //   case NetworkType.DEVNET:
+    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS)
+    //   case NetworkType.TESTNET:
+    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS_TEST)
+    //   case NetworkType.MAINNET:
+    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS)
+    //   default:
+    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS)
+    // }
+    return true
+  })
 
 export type TokenAccounts = ITokenAccount & {
   symbol: string

@@ -4,7 +4,7 @@ import { makeStyles } from 'tss-react/mui'
 export const useStyles = makeStyles()(() => {
   return {
     root: {
-      background: 'transparent',
+      background: 'none',
       '& > *': {
         backgroundColor: 'transparent'
       }

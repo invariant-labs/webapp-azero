@@ -212,13 +212,6 @@ const useStyles = makeStyles()(theme => {
       color: colors.invariant.yellow,
       ...typography.caption2,
       textAlign: 'right'
-    },
-    globalPrice: {
-      display: 'inline-block',
-      color: colors.invariant.blue,
-      ...typography.caption2,
-      textAlign: 'right',
-      marginLeft: 4
     }
   }
 })

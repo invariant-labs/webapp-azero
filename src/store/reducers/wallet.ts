@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/consts/types'
-import { BN } from '@polkadot/util'
 import { AddressOrPair } from '@polkadot/api-base/types'
 import { Keyring } from '@polkadot/keyring'
+import { TokenAmount } from '@invariant-labs/a0-sdk/src'
 
 export enum Status {
   Uninitialized = 'uninitialized',
@@ -13,7 +13,7 @@ export enum Status {
 
 export interface ITokenAccount {
   programId: Keyring
-  balance: BN
+  balance: TokenAmount
   address: AddressOrPair
   decimals: number
 }
@@ -35,7 +35,7 @@ export interface ITokenAccount {
 export interface IAlephZeroWallet {
   status: Status
   address: string
-  balance: string
+  balance: TokenAmount
   accounts: { [key in string]: ITokenAccount }
   balanceLoading: boolean
 }
@@ -43,7 +43,7 @@ export interface IAlephZeroWallet {
 export const defaultState: IAlephZeroWallet = {
   status: Status.Uninitialized,
   address: '',
-  balance: '',
+  balance: BigInt(0),
   accounts: {},
   balanceLoading: false
 }
@@ -66,7 +66,7 @@ const walletSlice = createSlice({
       state.status = action.payload
       return state
     },
-    setBalance(state, action: PayloadAction<string>) {
+    setBalance(state, action: PayloadAction<TokenAmount>) {
       state.balance = action.payload
       return state
     },

@@ -1,4 +1,15 @@
-import { NetworkType } from './static'
+import { PlotTickData } from '@store/reducers/positions'
+import { NetworkType, TokenPriceData, tokensPrices } from './static'
+import axios from 'axios'
+import {
+  TokenAmount,
+  calculatePriceImpact,
+  calculateSqrtPriceAfterSlippage,
+  getMaxTick,
+  getMinTick,
+  priceToSqrtPrice,
+  sqrtPriceToPrice
+} from '@invariant-labs/a0-sdk/src'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -174,4 +185,104 @@ export const toMaxNumericPlaces = (num: number, places: number): string => {
   }
 
   return num.toFixed(places + Math.abs(log) - 1)
+}
+
+export const calcPrice = (index: bigint, isXtoY: boolean, xDecimal: number, yDecimal: number) => {
+  //Check if this is correct
+  const price = calcYPerXPrice(priceToSqrtPrice(index).toString(), xDecimal, yDecimal)
+
+  return isXtoY ? price : price !== 0 ? 1 / price : Number.MAX_SAFE_INTEGER
+}
+
+export const createPlaceholderLiquidityPlot = (
+  isXtoY: boolean,
+  yValueToFill: number,
+  tickSpacing: number,
+  tokenXDecimal: number,
+  tokenYDecimal: number
+) => {
+  const ticksData: PlotTickData[] = []
+
+  const min = getMinTick(tickSpacing)
+  const max = getMaxTick(tickSpacing)
+
+  const minPrice = calcPrice(min, isXtoY, tokenXDecimal, tokenYDecimal)
+
+  ticksData.push({
+    x: minPrice,
+    y: yValueToFill,
+    index: Number(min)
+  })
+
+  const maxPrice = calcPrice(max, isXtoY, tokenXDecimal, tokenYDecimal)
+
+  ticksData.push({
+    x: maxPrice,
+    y: yValueToFill,
+    index: Number(max)
+  })
+
+  return isXtoY ? ticksData : ticksData.reverse()
+}
+
+export interface CoingeckoPriceData {
+  price: number
+  priceChange: number
+}
+export interface CoingeckoApiPriceData {
+  id: string
+  current_price: number
+  price_change_percentage_24h: number
+}
+
+export const getCoingeckoTokenPrice = async (id: string): Promise<CoingeckoPriceData> => {
+  return await axios
+    .get<
+      CoingeckoApiPriceData[]
+    >(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${id}`)
+    .then(res => {
+      return {
+        price: res.data[0].current_price ?? 0,
+        priceChange: res.data[0].price_change_percentage_24h ?? 0
+      }
+    })
+}
+
+export const getMockedTokenPrice = (symbol: string, network: NetworkType): TokenPriceData => {
+  const sufix = network === NetworkType.DEVNET ? '_DEV' : '_TEST'
+  const prices = tokensPrices[network]
+  switch (symbol) {
+    case 'BTC':
+      return prices[symbol + sufix]
+    case 'ETH':
+      return prices['W' + symbol + sufix]
+    case 'USDC':
+      return prices[symbol + sufix]
+    default:
+      return { price: 0 }
+  }
+}
+
+export const printBN = (amount: TokenAmount, decimals: number): string => {
+  const amountString = amount.toString()
+  const isNegative = amountString.length > 0 && amountString[0] === '-'
+
+  const balanceString = isNegative ? amountString.slice(1) : amountString
+
+  if (balanceString.length <= decimals) {
+    return (
+      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+      (isNegative ? '-' : '') + '0.' + '0'.repeat(decimals - balanceString.length) + balanceString
+    )
+  } else {
+    return (
+      (isNegative ? '-' : '') +
+      trimZeros(
+        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+        balanceString.substring(0, balanceString.length - decimals) +
+          '.' +
+          balanceString.substring(balanceString.length - decimals)
+      )
+    )
+  }
 }
