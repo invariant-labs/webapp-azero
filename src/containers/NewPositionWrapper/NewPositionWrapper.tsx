@@ -471,8 +471,8 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       initialTokenFrom={initialTokenFrom}
       initialTokenTo={initialTokenTo}
       initialFee={initialFee}
-      poolAddress='0x1234567890ABCDEF' // TODO - add real data
-      calculatePoolAddress={async () => '0x0987654321FEDCBA'} // TODO - add real data
+      poolAddress='' // TODO - add real data
+      calculatePoolAddress={async () => ''} // TODO - add real data
       copyPoolAddressHandler={copyPoolAddressHandler}
       tokens={tokens}
       data={data}
