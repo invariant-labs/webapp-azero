@@ -5,6 +5,7 @@ export const useStyles = makeStyles()(() => {
   return {
     root: {
       background: 'none',
+      backgroundColor: 'transparent',
       '& > *': {
         backgroundColor: 'transparent'
       }

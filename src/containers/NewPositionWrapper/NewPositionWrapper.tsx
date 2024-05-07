@@ -1,5 +1,5 @@
 import NewPosition from '@components/NewPosition/NewPosition'
-import { ProgressState } from '@components/common/AnimatedButton'
+import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import {
   calcPrice,
   calcYPerXPrice,

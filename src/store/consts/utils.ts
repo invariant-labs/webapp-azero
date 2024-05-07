@@ -286,3 +286,8 @@ export const printBN = (amount: TokenAmount, decimals: number): string => {
     )
   }
 }
+
+export const parseFeeToPathFee = (fee: bigint): string => {
+  const parsedFee = (fee / BigInt(Math.pow(10, 8))).toString().padStart(3, '0')
+  return parsedFee.slice(0, parsedFee.length - 2) + '_' + parsedFee.slice(parsedFee.length - 2)
+}

@@ -1,10 +1,17 @@
 import { PositionsList } from './PositionsList'
-
+import { MemoryRouter } from 'react-router-dom'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta = {
   title: 'PositionsList',
-  component: PositionsList
+  component: PositionsList,
+  decorators: [
+    Story => (
+      <MemoryRouter>
+        <Story />
+      </MemoryRouter>
+    )
+  ]
 } satisfies Meta<typeof PositionsList>
 
 export default meta

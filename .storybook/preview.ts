@@ -8,6 +8,7 @@ import { ThemeProvider, CssBaseline } from '@mui/material'
 import { withThemeFromJSXProvider } from '@storybook/addon-themes'
 import { theme } from '../src/static/theme'
 import { createBrowserRouter } from 'react-router-dom'
+import { withStore } from './decorators'
 
 const customViewports = {
   sx375: {
@@ -49,6 +50,9 @@ const customViewports = {
 
 const preview: Preview = {
   parameters: {
+    themes: {
+      themeOverride: 'dark'
+    },
     controls: {
       matchers: {
         color: /(background|color)$/i,
@@ -74,20 +78,20 @@ const preview: Preview = {
         }
       ]
     },
-    createBrowserRouter: { withRouter }
+    createBrowserRouter: { withRouter },
+    actions: { argTypesRegex: '^on.*' }
   },
 
   decorators: [
     withThemeFromJSXProvider({
-      GlobalStyles: CssBaseline,
-      Provider: ThemeProvider,
       themes: {
         dark: theme
       },
-
-      defaultTheme: 'dark'
-    }),
-    withRouter
+      defaultTheme: 'dark',
+      Provider: ThemeProvider,
+      GlobalStyles: CssBaseline
+    })
+    // withRouter
   ]
 }
 

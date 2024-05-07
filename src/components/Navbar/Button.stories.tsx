@@ -15,5 +15,3 @@ export const Primary: Story = {
     name: 'Test Button'
   }
 }
-
-// More on interaction testing: https://storybook.js.org/docs/writing-tests/interaction-testing
