@@ -1,10 +1,10 @@
 import { colors, typography } from '@static/theme'
 import { makeStyles } from 'tss-react/mui'
 
-const useStyles = makeStyles()(() => {
+export const useStyles = makeStyles()(() => {
   return {
     root: {
-      background: 'transparent',
+      background: 'none',
       '& > *': {
         backgroundColor: 'transparent'
       }
@@ -22,31 +22,14 @@ const useStyles = makeStyles()(() => {
         paddingBottom: 10
       }
     },
-    header: {
-      fontWeight: 700,
-      fontSize: 20,
-      lineHeight: '24px',
-      letterSpacing: '-0.03px'
-    },
-    text: {
-      ...typography.body1,
-      color: colors.invariant.lightGrey,
-      fontWeight: 400,
-      fontSize: 14,
-      margin: '24px 0 0 0'
-    },
+
     label: {
-      color: `${colors.invariant.lightGrey} !important`,
-      marginBottom: 8,
-      fontWeight: 400
+      ...typography.body2,
+      color: colors.invariant.lightHover,
+      marginBottom: 8
     },
-    labelColor: {
-      color: `${colors.invariant.pink} !important`
-    },
-    labelWhite: {
-      color: 'white !important'
-    },
-    closeButton: {
+
+    selectTokenClose: {
       minWidth: 0,
       background: 'none',
       '&:hover': {
@@ -65,13 +48,13 @@ const useStyles = makeStyles()(() => {
     },
     detailsInfoForm: {
       border: `1px solid ${colors.invariant.component}`,
-      color: colors.invariant.text,
+      color: colors.invariant.light,
       borderRadius: 15,
       width: '100%',
       backgroundColor: colors.invariant.newDark,
       ...typography.heading4,
       fontWeight: 400,
-      padding: 14,
+      padding: 8,
       '&::placeholder': {
         color: colors.invariant.light
       },
@@ -80,25 +63,30 @@ const useStyles = makeStyles()(() => {
       }
     },
     innerInput: {
-      paddingBlock: 0,
-      fontSize: 16,
-      lineHeight: '20px',
-      letterSpacing: '-0.03px'
+      paddingBlock: 0
     },
-    saveButton: {
-      height: 32,
-      width: '100%',
-      fontSize: 14,
-      margin: '24px 0 0 0',
-      borderRadius: 8,
-      background: colors.invariant.greenLinearGradient
+    detailsInfoBtn: {
+      minWidth: 49,
+      backgroundColor: colors.invariant.green,
+      borderRadius: 9,
+      border: 'none',
+      padding: 0,
+      width: 49,
+      height: 28,
+      cursor: 'pointer',
+      ...typography.body2,
+      '&:hover': {
+        filter: 'brightness(1.15)',
+        transition: ' .4s filter',
+        boxShadow:
+          '0px 3px 1px -2px rgba(43, 193, 144, 0.2),0px 1px 2px 0px rgba(45, 168, 128, 0.14),0px 0px 5px 7px rgba(59, 183, 142, 0.12)'
+      }
     },
-    saveButtonNotSaved: {
-      background: colors.invariant.pinkLinearGradient
-    },
-    paper: {
-      background: 'transparent',
-      boxShadow: 'none'
+    info: {
+      ...typography.caption2,
+      color: colors.white.main,
+      marginTop: 10,
+      textAlign: 'justify'
     }
   }
 })

@@ -7,51 +7,51 @@ import {
   FaucetToken,
   NetworkType
 } from '@store/consts/static'
+import { actions } from '@store/reducers/connection'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import { getAdapter } from '@utils/web3'
-import React, { useMemo } from 'react'
-import { useDispatch } from 'react-redux'
+import { Status, actions as walletActions } from '@store/reducers/wallet'
+import { network, rpcAddress } from '@store/selectors/connection'
+import { address, status } from '@store/selectors/wallet'
+import { openWalletSelectorModal } from '@utils/web3/selector'
+import { getAlephZeroWallet } from '@utils/web3/wallet'
+import React, { useEffect, useMemo } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 
-export interface IPriorityFeeOptions {
-  label: string
-  value: number
-  saveValue: number
-  description: string
-}
-
 export const HeaderWrapper: React.FC = () => {
-  // const dispatch = useDispatch()
-  // const walletAddress = useSelector(address)
-  // const walletStatus = useSelector(status)
-  // const currentNetwork = useSelector(network)
-  // const currentRpc = useSelector(rpcAddress)
-  const location = useLocation()
-  const walletAddress = '0x1234567890'
-  const currentNetwork = NetworkType.TESTNET
-  const currentRpc = AlephZeroNetworks.TEST
   const dispatch = useDispatch()
+  const walletStatus = useSelector(status)
+  const currentNetwork = useSelector(network)
+  const currentRpc = useSelector(rpcAddress)
+  const location = useLocation()
+  const walletAddress = useSelector(address)
 
-  // useEffect(() => {
-  //   nightlyConnectAdapter.addListener('connect', () => {
-  //     dispatch(walletActions.connect())
-  //   })
+  useEffect(() => {
+    const fetchWallet = async () => {
+      const wallet = await getAlephZeroWallet()
+      wallet.addListener('connect', () => {
+        dispatch(walletActions.connect())
+      })
+      // if (wallet.connected) {
+      //   dispatch(walletActions.connect())
+      // }
 
-  //   if (nightlyConnectAdapter.connected) {
-  //     dispatch(walletActions.connect())
-  //   }
+      await wallet.canEagerConnect().then(
+        async canEagerConnect => {
+          if (canEagerConnect) {
+            // await wallet.connect()
 
-  //   nightlyConnectAdapter.canEagerConnect().then(
-  //     async canEagerConnect => {
-  //       if (canEagerConnect) {
-  //         await nightlyConnectAdapter.connect()
-  //       }
-  //     },
-  //     error => {
-  //       console.log(error)
-  //     }
-  //   )
-  // }, [])
+            dispatch(walletActions.connect())
+          }
+        },
+        error => {
+          console.log(error)
+        }
+      )
+    }
+
+    fetchWallet()
+  }, [])
 
   const defaultTestnetRPC = useMemo(() => {
     const lastRPC = localStorage.getItem('INVARIANT_TESTNET_RPC')
@@ -66,9 +66,9 @@ export const HeaderWrapper: React.FC = () => {
   }, [])
 
   const getAddress = async (): Promise<string | null> => {
-    const adapter = await getAdapter()
+    const wallet = await getAlephZeroWallet()
 
-    const accounts = await adapter.accounts.get()
+    const accounts = await wallet.accounts.get()
 
     if (accounts.length > 0) {
       return accounts[0].address
@@ -171,42 +171,28 @@ export const HeaderWrapper: React.FC = () => {
   return (
     <Header
       address={walletAddress}
-      onNetworkSelect={(network, rpcAddress) => {
+      onNetworkSelect={(network, rpcAddress, rpcName) => {
         if (network !== currentNetwork || rpcAddress !== currentRpc) {
           if (network === NetworkType.TESTNET) {
             localStorage.setItem('INVARIANT_TESTNET_RPC', rpcAddress)
           }
 
-          // dispatch(actions.setNetwork({ network, rpcAddress, rpcName }))
+          dispatch(actions.setNetwork({ network, rpcAddress, rpcName }))
         }
       }}
-      // onConnectWallet={openWalletSelectorModal}
-      onConnectWallet={() => {}}
+      onConnectWallet={openWalletSelectorModal}
       landing={location.pathname.substring(1)}
-      // walletConnected={walletStatus === Status.Initialized}
+      walletConnected={walletStatus === Status.Initialized}
       // onFaucet={() => {
       //   dispatch(walletActions.airdrop())
       // }}
-      // onDisconnectWallet={() => {
-      //   dispatch(walletActions.disconnect())
-      // }}
-      walletConnected={true}
+      onDisconnectWallet={() => {
+        dispatch(walletActions.disconnect())
+      }}
       onFaucet={onFaucet}
-      onDisconnectWallet={() => {}}
       typeOfNetwork={currentNetwork}
       rpc={currentRpc}
       defaultTestnetRPC={defaultTestnetRPC}
-      recentPriorityFee={recentPriorityFee}
-      // onPrioritySave={() => {
-      //   dispatch(
-      //     snackbarsActions.add({
-      //       message: 'Priority fee updated',
-      //       variant: 'success',
-      //       persist: false
-      //     })
-      //   )
-      // }}
-      onPrioritySave={() => {}}
     />
   )
 }

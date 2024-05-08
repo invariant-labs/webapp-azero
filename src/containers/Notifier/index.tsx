@@ -1,9 +1,6 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useSnackbar } from 'notistack'
-
-// import { network } from '@selectors/solanaConnection'
-
 import { snackbarsSelectors } from '@store/selectors/snackbars'
 import { actions } from '@store/reducers/snackbars'
 import useStyles from './style'
@@ -24,7 +21,6 @@ const Notifier = () => {
   const removeDisplayed = (id: string) => {
     displayed = [...displayed.filter(key => id !== key)]
   }
-  //   const currentNetwork: string = useSelector(network)
 
   React.useEffect(() => {
     notifications.forEach(({ key = '', message, open, variant, txid, persist = true }) => {
@@ -35,7 +31,7 @@ const Notifier = () => {
       }
       // do nothing if snackbar is already displayed
       if (key && displayed.includes(key)) return
-      // do nothing if snackbar is already displayed
+
       const action = () =>
         txid && (
           <div className={classes.detailsWrapper}>
