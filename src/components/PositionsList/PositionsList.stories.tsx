@@ -1,5 +1,5 @@
 import { PositionsList } from './PositionsList'
-import { MemoryRouter } from 'react-router-dom'
+import { BrowserRouter, MemoryRouter } from 'react-router-dom'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta = {
@@ -7,9 +7,9 @@ const meta = {
   component: PositionsList,
   decorators: [
     Story => (
-      <MemoryRouter>
+      <BrowserRouter>
         <Story />
-      </MemoryRouter>
+      </BrowserRouter>
     )
   ]
 } satisfies Meta<typeof PositionsList>

@@ -1,4 +1,3 @@
-import Header from '@components/Header'
 import { AlephZeroNetworks, NetworkType } from '@store/consts/static'
 import React, { useEffect, useMemo } from 'react'
 import { useLocation } from 'react-router-dom'
@@ -9,6 +8,7 @@ import { status, address } from '@store/selectors/wallet'
 import { network, rpcAddress } from '@store/selectors/connection'
 import { openWalletSelectorModal } from '@utils/web3/selector'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
+import Header from '@components/Header/Header'
 
 export const HeaderWrapper: React.FC = () => {
   const dispatch = useDispatch()

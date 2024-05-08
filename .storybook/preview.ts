@@ -78,8 +78,8 @@ const preview: Preview = {
         }
       ]
     },
-    createBrowserRouter: { withRouter },
-    actions: { argTypesRegex: '^on.*' }
+    createBrowserRouter: { withRouter }
+    // actions: { argTypesRegex: '^on.*' }
   },
 
   decorators: [

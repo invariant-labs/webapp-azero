@@ -38,7 +38,7 @@ export interface IDepositSelector {
   priceA?: number
   priceB?: number
   onReverseTokens: () => void
-  poolIndex: number | null
+  poolIndex: bigint | null
   bestTierIndex?: number
   canCreateNewPool: boolean
   canCreateNewPosition: boolean

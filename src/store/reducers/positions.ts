@@ -11,9 +11,9 @@ export interface PositionsListStore {
   loading: boolean
 }
 export interface PlotTickData {
-  x: number
-  y: number
-  index: number
+  x: bigint
+  y: bigint
+  index: bigint
 }
 
 export type TickPlotPositionData = Omit<PlotTickData, 'y'>

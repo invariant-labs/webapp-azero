@@ -1,7 +1,7 @@
 export interface ILiquidityToken {
   name: string
   icon: string
-  decimal: number
+  decimal: bigint
   liqValue: number
   claimValue: number
   balance: number

@@ -91,10 +91,10 @@ export const BoxInfo: React.FC<{
   }
 
   const tokenXPrintValue =
-    Math.abs(Number(tokenA.value)) < 10 ** -tokenA.decimal ? 0 : Number(tokenA.value)
+    Math.abs(Number(tokenA.value)) < 10 ** Number(-tokenA.decimal) ? 0 : Number(tokenA.value)
 
   const tokenYPrintValue =
-    Math.abs(Number(tokenB.value)) < 10 ** -tokenB.decimal ? 0 : Number(tokenB.value)
+    Math.abs(Number(tokenB.value)) < 10 ** Number(-tokenB.decimal) ? 0 : Number(tokenB.value)
 
   return (
     <Grid className={classes.boxInfo}>
@@ -106,8 +106,8 @@ export const BoxInfo: React.FC<{
             variant='contained'
             onClick={onClickButton}
             disabled={
-              Math.abs(Number(tokenA.value)) < 10 ** -tokenA.decimal &&
-              Math.abs(Number(tokenB.value)) < 10 ** -tokenB.decimal
+              Math.abs(Number(tokenA.value)) < 10 ** Number(-tokenA.decimal) &&
+              Math.abs(Number(tokenB.value)) < 10 ** Number(-tokenB.decimal)
             }>
             Claim fee
           </Button>
@@ -127,7 +127,9 @@ export const BoxInfo: React.FC<{
               <Typography className={classes.tokenName}>{tokenA.name}</Typography>
             </Grid>
             <Typography className={classes.tokenValue}>
-              {formatNumbers(thresholdsWithTokenDecimal(tokenA.decimal))(`${tokenXPrintValue}`)}
+              {formatNumbers(thresholdsWithTokenDecimal(Number(tokenA.decimal)))(
+                `${tokenXPrintValue}`
+              )}
               {showPrefix(tokenXPrintValue, prefixConfig)}
             </Typography>
           </Grid>
@@ -157,7 +159,9 @@ export const BoxInfo: React.FC<{
               <Typography className={classes.tokenName}>{tokenB.name}</Typography>
             </Grid>
             <Typography className={classes.tokenValue}>
-              {formatNumbers(thresholdsWithTokenDecimal(tokenB.decimal))(`${tokenYPrintValue}`)}
+              {formatNumbers(thresholdsWithTokenDecimal(Number(tokenB.decimal)))(
+                `${tokenYPrintValue}`
+              )}
               {showPrefix(tokenYPrintValue, prefixConfig)}
             </Typography>
           </Grid>

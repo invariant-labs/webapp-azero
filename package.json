@@ -27,6 +27,7 @@
     "@polkadot/extension-inject": "^0.47.1",
     "@reduxjs/toolkit": "^2.2.3",
     "@storybook/addon-actions": "^8.0.10",
+    "animated-number-react": "^0.1.2",
     "axios": "^1.6.8",
     "classnames": "^2.5.1",
     "notistack": "^3.0.1",

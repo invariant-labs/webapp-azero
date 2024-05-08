@@ -29,7 +29,7 @@ export interface TokenPriceData {
 export interface Token {
   symbol: string
   address: AddressOrPair
-  decimals: number
+  decimals: bigint
   name: string
   logoURI: string
   coingeckoId?: string

@@ -15,7 +15,7 @@ export interface ISinglePositionPlot {
   leftRange: TickPlotPositionData
   rightRange: TickPlotPositionData
   midPrice: TickPlotPositionData
-  currentPrice: number
+  currentPrice: bigint
   tokenY: Pick<ILiquidityToken, 'name' | 'decimal'>
   tokenX: Pick<ILiquidityToken, 'name' | 'decimal'>
   ticksLoading: boolean
@@ -160,28 +160,28 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
         </Grid>
       </Grid>
       <Grid className={classes.plotWrapper}>
-        <PriceRangePlot
-          data={data}
+        {/* <PriceRangePlot
+          parsedData={data}
           plotMin={plotMin}
           plotMax={plotMax}
           zoomMinus={zoomMinus}
           zoomPlus={zoomPlus}
           disabled
-          leftRange={leftRange}
-          rightRange={rightRange}
-          midPrice={midPrice}
+          parsedLeftRange={leftRange}
+          parsedRightRange={rightRange}
+          parsedMidPrice={midPrice}
           className={classes.plot}
           loading={ticksLoading}
           isXtoY={xToY}
           tickSpacing={tickSpacing}
-          xDecimal={tokenX.decimal}
-          yDecimal={tokenY.decimal}
+          xDecimal={Number(tokenX.decimal)}
+          yDecimal={Number(tokenY.decimal)}
           isDiscrete={isPlotDiscrete}
           coverOnLoading
           hasError={hasTicksError}
           reloadHandler={reloadHandler}
           volumeRange={volumeRange}
-        />
+        /> */}
       </Grid>
       <Grid className={classes.minMaxInfo}>
         <LiquidationRangeInfo
@@ -203,7 +203,7 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
         </Card>
         <Card className={classes.currentPriceAmonut}>
           <Typography component='p'>
-            <Typography component='span'>{currentPrice}</Typography>
+            <Typography component='span'>{currentPrice.toString()}</Typography>
             {xToY ? tokenY.name : tokenX.name} per {xToY ? tokenX.name : tokenY.name}
           </Typography>
         </Card>

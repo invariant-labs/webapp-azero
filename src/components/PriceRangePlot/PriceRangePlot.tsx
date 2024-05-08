@@ -16,10 +16,10 @@ import { Button, Grid, Typography, useMediaQuery } from '@mui/material'
 export type TickPlotPositionData = Omit<PlotTickData, 'y'>
 
 export interface IPriceRangePlot {
-  data: PlotTickData[]
-  midPrice?: TickPlotPositionData
-  leftRange: TickPlotPositionData
-  rightRange: TickPlotPositionData
+  parsedData: PlotTickData[]
+  parsedMidPrice?: TickPlotPositionData
+  parsedLeftRange: TickPlotPositionData
+  parsedRightRange: TickPlotPositionData
   onChangeRange?: (left: number, right: number) => void
   style?: React.CSSProperties
   className?: string
@@ -44,10 +44,10 @@ export interface IPriceRangePlot {
 }
 
 export const PriceRangePlot: React.FC<IPriceRangePlot> = ({
-  data,
-  leftRange,
-  rightRange,
-  midPrice,
+  parsedData,
+  parsedLeftRange,
+  parsedRightRange,
+  parsedMidPrice,
   onChangeRange,
   style,
   className,
@@ -67,6 +67,25 @@ export const PriceRangePlot: React.FC<IPriceRangePlot> = ({
   reloadHandler,
   volumeRange
 }) => {
+  // TODO check which types should be applied here, bigint or numbers, this fix workaround
+  const data = parsedData.map(tick => ({
+    x: Number(tick.x),
+    y: Number(tick.y),
+    index: Number(tick.index)
+  }))
+  const midPrice = {
+    x: Number(parsedMidPrice?.x),
+    index: Number(parsedMidPrice?.index)
+  }
+  const leftRange = {
+    x: Number(parsedLeftRange.x),
+    index: Number(parsedLeftRange.index)
+  }
+  const rightRange = {
+    x: Number(parsedRightRange.x),
+    index: Number(parsedRightRange.index)
+  }
+
   const { classes } = useStyles()
 
   const isSmDown = useMediaQuery(theme.breakpoints.down('sm'))

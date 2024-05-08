@@ -19,6 +19,7 @@ import { Status } from '@store/reducers/wallet'
 import { Navigate } from 'react-router-dom'
 import { VariantType } from 'notistack'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
+import PositionDetails from '@components/PositionDetails/PositionDetails'
 // import { hasFarms, hasUserStakes, stakesForPosition } from '@selectors/farms'
 // import { actions as farmsActions } from '@reducers/farms'
 // import { Status } from '@reducers/solanaWallet'
@@ -74,7 +75,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
       return {
         index: position.poolData.currentTickIndex,
         x: calcYPerXPrice(
-          position.poolData.sqrtPrice.toString(),
+          position.poolData.sqrtPrice,
           position.tokenX.decimals,
           position.tokenY.decimals
         )
@@ -82,8 +83,8 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
     }
 
     return {
-      index: 0,
-      x: 0
+      index: 0n,
+      x: 0n
     }
   }, [position?.poolKey])
 
@@ -101,8 +102,8 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
     }
 
     return {
-      index: 0,
-      x: 0
+      index: 0n,
+      x: 0n
     }
   }, [position?.poolKey])
 
@@ -120,8 +121,8 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
     }
 
     return {
-      index: 0,
-      x: 0
+      index: 0n,
+      x: 0n
     }
   }, [position?.poolKey])
 
@@ -151,11 +152,11 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
     () =>
       position
         ? calcYPerXPrice(
-            position.poolData.sqrtPrice.toString(),
+            position.poolData.sqrtPrice,
             position.tokenX.decimals,
             position.tokenY.decimals
           )
-        : 0,
+        : 0n,
     [position]
   )
 
@@ -351,7 +352,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
         tokenYAddress={position.tokenY.assetAddress}
         poolAddress={position.poolData.address}
         copyPoolAddressHandler={copyPoolAddressHandler}
-        detailsData={data}
+        detailsData={[{ x: 12n, y: 123n, index: -44364n }]}
         midPrice={midPrice}
         leftRange={leftRange}
         rightRange={rightRange}
@@ -365,8 +366,8 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
           icon: position.tokenX.logoURI,
           decimal: position.tokenX.decimals,
           balance: +printBN(position.tokenX.balance, position.tokenX.decimals),
-          liqValue: tokenXLiquidity,
-          claimValue: tokenXClaim,
+          liqValue: 5.123, // add real data
+          claimValue: 1.23, // add real data
           usdValue:
             typeof tokenXPriceData?.price === 'undefined'
               ? undefined
@@ -378,23 +379,23 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
           icon: position.tokenY.logoURI,
           decimal: position.tokenY.decimals,
           balance: +printBN(position.tokenY.balance, position.tokenY.decimals),
-          liqValue: tokenYLiquidity,
-          claimValue: tokenYClaim,
+          liqValue: 123.123, // add real data
+          claimValue: 12.23, // add real data
           usdValue:
             typeof tokenYPriceData?.price === 'undefined'
               ? undefined
               : tokenYPriceData.price * +printBN(position.tokenY.balance, position.tokenY.decimals)
         }}
         tokenYPriceData={tokenYPriceData}
-        fee={position.poolData.fee}
-        min={min} // add real data
-        max={max} // add real data
+        fee={position.poolData.feeGrowthGlobalX} //TODO check if this is correct
+        min={0.0118541383040056} // add real data
+        max={1.23123} // add real data
         initialIsDiscreteValue={initialIsDiscreteValue}
         onDiscreteChange={setIsDiscreteValue}
         showFeesLoader={showFeesLoader}
         hasTicksError={hasTicksError}
         reloadHandler={() => {}} // add real data
-        plotVolumeRange={currentVolumeRange}
+        plotVolumeRange={undefined} // add real data
       />
     )
   }

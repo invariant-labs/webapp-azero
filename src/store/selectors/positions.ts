@@ -44,7 +44,7 @@ export const positionsWithPoolsData = createSelector(
       }
     })
 
-    //check if this is correct
+    //TODO check if this is correct
     return list.map((position, index) => ({
       ...position,
       poolData: poolsByKey[position.toString()],
@@ -57,7 +57,7 @@ export const positionsWithPoolsData = createSelector(
 
 export const singlePositionData = (id: string) =>
   createSelector(positionsWithPoolsData, positions =>
-    // check if this is correct
+    // TODO check if this is correct
     positions.find(
       position => id === position.address.toString() + '_' + position.poolKey.toString()
     )

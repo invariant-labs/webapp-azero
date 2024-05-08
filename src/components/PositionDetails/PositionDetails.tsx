@@ -25,7 +25,7 @@ interface IProps {
   leftRange: TickPlotPositionData
   rightRange: TickPlotPositionData
   midPrice: TickPlotPositionData
-  currentPrice: number
+  currentPrice: bigint
   tokenX: ILiquidityToken
   tokenY: ILiquidityToken
   tokenXPriceData?: TokenPriceData
@@ -154,18 +154,22 @@ const PositionDetails: React.FC<IProps> = ({
             detailsData.length
               ? xToY
                 ? detailsData
-                : detailsData.map(tick => ({ ...tick, x: 1 / tick.x })).reverse()
+                : detailsData.map(tick => ({ ...tick, x: 1n / tick.x })).reverse()
               : Array(100)
                   .fill(1)
-                  .map((_e, index) => ({ x: index, y: index, index }))
+                  .map((_e, index) => ({
+                    x: BigInt(index),
+                    y: BigInt(index),
+                    index: BigInt(index)
+                  }))
           }
-          leftRange={xToY ? leftRange : { ...rightRange, x: 1 / rightRange.x }}
-          rightRange={xToY ? rightRange : { ...leftRange, x: 1 / leftRange.x }}
+          leftRange={xToY ? leftRange : { ...rightRange, x: 1n / rightRange.x }}
+          rightRange={xToY ? rightRange : { ...leftRange, x: 1n / leftRange.x }}
           midPrice={{
             ...midPrice,
-            x: midPrice.x ** (xToY ? 1 : -1)
+            x: midPrice.x ** (xToY ? 1n : -1n)
           }}
-          currentPrice={currentPrice ** (xToY ? 1 : -1)}
+          currentPrice={currentPrice ** (xToY ? 1n : -1n)}
           tokenY={tokenY}
           tokenX={tokenX}
           ticksLoading={ticksLoading}
