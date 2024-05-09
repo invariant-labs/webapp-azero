@@ -1,5 +1,5 @@
 import FooterWrapper from '@containers/FooterWrapper'
-import HeaderWrapper from '@containers/HeaderWrapper'
+
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Outlet, useNavigate } from 'react-router-dom'
@@ -8,6 +8,7 @@ import { status as connectionStatus } from '@store/selectors/connection'
 import { status } from '@store/selectors/wallet'
 import { Status } from '@store/reducers/connection'
 import { Status as WalletStatus } from '@store/reducers/wallet'
+import HeaderWrapper from '@containers/HeaderWrapper/HeaderWrapper'
 
 const RootPage: React.FC = () => {
   const navigate = useNavigate()

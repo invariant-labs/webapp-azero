@@ -13,10 +13,18 @@ const configureAppStore = (initialState = {}) => {
 
   const store = configureStore({
     reducer: combinedReducers,
-    middleware: getDefaultMiddleware => getDefaultMiddleware().concat(middleware),
+    middleware: getDefaultMiddleware =>
+      getDefaultMiddleware({
+        // serializableCheck: false //Find better solution to fix serializable check error
+      }).concat(middleware),
     preloadedState: initialState,
     // devTools: process.env.NODE_ENV !== "production",
-    devTools: true
+    devTools: {
+      serialize: {
+        replacer: (_key, value) => (typeof value === 'bigint' ? value.toString() : value),
+        options: true
+      }
+    }
   })
 
   sagaMiddleware.run(rootSaga)

@@ -3,9 +3,7 @@ import { useState } from 'react'
 import { actions as walletActions } from '@store/reducers/wallet'
 import { useDispatch } from 'react-redux'
 
-export interface ISwap {}
-
-export const Swap: React.FC<ISwap> = () => {
+export const TestTransaction: React.FC = () => {
   const RECEIVER = '5EnRWxJwqLuexBZtbJVTmfAzzc6Fwpw2Gv9AYs1gYHsgvzfH'
   const dispatch = useDispatch()
   const [receiverAddress, setReceiverAddress] = useState<string>(RECEIVER)
@@ -45,4 +43,4 @@ export const Swap: React.FC<ISwap> = () => {
     </Grid>
   )
 }
-export default Swap
+export default TestTransaction
