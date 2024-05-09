@@ -2,7 +2,7 @@ import { Box, Button, CardMedia, Grid, IconButton, useMediaQuery } from '@mui/ma
 import { Link } from 'react-router-dom'
 import useStyles from './style'
 import { useEffect, useState } from 'react'
-import NavbarButton from '@components/common/Navbar/Button'
+import NavbarButton from '@components/Navbar/Button'
 import icons from '@static/icons'
 import RoutesModal from '@components/Modals/RoutesModal'
 import Hamburger from '@static/svg/Hamburger.svg'

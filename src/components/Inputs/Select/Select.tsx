@@ -11,10 +11,11 @@ import { AddressOrPair } from '@polkadot/api/types'
 
 export interface ISelectModal {
   name?: string
-  centered?: boolean
   current: SwapToken | null
-  // tokens: SwapToken[]
-  tokens: any[]
+  centered?: boolean
+
+  tokens: SwapToken[]
+
   onSelect: (index: number) => void
   className?: string
   hideBalancesInModal?: boolean

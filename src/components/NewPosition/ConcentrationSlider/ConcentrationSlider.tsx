@@ -80,9 +80,9 @@ export const ConcentrationSlider: React.FC<IProps> = ({
       marks={marks}
       min={0}
       max={values.length - 1}
-      value={valueIndex}
-      components={{
-        Thumb: props => <Thumb concentrationValues={values} {...props} />
+      value={12}
+      slotProps={{
+        thumb: <Thumb concentrationValues={values} />
       }}
       track={false}
     />

@@ -1,5 +1,5 @@
 import NewPosition from '@components/NewPosition/NewPosition'
-import { ProgressState } from '@components/common/AnimatedButton'
+import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import {
   TokenAmount,
   getLiquidityByX,
@@ -63,7 +63,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const canUserCreateNewPool = useSelector(canCreateNewPool(currentNetwork))
   const canUserCreateNewPosition = useSelector(canCreateNewPosition(currentNetwork))
 
-  const [poolIndex, setPoolIndex] = useState<number | null>(null)
+  const [poolIndex, setPoolIndex] = useState<bigint | null>(null)
 
   const [progress, setProgress] = useState<ProgressState>('none')
 
@@ -137,7 +137,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         ? tokens[tokenAIndex].decimals
         : tokens[tokenBIndex].decimals
     }
-    return 0
+    return 0n
   }, [tokenAIndex, tokenBIndex])
 
   const yDecimal = useMemo(() => {
@@ -147,7 +147,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         ? tokens[tokenBIndex].decimals
         : tokens[tokenAIndex].decimals
     }
-    return 0
+    return 0n
   }, [tokenAIndex, tokenBIndex])
 
   const [feeIndex, setFeeIndex] = useState(0)
@@ -157,13 +157,13 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     () =>
       // ALL_FEE_TIERS_DATA[feeIndex].tier.tickSpacing ??
       // feeToTickSpacing(ALL_FEE_TIERS_DATA[feeIndex].tier.fee),
-      0,
+      1n,
     [feeIndex]
   )
 
   const [midPrice, setMidPrice] = useState<TickPlotPositionData>({
-    index: 0,
-    x: 1
+    index: 0n,
+    x: 1n
   })
 
   const isWaitingForNewPool = useMemo(() => {
@@ -195,33 +195,33 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       // }
     }
   }, [isWaitingForNewPool])
-  useEffect(() => {
-    if (poolIndex !== null) {
-      setMidPrice({
-        index: allPools[poolIndex].currentTickIndex,
-        x:
-          calcYPerXPrice(allPools[poolIndex].sqrtPrice.toString(), xDecimal, yDecimal) **
-          (isXtoY ? 1 : -1)
-      })
-    }
-  }, [poolIndex, isXtoY, xDecimal, yDecimal, allPools])
+  // useEffect(() => {
+  //   if (poolIndex !== null) {
+  //     setMidPrice({
+  //       index: allPools[poolIndex].currentTickIndex,
+  //       x:
+  //         calcYPerXPrice(allPools[poolIndex].sqrtPrice.toString(), xDecimal, yDecimal) **
+  //         (isXtoY ? 1 : -1)
+  //     })
+  //   }
+  // }, [poolIndex, isXtoY, xDecimal, yDecimal, allPools])
 
-  useEffect(() => {
-    if (poolIndex === null) {
-      setMidPrice({
-        index: 0,
-        x: calcPrice(BigInt(0), isXtoY, xDecimal, yDecimal)
-      })
-    }
-  }, [poolIndex, isXtoY, xDecimal, yDecimal])
+  // useEffect(() => {
+  //   if (poolIndex === null) {
+  //     setMidPrice({
+  //       index: 0,
+  //       x: calcPrice(0n, isXtoY, xDecimal, yDecimal)
+  //     })
+  //   }
+  // }, [poolIndex, isXtoY, xDecimal, yDecimal])
 
   const data = useMemo(() => {
-    if (ticksLoading) {
-      return createPlaceholderLiquidityPlot(isXtoY, 10, tickSpacing, xDecimal, yDecimal)
-    }
+    // if (ticksLoading) {
+    //   return createPlaceholderLiquidityPlot(isXtoY, 10, tickSpacing, xDecimal, yDecimal)
+    // }
 
     if (currentPairReversed === true) {
-      return ticksData.map(tick => ({ ...tick, x: 1 / tick.x })).reverse()
+      return ticksData.map(tick => ({ ...tick, x: 1n / tick.x })).reverse()
     }
 
     return ticksData
@@ -272,7 +272,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   //       .catch(() => {
   //         dispatch(
   //           snackbarsActions.add({
-  //             message: 'Token adding failed, check if address is valid and try again',
+  //             message: 'Token adding failed,
   //             variant: 'error',
   //             persist: false
   //           })
@@ -362,7 +362,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       return undefined
     }
 
-    const poolAddress = allPools[poolIndex].address.toString()
+    const poolAddress = allPools[Number(poolIndex)].address.toString()
 
     if (!poolsVolumeRanges[poolAddress]) {
       return undefined
@@ -425,14 +425,16 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     const lowerTick = Math.min(left, right)
     const upperTick = Math.max(left, right)
 
-    //Check if this is correct
+    //TODO check if this is correct
     try {
       if (byX) {
         const result = getLiquidityByX(
           amount,
           lowerTick,
           upperTick,
-          poolIndex !== null ? allPools[poolIndex].sqrtPrice : priceToSqrtPrice(BigInt(midPrice.x)),
+          poolIndex !== null
+            ? allPools[Number(poolIndex)].sqrtPrice
+            : priceToSqrtPrice(BigInt(midPrice.x)),
           true
         )
         if (isMountedRef.current) {
@@ -444,7 +446,9 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         amount,
         lowerTick,
         upperTick,
-        poolIndex !== null ? allPools[poolIndex].sqrtPrice : priceToSqrtPrice(BigInt(midPrice.x)),
+        poolIndex !== null
+          ? allPools[Number(poolIndex)].sqrtPrice
+          : priceToSqrtPrice(BigInt(midPrice.x)),
         true
       )
       if (isMountedRef.current) {
@@ -456,7 +460,9 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         amount,
         lowerTick,
         upperTick,
-        poolIndex !== null ? allPools[poolIndex].sqrtPrice : priceToSqrtPrice(BigInt(midPrice.x)),
+        poolIndex !== null
+          ? allPools[Number(poolIndex)].sqrtPrice
+          : priceToSqrtPrice(BigInt(midPrice.x)),
         true
       )
       if (isMountedRef.current) {

@@ -11,7 +11,8 @@ const config: StorybookConfig = {
     '@storybook/addon-viewport',
     '@storybook/react-vite',
     '@storybook/addon-themes',
-    'storybook-addon-remix-react-router'
+    'storybook-addon-remix-react-router',
+    '@storybook/addon-actions'
   ],
   framework: {
     name: '@storybook/react-vite',

@@ -5,6 +5,9 @@ import useStyles from './style'
 import activeLiquidity from '@static/svg/activeLiquidity.svg'
 import { PositionOpeningMethod } from '@store/consts/static'
 import { Button, Grid, Tooltip, Typography } from '@mui/material'
+import PlotTypeSwitch from '@components/PlotTypeSwitch/PlotTypeSwitch'
+import PriceRangePlot from '@components/PriceRangePlot/PriceRangePlot'
+import RangeInput from '@components/Inputs/RangeInput/RangeInput'
 
 export interface IRangeSelector {
   // data: PlotTickData[]
@@ -13,36 +16,36 @@ export interface IRangeSelector {
   midPrice: any
   tokenASymbol: string
   tokenBSymbol: string
-  onChangeRange: (leftIndex: number, rightIndex: number) => void
+  onChangeRange: (leftIndex: bigint, rightIndex: bigint) => void
   blocked?: boolean
   blockerInfo?: string
   ticksLoading: boolean
   isXtoY: boolean
-  xDecimal: number
-  yDecimal: number
-  tickSpacing: number
+  xDecimal: bigint
+  yDecimal: bigint
+  tickSpacing: bigint
   currentPairReversed: boolean | null
   initialIsDiscreteValue: boolean
   onDiscreteChange: (val: boolean) => void
   positionOpeningMethod?: PositionOpeningMethod
-  poolIndex: number | null
+  poolIndex: bigint | null
   hasTicksError?: boolean
   reloadHandler: () => void
   volumeRange?: {
-    min: number
-    max: number
+    min: bigint
+    max: bigint
   }
   concentrationArray: number[]
   minimumSliderIndex: number
   concentrationIndex: number
   setConcentrationIndex: (val: number) => void
   getTicksInsideRange: (
-    left: number,
-    right: number,
+    left: bigint,
+    right: bigint,
     isXtoY: boolean
   ) => {
-    leftInRange: number
-    rightInRange: number
+    leftInRange: bigint
+    rightInRange: bigint
   }
 }
 
@@ -77,8 +80,8 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
 
   // const [leftRange, setLeftRange] = useState(getMinTick(tickSpacing))
   // const [rightRange, setRightRange] = useState(getMaxTick(tickSpacing))
-  const [leftRange, setLeftRange] = useState(123)
-  const [rightRange, setRightRange] = useState(12334)
+  const [leftRange, setLeftRange] = useState(123n)
+  const [rightRange, setRightRange] = useState(12334n)
 
   const [leftInput, setLeftInput] = useState('')
   const [rightInput, setRightInput] = useState('')
@@ -140,14 +143,13 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
     <Grid container className={classes.wrapper} direction='column'>
       <Grid className={classes.headerContainer} container justifyContent='space-between'>
         <Typography className={classes.header}>Price range</Typography>
-        {/* <PlotTypeSwitch
+        <PlotTypeSwitch
           onSwitch={val => {
             setIsPlotDiscrete(val)
             onDiscreteChange(val)
           }}
-          onSwitch={() => {}}
           initialValue={isPlotDiscrete ? 1 : 0}
-        /> */}
+        />
       </Grid>
       <Grid className={classes.infoRow} container justifyContent='flex-end'>
         <Grid container direction='column' alignItems='flex-end'>
@@ -192,45 +194,46 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
         </Grid>
       </Grid>
       <Grid container className={classes.innerWrapper}>
+        {/* TODO check how to fix price range plot */}
         {/* <PriceRangePlot
           className={classes.plot}
-          data={data}
+          parsedData={data}
           onChangeRange={changeRangeHandler}
           // leftRange={{
           //   index: leftRange,
-          //   x: calcPrice(leftRange, isXtoY, xDecimal, yDecimal)
+          //   x: calcPrice(BigInt(leftRange), isXtoY, xDecimal, yDecimal) // TODO check if this is correct
           // }}
           // rightRange={{
           //   index: rightRange,
-          //   x: calcPrice(rightRange, isXtoY, xDecimal, yDecimal)
+          //   x: calcPrice(BigInt(rightRange), isXtoY, xDecimal, yDecimal) // TODO check if this is correct
           // }}
-          leftRange={{
+          parsedLeftRange={{
             index: leftRange,
-            x: 1234
+            x: 12n
           }}
-          rightRange={{
+          parsedRightRange={{
             index: rightRange,
-            x: 12
+            x: 12334n
           }}
-          midPrice={midPrice}
+          parsedMidPrice={midPrice}
           plotMin={plotMin}
           plotMax={plotMax}
           zoomMinus={zoomMinus}
           zoomPlus={zoomPlus}
           loading={ticksLoading}
           isXtoY={isXtoY}
-          tickSpacing={tickSpacing}
-          xDecimal={xDecimal}
-          yDecimal={yDecimal}
+          tickSpacing={Number(tickSpacing)} // TODO check correct type
+          xDecimal={Number(xDecimal)}
+          yDecimal={Number(yDecimal)}
           isDiscrete={isPlotDiscrete}
           disabled={positionOpeningMethod === 'concentration'}
           hasError={hasTicksError}
           reloadHandler={reloadHandler}
-          volumeRange={volumeRange}
+          volumeRange={undefined} // TODO check correct type
         /> */}
         <Typography className={classes.subheader}>Set price range</Typography>
         <Grid container className={classes.inputs}>
-          {/* <RangeInput
+          <RangeInput
             disabled={positionOpeningMethod === 'concentration'}
             className={classes.input}
             label='Min price'
@@ -239,33 +242,31 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
             currentValue={leftInputRounded}
             setValue={onLeftInputChange}
             decreaseValue={() => {
-              const newLeft = isXtoY
-                ? Math.max(getMinTick(tickSpacing), leftRange - tickSpacing)
-                : Math.min(getMaxTick(tickSpacing), leftRange + tickSpacing)
-              changeRangeHandler(newLeft, rightRange)
-              autoZoomHandler(newLeft, rightRange)
+              // const newLeft = isXtoY
+              //   ? Math.max(getMinTick(tickSpacing), leftRange - tickSpacing)
+              //   : Math.min(getMaxTick(tickSpacing), leftRange + tickSpacing)
+              // changeRangeHandler(newLeft, rightRange)
+              // autoZoomHandler(newLeft, rightRange)
             }}
             increaseValue={() => {
-              const newLeft = isXtoY
-                ? Math.min(rightRange - tickSpacing, leftRange + tickSpacing)
-                : Math.max(rightRange + tickSpacing, leftRange - tickSpacing)
-
-              changeRangeHandler(newLeft, rightRange)
-              autoZoomHandler(newLeft, rightRange)
+              // const newLeft = isXtoY
+              //   ? Math.min(rightRange - tickSpacing, leftRange + tickSpacing)
+              //   : Math.max(rightRange + tickSpacing, leftRange - tickSpacing)
+              // changeRangeHandler(newLeft, rightRange)
+              // autoZoomHandler(newLeft, rightRange)
             }}
             onBlur={() => {
-              const newLeft = isXtoY
-                ? Math.min(
-                    rightRange - tickSpacing,
-                    nearestTickIndex(+leftInput, tickSpacing, isXtoY, xDecimal, yDecimal)
-                  )
-                : Math.max(
-                    rightRange + tickSpacing,
-                    nearestTickIndex(+leftInput, tickSpacing, isXtoY, xDecimal, yDecimal)
-                  )
-
-              changeRangeHandler(newLeft, rightRange)
-              autoZoomHandler(newLeft, rightRange)
+              // const newLeft = isXtoY
+              //   ? Math.min(
+              //       rightRange - tickSpacing,
+              //       nearestTickIndex(+leftInput, tickSpacing, isXtoY, xDecimal, yDecimal)
+              //     )
+              //   : Math.max(
+              //       rightRange + tickSpacing,
+              //       nearestTickIndex(+leftInput, tickSpacing, isXtoY, xDecimal, yDecimal)
+              //     )
+              // changeRangeHandler(newLeft, rightRange)
+              // autoZoomHandler(newLeft, rightRange)
             }}
             diffLabel='Min - Current price'
             percentDiff={((+leftInput - midPrice.x) / midPrice.x) * 100}
@@ -279,39 +280,39 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
             currentValue={rightInputRounded}
             setValue={onRightInputChange}
             decreaseValue={() => {
-              const newRight = isXtoY
-                ? Math.max(rightRange - tickSpacing, leftRange + tickSpacing)
-                : Math.min(rightRange + tickSpacing, leftRange - tickSpacing)
-              changeRangeHandler(leftRange, newRight)
-              autoZoomHandler(leftRange, newRight)
+              // const newRight = isXtoY
+              //   ? Math.max(rightRange - tickSpacing, leftRange + tickSpacing)
+              //   : Math.min(rightRange + tickSpacing, leftRange - tickSpacing)
+              // changeRangeHandler(leftRange, newRight)
+              // autoZoomHandler(leftRange, newRight)
             }}
             increaseValue={() => {
-              const newRight = isXtoY
-                ? Math.min(getMaxTick(tickSpacing), rightRange + tickSpacing)
-                : Math.max(getMinTick(tickSpacing), rightRange - tickSpacing)
-              changeRangeHandler(leftRange, newRight)
-              autoZoomHandler(leftRange, newRight)
+              // const newRight = isXtoY
+              //   ? Math.min(getMaxTick(tickSpacing), rightRange + tickSpacing)
+              //   : Math.max(getMinTick(tickSpacing), rightRange - tickSpacing)
+              // changeRangeHandler(leftRange, newRight)
+              // autoZoomHandler(leftRange, newRight)
             }}
             onBlur={() => {
-              const newRight = isXtoY
-                ? Math.max(
-                    leftRange + tickSpacing,
-                    nearestTickIndex(+rightInput, tickSpacing, isXtoY, xDecimal, yDecimal)
-                  )
-                : Math.min(
-                    leftRange - tickSpacing,
-                    nearestTickIndex(+rightInput, tickSpacing, isXtoY, xDecimal, yDecimal)
-                  )
-              changeRangeHandler(leftRange, newRight)
-              autoZoomHandler(leftRange, newRight)
+              // const newRight = isXtoY
+              //   ? Math.max(
+              //       leftRange + tickSpacing,
+              //       nearestTickIndex(+rightInput, tickSpacing, isXtoY, xDecimal, yDecimal)
+              //     )
+              //   : Math.min(
+              //       leftRange - tickSpacing,
+              //       nearestTickIndex(+rightInput, tickSpacing, isXtoY, xDecimal, yDecimal)
+              //     )
+              // changeRangeHandler(leftRange, newRight)
+              // autoZoomHandler(leftRange, newRight)
             }}
             diffLabel='Max - Current price'
             percentDiff={((+rightInput - midPrice.x) / midPrice.x) * 100}
-          /> */}
+          />
         </Grid>
         {positionOpeningMethod === 'concentration' ? (
           <Grid container className={classes.sliderWrapper}>
-            {/* <ConcentrationSlider
+            <ConcentrationSlider
               key={poolIndex ?? -1}
               valueIndex={concentrationIndex}
               values={concentrationArray}
@@ -320,7 +321,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
                 setConcentrationIndex(value)
               }}
               minimumSliderIndex={minimumSliderIndex}
-            /> */}
+            />
 
             <span>Slider</span>
           </Grid>

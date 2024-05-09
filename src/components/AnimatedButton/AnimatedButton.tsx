@@ -1,5 +1,4 @@
 import React from 'react'
-
 import successGif from '@static/gif/successAnimation.gif'
 import errorGif from '@static/gif/errorAnimation.gif'
 import loadingAnimation from '@static/gif/loading.gif'

@@ -3,7 +3,7 @@ import { EmptyPlaceholder } from './EmptyPlaceholder'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta = {
-  title: 'EmptyPlaceholder',
+  title: 'Common/EmptyPlaceholder',
   component: EmptyPlaceholder
 } satisfies Meta<typeof EmptyPlaceholder>
 

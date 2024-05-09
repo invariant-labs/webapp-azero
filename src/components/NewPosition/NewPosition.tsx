@@ -1,3 +1,4 @@
+import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import Slippage from '@components/Modals/Slippage/Slippage'
 import { NoConnected } from '@components/NoConnected/NoConnected'
 import { Percentage, TokenAmount } from '@invariant-labs/a0-sdk'
@@ -55,14 +56,13 @@ export interface INewPosition {
   ticksLoading: boolean
   showNoConnected?: boolean
   // noConnectedBlockerProps: INoConnected
-  // progress: ProgressState
-  progress: any
+  progress: ProgressState
   isXtoY: boolean
-  xDecimal: number
-  yDecimal: number
-  tickSpacing: number
+  xDecimal: bigint
+  yDecimal: bigint
+  tickSpacing: bigint
   isWaitingForNewPool: boolean
-  poolIndex: number | null
+  poolIndex: bigint | null
   currentPairReversed: boolean | null
   bestTiers: BestTier[]
   initialIsDiscreteValue: boolean
@@ -84,8 +84,8 @@ export interface INewPosition {
   hasTicksError?: boolean
   reloadHandler: () => void
   plotVolumeRange?: {
-    min: number
-    max: number
+    min: bigint
+    max: bigint
   }
   currentFeeIndex: number
   onSlippageChange: (slippage: string) => void
@@ -138,8 +138,8 @@ export const NewPosition: React.FC<INewPosition> = ({
   initialSlippage
 }) => {
   // TODO delete mock data below
-  const getMinTick = (a: number) => 145
-  const getMaxTick = (a: number) => 52556
+  const getMinTick = (a: bigint) => 145n
+  const getMaxTick = (a: bigint) => 52556n
   const concentrationArray = [
     2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
     28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
@@ -241,7 +241,7 @@ export const NewPosition: React.FC<INewPosition> = ({
     tokenBSymbol: 'XYZ'
   }
 
-  const getTicksInsideRange = (left: number, right: number, isXtoY: boolean) => {
+  const getTicksInsideRange = (left: bigint, right: bigint, isXtoY: boolean) => {
     const leftMax = isXtoY ? getMinTick(tickSpacing) : getMaxTick(tickSpacing)
     const rightMax = isXtoY ? getMaxTick(tickSpacing) : getMinTick(tickSpacing)
 
@@ -259,9 +259,9 @@ export const NewPosition: React.FC<INewPosition> = ({
     return { leftInRange, rightInRange }
   }
 
-  const onChangeRange = (left: number, right: number) => {
-    let leftRange: number
-    let rightRange: number
+  const onChangeRange = (left: bigint, right: bigint) => {
+    let leftRange: bigint
+    let rightRange: bigint
 
     if (positionOpeningMethod === 'range') {
       const { leftInRange, rightInRange } = getTicksInsideRange(left, right, isXtoY)
@@ -316,7 +316,7 @@ export const NewPosition: React.FC<INewPosition> = ({
   }
 
   // Mocked onChangeMidPrice
-  const onChangeMidPrice = (mid: number) => {
+  const onChangeMidPrice = (mid: BigInt) => {
     console.log(mid)
   }
   // const bestTierIndex =
@@ -587,7 +587,7 @@ export const NewPosition: React.FC<INewPosition> = ({
             yDecimal={yDecimal}
             tokenASymbol={tokenAIndex !== null ? tokens[tokenAIndex].symbol : 'ABC'}
             tokenBSymbol={tokenBIndex !== null ? tokens[tokenBIndex].symbol : 'XYZ'}
-            midPrice={midPrice.index}
+            midPrice={BigInt(midPrice.index)} // TODO check what is the type of midPrice
             onChangeMidPrice={onChangeMidPrice}
             currentPairReversed={currentPairReversed}
           />

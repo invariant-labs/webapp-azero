@@ -9,7 +9,7 @@ export interface IProps {
   children: React.ReactNode
 }
 
-export const CustonScrollbar: React.FC<IProps> = props => {
+export const CustomScrollbar: React.FC<IProps> = props => {
   const { classes } = useStyles()
 
   return (
@@ -30,4 +30,4 @@ export const CustonScrollbar: React.FC<IProps> = props => {
   )
 }
 
-export default CustonScrollbar
+export default CustomScrollbar

@@ -1,4 +1,4 @@
-import Header from '@components/Header'
+import Header from '@components/Header/Header'
 import { Keyring, Network, PSP22, initPolkadotApi } from '@invariant-labs/a0-sdk'
 import {
   AlephZeroNetworks,

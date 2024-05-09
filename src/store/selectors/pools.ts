@@ -23,7 +23,7 @@ export const {
 ])
 
 export const poolsArraySortedByFees = createSelector(pools, allPools =>
-  // Check if this is correct
+  // TODO check if this is correct
   Object.values(allPools).sort((a, b) => Number(a.feeReceiver) - Number(b.feeReceiver))
 )
 
