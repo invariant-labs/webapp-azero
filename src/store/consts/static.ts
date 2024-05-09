@@ -128,6 +128,8 @@ export const commonTokensForNetworks: Record<NetworkType, AddressOrPair[]> = {
   Localnet: []
 }
 
+export const FAUCET_DEPLOYER_MNEMONIC =
+  'motion ice subject actress spider rare leg fortune brown similar excess amazing'
 export const FAUCET_TOKEN_AMOUNT = 1000n
 
 export enum FaucetDecimal {
@@ -137,7 +139,7 @@ export enum FaucetDecimal {
 }
 
 export enum FaucetToken {
-  BTC = '5HSJiEuRf7U1kaQ5FvYiiFyL8hFd8iNaVHgSu6hRovWQ4NjH',
-  ETH = '5HmtCRaA51dANEnbPnAZzmUmytGbXBbwXHaWn3GdNfTHkncG',
-  USDC = '5DxLneeqtaCeeCMHBJkm5cbfvuGQ2Lk9mXW7UcdHqFo9E8kQ'
+  BTC = '5GhF7vS1A2CFWMCck69J8LGh37DgRLjYjjQTA49pAMXUeZ5B',
+  ETH = '5E8qAJ4aU2LC7Dq31cb4H9zR9zM1t5fVBaUZr2qBkJSWeUuL',
+  USDC = '5HJQP6MEFm2Hv42EG286r69LoCkomLgG23hRgYXo2VU2cYn6'
 }

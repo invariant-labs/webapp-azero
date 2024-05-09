@@ -2,6 +2,7 @@ import Header from '@components/Header'
 import { Keyring, Network, PSP22, initPolkadotApi } from '@invariant-labs/a0-sdk'
 import {
   AlephZeroNetworks,
+  FAUCET_DEPLOYER_MNEMONIC,
   FAUCET_TOKEN_AMOUNT,
   FaucetDecimal,
   FaucetToken,
@@ -93,11 +94,11 @@ export const HeaderWrapper: React.FC = () => {
     const api = await initPolkadotApi(Network.Testnet)
 
     const keyring = new Keyring({ type: 'sr25519' })
-    const account = keyring.addFromUri('//Alice')
+    const account = keyring.addFromUri(FAUCET_DEPLOYER_MNEMONIC)
 
     const data = api.createType('Vec<u8>', [])
 
-    const notRefilledTokens = []
+    const notAirdroppedTokens = []
 
     const psp22 = await PSP22.load(api, Network.Testnet, FaucetToken.BTC, {
       storageDepositLimit: 100000000000,
@@ -112,13 +113,13 @@ export const HeaderWrapper: React.FC = () => {
 
       dispatch(
         snackbarsActions.add({
-          message: `Refilled BTC token.`,
+          message: `Airdropped BTC tokens`,
           variant: 'success',
           persist: false
         })
       )
     } else {
-      notRefilledTokens.push('BTC')
+      notAirdroppedTokens.push('BTC')
     }
 
     psp22.setContractAddress(FaucetToken.ETH)
@@ -130,13 +131,13 @@ export const HeaderWrapper: React.FC = () => {
 
       dispatch(
         snackbarsActions.add({
-          message: `Refilled ETH token.`,
+          message: `Airdropped ETH tokens`,
           variant: 'success',
           persist: false
         })
       )
     } else {
-      notRefilledTokens.push('ETH')
+      notAirdroppedTokens.push('ETH')
     }
 
     psp22.setContractAddress(FaucetToken.USDC)
@@ -148,19 +149,19 @@ export const HeaderWrapper: React.FC = () => {
 
       dispatch(
         snackbarsActions.add({
-          message: `Refilled USDC token.`,
+          message: `Airdropped USDC tokens`,
           variant: 'success',
           persist: false
         })
       )
     } else {
-      notRefilledTokens.push('USDC')
+      notAirdroppedTokens.push('USDC')
     }
 
-    if (notRefilledTokens.length > 0) {
+    if (notAirdroppedTokens.length > 0) {
       return dispatch(
         snackbarsActions.add({
-          message: `Didn't refill ${notRefilledTokens.join(', ')} ${notRefilledTokens.length === 1 ? 'token' : 'tokens'} due to high balance.`,
+          message: `Didn't airdrop ${notAirdroppedTokens.join(', ')} ${notAirdroppedTokens.length === 1 ? 'token' : 'tokens'} due to high balance`,
           variant: 'error',
           persist: false
         })
