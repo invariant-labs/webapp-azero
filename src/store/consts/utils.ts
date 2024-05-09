@@ -5,8 +5,8 @@ import {
   TokenAmount,
   calculatePriceImpact,
   calculateSqrtPriceAfterSlippage,
-  getMaxTick,
-  getMinTick,
+  getMaxSqrtPrice,
+  getMinSqrtPrice,
   priceToSqrtPrice,
   sqrtPriceToPrice
 } from '@invariant-labs/a0-sdk/src'
@@ -102,10 +102,11 @@ export const formatNumbers =
     return num < 0 && threshold ? '-' + formatted : formatted
   }
 
-export const printAmount = (amount: string, decimals: number): string => {
-  const isNegative = amount.length > 0 && amount[0] === '-'
+export const printAmount = (amount: TokenAmount, decimals: number): string => {
+  const amountString = amount.toString()
+  const isNegative = amountString.length > 0 && amountString[0] === '-'
 
-  const balanceString = isNegative ? amount.slice(1) : amount
+  const balanceString = isNegative ? amountString.slice(1) : amountString
 
   if (balanceString.length <= decimals) {
     return (
@@ -133,11 +134,15 @@ export const trimZeros = (numStr: string): string => {
 
 export const PRICE_DECIMAL = 24
 
-export const calcYPerXPrice = (sqrtPrice: string, xDecimal: number, yDecimal: number): number => {
+export const calcYPerXPrice = (
+  sqrtPrice: TokenAmount,
+  xDecimal: bigint,
+  yDecimal: bigint
+): bigint => {
   const sqrt = +printAmount(sqrtPrice, PRICE_DECIMAL)
-  const proportion = sqrt * sqrt
+  const proportion = BigInt(sqrt * sqrt)
 
-  return proportion / 10 ** (yDecimal - xDecimal)
+  return proportion / 10n ** (yDecimal - xDecimal)
 }
 
 export const trimLeadingZeros = (amount: string): string => {
@@ -187,31 +192,39 @@ export const toMaxNumericPlaces = (num: number, places: number): string => {
   return num.toFixed(places + Math.abs(log) - 1)
 }
 
-export const calcPrice = (index: bigint, isXtoY: boolean, xDecimal: number, yDecimal: number) => {
-  //Check if this is correct
-  const price = calcYPerXPrice(priceToSqrtPrice(index).toString(), xDecimal, yDecimal)
+export const calcPrice = (
+  amount: TokenAmount,
+  isXtoY: boolean,
+  xDecimal: bigint,
+  yDecimal: bigint
+) => {
+  //TODO check if this is correct, in Solana sdk was method calculatePriceSqrt which takes index to calculate price
+  const price = calcYPerXPrice(priceToSqrtPrice(amount), xDecimal, yDecimal)
 
-  return isXtoY ? price : price !== 0 ? 1 / price : Number.MAX_SAFE_INTEGER
+  return isXtoY ? price : 1n / price
 }
 
 export const createPlaceholderLiquidityPlot = (
   isXtoY: boolean,
-  yValueToFill: number,
+  yValueToFill: bigint,
   tickSpacing: number,
-  tokenXDecimal: number,
-  tokenYDecimal: number
+  tokenXDecimal: bigint,
+  tokenYDecimal: bigint
 ) => {
   const ticksData: PlotTickData[] = []
 
-  const min = getMinTick(tickSpacing)
-  const max = getMaxTick(tickSpacing)
+  // const min = getMinTick(tickSpacing) //TODO check if this is correct
+  // const max = getMaxTick(tickSpacing)
+
+  const min = 10n
+  const max = 1203n
 
   const minPrice = calcPrice(min, isXtoY, tokenXDecimal, tokenYDecimal)
 
   ticksData.push({
     x: minPrice,
     y: yValueToFill,
-    index: Number(min)
+    index: min
   })
 
   const maxPrice = calcPrice(max, isXtoY, tokenXDecimal, tokenYDecimal)
@@ -219,7 +232,7 @@ export const createPlaceholderLiquidityPlot = (
   ticksData.push({
     x: maxPrice,
     y: yValueToFill,
-    index: Number(max)
+    index: max
   })
 
   return isXtoY ? ticksData : ticksData.reverse()
@@ -263,7 +276,8 @@ export const getMockedTokenPrice = (symbol: string, network: NetworkType): Token
   }
 }
 
-export const printBN = (amount: TokenAmount, decimals: number): string => {
+export const printBN = (amount: TokenAmount, decimals: bigint): string => {
+  const parsedDecimals = Number(decimals)
   const amountString = amount.toString()
   const isNegative = amountString.length > 0 && amountString[0] === '-'
 
@@ -272,17 +286,25 @@ export const printBN = (amount: TokenAmount, decimals: number): string => {
   if (balanceString.length <= decimals) {
     return (
       // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-      (isNegative ? '-' : '') + '0.' + '0'.repeat(decimals - balanceString.length) + balanceString
+      (isNegative ? '-' : '') +
+      '0.' +
+      '0'.repeat(parsedDecimals - balanceString.length) +
+      balanceString
     )
   } else {
     return (
       (isNegative ? '-' : '') +
       trimZeros(
         // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-        balanceString.substring(0, balanceString.length - decimals) +
+        balanceString.substring(0, balanceString.length - parsedDecimals) +
           '.' +
-          balanceString.substring(balanceString.length - decimals)
+          balanceString.substring(balanceString.length - parsedDecimals)
       )
     )
   }
+}
+
+export const parseFeeToPathFee = (fee: bigint): string => {
+  const parsedFee = (fee / BigInt(Math.pow(10, 8))).toString().padStart(3, '0')
+  return parsedFee.slice(0, parsedFee.length - 2) + '_' + parsedFee.slice(parsedFee.length - 2)
 }

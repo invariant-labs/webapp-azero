@@ -3,12 +3,12 @@ import classNames from 'classnames'
 import React, { useCallback, useEffect, useState } from 'react'
 import FeeSwitch from '../FeeSwitch/FeeSwitch'
 import { useStyles } from './style'
-import AnimatedButton, { ProgressState } from '@components/common/AnimatedButton'
+import AnimatedButton, { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import { PositionOpeningMethod } from '@store/consts/static'
 import { Grid, Typography } from '@mui/material'
 import { getScaleFromString, printBN } from '@store/consts/utils'
-import DepositAmountInput from '@components/common/Inputs/DepositAmountInput/DepositAmountInput'
-import Select from '@components/common/Inputs/Select/Select'
+import DepositAmountInput from '@components/Inputs/DepositAmountInput/DepositAmountInput'
+import Select from '@components/Inputs/Select/Select'
 
 export interface InputState {
   value: string
@@ -38,7 +38,7 @@ export interface IDepositSelector {
   priceA?: number
   priceB?: number
   onReverseTokens: () => void
-  poolIndex: number | null
+  poolIndex: bigint | null
   bestTierIndex?: number
   canCreateNewPool: boolean
   canCreateNewPosition: boolean

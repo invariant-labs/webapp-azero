@@ -18,7 +18,13 @@ import {
   Typography,
   useMediaQuery
 } from '@mui/material'
-import { FormatNumberThreshold, formatNumbers, printBN, showPrefix } from '@store/consts/utils'
+import {
+  FormatNumberThreshold,
+  formatNumbers,
+  printAmount,
+  printBN,
+  showPrefix
+} from '@store/consts/utils'
 import AddTokenModal from '@components/Modals/AddTokenModal/AddTokenModal'
 
 export interface ISelectTokenModal {
@@ -120,10 +126,9 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
         token.strAddress.includes(value)
       )
     })
-
     const sorted = list.sort((a, b) => {
-      const aBalance = +printBN(a.balance, a.decimals)
-      const bBalance = +printBN(b.balance, b.decimals)
+      const aBalance = +printAmount(a.balance, Number(a.decimals))
+      const bBalance = +printAmount(b.balance, Number(b.decimals))
       if ((aBalance === 0 && bBalance === 0) || (aBalance > 0 && bBalance > 0)) {
         if (value.length) {
           if (
@@ -132,7 +137,6 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
           ) {
             return -1
           }
-
           if (
             b.symbol.toLowerCase().startsWith(value.toLowerCase()) &&
             !a.symbol.toLowerCase().startsWith(value.toLowerCase())
@@ -140,13 +144,11 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
             return 1
           }
         }
-
         return a.symbol.toLowerCase().localeCompare(b.symbol.toLowerCase())
       }
-
       return aBalance === 0 ? 1 : -1
     })
-
+    return list // TODO delete this line
     return hideUnknown ? sorted.filter(token => !token.isUnknown) : sorted
   }, [value, tokensWithIndexes, hideUnknown])
 
@@ -265,11 +267,11 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
               width={360}
               itemSize={66}
               itemCount={filteredTokens.length}
-              outerElementType={CustomScrollbarsVirtualList}
+              outerElementType={CustomScrollbarsVirtualList} //TODO check why scrollbar is not working
               outerRef={outerRef}>
               {({ index, style }: { index: number; style: React.CSSProperties }) => {
                 const token = filteredTokens[index]
-                const tokenBalance = printBN(token.balance, token.decimals)
+                const tokenBalance = printAmount(token.balance, Number(token.decimals)) // TODO check if printBN  is needed, and instead of that can be used printAmount?
 
                 return (
                   <Grid
@@ -297,7 +299,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
                     </Grid>
                     {!hideBalances && Number(tokenBalance) > 0 ? (
                       <Typography className={classes.tokenBalanceStatus}>
-                        Balance: {formatNumbers(thresholds(token.decimals))(tokenBalance)}
+                        Balance: {formatNumbers(thresholds(Number(token.decimals)))(tokenBalance)}
                         {showPrefix(Number(tokenBalance))}
                       </Typography>
                     ) : null}

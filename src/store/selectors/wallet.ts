@@ -47,8 +47,8 @@ export const tokenAccountsAddress = () =>
   })
 
 export interface SwapToken {
-  balance: TokenAmount
-  decimals: number
+  balance: TokenAmount // TODO check if this is correct type
+  decimals: bigint
   symbol: string
   assetAddress: AddressOrPair
   name: string
@@ -68,7 +68,7 @@ export const swapTokens = createSelector(
       balance:
         token.address.toString() === TESTNET_WAZERO_ADDRESS
           ? a0Balance
-          : allAccounts[token.address.toString()]?.balance ?? BigInt(0)
+          : allAccounts[token.address.toString()]?.balance ?? 0n
     }))
   }
 )
@@ -79,7 +79,7 @@ export const swapTokensDict = createSelector(
   balance,
   (allAccounts, tokens, a0Balance) => {
     const swapTokens: Record<string, SwapToken> = {}
-    //Check if this is correct
+    //TODO check if this is correct
     Object.entries(tokens).forEach(([key, val]) => {
       swapTokens[key] = {
         ...val,
