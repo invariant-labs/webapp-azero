@@ -1,9 +1,18 @@
 import createSagaMiddleware from 'redux-saga'
 
-import { configureStore } from '@reduxjs/toolkit'
+import { configureStore, isPlain } from '@reduxjs/toolkit'
 
 import combinedReducers from './reducers'
 import rootSaga from './sagas'
+
+const isSerializable = (value: any) => {
+  return typeof value === 'bigint' || isPlain(value)
+}
+const getEntries = (value: any) => {
+  return typeof value === 'bigint'
+    ? [['bigint', value.toString()] as [string, any]]
+    : Object.entries(value)
+}
 
 const configureAppStore = (initialState = {}) => {
   const reduxSagaMonitorOptions = {}
@@ -15,7 +24,10 @@ const configureAppStore = (initialState = {}) => {
     reducer: combinedReducers,
     middleware: getDefaultMiddleware =>
       getDefaultMiddleware({
-        // serializableCheck: false //Find better solution to fix serializable check error
+        serializableCheck: {
+          isSerializable,
+          getEntries
+        }
       }).concat(middleware),
     preloadedState: initialState,
     // devTools: process.env.NODE_ENV !== "production",
