@@ -12,7 +12,7 @@ export enum Status {
 
 export interface ITokenAccount {
   address: string
-  balance: string
+  balance: bigint
 }
 // export interface ITokenData {
 //   programId: string
