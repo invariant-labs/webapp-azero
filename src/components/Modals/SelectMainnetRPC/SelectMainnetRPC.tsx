@@ -3,15 +3,15 @@ import classNames from 'classnames'
 import React, { useState } from 'react'
 import useStyles from './styles'
 import { ISelectNetwork } from '@store/consts/types'
-import { NetworkType } from '@store/consts/static'
 import { Button, Grid, Input, Popover, Typography } from '@mui/material'
 import DotIcon from '@mui/icons-material/FiberManualRecordRounded'
+import { Network } from '@invariant-labs/a0-sdk'
 
 export interface ISelectMainnetRpc {
   networks: ISelectNetwork[]
   open: boolean
   anchorEl: HTMLButtonElement | null
-  onSelect: (networkType: NetworkType, rpcAddress: string, rpcName?: string) => void
+  onSelect: (networkType: Network, rpcAddress: string, rpcName?: string) => void
   handleClose: () => void
   activeRPC: string
 }
@@ -91,7 +91,7 @@ export const SelectMainnetRPC: React.FC<ISelectMainnetRpc> = ({
           <Button
             className={classes.add}
             onClick={() => {
-              onSelect(NetworkType.TESTNET, address, 'Custom')
+              onSelect(Network.Testnet, address, 'Custom')
               handleClose()
             }}
             disableRipple

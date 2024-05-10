@@ -5,7 +5,7 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import { FixedSizeList as List } from 'react-window'
 import useStyles from '../style'
 import { theme } from '@static/theme'
-import { SwapToken } from '@store/selectors/wallet'
+
 import { AddressOrPair } from '@polkadot/api/types'
 import {
   Box,
@@ -26,6 +26,7 @@ import {
   showPrefix
 } from '@store/consts/utils'
 import AddTokenModal from '@components/Modals/AddTokenModal/AddTokenModal'
+import { SwapToken } from '@store/selectors/wallet'
 
 export interface ISelectTokenModal {
   tokens: SwapToken[]

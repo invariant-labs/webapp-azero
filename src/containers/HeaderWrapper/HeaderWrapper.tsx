@@ -1,5 +1,6 @@
 import Header from '@components/Header/Header'
-import { AlephZeroNetworks, NetworkType } from '@store/consts/static'
+import { Network } from '@invariant-labs/a0-sdk'
+import { AlephZeroNetworks } from '@store/consts/static'
 import { actions } from '@store/reducers/connection'
 import { Status, actions as walletActions } from '@store/reducers/wallet'
 import { network, rpcAddress } from '@store/selectors/connection'
@@ -56,7 +57,7 @@ export const HeaderWrapper: React.FC = () => {
       address={walletAddress}
       onNetworkSelect={(network, rpcAddress, rpcName) => {
         if (network !== currentNetwork || rpcAddress !== currentRpc) {
-          if (network === NetworkType.TESTNET) {
+          if (network === Network.Testnet) {
             localStorage.setItem('INVARIANT_TESTNET_RPC', rpcAddress)
           }
 

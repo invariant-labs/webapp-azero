@@ -1,12 +1,6 @@
+import { Network } from '@invariant-labs/a0-sdk/src'
 import { Keyring } from '@polkadot/api'
 import { AddressOrPair } from '@polkadot/api/types'
-
-export enum NetworkType {
-  DEVNET = 'Devnet',
-  TESTNET = 'Testnet',
-  LOCALNET = 'Localnet',
-  MAINNET = 'Mainnet'
-}
 
 export enum AlephZeroNetworks {
   TEST = 'wss://ws.test.azero.dev',
@@ -38,14 +32,10 @@ export interface Token {
 // TODO - add real data
 export const ALL_FEE_TIERS_DATA = []
 
-export const tokensPrices: Record<NetworkType, Record<string, TokenPriceData>> = {
-  Devnet: {},
-  Mainnet: {},
-  Testnet: {
-    USDC_TEST: { price: 1 },
-    BTC_TEST: { price: 64572.0 }
-  },
-  Localnet: {}
+export const tokensPrices: Record<Network, Record<string, TokenPriceData>> = {
+  [Network.Testnet]: { USDC_TEST: { price: 1 }, BTC_TEST: { price: 64572.0 } },
+  [Network.Mainnet]: {},
+  [Network.Local]: {}
 }
 export interface BestTier {
   tokenX: AddressOrPair
@@ -114,18 +104,16 @@ const mainnetBestTiersCreator = () => {
   return bestTiers
 }
 
-export const bestTiers: Record<NetworkType, BestTier[]> = {
-  Devnet: [],
-  Testnet: [],
-  Mainnet: [],
-  Localnet: []
+export const bestTiers: Record<Network, BestTier[]> = {
+  [Network.Testnet]: [],
+  [Network.Mainnet]: [],
+  [Network.Local]: []
 }
 
-export const commonTokensForNetworks: Record<NetworkType, AddressOrPair[]> = {
-  Devnet: [],
-  Mainnet: [],
-  Testnet: [],
-  Localnet: []
+export const commonTokensForNetworks: Record<Network, AddressOrPair[]> = {
+  [Network.Testnet]: [],
+  [Network.Mainnet]: [],
+  [Network.Local]: []
 }
 
 export const FAUCET_DEPLOYER_MNEMONIC =

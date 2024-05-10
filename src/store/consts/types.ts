@@ -1,5 +1,5 @@
 import { AnyAction, ActionCreator } from 'redux'
-import { NetworkType } from './static'
+import { Network } from '@invariant-labs/a0-sdk'
 
 interface ActionsBasicType {
   [k: string]: ActionCreator<AnyAction>
@@ -10,7 +10,7 @@ export type PayloadType<actions extends ActionsBasicType> = {
 }
 
 export interface ISelectNetwork {
-  networkType: NetworkType
+  networkType: Network
   rpc: string
   rpcName?: string
 }

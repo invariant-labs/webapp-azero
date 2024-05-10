@@ -1,5 +1,6 @@
+import { Network } from '@invariant-labs/a0-sdk/src'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
-import { AlephZeroNetworks, NetworkType } from '@store/consts/static'
+import { AlephZeroNetworks } from '@store/consts/static'
 import { PayloadType } from '@store/consts/types'
 
 export enum Status {
@@ -11,7 +12,7 @@ export enum Status {
 export interface IAlephZeroConnectionStore {
   status: Status
   message: string
-  network: NetworkType
+  network: Network
   blockNumber: number
   rpcAddress: string
 }
@@ -19,7 +20,7 @@ export interface IAlephZeroConnectionStore {
 export const defaultState: IAlephZeroConnectionStore = {
   status: Status.Uninitialized,
   message: '',
-  network: NetworkType.TESTNET,
+  network: Network.Testnet,
   blockNumber: 0,
   rpcAddress: AlephZeroNetworks.TEST
 }
@@ -43,7 +44,7 @@ const connectionSlice = createSlice({
     setNetwork(
       state,
       action: PayloadAction<{
-        network: NetworkType
+        network: Network
         rpcAddress: string
         rpcName?: string
       }>

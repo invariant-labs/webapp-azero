@@ -9,21 +9,22 @@ import Hamburger from '@static/svg/Hamburger.svg'
 import DotIcon from '@mui/icons-material/FiberManualRecordRounded'
 import { blurContent, unblurContent } from '@utils/uiUtils'
 import ChangeWalletButton from './HeaderButton/ChangeWalletButton'
-import { AlephZeroNetworks, NetworkType } from '@store/consts/static'
+import { AlephZeroNetworks } from '@store/consts/static'
 import SelectNetworkButton from './HeaderButton/SelectNetworkButton'
 import { AddressOrPair } from '@polkadot/api-base/types'
 import SelectRPCButton from './HeaderButton/SelectRPCButton'
 import useButtonStyles from './HeaderButton/style'
 import { theme } from '@static/theme'
 import SelectMainnetRPC from '@components/Modals/SelectMainnetRPC/SelectMainnetRPC'
+import { Network } from '@invariant-labs/a0-sdk/src'
 
 export interface IHeader {
   address: AddressOrPair
-  onNetworkSelect: (networkType: NetworkType, rpcAddress: string, rpcName?: string) => void
+  onNetworkSelect: (networkType: Network, rpcAddress: string, rpcName?: string) => void
   onConnectWallet: () => void
   walletConnected: boolean
   landing: string
-  typeOfNetwork: NetworkType
+  typeOfNetwork: Network
   rpc: string
   onFaucet?: () => void
   onDisconnectWallet: () => void
@@ -62,7 +63,7 @@ export const Header: React.FC<IHeader> = ({
 
   const testnetRPCs = [
     {
-      networkType: NetworkType.TESTNET,
+      networkType: Network.Testnet,
       rpc: AlephZeroNetworks.TEST,
       rpcName: 'Aleph zero'
     }
@@ -113,7 +114,7 @@ export const Header: React.FC<IHeader> = ({
         </Grid>
 
         <Grid container item className={classes.buttons} wrap='nowrap' gap={1.5}>
-          {typeOfNetwork === NetworkType.DEVNET || typeOfNetwork === NetworkType.TESTNET ? (
+          {typeOfNetwork === Network.Testnet ? (
             <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
               <Button
                 className={buttonStyles.classes.headerButton}
@@ -124,7 +125,7 @@ export const Header: React.FC<IHeader> = ({
               </Button>
             </Box>
           ) : null}
-          {typeOfNetwork === NetworkType.TESTNET ? (
+          {typeOfNetwork === Network.Testnet ? (
             <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
               <SelectRPCButton rpc={rpc} networks={testnetRPCs} onSelect={onNetworkSelect} />
             </Box>
@@ -133,7 +134,7 @@ export const Header: React.FC<IHeader> = ({
             name={typeOfNetwork}
             networks={[
               {
-                networkType: NetworkType.TESTNET,
+                networkType: Network.Testnet,
                 rpc: defaultTestnetRPC,
                 rpcName:
                   testnetRPCs.find(data => data.rpc === defaultTestnetRPC)?.rpcName ?? 'Custom'
@@ -186,14 +187,9 @@ export const Header: React.FC<IHeader> = ({
               setRoutesModalOpen(false)
               unblurContent()
             }}
-            onFaucet={
-              (typeOfNetwork === NetworkType.DEVNET || typeOfNetwork === NetworkType.TESTNET) &&
-              isXsDown
-                ? onFaucet
-                : undefined
-            }
+            onFaucet={typeOfNetwork === Network.Testnet && isXsDown ? onFaucet : undefined}
             onRPC={
-              typeOfNetwork === NetworkType.TESTNET && isXsDown
+              typeOfNetwork === Network.Testnet && isXsDown
                 ? () => {
                     setRoutesModalOpen(false)
                     setTestnetRpcsOpen(true)
@@ -201,7 +197,7 @@ export const Header: React.FC<IHeader> = ({
                 : undefined
             }
           />
-          {typeOfNetwork === NetworkType.TESTNET ? (
+          {typeOfNetwork === Network.Testnet ? (
             <SelectMainnetRPC
               networks={testnetRPCs}
               open={testnetRpcsOpen}

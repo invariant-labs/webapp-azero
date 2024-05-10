@@ -5,17 +5,15 @@ import useStyles from './style'
 import { blurContent, unblurContent } from '@utils/uiUtils'
 import { Button } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { SwapToken } from '@store/selectors/wallet'
 import SelectTokenModal from '@components/Modals/SelectModals/SelectTokenModal/SelectTokenModal'
 import { AddressOrPair } from '@polkadot/api/types'
+import { SwapToken } from '@store/selectors/wallet'
 
 export interface ISelectModal {
   name?: string
   current: SwapToken | null
   centered?: boolean
-
   tokens: SwapToken[]
-
   onSelect: (index: number) => void
   className?: string
   hideBalancesInModal?: boolean

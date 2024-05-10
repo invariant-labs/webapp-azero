@@ -1,8 +1,7 @@
-import { TESTNET_WAZERO_ADDRESS, TokenAmount } from '@invariant-labs/a0-sdk'
+import { Network, TESTNET_WAZERO_ADDRESS, TokenAmount } from '@invariant-labs/a0-sdk'
 import { AddressOrPair } from '@polkadot/api/types'
 import { BN } from '@polkadot/util'
 import { createSelector } from '@reduxjs/toolkit'
-import { NetworkType } from '@store/consts/static'
 import { IAlephZeroWallet, ITokenAccount, walletSliceName } from '@store/reducers/wallet'
 import { AnyProps, keySelectors } from './helpers'
 import { tokens } from './pools'
@@ -95,7 +94,7 @@ export const swapTokensDict = createSelector(
   }
 )
 
-export const canCreateNewPool = (network: NetworkType) =>
+export const canCreateNewPool = (network: Network) =>
   createSelector(balance, ethBalance => {
     // switch (network) {
     //   case NetworkType.DEVNET:
@@ -109,7 +108,7 @@ export const canCreateNewPool = (network: NetworkType) =>
     // }
     return true
   })
-export const canCreateNewPosition = (network: NetworkType) =>
+export const canCreateNewPosition = (network: Network) =>
   createSelector(balance, ethBalance => {
     // switch (network) {
     //   case NetworkType.DEVNET:

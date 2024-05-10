@@ -1,17 +1,16 @@
 import React from 'react'
-
 import useStyles from './style'
 import { ISelectNetwork } from '@store/consts/types'
-import { NetworkType } from '@store/consts/static'
 import { blurContent, unblurContent } from '@utils/uiUtils'
 import { Button } from '@mui/material'
 import SelectMainnetRPC from '@components/Modals/SelectMainnetRPC/SelectMainnetRPC'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import { Network } from '@invariant-labs/a0-sdk'
 
 export interface IProps {
   rpc: string
   networks: ISelectNetwork[]
-  onSelect: (networkType: NetworkType, rpcAddress: string, rpcName?: string) => void
+  onSelect: (networkType: Network, rpcAddress: string, rpcName?: string) => void
   disabled?: boolean
 }
 export const SelectRPCButton: React.FC<IProps> = ({

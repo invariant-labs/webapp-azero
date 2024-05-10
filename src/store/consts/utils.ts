@@ -1,13 +1,13 @@
-import { TokenAmount, priceToSqrtPrice } from '@invariant-labs/a0-sdk'
+import { Network, TokenAmount, priceToSqrtPrice } from '@invariant-labs/a0-sdk'
 import { PlotTickData } from '@store/reducers/positions'
 import axios from 'axios'
-import { NetworkType, TokenPriceData, tokensPrices } from './static'
+import { TokenPriceData, tokensPrices } from './static'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
-export const getInvariantAddress = (network: NetworkType): string | null => {
+export const getInvariantAddress = (network: Network): string | null => {
   switch (network) {
-    case NetworkType.TESTNET:
+    case Network.Testnet:
       return '5FiTccBSAH9obLA4Q33hYrL3coPm2SE276rFPVttFPFnaxnC'
     default:
       return null
@@ -253,8 +253,8 @@ export const getCoingeckoTokenPrice = async (id: string): Promise<CoingeckoPrice
     })
 }
 
-export const getMockedTokenPrice = (symbol: string, network: NetworkType): TokenPriceData => {
-  const sufix = network === NetworkType.DEVNET ? '_DEV' : '_TEST'
+export const getMockedTokenPrice = (symbol: string, network: Network): TokenPriceData => {
+  const sufix = network === Network.Testnet ? '_TEST' : '_DEV'
   const prices = tokensPrices[network]
   switch (symbol) {
     case 'BTC':
