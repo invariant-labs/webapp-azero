@@ -3,12 +3,7 @@ import { NightlyConnectAdapter } from '@nightlylabs/wallet-selector-polkadot'
 import { AddressOrPair, SubmittableExtrinsic } from '@polkadot/api/types'
 import { SignerOptions } from '@polkadot/api/types/submittable'
 import { PayloadAction } from '@reduxjs/toolkit'
-import {
-  FAUCET_TOKEN_AMOUNT,
-  TokenDecimal,
-  TokenList,
-  getFaucetDeployer
-} from '@store/consts/static'
+import { TokenAirdropAmount, TokenList, getFaucetDeployer } from '@store/consts/static'
 import { createLoaderKey } from '@store/consts/utils'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Status, actions, actions as walletActions } from '@store/reducers/wallet'
@@ -132,12 +127,12 @@ export function* handleAirdrop(): Generator {
 
   for (const ticker in TokenList) {
     const address = TokenList[ticker as keyof typeof TokenList]
-    const decimal = TokenDecimal[ticker as keyof typeof TokenDecimal]
+    const airdropAmount = TokenAirdropAmount[ticker as keyof typeof TokenList]
 
     yield* call([psp22, psp22.setContractAddress], address)
     const balance = yield* call([psp22, psp22.balanceOf], faucetDeployer, address)
     yield* put(walletActions.setTokenAccount({ address, balance: String(balance) }))
-    const faucetAmount = FAUCET_TOKEN_AMOUNT * 10n ** BigInt(decimal)
+    const faucetAmount = BigInt(airdropAmount)
     if (balance < faucetAmount) {
       yield* call(psp22.mint, faucetDeployer, faucetAmount)
       yield* call(psp22.transfer, faucetDeployer, address, faucetAmount, data)

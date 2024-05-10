@@ -126,10 +126,10 @@ export const getFaucetDeployer = () => {
 
 export const FAUCET_TOKEN_AMOUNT = 1000n
 
-export enum TokenDecimal {
-  BTC = 8,
-  ETH = 18,
-  USDC = 6
+export enum TokenAirdropAmount {
+  BTC = 100000,
+  ETH = '20000000000000000',
+  USDC = 50000000
 }
 
 export enum TokenList {
