@@ -1,4 +1,4 @@
-import { FeeTier, Network } from '@invariant-labs/a0-sdk/src'
+import { Network } from '@invariant-labs/a0-sdk/src'
 import { Keyring } from '@polkadot/api'
 import { AddressOrPair } from '@polkadot/api/types'
 
@@ -114,4 +114,26 @@ export const commonTokensForNetworks: Record<Network, AddressOrPair[]> = {
   [Network.Testnet]: [],
   [Network.Mainnet]: [],
   [Network.Local]: []
+}
+
+export const FAUCET_DEPLOYER_MNEMONIC =
+  'motion ice subject actress spider rare leg fortune brown similar excess amazing'
+
+export const getFaucetDeployer = () => {
+  const keyring = new Keyring({ type: 'sr25519' })
+  return keyring.addFromUri(FAUCET_DEPLOYER_MNEMONIC)
+}
+
+export const FAUCET_TOKEN_AMOUNT = 1000n
+
+export const TokenAirdropAmount = {
+  BTC: 100000n,
+  ETH: 20000000000000000n,
+  USDC: 50000000n
+}
+
+export enum TokenList {
+  BTC = '5GhF7vS1A2CFWMCck69J8LGh37DgRLjYjjQTA49pAMXUeZ5B',
+  ETH = '5E8qAJ4aU2LC7Dq31cb4H9zR9zM1t5fVBaUZr2qBkJSWeUuL',
+  USDC = '5HJQP6MEFm2Hv42EG286r69LoCkomLgG23hRgYXo2VU2cYn6'
 }

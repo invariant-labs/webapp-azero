@@ -1,11 +1,10 @@
-import { IAlephZeroWallet, ITokenAccount, walletSliceName } from '@store/reducers/wallet'
-import { keySelectors, AnyProps } from './helpers'
+import { Network, TESTNET_WAZERO_ADDRESS, TokenAmount } from '@invariant-labs/a0-sdk'
+import { AddressOrPair } from '@polkadot/api/types'
 import { BN } from '@polkadot/util'
 import { createSelector } from '@reduxjs/toolkit'
-import { AddressOrPair } from '@polkadot/api/types'
+import { IAlephZeroWallet, ITokenAccount, walletSliceName } from '@store/reducers/wallet'
+import { AnyProps, keySelectors } from './helpers'
 import { tokens } from './pools'
-import { TESTNET_WAZERO_ADDRESS, TokenAmount } from '@invariant-labs/a0-sdk/src'
-import { Network } from '@invariant-labs/a0-sdk'
 
 const store = (s: AnyProps) => s[walletSliceName] as IAlephZeroWallet
 

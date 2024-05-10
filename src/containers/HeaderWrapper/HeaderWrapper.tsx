@@ -1,15 +1,15 @@
-import { AlephZeroNetworks } from '@store/consts/static'
-import React, { useEffect, useMemo } from 'react'
-import { useLocation } from 'react-router-dom'
-import { actions } from '@store/reducers/connection'
-import { Status, actions as walletActions } from '@store/reducers/wallet'
-import { useDispatch, useSelector } from 'react-redux'
-import { status, address } from '@store/selectors/wallet'
-import { network, rpcAddress } from '@store/selectors/connection'
-import { openWalletSelectorModal } from '@utils/web3/selector'
-import { getAlephZeroWallet } from '@utils/web3/wallet'
 import Header from '@components/Header/Header'
 import { Network } from '@invariant-labs/a0-sdk'
+import { AlephZeroNetworks } from '@store/consts/static'
+import { actions } from '@store/reducers/connection'
+import { Status, actions as walletActions } from '@store/reducers/wallet'
+import { network, rpcAddress } from '@store/selectors/connection'
+import { address, status } from '@store/selectors/wallet'
+import { openWalletSelectorModal } from '@utils/web3/selector'
+import { getAlephZeroWallet } from '@utils/web3/wallet'
+import React, { useEffect, useMemo } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useLocation } from 'react-router-dom'
 
 export const HeaderWrapper: React.FC = () => {
   const dispatch = useDispatch()
@@ -73,7 +73,7 @@ export const HeaderWrapper: React.FC = () => {
       onDisconnectWallet={() => {
         dispatch(walletActions.disconnect())
       }}
-      onFaucet={() => {}}
+      onFaucet={() => dispatch(walletActions.airdrop())}
       typeOfNetwork={currentNetwork}
       rpc={currentRpc}
       defaultTestnetRPC={defaultTestnetRPC}

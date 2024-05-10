@@ -1,6 +1,6 @@
-import { Percentage, TESTNET_WAZERO_ADDRESS, TokenAmount } from '@invariant-labs/a0-sdk/src'
+import { Percentage, TESTNET_WAZERO_ADDRESS, TokenAmount } from '@invariant-labs/a0-sdk'
 import { AddressOrPair } from '@polkadot/api/types'
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/consts/types'
 
 export interface Swap {

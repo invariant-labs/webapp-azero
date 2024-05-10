@@ -1,4 +1,4 @@
-import { Position, Tick, TokenAmount } from '@invariant-labs/a0-sdk/src'
+import { Position, Tick, TokenAmount } from '@invariant-labs/a0-sdk'
 import { AddressOrPair } from '@polkadot/api/types'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/consts/types'

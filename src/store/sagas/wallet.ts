@@ -1,24 +1,26 @@
-import {
-  call,
-  takeLeading,
-  SagaGenerator,
-  put,
-  spawn,
-  all,
-  select,
-  takeLatest
-} from 'typed-redux-saga'
-import { actions, Status } from '@store/reducers/wallet'
-import { getConnection } from './connection'
-import { getAlephZeroWallet, disconnectWallet } from '@utils/web3/wallet'
+import { Network, PSP22 } from '@invariant-labs/a0-sdk'
 import { NightlyConnectAdapter } from '@nightlylabs/wallet-selector-polkadot'
 import { AddressOrPair, SubmittableExtrinsic } from '@polkadot/api/types'
-import { address, status } from '@store/selectors/wallet'
-import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { SignerOptions } from '@polkadot/api/types/submittable'
-import { createLoaderKey } from '@store/consts/utils'
-import { closeSnackbar } from 'notistack'
 import { PayloadAction } from '@reduxjs/toolkit'
+import { TokenAirdropAmount, TokenList, getFaucetDeployer } from '@store/consts/static'
+import { createLoaderKey } from '@store/consts/utils'
+import { actions as snackbarsActions } from '@store/reducers/snackbars'
+import { Status, actions, actions as walletActions } from '@store/reducers/wallet'
+import { address, status } from '@store/selectors/wallet'
+import { disconnectWallet, getAlephZeroWallet } from '@utils/web3/wallet'
+import { closeSnackbar } from 'notistack'
+import {
+  SagaGenerator,
+  all,
+  call,
+  put,
+  select,
+  spawn,
+  takeLatest,
+  takeLeading
+} from 'typed-redux-saga'
+import { getConnection } from './connection'
 
 export function* getWallet(): SagaGenerator<NightlyConnectAdapter> {
   const wallet = yield* call(getAlephZeroWallet)
@@ -103,63 +105,60 @@ export function* handleBalance(): Generator {
 //   return token
 // }
 
-// export function* handleAirdrop(): Generator {
-//   const walletStatus = yield* select(status)
-//   if (walletStatus !== Status.Initialized) {
-//     yield put(
-//       snackbarsActions.add({
-//         message: 'Connect your wallet first',
-//         variant: 'warning',
-//         persist: false
-//       })
-//     )
-//     return
-//   }
+export function* handleAirdrop(): Generator {
+  const walletAddress = yield* select(address)
 
-//   const loaderKey = createLoaderKey()
-//   yield put(
-//     snackbarsActions.add({
-//       message: 'Airdrop in progress',
-//       variant: 'pending',
-//       persist: true,
-//       key: loaderKey
-//     })
-//   )
+  if (!walletAddress) {
+    return yield* put(
+      snackbarsActions.add({
+        message: 'You have to connect your wallet before claiming the faucet',
+        variant: 'error',
+        persist: false
+      })
+    )
+  }
 
-//   const connection = yield* call(getConnection)
-//   const networkType = yield* select(network)
-//   const wallet = yield* call(getWallet)
-//   let balance = yield* call([connection, connection.getBalance], wallet.publicKey)
-//   if (balance < 0.05 * 1e9) {
-//     yield* call([connection, connection.requestAirdrop], wallet.publicKey, 0.1 * 1e9)
-//     balance = yield* call([connection, connection.getBalance], wallet.publicKey)
-//     yield* call(sleep, 2000)
-//     let retries = 30
-//     for (;;) {
-//       // eslint-disable-next-line eqeqeq
-//       if (0.05 * 1e9 < (yield* call([connection, connection.getBalance], wallet.publicKey))) {
-//         break
-//       }
-//       yield* call(sleep, 2000)
-//       if (--retries <= 0) {
-//         break
-//       }
-//     }
-//   }
+  const connection = yield* getConnection()
+  const faucetDeployer = getFaucetDeployer()
+  const data = connection.createType('Vec<u8>', [])
+  const notAirdroppedTokens = []
 
-//   yield* call(getCollateralTokenAirdrop, airdropTokens[networkType], airdropQuantities[networkType])
+  const psp22 = yield* call(PSP22.load, connection, Network.Testnet, '')
 
-//   yield put(
-//     snackbarsActions.add({
-//       message: 'You will soon receive airdrop',
-//       variant: 'success',
-//       persist: false
-//     })
-//   )
+  for (const ticker in TokenList) {
+    const address = TokenList[ticker as keyof typeof TokenList]
+    const airdropAmount = TokenAirdropAmount[ticker as keyof typeof TokenList]
 
-//   closeSnackbar(loaderKey)
-//   yield put(snackbarsActions.remove(loaderKey))
-// }
+    yield* call([psp22, psp22.setContractAddress], address)
+    const balance = yield* call([psp22, psp22.balanceOf], faucetDeployer, address)
+    yield* put(walletActions.setTokenAccount({ address, balance }))
+    const faucetAmount = airdropAmount
+    if (balance < faucetAmount) {
+      yield* call(psp22.mint, faucetDeployer, faucetAmount)
+      yield* call(psp22.transfer, faucetDeployer, address, faucetAmount, data)
+
+      yield* put(
+        snackbarsActions.add({
+          message: `Airdropped ${ticker} tokens`,
+          variant: 'success',
+          persist: false
+        })
+      )
+    } else {
+      notAirdroppedTokens.push(ticker)
+    }
+  }
+
+  if (notAirdroppedTokens.length > 0) {
+    yield* put(
+      snackbarsActions.add({
+        message: `Didn't airdrop ${notAirdroppedTokens.join(', ')} ${notAirdroppedTokens.length === 1 ? 'token' : 'tokens'} due to high balance`,
+        variant: 'error',
+        persist: false
+      })
+    )
+  }
+}
 
 // export function* setEmptyAccounts(collateralsAddresses: PublicKey[]): Generator {
 //   const tokensAccounts = yield* select(accounts)
@@ -346,9 +345,9 @@ export function* disconnectHandler(): Generator {
   yield takeLatest(actions.disconnect, handleDisconnect)
 }
 
-// export function* airdropSaga(): Generator {
-//   yield takeLeading(actions.airdrop, handleAirdrop)
-// }
+export function* airdropSaga(): Generator {
+  yield takeLeading(actions.airdrop, handleAirdrop)
+}
 
 export function* initSaga(): Generator {
   yield takeLeading(actions.initWallet, init)
@@ -361,5 +360,7 @@ export function* handleTestTransaction(): Generator {
   yield takeLeading(actions.initTestTransaction, testTransaction)
 }
 export function* walletSaga(): Generator {
-  yield all([initSaga, connectHandler, disconnectHandler, handleTestTransaction].map(spawn))
+  yield all(
+    [initSaga, airdropSaga, connectHandler, disconnectHandler, handleTestTransaction].map(spawn)
+  )
 }

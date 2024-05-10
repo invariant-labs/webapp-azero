@@ -1,8 +1,7 @@
+import { TokenAmount } from '@invariant-labs/a0-sdk'
+import { AddressOrPair } from '@polkadot/api-base/types'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/consts/types'
-import { AddressOrPair } from '@polkadot/api-base/types'
-import { Keyring } from '@polkadot/keyring'
-import { TokenAmount } from '@invariant-labs/a0-sdk/src'
 
 export enum Status {
   Uninitialized = 'uninitialized',
@@ -12,10 +11,8 @@ export enum Status {
 }
 
 export interface ITokenAccount {
-  programId: Keyring
-  balance: TokenAmount
-  address: AddressOrPair
-  decimals: number
+  address: string
+  balance: bigint
 }
 // export interface ITokenData {
 //   programId: string
@@ -94,10 +91,10 @@ const walletSlice = createSlice({
     //   })
     //   return state
     // },
-    // setTokenBalance(state, action: PayloadAction<IsetTokenBalance>) {
-    //   state.accounts[action.payload.programId].balance = action.payload.balance
-    //   return state
-    // },
+    setTokenAccount(state, action: PayloadAction<ITokenAccount>) {
+      state.accounts[action.payload.address.toString()] = action.payload
+      return state
+    },
     // Triggers rescan for tokens that we control
     rescanTokens() {},
     airdrop() {},

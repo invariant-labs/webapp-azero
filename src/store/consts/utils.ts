@@ -1,16 +1,7 @@
+import { Network, TokenAmount, priceToSqrtPrice } from '@invariant-labs/a0-sdk'
 import { PlotTickData } from '@store/reducers/positions'
-import { TokenPriceData, tokensPrices } from './static'
 import axios from 'axios'
-import {
-  TokenAmount,
-  calculatePriceImpact,
-  calculateSqrtPriceAfterSlippage,
-  getMaxSqrtPrice,
-  getMinSqrtPrice,
-  priceToSqrtPrice,
-  sqrtPriceToPrice
-} from '@invariant-labs/a0-sdk/src'
-import { Network } from '@invariant-labs/a0-sdk'
+import { TokenPriceData, tokensPrices } from './static'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 

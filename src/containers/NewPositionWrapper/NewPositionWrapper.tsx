@@ -1,26 +1,12 @@
 import NewPosition from '@components/NewPosition/NewPosition'
 import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import {
-  calcPrice,
-  calcYPerXPrice,
-  createPlaceholderLiquidityPlot,
-  getCoingeckoTokenPrice,
-  getMockedTokenPrice
-} from '@store/consts/utils'
-import { TickPlotPositionData } from '@store/reducers/positions'
-import { network } from '@store/selectors/connection'
-import {
-  isLoadingLatestPoolsForTransaction,
-  poolsArraySortedByFees,
-  volumeRanges
-} from '@store/selectors/pools'
-import { initPosition, plotTicks } from '@store/selectors/positions'
-import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import { canCreateNewPool, canCreateNewPosition, status, swapTokens } from '@store/selectors/wallet'
-import { getCurrentAlephZeroConnection } from '@utils/web3/connection'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { VariantType } from 'notistack'
+  TokenAmount,
+  getLiquidityByX,
+  getLiquidityByY,
+  priceToSqrtPrice
+} from '@invariant-labs/a0-sdk'
+import { AddressOrPair } from '@polkadot/api/types'
 import {
   PositionOpeningMethod,
   TokenPriceData,
@@ -28,13 +14,27 @@ import {
   commonTokensForNetworks
 } from '@store/consts/static'
 import {
-  TokenAmount,
-  getLiquidityByX,
-  getLiquidityByY,
-  priceToSqrtPrice
-} from '@invariant-labs/a0-sdk/src'
-import { AddressOrPair } from '@polkadot/api/types'
+  calcPrice,
+  calcYPerXPrice,
+  createPlaceholderLiquidityPlot,
+  getCoingeckoTokenPrice,
+  getMockedTokenPrice
+} from '@store/consts/utils'
+import { TickPlotPositionData } from '@store/reducers/positions'
+import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Status } from '@store/reducers/wallet'
+import { network } from '@store/selectors/connection'
+import {
+  isLoadingLatestPoolsForTransaction,
+  poolsArraySortedByFees,
+  volumeRanges
+} from '@store/selectors/pools'
+import { initPosition, plotTicks } from '@store/selectors/positions'
+import { canCreateNewPool, canCreateNewPosition, status, swapTokens } from '@store/selectors/wallet'
+import { getCurrentAlephZeroConnection } from '@utils/web3/connection'
+import { VariantType } from 'notistack'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 export interface IProps {
   initialTokenFrom: string

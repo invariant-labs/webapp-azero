@@ -1,6 +1,6 @@
-import { Pool, Tick } from '@invariant-labs/a0-sdk/src'
-import { createSlice } from '@reduxjs/toolkit'
+import { Pool, Tick } from '@invariant-labs/a0-sdk'
 import { AddressOrPair } from '@polkadot/api/types'
+import { createSlice } from '@reduxjs/toolkit'
 import { Token } from '@store/consts/static'
 import { PayloadType } from '@store/consts/types'
 
