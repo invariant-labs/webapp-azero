@@ -132,7 +132,7 @@ export function* handleAirdrop(): Generator {
     yield* call([psp22, psp22.setContractAddress], address)
     const balance = yield* call([psp22, psp22.balanceOf], faucetDeployer, address)
     yield* put(walletActions.setTokenAccount({ address, balance }))
-    const faucetAmount = BigInt(airdropAmount)
+    const faucetAmount = airdropAmount
     if (balance < faucetAmount) {
       yield* call(psp22.mint, faucetDeployer, faucetAmount)
       yield* call(psp22.transfer, faucetDeployer, address, faucetAmount, data)
