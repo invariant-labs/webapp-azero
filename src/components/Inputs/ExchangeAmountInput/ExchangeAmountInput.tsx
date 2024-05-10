@@ -1,0 +1,257 @@
+import React, { CSSProperties, useRef } from 'react'
+import classNames from 'classnames'
+import Select from '@components/Inputs/Select/Select'
+import loadingAnimation from '@static/gif/loading.gif'
+import useStyles from './style'
+import { AddressOrPair } from '@polkadot/api/types'
+import { FormatNumberThreshold, formatNumbers, showPrefix } from '@store/consts/utils'
+import { Grid, Input, Tooltip, Typography } from '@mui/material'
+import { SwapToken } from '@store/selectors/wallet'
+import { OutlinedButton } from '@components/OutlinedButton/OutlinedButton'
+
+interface IProps {
+  setValue: (value: string) => void
+  value?: string
+  error?: string | null
+  className?: string
+  decimal: bigint
+  placeholder?: string
+  style?: CSSProperties
+  onMaxClick: () => void
+  current: SwapToken | null
+  tokens: SwapToken[]
+  onSelect: (index: number) => void
+  disabled: boolean
+  balance?: string
+  hideBalances?: boolean
+  handleAddToken: (address: string) => void
+  commonTokens: AddressOrPair[]
+  limit?: number
+  initialHideUnknownTokensValue: boolean
+  onHideUnknownTokensChange: (val: boolean) => void
+  percentageChange?: number
+  tokenPrice?: number
+  priceLoading?: boolean
+  isBalanceLoading: boolean
+}
+
+export const AmountInput: React.FC<IProps> = ({
+  value,
+  setValue,
+  error,
+  className,
+  decimal,
+  placeholder,
+  style,
+  onMaxClick,
+  current,
+  tokens,
+  onSelect,
+  disabled,
+  balance,
+  hideBalances = false,
+  handleAddToken,
+  commonTokens,
+  limit,
+  initialHideUnknownTokensValue,
+  onHideUnknownTokensChange,
+  tokenPrice,
+  priceLoading = false,
+  isBalanceLoading
+}) => {
+  const { classes } = useStyles({ walletDisconnected: hideBalances })
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const thresholds: FormatNumberThreshold[] = [
+    {
+      value: 10,
+      decimals: Number(decimal)
+    },
+    {
+      value: 100,
+      decimals: 4
+    },
+    {
+      value: 1000,
+      decimals: 2
+    },
+    {
+      value: 10000,
+      decimals: 1
+    },
+    {
+      value: 1000000,
+      decimals: 2,
+      divider: 1000
+    },
+    {
+      value: 1000000000,
+      decimals: 2,
+      divider: 1000000
+    },
+    {
+      value: Infinity,
+      decimals: 2,
+      divider: 1000000000
+    }
+  ]
+
+  const usdThresholds: FormatNumberThreshold[] = [
+    {
+      value: 1000,
+      decimals: 2
+    },
+    {
+      value: 10000,
+      decimals: 1
+    },
+    {
+      value: 1000000,
+      decimals: 2,
+      divider: 1000
+    },
+    {
+      value: 1000000000,
+      decimals: 2,
+      divider: 1000000
+    },
+    {
+      value: Infinity,
+      decimals: 2,
+      divider: 1000000000
+    }
+  ]
+
+  const allowOnlyDigitsAndTrimUnnecessaryZeros: React.ChangeEventHandler<HTMLInputElement> = e => {
+    const onlyNumbersRegex = /^\d*\.?\d*$/
+    const trimDecimal = `^\\d*\\.?\\d{0,${decimal}}$`
+    const regex = new RegExp(trimDecimal, 'g')
+    if (e.target.value === '' || regex.test(e.target.value)) {
+      if (typeof limit !== 'undefined' && +e.target.value > limit) {
+        return
+      }
+
+      const startValue = e.target.value
+      const caretPosition = e.target.selectionStart
+
+      let parsed = e.target.value
+
+      const dotRegex = /^\.\d*$/
+      if (dotRegex.test(parsed)) {
+        parsed = `0${parsed}`
+      }
+
+      const diff = startValue.length - parsed.length
+
+      setValue(parsed)
+      if (caretPosition !== null && parsed !== startValue) {
+        setTimeout(() => {
+          if (inputRef.current) {
+            inputRef.current.selectionStart = Math.max(caretPosition - diff, 0)
+            inputRef.current.selectionEnd = Math.max(caretPosition - diff, 0)
+          }
+        }, 0)
+      }
+    } else if (!onlyNumbersRegex.test(e.target.value)) {
+      setValue('')
+    } else if (!regex.test(e.target.value)) {
+      setValue(e.target.value.slice(0, e.target.value.length - 1))
+    }
+  }
+
+  const tokenIcon = !current ? '' : current.symbol
+
+  const usdBalance = tokenPrice && balance ? tokenPrice * +balance : 0
+
+  const formattedBalance = balance ? ' ' + formatNumbers(thresholds)(balance.toString()) : 0
+
+  return (
+    <>
+      <Grid container alignItems='center' wrap='nowrap' className={classes.exchangeContainer}>
+        <Select
+          centered={true}
+          tokens={tokens}
+          onSelect={onSelect}
+          current={current}
+          className={classes.select}
+          hideBalancesInModal={hideBalances}
+          handleAddToken={handleAddToken}
+          commonTokens={commonTokens}
+          initialHideUnknownTokensValue={initialHideUnknownTokensValue}
+          onHideUnknownTokensChange={onHideUnknownTokensChange}
+        />
+        <Input
+          inputRef={inputRef}
+          error={!!error}
+          className={classNames(classes.amountInput, className)}
+          classes={{ input: classes.input }}
+          style={style}
+          type={'text'}
+          value={value}
+          disableUnderline={true}
+          placeholder={placeholder}
+          onChange={allowOnlyDigitsAndTrimUnnecessaryZeros}
+        />
+      </Grid>
+      {!hideBalances && (
+        <Grid
+          container
+          justifyContent='space-between'
+          alignItems='center'
+          direction='row'
+          wrap='nowrap'
+          className={classes.bottom}>
+          <Grid className={classes.balanceContainer} onClick={onMaxClick}>
+            <Typography className={classes.BalanceTypography}>
+              Balance:
+              {isBalanceLoading ? (
+                <img src={loadingAnimation} className={classes.loadingBalance} />
+              ) : (
+                formattedBalance
+              )}
+              {showPrefix(Number(balance))} {tokenIcon.slice(0, 8)}
+              {tokenIcon.length > 8 ? '...' : ''}
+            </Typography>
+            <OutlinedButton
+              name='Max'
+              color='primary'
+              onClick={onMaxClick}
+              className={classes.maxButton}
+              labelClassName={classes.label}
+              disabled={
+                disabled && isNaN(Number(balance))
+                  ? disabled
+                  : isNaN(Number(balance)) || hideBalances
+              }
+            />
+          </Grid>
+          <Grid className={classes.percentages} container alignItems='center' wrap='nowrap'>
+            {current ? (
+              priceLoading ? (
+                <img src={loadingAnimation} className={classes.loading} />
+              ) : tokenPrice ? (
+                <>
+                  <Typography className={classes.caption2}>
+                    ~${formatNumbers(usdThresholds)(usdBalance.toString()) + showPrefix(usdBalance)}
+                  </Typography>
+                </>
+              ) : (
+                <Tooltip
+                  title='Cannot fetch price of token'
+                  placement='bottom'
+                  classes={{
+                    tooltip: classes.tooltip
+                  }}>
+                  <Typography className={classes.noData}>
+                    <span className={classes.noDataIcon}>?</span>No data
+                  </Typography>
+                </Tooltip>
+              )
+            ) : null}
+          </Grid>
+        </Grid>
+      )}
+    </>
+  )
+}
+export default AmountInput

@@ -43,7 +43,7 @@ export interface IAlephZeroWallet {
 export const defaultState: IAlephZeroWallet = {
   status: Status.Uninitialized,
   address: '',
-  balance: BigInt(0),
+  balance: 0n,
   accounts: {},
   balanceLoading: false
 }

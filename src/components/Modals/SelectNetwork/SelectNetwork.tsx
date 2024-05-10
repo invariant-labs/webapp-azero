@@ -3,17 +3,17 @@ import icons from '@static/icons'
 import classNames from 'classnames'
 import useStyles from './style'
 import { ISelectNetwork } from '@store/consts/types'
-import { NetworkType } from '@store/consts/static'
 import { Grid, Popover, Typography } from '@mui/material'
 import DotIcon from '@mui/icons-material/FiberManualRecordRounded'
+import { Network } from '@invariant-labs/a0-sdk'
 
 export interface ISelectNetworkModal {
   networks: ISelectNetwork[]
   open: boolean
   anchorEl: HTMLButtonElement | null
-  onSelect: (networkType: NetworkType, rpcAddress: string, rpcName?: string) => void
+  onSelect: (networkType: Network, rpcAddress: string, rpcName?: string) => void
   handleClose: () => void
-  activeNetwork: NetworkType
+  activeNetwork: Network
 }
 export const SelectNetwork: React.FC<ISelectNetworkModal> = ({
   networks,

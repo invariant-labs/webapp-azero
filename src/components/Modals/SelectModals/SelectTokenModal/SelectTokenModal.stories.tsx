@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import SelectTokenModal from './SelectTokenModal'
-import { NetworkType } from '@store/consts/static'
 import { fn } from '@storybook/test'
-import { SwapToken } from '@store/selectors/wallet'
 
 const tokens: any[] = [
   {

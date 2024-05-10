@@ -1,4 +1,4 @@
-import { AlephZeroNetworks, NetworkType } from '@store/consts/static'
+import { AlephZeroNetworks } from '@store/consts/static'
 import React, { useEffect, useMemo } from 'react'
 import { useLocation } from 'react-router-dom'
 import { actions } from '@store/reducers/connection'
@@ -9,6 +9,7 @@ import { network, rpcAddress } from '@store/selectors/connection'
 import { openWalletSelectorModal } from '@utils/web3/selector'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import Header from '@components/Header/Header'
+import { Network } from '@invariant-labs/a0-sdk'
 
 export const HeaderWrapper: React.FC = () => {
   const dispatch = useDispatch()
@@ -56,7 +57,7 @@ export const HeaderWrapper: React.FC = () => {
       address={walletAddress}
       onNetworkSelect={(network, rpcAddress, rpcName) => {
         if (network !== currentNetwork || rpcAddress !== currentRpc) {
-          if (network === NetworkType.TESTNET) {
+          if (network === Network.Testnet) {
             localStorage.setItem('INVARIANT_TESTNET_RPC', rpcAddress)
           }
 

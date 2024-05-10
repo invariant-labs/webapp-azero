@@ -223,7 +223,7 @@ export function* testTransaction(
   try {
     const { amount, receiverAddress } = action.payload
     const walletAddress = yield* select(address)
-
+    console.log(walletAddress)
     if (!walletAddress) {
       yield put(
         snackbarsActions.add({
@@ -293,7 +293,7 @@ export function* init(): Generator {
 
     const balance = yield* call(getBalance, accounts[0].address)
 
-    yield* put(actions.setBalance(balance))
+    yield* put(actions.setBalance(BigInt(balance)))
     yield* put(actions.setStatus(Status.Initialized))
     // // yield* call(fetchTokensAccounts)
     yield* put(actions.setIsBalanceLoading(false))

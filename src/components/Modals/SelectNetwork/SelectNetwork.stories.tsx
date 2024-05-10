@@ -1,24 +1,24 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import SelectNetwork from './SelectNetwork'
-import { NetworkType } from '@store/consts/static'
+import { Network } from '@invariant-labs/a0-sdk'
 
 const meta = {
   title: 'Modals/SelectNetwork',
   component: SelectNetwork,
   args: {
-    activeNetwork: NetworkType.TESTNET,
+    activeNetwork: Network.Testnet,
     anchorEl: null,
     handleClose: () => {},
     networks: [
       {
-        networkType: NetworkType.TESTNET,
+        networkType: Network.Testnet,
         rpc: 'https://testnet-mock.com',
         rpcName: 'Testnet'
       },
       {
-        networkType: NetworkType.DEVNET,
-        rpc: 'https://devnet-mock.com',
-        rpcName: 'Devnet'
+        networkType: Network.Mainnet,
+        rpc: 'https://mock.com',
+        rpcName: 'Mainnet'
       }
     ],
     onSelect: () => {},

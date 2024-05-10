@@ -1,4 +1,4 @@
-import WrappedSwap from '@containers/WrappedSwap'
+import WrappedSwap from '@containers/WrappedSwap/WrappedSwap'
 import useStyles from './styles'
 import { Grid } from '@mui/material'
 

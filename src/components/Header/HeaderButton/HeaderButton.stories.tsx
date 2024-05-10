@@ -3,13 +3,14 @@ import { fn } from '@storybook/test'
 import ChangeWalletButton from './ChangeWalletButton'
 import SelectNetworkButton from './SelectNetworkButton'
 import SelectRPCButton from './SelectRPCButton'
-import { AlephZeroNetworks, NetworkType } from '@store/consts/static'
+import { AlephZeroNetworks } from '@store/consts/static'
 import { MemoryRouter } from 'react-router-dom'
 import { on } from 'events'
 import { Typography } from '@mui/material'
 import { toBlur } from '@utils/uiUtils'
 
 import { action } from '@storybook/addon-actions'
+import { Network } from '@invariant-labs/a0-sdk'
 
 const meta = {
   title: 'Buttons/HeaderButtons',
@@ -61,11 +62,8 @@ export const SelectNetwork: Story = {
   render: () => (
     <div style={{ padding: '100px' }}>
       <SelectNetworkButton
-        name={NetworkType.TESTNET}
-        networks={[
-          { networkType: NetworkType.DEVNET, rpc: AlephZeroNetworks.DEV },
-          { networkType: NetworkType.MAINNET, rpc: AlephZeroNetworks.TEST }
-        ]}
+        name={Network.Testnet}
+        networks={[{ networkType: Network.Testnet, rpc: AlephZeroNetworks.TEST }]}
         onSelect={(networkType, rpc) => action('chosen: ' + networkType + ' ' + rpc)()}
       />
     </div>
@@ -79,11 +77,10 @@ export const SelectRPC: Story = {
         rpc={AlephZeroNetworks.TEST}
         networks={[
           {
-            networkType: NetworkType.TESTNET,
+            networkType: Network.Testnet,
             rpc: AlephZeroNetworks.TEST,
             rpcName: 'Testnet'
-          },
-          { networkType: NetworkType.DEVNET, rpc: AlephZeroNetworks.DEV, rpcName: 'Devnet' }
+          }
         ]}
         onSelect={(networkType, rpc) => action('chosen: ' + networkType + ' ' + rpc)()}
       />

@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import DepositSelector from './DepositSelector'
 import { fn } from '@storybook/test'
-import { SwapToken } from '@store/selectors/wallet'
 import { useState } from 'react'
 
 const tokens: any[] = [

@@ -9,7 +9,6 @@ import PoolInit from './PoolInit/PoolInit'
 import RangeSelector from './RangeSelector/RangeSelector'
 import useStyles from './style'
 import { Button, Grid, Typography } from '@mui/material'
-import { SwapToken } from '@store/selectors/wallet'
 import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
 import { BestTier, PositionOpeningMethod, TokenPriceData } from '@store/consts/static'
 import { NoConnected } from '@components/NoConnected/NoConnected'
@@ -19,6 +18,7 @@ import { addressToTicker } from '@store/consts/uiUtiils'
 import { VariantType } from 'notistack'
 import { Percentage, TokenAmount } from '@invariant-labs/a0-sdk/src'
 import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
+import { SwapToken } from '@store/selectors/wallet'
 
 export interface INewPosition {
   initialTokenFrom: string
