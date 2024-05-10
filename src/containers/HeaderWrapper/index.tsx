@@ -1,18 +1,19 @@
 import Header from '@components/Header/Header'
-import { Keyring, Network, PSP22, initPolkadotApi } from '@invariant-labs/a0-sdk'
+import { Keyring, Network, PSP22 } from '@invariant-labs/a0-sdk'
 import {
   AlephZeroNetworks,
   FAUCET_DEPLOYER_MNEMONIC,
   FAUCET_TOKEN_AMOUNT,
-  FaucetDecimal,
-  FaucetToken,
-  NetworkType
+  NetworkType,
+  TokenDecimal,
+  TokenList
 } from '@store/consts/static'
 import { actions } from '@store/reducers/connection'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Status, actions as walletActions } from '@store/reducers/wallet'
 import { network, rpcAddress } from '@store/selectors/connection'
 import { address, status } from '@store/selectors/wallet'
+import { getAlephZeroConnection } from '@utils/web3/connection'
 import { openWalletSelectorModal } from '@utils/web3/selector'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import React, { useEffect, useMemo } from 'react'
@@ -60,12 +61,6 @@ export const HeaderWrapper: React.FC = () => {
     return lastRPC === null ? AlephZeroNetworks.TEST : lastRPC
   }, [])
 
-  const recentPriorityFee = useMemo(() => {
-    const lastFee = localStorage.getItem('INVARIANT_MAINNET_PRIORITY_FEE')
-
-    return lastFee === null ? '' : lastFee
-  }, [])
-
   const getAddress = async (): Promise<string | null> => {
     const wallet = await getAlephZeroWallet()
 
@@ -91,7 +86,7 @@ export const HeaderWrapper: React.FC = () => {
       )
     }
 
-    const api = await initPolkadotApi(Network.Testnet)
+    const api = await getAlephZeroConnection(AlephZeroNetworks.TEST)
 
     const keyring = new Keyring({ type: 'sr25519' })
     const account = keyring.addFromUri(FAUCET_DEPLOYER_MNEMONIC)
@@ -100,62 +95,34 @@ export const HeaderWrapper: React.FC = () => {
 
     const notAirdroppedTokens = []
 
-    const psp22 = await PSP22.load(api, Network.Testnet, FaucetToken.BTC, {
+    const psp22 = await PSP22.load(api, Network.Testnet, '', {
       storageDepositLimit: 100000000000,
       refTime: 100000000000,
       proofSize: 100000000000
     })
-    let balance = await psp22.balanceOf(account, address)
-    let faucetAmount = FAUCET_TOKEN_AMOUNT * 10n ** BigInt(FaucetDecimal.BTC)
-    if (balance < faucetAmount) {
-      await psp22.mint(account, faucetAmount)
-      await psp22.transfer(account, address, faucetAmount, data)
 
-      dispatch(
-        snackbarsActions.add({
-          message: `Airdropped BTC tokens`,
-          variant: 'success',
-          persist: false
-        })
-      )
-    } else {
-      notAirdroppedTokens.push('BTC')
-    }
+    for (const ticker in TokenList) {
+      const address = TokenList[ticker as keyof typeof TokenList]
+      const decimal = TokenDecimal[ticker as keyof typeof TokenDecimal]
 
-    psp22.setContractAddress(FaucetToken.ETH)
-    balance = await psp22.balanceOf(account, address)
-    faucetAmount = FAUCET_TOKEN_AMOUNT * 10n ** BigInt(FaucetDecimal.ETH)
-    if (balance < faucetAmount) {
-      await psp22.mint(account, faucetAmount)
-      await psp22.transfer(account, address, faucetAmount, data)
+      psp22.setContractAddress(address)
+      const balance = await psp22.balanceOf(account, address)
+      dispatch(walletActions.setTokenAccount({ address, balance, decimal }))
+      const faucetAmount = FAUCET_TOKEN_AMOUNT * 10n ** BigInt(decimal)
+      if (balance < faucetAmount) {
+        await psp22.mint(account, faucetAmount)
+        await psp22.transfer(account, address, faucetAmount, data)
 
-      dispatch(
-        snackbarsActions.add({
-          message: `Airdropped ETH tokens`,
-          variant: 'success',
-          persist: false
-        })
-      )
-    } else {
-      notAirdroppedTokens.push('ETH')
-    }
-
-    psp22.setContractAddress(FaucetToken.USDC)
-    balance = await psp22.balanceOf(account, address)
-    faucetAmount = FAUCET_TOKEN_AMOUNT * 10n ** BigInt(FaucetDecimal.USDC)
-    if (balance < faucetAmount) {
-      await psp22.mint(account, faucetAmount)
-      await psp22.transfer(account, address, faucetAmount, data)
-
-      dispatch(
-        snackbarsActions.add({
-          message: `Airdropped USDC tokens`,
-          variant: 'success',
-          persist: false
-        })
-      )
-    } else {
-      notAirdroppedTokens.push('USDC')
+        dispatch(
+          snackbarsActions.add({
+            message: `Airdropped ${ticker} tokens`,
+            variant: 'success',
+            persist: false
+          })
+        )
+      } else {
+        notAirdroppedTokens.push(ticker)
+      }
     }
 
     if (notAirdroppedTokens.length > 0) {

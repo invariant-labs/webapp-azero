@@ -132,13 +132,13 @@ export const FAUCET_DEPLOYER_MNEMONIC =
   'motion ice subject actress spider rare leg fortune brown similar excess amazing'
 export const FAUCET_TOKEN_AMOUNT = 1000n
 
-export enum FaucetDecimal {
+export enum TokenDecimal {
   BTC = 8,
   ETH = 18,
   USDC = 6
 }
 
-export enum FaucetToken {
+export enum TokenList {
   BTC = '5GhF7vS1A2CFWMCck69J8LGh37DgRLjYjjQTA49pAMXUeZ5B',
   ETH = '5E8qAJ4aU2LC7Dq31cb4H9zR9zM1t5fVBaUZr2qBkJSWeUuL',
   USDC = '5HJQP6MEFm2Hv42EG286r69LoCkomLgG23hRgYXo2VU2cYn6'
