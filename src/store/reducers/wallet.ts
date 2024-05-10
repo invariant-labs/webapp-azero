@@ -11,9 +11,8 @@ export enum Status {
 }
 
 export interface ITokenAccount {
-  address: AddressOrPair
-  balance: TokenAmount
-  decimal: number
+  address: string
+  balance: string
 }
 // export interface ITokenData {
 //   programId: string

@@ -130,6 +130,12 @@ export const commonTokensForNetworks: Record<NetworkType, AddressOrPair[]> = {
 
 export const FAUCET_DEPLOYER_MNEMONIC =
   'motion ice subject actress spider rare leg fortune brown similar excess amazing'
+
+export const getFaucetDeployer = () => {
+  const keyring = new Keyring({ type: 'sr25519' })
+  return keyring.addFromUri(FAUCET_DEPLOYER_MNEMONIC)
+}
+
 export const FAUCET_TOKEN_AMOUNT = 1000n
 
 export enum TokenDecimal {
