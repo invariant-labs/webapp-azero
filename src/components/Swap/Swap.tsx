@@ -1,27 +1,27 @@
 import AnimatedButton, { ProgressState } from '@components/AnimatedButton/AnimatedButton'
+import ChangeWalletButton from '@components/Header/HeaderButton/ChangeWalletButton'
+import ExchangeAmountInput from '@components/Inputs/ExchangeAmountInput/ExchangeAmountInput'
+import Slippage from '@components/Modals/Slippage/Slippage'
 import { Percentage, Price, Tick, TokenAmount } from '@invariant-labs/a0-sdk'
+import { Box, Button, CardMedia, Grid, Typography } from '@mui/material'
 import { AddressOrPair } from '@polkadot/api/types'
 import infoIcon from '@static/svg/info.svg'
 import refreshIcon from '@static/svg/refresh.svg'
 import settingIcon from '@static/svg/settings.svg'
 import SwapArrows from '@static/svg/swap-arrows.svg'
+import { TokenPriceData } from '@store/consts/static'
+import { PoolWithAddress } from '@store/reducers/pools'
+import { Swap as SwapData } from '@store/reducers/swap'
 import { Status } from '@store/reducers/wallet'
+import { SwapToken } from '@store/selectors/wallet'
+import { blurContent, unblurContent } from '@utils/uiUtils'
 import classNames from 'classnames'
 import React, { useEffect, useRef, useState } from 'react'
-import { Swap as SwapData } from '@store/reducers/swap'
-import { PoolWithAddress } from '@store/reducers/pools'
-import { TokenPriceData } from '@store/consts/static'
-import useStyles from './style'
-import { trimLeadingZeros } from '@store/consts/utils'
-import { blurContent, unblurContent } from '@utils/uiUtils'
-import { Box, Button, CardMedia, Grid, Typography } from '@mui/material'
-import Slippage from '@components/Modals/Slippage/Slippage'
-import ChangeWalletButton from '@components/Header/HeaderButton/ChangeWalletButton'
 import ExchangeRate from './ExchangeRate/ExchangeRate'
-import TransactionDetailsBox from './TransactionDetailsBox/TransactionDetailsBox'
-import ExchangeAmountInput from '@components/Inputs/ExchangeAmountInput/ExchangeAmountInput'
-import { SwapToken } from '@store/selectors/wallet'
+import SendTestTransactionButton from './SendTestTransactionButton/SendTestTransactionButton'
 import TestTransaction from './TestTransaction/TestTransaction'
+import TransactionDetailsBox from './TransactionDetailsBox/TransactionDetailsBox'
+import useStyles from './style'
 
 export interface Pools {
   tokenX: AddressOrPair
@@ -717,6 +717,7 @@ export const Swap: React.FC<ISwap> = ({
         )}
       </Grid>
       <TestTransaction />
+      <SendTestTransactionButton />
     </Grid>
   )
 }
