@@ -13,24 +13,15 @@ import { actions } from '@store/reducers/pools'
 const MarketEvents = () => {
   const dispatch = useDispatch()
   const network = useSelector(networkType)
-  const rpc = useSelector(rpcAddress)
   const networkStatus = useSelector(status)
-  const tickmaps = useSelector(tickMaps)
-  const allPools = useSelector(poolsArraySortedByFees)
-
-  const poolTicksArray = useSelector(poolTicks)
-  const [subscribedTick, _setSubscribeTick] = useState<Set<string>>(new Set())
-  const [subscribedTickmap, _setSubscribedTickmap] = useState<Set<string>>(new Set())
 
   useEffect(() => {
-    console.log('MarketEvents')
     const connection = getCurrentAlephZeroConnection()
     console.log(networkStatus !== Status.Initialized)
     console.log(connection)
 
     const connectEvents = () => {
       let tokens = getNetworkTokensList(network)
-      console.log(tokens)
 
       const currentListStr = localStorage.getItem(`CUSTOM_TOKENS_${network}`)
       const currentList: [] =
