@@ -1,11 +1,11 @@
 import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import Slippage from '@components/Modals/Slippage/Slippage'
 import { NoConnected } from '@components/NoConnected/NoConnected'
-import { Percentage, TokenAmount } from '@invariant-labs/a0-sdk'
+import { Percentage, TokenAmount, toPercentage } from '@invariant-labs/a0-sdk'
 import { Button, Grid, Typography } from '@mui/material'
 import backIcon from '@static/svg/back-arrow.svg'
 import settingIcon from '@static/svg/settings.svg'
-import { BestTier, PositionOpeningMethod, TokenPriceData } from '@store/consts/static'
+import { BestTier, PositionOpeningMethod, TokenList, TokenPriceData } from '@store/consts/static'
 import { addressToTicker } from '@store/consts/uiUtiils'
 import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
 import { SwapToken } from '@store/selectors/wallet'
@@ -484,13 +484,19 @@ export const NewPosition: React.FC<INewPosition> = ({
             setTokenAIndex(index1)
             setTokenBIndex(index2)
             onChangePositionTokens(index1, index2, fee)
-
+            console.log(fee)
             updatePath(index1, index2, fee)
           }}
           //Mocked data
           onAddLiquidity={() => {
             if (!isWaitingForNewPool) {
-              dispatch(actions.initPool({ fee: 1n, tickSpacing: 1n }))
+              dispatch(
+                actions.initPool({
+                  tokenX: TokenList.ETH,
+                  tokenY: TokenList.BTC,
+                  feeTier: { fee: 500000000n, tickSpacing: 5n }
+                })
+              )
             }
           }}
           tokenAInputState={{

@@ -275,7 +275,7 @@ export const printBN = (amount: TokenAmount, decimals: bigint): string => {
 
   const balanceString = isNegative ? amountString.slice(1) : amountString
 
-  if (balanceString.length <= decimals) {
+  if (balanceString.length <= Number(decimals)) {
     return (
       // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
       (isNegative ? '-' : '') +

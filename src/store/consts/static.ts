@@ -29,8 +29,10 @@ export interface Token {
   isUnknown?: boolean
 }
 
-// TODO - add real data
-export const ALL_FEE_TIERS_DATA = []
+// export const ALL_FEE_TIERS_DATA = feeTiers.map((tier, index) => ({
+//   tier,
+//   primaryIndex: index
+// }))
 
 export const tokensPrices: Record<Network, Record<string, TokenPriceData>> = {
   [Network.Testnet]: { USDC_TEST: { price: 1 }, BTC_TEST: { price: 64572.0 } },
