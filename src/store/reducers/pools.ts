@@ -1,6 +1,6 @@
-import { Pool, Tick } from '@invariant-labs/a0-sdk'
+import { FeeTier, Pool, Tick } from '@invariant-labs/a0-sdk'
 import { AddressOrPair } from '@polkadot/api/types'
-import { createSlice } from '@reduxjs/toolkit'
+import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { Token } from '@store/consts/static'
 import { PayloadType } from '@store/consts/types'
 
@@ -86,6 +86,9 @@ const poolsSlice = createSlice({
   name: poolsSliceName,
   initialState: defaultState,
   reducers: {
+    initPool(state, _action: PayloadAction<FeeTier>) {
+      return state
+    }
     // addTokens(state, action: PayloadAction<Record<string, Token>>) {
     //   state.tokens = {
     //     ...state.tokens,

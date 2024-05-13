@@ -19,6 +19,8 @@ import MarketIdLabel from './MarketIdLabel/MarketIdLabel'
 import PoolInit from './PoolInit/PoolInit'
 import RangeSelector from './RangeSelector/RangeSelector'
 import useStyles from './style'
+import { useDispatch } from 'react-redux'
+import { actions } from '@store/reducers/pools'
 
 export interface INewPosition {
   initialTokenFrom: string
@@ -137,6 +139,8 @@ export const NewPosition: React.FC<INewPosition> = ({
   onSlippageChange,
   initialSlippage
 }) => {
+  const dispatch = useDispatch()
+
   // TODO delete mock data below
   const getMinTick = (a: bigint) => 145n
   const getMaxTick = (a: bigint) => 52556n
@@ -484,7 +488,11 @@ export const NewPosition: React.FC<INewPosition> = ({
             updatePath(index1, index2, fee)
           }}
           //Mocked data
-          onAddLiquidity={() => {}}
+          onAddLiquidity={() => {
+            if (!isWaitingForNewPool) {
+              dispatch(actions.initPool({ fee: 1n, tickSpacing: 1n }))
+            }
+          }}
           tokenAInputState={{
             blocked: false,
             blockerInfo: '',

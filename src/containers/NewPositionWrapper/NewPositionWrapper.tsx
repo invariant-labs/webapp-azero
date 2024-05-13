@@ -23,7 +23,7 @@ import {
 import { TickPlotPositionData } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Status } from '@store/reducers/wallet'
-import { network } from '@store/selectors/connection'
+import { networkType } from '@store/selectors/connection'
 import {
   isLoadingLatestPoolsForTransaction,
   poolsArraySortedByFees,
@@ -58,7 +58,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const { success, inProgress } = useSelector(initPosition)
   const { data: ticksData, loading: ticksLoading, hasError: hasTicksError } = useSelector(plotTicks)
   const isFetchingNewPool = useSelector(isLoadingLatestPoolsForTransaction)
-  const currentNetwork = useSelector(network)
+  const currentNetwork = useSelector(networkType)
 
   const canUserCreateNewPool = useSelector(canCreateNewPool(currentNetwork))
   const canUserCreateNewPosition = useSelector(canCreateNewPosition(currentNetwork))

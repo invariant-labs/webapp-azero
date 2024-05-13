@@ -12,7 +12,7 @@ export enum Status {
 export interface IAlephZeroConnectionStore {
   status: Status
   message: string
-  network: Network
+  networkType: Network
   blockNumber: number
   rpcAddress: string
 }
@@ -20,7 +20,7 @@ export interface IAlephZeroConnectionStore {
 export const defaultState: IAlephZeroConnectionStore = {
   status: Status.Uninitialized,
   message: '',
-  network: Network.Testnet,
+  networkType: Network.Testnet,
   blockNumber: 0,
   rpcAddress: AlephZeroNetworks.TEST
 }
@@ -44,12 +44,12 @@ const connectionSlice = createSlice({
     setNetwork(
       state,
       action: PayloadAction<{
-        network: Network
+        networkType: Network
         rpcAddress: string
         rpcName?: string
       }>
     ) {
-      state.network = action.payload.network
+      state.networkType = action.payload.networkType
       state.rpcAddress = action.payload.rpcAddress
       return state
     },
