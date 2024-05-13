@@ -139,7 +139,7 @@ export function* handleAirdrop(): Generator {
     const faucetAmount = airdropAmount
     if (balance < faucetAmount) {
       yield* call([psp22, psp22.mint], faucetDeployer, faucetAmount)
-      yield* call([psp22, psp22.transfer], faucetDeployer, address, faucetAmount, data)
+      yield* call([psp22, psp22.transfer], faucetDeployer, walletAddress, faucetAmount, data)
 
       yield* put(
         snackbarsActions.add({
