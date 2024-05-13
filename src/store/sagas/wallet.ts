@@ -123,19 +123,23 @@ export function* handleAirdrop(): Generator {
   const data = connection.createType('Vec<u8>', [])
   const notAirdroppedTokens = []
 
-  const psp22 = yield* call(PSP22.load, connection, Network.Testnet, '')
+  const psp22 = yield* call(PSP22.load, connection, Network.Testnet, '', {
+    storageDepositLimit: 10000000000,
+    refTime: 10000000000,
+    proofSize: 10000000000
+  })
 
   for (const ticker in TokenList) {
     const address = TokenList[ticker as keyof typeof TokenList]
     const airdropAmount = TokenAirdropAmount[ticker as keyof typeof TokenList]
 
     yield* call([psp22, psp22.setContractAddress], address)
-    const balance = yield* call([psp22, psp22.balanceOf], faucetDeployer.address, address)
+    const balance = yield* call([psp22, psp22.balanceOf], faucetDeployer.address, walletAddress)
     yield* put(walletActions.setTokenAccount({ address, balance }))
     const faucetAmount = airdropAmount
     if (balance < faucetAmount) {
-      yield* call(psp22.mint, faucetDeployer, faucetAmount)
-      yield* call(psp22.transfer, faucetDeployer, address, faucetAmount, data)
+      yield* call([psp22, psp22.mint], faucetDeployer, faucetAmount)
+      yield* call([psp22, psp22.transfer], faucetDeployer, address, faucetAmount, data)
 
       yield* put(
         snackbarsActions.add({

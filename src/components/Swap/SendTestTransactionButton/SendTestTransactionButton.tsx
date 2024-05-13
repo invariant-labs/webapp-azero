@@ -34,7 +34,8 @@ export const SendTestTransactionButton: React.FC = () => {
     const data = api.createType('Vec<u8>', [])
     const tx = psp22.transferTx(getFaucetDeployer().address, 1000n, data)
 
-    console.log(await psp22.balanceOf(walletAddress, walletAddress))
+    const faucetDeployer = getFaucetDeployer()
+    console.log(await psp22.balanceOf(faucetDeployer.address, walletAddress))
 
     const signedTx = await tx.signAsync(walletAddress, { signer: adapter.signer })
 
