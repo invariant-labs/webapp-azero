@@ -7,11 +7,11 @@ import { address } from '@store/selectors/wallet'
 import {
   Invariant,
   newPoolKey,
-  priceToSqrtPrice,
   toPrice,
   sendTx,
   TESTNET_INVARIANT_ADDRESS,
-  PoolKey
+  PoolKey,
+  toSqrtPrice
 } from '@invariant-labs/a0-sdk'
 
 import { createLoaderKey } from '@store/consts/utils'
@@ -19,7 +19,6 @@ import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { closeSnackbar } from 'notistack'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { Signer } from '@polkadot/api/types'
-import { signAndSend } from './wallet'
 
 export function* handleInitPool(action: PayloadAction<PoolKey>) {
   const loaderKey = createLoaderKey()
@@ -47,40 +46,43 @@ export function* handleInitPool(action: PayloadAction<PoolKey>) {
       network,
       TESTNET_INVARIANT_ADDRESS,
       {
-        storageDepositLimit: 10000000000,
-        refTime: 10000000000,
-        proofSize: 10000000000
+        storageDepositLimit: 100000000000,
+        refTime: 100000000000,
+        proofSize: 100000000000
       }
     )
 
     const poolKey = newPoolKey(tokenX, tokenY, feeTier)
 
     const price = toPrice(1n, 0n)
-    const initSqrtPrice = priceToSqrtPrice(price)
+    const initSqrtPrice = toSqrtPrice(1n, 0n)
 
     const tx = yield* call([invariant, invariant.createPoolTx], poolKey, initSqrtPrice)
 
-    // const id = call(signAndSend, adapter, tx, walletAddress)
-    // console.log(id)
+    yield put(
+      snackbarsActions.add({
+        message: 'Signing transaction...',
+        variant: 'pending',
+        persist: true,
+        key: loaderSigningTx
+      })
+    )
+
     const signedTx = yield* call([tx, tx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
     })
 
-    console.log(signedTx)
+    closeSnackbar(loaderSigningTx)
+    yield put(snackbarsActions.remove(loaderSigningTx))
 
     const txResult = yield* call(sendTx, signedTx)
-
-    console.log(txResult)
-
-    // const pools = yield* call([invariant, invariant.getPools], walletAddress, 10n, 20n)
-    // console.log(pools)
 
     yield put(
       snackbarsActions.add({
         message: 'Pool successfully created',
         variant: 'success',
-        persist: false
-        // txid: tx.
+        persist: false,
+        txid: txResult.hash
       })
     )
 
@@ -90,6 +92,8 @@ export function* handleInitPool(action: PayloadAction<PoolKey>) {
     console.log(error)
     closeSnackbar(loaderKey)
     yield put(snackbarsActions.remove(loaderKey))
+    closeSnackbar(loaderSigningTx)
+    yield put(snackbarsActions.remove(loaderSigningTx))
   }
 }
 

@@ -34,10 +34,10 @@ export interface INewPosition {
   midPrice: TickPlotPositionData
   setMidPrice: (mid: TickPlotPositionData) => void
   addLiquidityHandler: (
-    leftTickIndex: number,
-    rightTickIndex: number,
-    xAmount: number,
-    yAmount: number,
+    leftTickIndex: bigint,
+    rightTickIndex: bigint,
+    xAmount: TokenAmount,
+    yAmount: TokenAmount,
     slippage: Percentage
   ) => void
   onChangePositionTokens: (
@@ -104,6 +104,7 @@ export const NewPosition: React.FC<INewPosition> = ({
   tokens,
   data,
   midPrice,
+  addLiquidityHandler,
   progress = 'progress',
   onChangePositionTokens,
   isCurrentPoolExisting,
@@ -400,8 +401,7 @@ export const NewPosition: React.FC<INewPosition> = ({
   }
 
   const updatePath = (index1: number | null, index2: number | null, fee: number) => {
-    // const parsedFee = parseFeeToPathFee(+ALL_FEE_TIERS_DATA[fee].tier.fee)
-    const parsedFee = '0.1'
+    const parsedFee = feeTiers[fee].feeValue
 
     if (index1 != null && index2 != null) {
       const address1 = addressToTicker(tokens[index1].assetAddress.toString())
@@ -484,18 +484,23 @@ export const NewPosition: React.FC<INewPosition> = ({
             setTokenAIndex(index1)
             setTokenBIndex(index2)
             onChangePositionTokens(index1, index2, fee)
-            console.log(fee)
+
             updatePath(index1, index2, fee)
           }}
           //Mocked data
           onAddLiquidity={() => {
-            if (!isWaitingForNewPool) {
-              dispatch(
-                actions.initPool({
-                  tokenX: TokenList.ETH,
-                  tokenY: TokenList.BTC,
-                  feeTier: { fee: 500000000n, tickSpacing: 5n }
-                })
+            if (tokenAIndex !== null && tokenBIndex !== null) {
+              addLiquidityHandler(
+                leftRange,
+                rightRange,
+                isXtoY
+                  ? BigInt(tokenADeposit) * 10n ** tokens[tokenAIndex].decimals
+                  : BigInt(tokenBDeposit) * 10n ** tokens[tokenBIndex].decimals,
+                isXtoY
+                  ? BigInt(tokenBDeposit) * 10n ** tokens[tokenBIndex].decimals
+                  : BigInt(tokenADeposit) * 10n ** tokens[tokenAIndex].decimals,
+                1000n //TODO add real data
+                // { v: fromFee(new BN(Number(+slippTolerance * 1000))) }
               )
             }
           }}

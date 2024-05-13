@@ -10,6 +10,7 @@ import {
 import { AddressOrPair } from '@polkadot/api/types'
 import {
   PositionOpeningMethod,
+  TokenList,
   TokenPriceData,
   bestTiers,
   commonTokensForNetworks
@@ -160,7 +161,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   }, [tokenAIndex, tokenBIndex])
 
   const [feeIndex, setFeeIndex] = useState(0)
-  console.log(feeTiersArray[feeIndex])
+
   const fee = useMemo(
     () => (feeTiersArray[feeIndex] ? feeTiersArray[feeIndex].tier.fee : 1n),
     [feeIndex]
@@ -493,83 +494,75 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       data={data}
       midPrice={midPrice}
       setMidPrice={setMidPrice}
-      onChangePositionTokens={
-        (tokenA, tokenB, feeTierIndex) => {
-          setTokenAIndex(tokenA)
-          setTokenBIndex(tokenB)
-          setFeeIndex(feeTierIndex)
+      onChangePositionTokens={(tokenA, tokenB, feeTierIndex) => {
+        if (
+          tokenA !== null &&
+          tokenB !== null &&
+          tokenA !== tokenB &&
+          !(
+            tokenAIndex === tokenA &&
+            tokenBIndex === tokenB &&
+            fee === feeTiersArray[feeTierIndex].tier.fee
+          )
+        ) {
+          // const index = allPools.findIndex(
+          //   pool =>
+          //     pool.fee.v.eq(feeTiersArray[feeTierIndex].tier.fee) &&
+          //     ((pool.tokenX.equals(tokens[tokenA].assetAddress) &&
+          //       pool.tokenY.equals(tokens[tokenB].assetAddress)) ||
+          //       (pool.tokenX.equals(tokens[tokenB].assetAddress) &&
+          //         pool.tokenY.equals(tokens[tokenA].assetAddress)))
+          // )
+          // if (
+          //   index !== poolIndex &&
+          //   !(
+          //     tokenAIndex === tokenB &&
+          //     tokenBIndex === tokenA &&
+          //     fee.eq(ALL_FEE_TIERS_DATA[feeTierIndex].tier.fee)
+          //   )
+          // ) {
+          //   if (isMountedRef.current) {
+          //     setPoolIndex(index !== -1 ? index : null)
+          //     setCurrentPairReversed(null)
+          //   }
+          // } else if (
+          //   tokenAIndex === tokenB &&
+          //   tokenBIndex === tokenA &&
+          //   fee === feeTiersArray[feeTierIndex].tier.fee
+          // ) {
+          //   if (isMountedRef.current) {
+          //     setCurrentPairReversed(currentPairReversed === null ? true : !currentPairReversed)
+          //   }
+          // }
+          // if (index !== -1 && index !== poolIndex) {
+          //   // dispatch(
+          //   //   actions.getCurrentPlotTicks({
+          //   //     poolIndex: index,
+          //   //     isXtoY: allPools[index].tokenX.equals(tokens[tokenA].assetAddress)
+          //   //   })
+          //   // )
+          // } else if (
+          //   !(
+          //     tokenAIndex === tokenB &&
+          //     tokenBIndex === tokenA &&
+          //     fee === feeTiersArray[feeTierIndex].tier.fee
+          //   )
+          // ) {
+          //   // dispatch(
+          //   //   poolsActions.getPoolData(
+          //   //     new Pair(tokens[tokenA].assetAddress, tokens[tokenB].assetAddress, {
+          //   //       fee: ALL_FEE_TIERS_DATA[feeTierIndex].tier.fee,
+          //   //       tickSpacing: ALL_FEE_TIERS_DATA[feeTierIndex].tier.tickSpacing
+          //   //     })
+          //   //   )
+          //   // )
+          // }
         }
-        //   if (
-        //     tokenA !== null &&
-        //     tokenB !== null &&
-        //     tokenA !== tokenB &&
-        //     !(
-        //       tokenAIndex === tokenA &&
-        //       tokenBIndex === tokenB &&
-        //       fee.eq(feeTiersArray[feeTierIndex].tier.fee)
-        //     )
-        //   ) {
-        //     const index = allPools.findIndex(
-        //       pool =>
-        //         pool.fee.v.eq(feeTiersArray[feeTierIndex].tier.fee) &&
-        //         ((pool.tokenX.equals(tokens[tokenA].assetAddress) &&
-        //           pool.tokenY.equals(tokens[tokenB].assetAddress)) ||
-        //           (pool.tokenX.equals(tokens[tokenB].assetAddress) &&
-        //             pool.tokenY.equals(tokens[tokenA].assetAddress)))
-        //     )
 
-        //     if (
-        //       index !== poolIndex &&
-        //       !(
-        //         tokenAIndex === tokenB &&
-        //         tokenBIndex === tokenA &&
-        //         fee.eq(ALL_FEE_TIERS_DATA[feeTierIndex].tier.fee)
-        //       )
-        //     ) {
-        //       if (isMountedRef.current) {
-        //         setPoolIndex(index !== -1 ? index : null)
-        //         setCurrentPairReversed(null)
-        //       }
-        //     } else if (
-        //       tokenAIndex === tokenB &&
-        //       tokenBIndex === tokenA &&
-        //       fee.eq(ALL_FEE_TIERS_DATA[feeTierIndex].tier.fee)
-        //     ) {
-        //       if (isMountedRef.current) {
-        //         setCurrentPairReversed(currentPairReversed === null ? true : !currentPairReversed)
-        //       }
-        //     }
-
-        //     if (index !== -1 && index !== poolIndex) {
-        //       dispatch(
-        //         actions.getCurrentPlotTicks({
-        //           poolIndex: index,
-        //           isXtoY: allPools[index].tokenX.equals(tokens[tokenA].assetAddress)
-        //         })
-        //       )
-        //     } else if (
-        //       !(
-        //         tokenAIndex === tokenB &&
-        //         tokenBIndex === tokenA &&
-        //         fee.eq(ALL_FEE_TIERS_DATA[feeTierIndex].tier.fee)
-        //       )
-        //     ) {
-        //       dispatch(
-        //         poolsActions.getPoolData(
-        //           new Pair(tokens[tokenA].assetAddress, tokens[tokenB].assetAddress, {
-        //             fee: ALL_FEE_TIERS_DATA[feeTierIndex].tier.fee,
-        //             tickSpacing: ALL_FEE_TIERS_DATA[feeTierIndex].tier.tickSpacing
-        //           })
-        //         )
-        //       )
-        //     }
-        //   }
-
-        //   setTokenAIndex(tokenA)
-        //   setTokenBIndex(tokenB)
-        //   setFeeIndex(feeTierIndex)
-        // }
-      }
+        setTokenAIndex(tokenA)
+        setTokenBIndex(tokenB)
+        setFeeIndex(feeTierIndex)
+      }}
       isCurrentPoolExisting={poolIndex !== null}
       feeTiers={feeTiersArray.map(tier => {
         return {
@@ -607,7 +600,48 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       onSlippageChange={onSlippageChange}
       initialSlippage={initialSlippage}
       progress={progress}
-      addLiquidityHandler={() => console.log('Adding liquidity')} // TODO - add real data
+      addLiquidityHandler={(leftTickIndex, rightTickIndex, xAmount, yAmount, slippage) => {
+        if (tokenAIndex === null || tokenBIndex === null) {
+          return
+        }
+
+        if (progress === 'none') {
+          setProgress('progress')
+        }
+        if (tokenAIndex !== null) {
+          console.log()
+        }
+        // const lowerTick = Math.min(leftTickIndex, rightTickIndex)
+        // const upperTick = Math.max(leftTickIndex, rightTickIndex)
+
+        dispatch(
+          poolsActions.initPool({
+            tokenX: tokens[tokenAIndex].assetAddress.toString(),
+            tokenY: tokens[tokenBIndex].assetAddress.toString(),
+            feeTier: feeTiersArray[feeIndex].tier
+          })
+        )
+        // dispatch(
+        //   actions.initPosition({
+        //     tokenX: tokens[isXtoY ? tokenAIndex : tokenBIndex].assetAddress,
+        //     tokenY: tokens[isXtoY ? tokenBIndex : tokenAIndex].assetAddress,
+        //     fee,
+        //     lowerTick,
+        //     upperTick,
+        //     liquidityDelta: liquidityRef.current,
+        //     initPool: poolIndex === null,
+        //     initTick: poolIndex === null ? midPrice.index : undefined,
+        //     xAmount: Math.floor(xAmount),
+        //     yAmount: Math.floor(yAmount),
+        //     slippage,
+        //     tickSpacing,
+        //     knownPrice:
+        //       poolIndex === null
+        //         ? calculatePriceSqrt(midPrice.index)
+        //         : allPools[poolIndex].sqrtPrice
+        //   })
+        // )
+      }} // TODO - add real data
       showNoConnected={walletStatus !== Status.Initialized}
     />
   )

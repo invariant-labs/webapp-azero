@@ -106,14 +106,14 @@ const poolsSlice = createSlice({
       }))
       state.feeTiers = indexedFeeTiers
       return state
+    },
+    addTokens(state, action: PayloadAction<Record<string, Token>>) {
+      state.tokens = {
+        ...state.tokens,
+        ...action.payload
+      }
+      return state
     }
-    // addTokens(state, action: PayloadAction<Record<string, Token>>) {
-    //   state.tokens = {
-    //     ...state.tokens,
-    //     ...action.payload
-    //   }
-    //   return state
-    // },
     // setVolumeRanges(state, action: PayloadAction<Record<string, Range[]>>) {
     //   state.volumeRanges = action.payload
     //   return state

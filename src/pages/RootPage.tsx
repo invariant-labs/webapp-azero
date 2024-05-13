@@ -1,5 +1,5 @@
 import FooterWrapper from '@containers/FooterWrapper'
-
+import EventsHandlers from '@containers/EventHandlers/index'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Outlet, useNavigate } from 'react-router-dom'
@@ -32,6 +32,7 @@ const RootPage: React.FC = () => {
   }, [])
   return (
     <>
+      {signerStatus === Status.Initialized && <EventsHandlers />}
       <HeaderWrapper />
       <Outlet />
       <FooterWrapper />
