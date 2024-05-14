@@ -309,8 +309,9 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
             onAddLiquidity()
           }
         }}
-        disabled={getButtonMessage() !== 'Add Liquidity'}
-        content={getButtonMessage()}
+        // disabled={getButtonMessage() !== 'Add Liquidity'}
+        // content={getButtonMessage()}
+        content='Test create pool'
         progress={progress}
       />
     </Grid>

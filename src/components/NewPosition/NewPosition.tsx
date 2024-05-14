@@ -1,11 +1,11 @@
 import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import Slippage from '@components/Modals/Slippage/Slippage'
 import { NoConnected } from '@components/NoConnected/NoConnected'
-import { Percentage, TokenAmount } from '@invariant-labs/a0-sdk'
+import { Percentage, TokenAmount, toPercentage } from '@invariant-labs/a0-sdk'
 import { Button, Grid, Typography } from '@mui/material'
 import backIcon from '@static/svg/back-arrow.svg'
 import settingIcon from '@static/svg/settings.svg'
-import { BestTier, PositionOpeningMethod, TokenPriceData } from '@store/consts/static'
+import { BestTier, PositionOpeningMethod, TokenList, TokenPriceData } from '@store/consts/static'
 import { addressToTicker } from '@store/consts/uiUtiils'
 import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
 import { SwapToken } from '@store/selectors/wallet'
@@ -19,6 +19,8 @@ import MarketIdLabel from './MarketIdLabel/MarketIdLabel'
 import PoolInit from './PoolInit/PoolInit'
 import RangeSelector from './RangeSelector/RangeSelector'
 import useStyles from './style'
+import { useDispatch } from 'react-redux'
+import { actions } from '@store/reducers/pools'
 
 export interface INewPosition {
   initialTokenFrom: string
@@ -32,10 +34,10 @@ export interface INewPosition {
   midPrice: TickPlotPositionData
   setMidPrice: (mid: TickPlotPositionData) => void
   addLiquidityHandler: (
-    leftTickIndex: number,
-    rightTickIndex: number,
-    xAmount: number,
-    yAmount: number,
+    leftTickIndex: bigint,
+    rightTickIndex: bigint,
+    xAmount: TokenAmount,
+    yAmount: TokenAmount,
     slippage: Percentage
   ) => void
   onChangePositionTokens: (
@@ -102,6 +104,7 @@ export const NewPosition: React.FC<INewPosition> = ({
   tokens,
   data,
   midPrice,
+  addLiquidityHandler,
   progress = 'progress',
   onChangePositionTokens,
   isCurrentPoolExisting,
@@ -137,6 +140,8 @@ export const NewPosition: React.FC<INewPosition> = ({
   onSlippageChange,
   initialSlippage
 }) => {
+  const dispatch = useDispatch()
+
   // TODO delete mock data below
   const getMinTick = (a: bigint) => 145n
   const getMaxTick = (a: bigint) => 52556n
@@ -396,8 +401,7 @@ export const NewPosition: React.FC<INewPosition> = ({
   }
 
   const updatePath = (index1: number | null, index2: number | null, fee: number) => {
-    // const parsedFee = parseFeeToPathFee(+ALL_FEE_TIERS_DATA[fee].tier.fee)
-    const parsedFee = '0.1'
+    const parsedFee = feeTiers[fee].feeValue
 
     if (index1 != null && index2 != null) {
       const address1 = addressToTicker(tokens[index1].assetAddress.toString())
@@ -484,7 +488,22 @@ export const NewPosition: React.FC<INewPosition> = ({
             updatePath(index1, index2, fee)
           }}
           //Mocked data
-          onAddLiquidity={() => {}}
+          onAddLiquidity={() => {
+            if (tokenAIndex !== null && tokenBIndex !== null) {
+              addLiquidityHandler(
+                leftRange,
+                rightRange,
+                isXtoY
+                  ? BigInt(tokenADeposit) * 10n ** tokens[tokenAIndex].decimals
+                  : BigInt(tokenBDeposit) * 10n ** tokens[tokenBIndex].decimals,
+                isXtoY
+                  ? BigInt(tokenBDeposit) * 10n ** tokens[tokenBIndex].decimals
+                  : BigInt(tokenADeposit) * 10n ** tokens[tokenAIndex].decimals,
+                1000n //TODO add real data
+                // { v: fromFee(new BN(Number(+slippTolerance * 1000))) }
+              )
+            }
+          }}
           tokenAInputState={{
             blocked: false,
             blockerInfo: '',

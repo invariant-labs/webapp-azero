@@ -1,6 +1,6 @@
 import { ApiPromise, WsProvider } from '@polkadot/api'
 
-let _alephZero: ApiPromise | undefined
+let _alephZero: ApiPromise | null = null
 let _network: string
 
 const getAlephZeroConnection = async (url: string) => {
@@ -60,7 +60,7 @@ const getAlephZeroConnection = async (url: string) => {
 //   }
 // }
 
-const getCurrentAlephZeroConnection = (): ApiPromise | undefined => {
+const getCurrentAlephZeroConnection = (): ApiPromise | null => {
   return _alephZero
 }
 

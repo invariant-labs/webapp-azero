@@ -1,7 +1,7 @@
 import { Network, TokenAmount, priceToSqrtPrice } from '@invariant-labs/a0-sdk'
 import { PlotTickData } from '@store/reducers/positions'
 import axios from 'axios'
-import { TokenPriceData, tokensPrices } from './static'
+import { BTC_TEST, ETH_TEST, Token, TokenPriceData, USDC_TEST, tokensPrices } from './static'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -275,7 +275,7 @@ export const printBN = (amount: TokenAmount, decimals: bigint): string => {
 
   const balanceString = isNegative ? amountString.slice(1) : amountString
 
-  if (balanceString.length <= decimals) {
+  if (balanceString.length <= Number(decimals)) {
     return (
       // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
       (isNegative ? '-' : '') +
@@ -299,4 +299,20 @@ export const printBN = (amount: TokenAmount, decimals: bigint): string => {
 export const parseFeeToPathFee = (fee: bigint): string => {
   const parsedFee = (fee / BigInt(Math.pow(10, 8))).toString().padStart(3, '0')
   return parsedFee.slice(0, parsedFee.length - 2) + '_' + parsedFee.slice(parsedFee.length - 2)
+}
+
+export const getNetworkTokensList = (networkType: Network): Record<string, Token> => {
+  const obj: Record<string, Token> = {}
+  switch (networkType) {
+    case Network.Mainnet: {
+    }
+    case Network.Testnet:
+      return {
+        [USDC_TEST.address.toString()]: USDC_TEST,
+        [BTC_TEST.address.toString()]: BTC_TEST,
+        [ETH_TEST.address.toString()]: ETH_TEST
+      }
+    default:
+      return {}
+  }
 }

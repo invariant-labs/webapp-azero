@@ -11,7 +11,7 @@ import {
   poolsArraySortedByFees,
   tickMaps
 } from '@store/selectors/pools'
-import { network } from '@store/selectors/connection'
+import { networkType } from '@store/selectors/connection'
 import { AddressOrPair } from '@polkadot/api/types'
 import { TokenPriceData, commonTokensForNetworks } from '@store/consts/static'
 import { getCoingeckoTokenPrice, getMockedTokenPrice } from '@store/consts/utils'
@@ -24,14 +24,14 @@ export const WrappedSwap = () => {
   const walletStatus = useSelector(status)
   const swap = useSelector(swapPool)
   const tickmap = useSelector(tickMaps)
-  const poolTicksForSimulation = useSelector(nearestPoolTicksForPair)
+  // const poolTicksForSimulation = useSelector(nearestPoolTicksForPair)
   const allPools = useSelector(poolsArraySortedByFees)
   const tokensList = useSelector(swapTokens)
   const tokensDict = useSelector(swapTokensDict)
   const isBalanceLoading = useSelector(balanceLoading)
   const { success, inProgress } = useSelector(swapPool)
   const isFetchingNewPool = useSelector(isLoadingLatestPoolsForTransaction)
-  const networkType = useSelector(network)
+  const network = useSelector(networkType)
 
   const [progress, setProgress] = useState<ProgressState>('none')
   const [tokenFrom, setTokenFrom] = useState<AddressOrPair | null>(null)
@@ -144,7 +144,7 @@ export const WrappedSwap = () => {
         .then(data => setTokenFromPriceData(data))
         .catch(() =>
           setTokenFromPriceData(
-            getMockedTokenPrice(tokensDict[tokenFrom.toString()].symbol, networkType)
+            getMockedTokenPrice(tokensDict[tokenFrom.toString()].symbol, network)
           )
         )
         .finally(() => setPriceFromLoading(false))
@@ -166,9 +166,7 @@ export const WrappedSwap = () => {
       getCoingeckoTokenPrice(id)
         .then(data => setTokenToPriceData(data))
         .catch(() =>
-          setTokenToPriceData(
-            getMockedTokenPrice(tokensDict[tokenTo.toString()].symbol, networkType)
-          )
+          setTokenToPriceData(getMockedTokenPrice(tokensDict[tokenTo.toString()].symbol, network))
         )
         .finally(() => setPriceToLoading(false))
     } else {
@@ -207,9 +205,7 @@ export const WrappedSwap = () => {
       getCoingeckoTokenPrice(idTo)
         .then(data => setTokenToPriceData(data))
         .catch(() =>
-          setTokenToPriceData(
-            getMockedTokenPrice(tokensDict[tokenTo.toString()].symbol, networkType)
-          )
+          setTokenToPriceData(getMockedTokenPrice(tokensDict[tokenTo.toString()].symbol, network))
         )
         .finally(() => setPriceToLoading(false))
     } else {
@@ -224,7 +220,7 @@ export const WrappedSwap = () => {
         .then(data => setTokenFromPriceData(data))
         .catch(() =>
           setTokenFromPriceData(
-            getMockedTokenPrice(tokensDict[tokenFrom.toString()].symbol, networkType)
+            getMockedTokenPrice(tokensDict[tokenFrom.toString()].symbol, network)
           )
         )
         .finally(() => setPriceFromLoading(false))
@@ -290,7 +286,7 @@ export const WrappedSwap = () => {
       pools={allPools}
       swapData={swap}
       progress={progress}
-      poolTicks={poolTicksForSimulation}
+      poolTicks={{}} //TODO add real data
       isWaitingForNewPool={isFetchingNewPool}
       tickmap={tickmap}
       // initialTokenFromIndex={initialTokenFromIndex === -1 ? null : initialTokenFromIndex}
@@ -299,7 +295,7 @@ export const WrappedSwap = () => {
       initialTokenFromIndex={1}
       initialTokenToIndex={2}
       handleAddToken={() => {}}
-      commonTokens={commonTokensForNetworks[networkType]}
+      commonTokens={commonTokensForNetworks[network]}
       initialHideUnknownTokensValue={initialHideUnknownTokensValue}
       onHideUnknownTokensChange={setHideUnknownTokensValue}
       tokenFromPriceData={tokenFromPriceData}

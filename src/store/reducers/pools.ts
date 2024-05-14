@@ -1,11 +1,16 @@
-import { Pool, Tick } from '@invariant-labs/a0-sdk'
+import { FeeTier, Pool, PoolKey, Tick } from '@invariant-labs/a0-sdk'
 import { AddressOrPair } from '@polkadot/api/types'
-import { createSlice } from '@reduxjs/toolkit'
+import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { Token } from '@store/consts/static'
 import { PayloadType } from '@store/consts/types'
 
 export interface PoolWithAddress extends Pool {
   address: AddressOrPair
+}
+
+export interface IndexedFeeTier {
+  tier: FeeTier
+  primaryIndex: number
 }
 
 export interface IPoolsStore {
@@ -16,6 +21,7 @@ export interface IPoolsStore {
   isLoadingLatestPoolsForTransaction: boolean
   tickMaps: { [key in string]: bigint[] }
   volumeRanges: Record<string, Range[]>
+  feeTiers: IndexedFeeTier[]
 }
 
 export interface UpdatePool {
@@ -58,7 +64,8 @@ export const defaultState: IPoolsStore = {
   nearestPoolTicksForPair: {},
   isLoadingLatestPoolsForTransaction: false,
   tickMaps: {},
-  volumeRanges: {}
+  volumeRanges: {},
+  feeTiers: []
 }
 
 export interface PairTokens {
@@ -86,13 +93,27 @@ const poolsSlice = createSlice({
   name: poolsSliceName,
   initialState: defaultState,
   reducers: {
-    // addTokens(state, action: PayloadAction<Record<string, Token>>) {
-    //   state.tokens = {
-    //     ...state.tokens,
-    //     ...action.payload
-    //   }
-    //   return state
-    // },
+    initPool(state, _action: PayloadAction<PoolKey>) {
+      return state
+    },
+    getFeeTiers(state) {
+      return state
+    },
+    setFeeTiers(state, action: PayloadAction<FeeTier[]>) {
+      const indexedFeeTiers = action.payload.map((tier, index) => ({
+        tier,
+        primaryIndex: index
+      }))
+      state.feeTiers = indexedFeeTiers
+      return state
+    },
+    addTokens(state, action: PayloadAction<Record<string, Token>>) {
+      state.tokens = {
+        ...state.tokens,
+        ...action.payload
+      }
+      return state
+    }
     // setVolumeRanges(state, action: PayloadAction<Record<string, Range[]>>) {
     //   state.volumeRanges = action.payload
     //   return state

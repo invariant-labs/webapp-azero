@@ -3,7 +3,7 @@ import { Network } from '@invariant-labs/a0-sdk'
 import { AlephZeroNetworks } from '@store/consts/static'
 import { actions } from '@store/reducers/connection'
 import { Status, actions as walletActions } from '@store/reducers/wallet'
-import { network, rpcAddress } from '@store/selectors/connection'
+import { networkType, rpcAddress } from '@store/selectors/connection'
 import { address, status } from '@store/selectors/wallet'
 import { openWalletSelectorModal } from '@utils/web3/selector'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
@@ -14,7 +14,7 @@ import { useLocation } from 'react-router-dom'
 export const HeaderWrapper: React.FC = () => {
   const dispatch = useDispatch()
   const walletStatus = useSelector(status)
-  const currentNetwork = useSelector(network)
+  const currentNetwork = useSelector(networkType)
   const currentRpc = useSelector(rpcAddress)
   const location = useLocation()
   const walletAddress = useSelector(address)
@@ -61,7 +61,7 @@ export const HeaderWrapper: React.FC = () => {
             localStorage.setItem('INVARIANT_TESTNET_RPC', rpcAddress)
           }
 
-          dispatch(actions.setNetwork({ network, rpcAddress, rpcName }))
+          dispatch(actions.setNetwork({ networkType: network, rpcAddress, rpcName }))
         }
       }}
       onConnectWallet={openWalletSelectorModal}
