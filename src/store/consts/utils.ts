@@ -11,7 +11,7 @@ import { ApiPromise } from '@polkadot/api'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
 import axios from 'axios'
-import { Token, TokenPriceData, tokensPrices } from './static'
+import { BTC_TEST, ETH_TEST, Token, TokenPriceData, USDC_TEST, tokensPrices } from './static'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -281,7 +281,7 @@ export const printBN = (amount: TokenAmount, decimals: bigint): string => {
 
   const balanceString = isNegative ? amountString.slice(1) : amountString
 
-  if (balanceString.length <= decimals) {
+  if (balanceString.length <= Number(decimals)) {
     return (
       // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
       (isNegative ? '-' : '') +
@@ -356,4 +356,20 @@ export const getPoolsFromPoolKeys = async (
 
 export const poolKeyToString = (poolKey: PoolKey): string => {
   return poolKey.tokenX + poolKey.tokenY + poolKey.feeTier.fee + poolKey.feeTier.tickSpacing
+}
+
+export const getNetworkTokensList = (networkType: Network): Record<string, Token> => {
+  const obj: Record<string, Token> = {}
+  switch (networkType) {
+    case Network.Mainnet: {
+    }
+    case Network.Testnet:
+      return {
+        [USDC_TEST.address.toString()]: USDC_TEST,
+        [BTC_TEST.address.toString()]: BTC_TEST,
+        [ETH_TEST.address.toString()]: ETH_TEST
+      }
+    default:
+      return {}
+  }
 }

@@ -1,5 +1,5 @@
+import EventsHandlers from '@containers/EventHandlers/index'
 import FooterWrapper from '@containers/FooterWrapper'
-
 import HeaderWrapper from '@containers/HeaderWrapper/HeaderWrapper'
 import { Status, actions as alephZeroConnectionActions } from '@store/reducers/connection'
 import { actions } from '@store/reducers/positions'
@@ -37,6 +37,7 @@ const RootPage: React.FC = () => {
   }, [])
   return (
     <>
+      {signerStatus === Status.Initialized && <EventsHandlers />}
       <HeaderWrapper />
       <Outlet />
       <FooterWrapper />

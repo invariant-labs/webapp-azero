@@ -87,7 +87,7 @@ export const useSingleTabStyles = makeStyles()(() => {
     },
     selected: {
       ...typography.heading4,
-      color: colors.white.main,
+      color: colors.white.main + ' !important',
       transition: 'color 300ms',
 
       '&:hover': {

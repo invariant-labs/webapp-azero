@@ -1,4 +1,5 @@
 import {
+  FeeTier,
   Pool,
   PoolKey,
   TESTNET_BTC_ADDRESS,
@@ -17,6 +18,11 @@ export interface PoolWithPoolKey extends Pool {
   poolKey: PoolKey
 }
 
+export interface IndexedFeeTier {
+  tier: FeeTier
+  primaryIndex: number
+}
+
 export interface IPoolsStore {
   tokens: Record<string, Token>
   pools: { [key in string]: PoolWithPoolKey }
@@ -25,6 +31,7 @@ export interface IPoolsStore {
   isLoadingLatestPoolsForTransaction: boolean
   tickMaps: { [key in string]: bigint[] }
   volumeRanges: Record<string, Range[]>
+  feeTiers: IndexedFeeTier[]
 }
 
 export interface UpdatePool {
@@ -67,7 +74,8 @@ export const defaultState: IPoolsStore = {
   nearestPoolTicksForPair: {},
   isLoadingLatestPoolsForTransaction: false,
   tickMaps: {},
-  volumeRanges: {}
+  volumeRanges: {},
+  feeTiers: []
 }
 
 export interface PairTokens {
@@ -95,6 +103,20 @@ const poolsSlice = createSlice({
   name: poolsSliceName,
   initialState: defaultState,
   reducers: {
+    initPool(state, _action: PayloadAction<PoolKey>) {
+      return state
+    },
+    getFeeTiers(state) {
+      return state
+    },
+    setFeeTiers(state, action: PayloadAction<FeeTier[]>) {
+      const indexedFeeTiers = action.payload.map((tier, index) => ({
+        tier,
+        primaryIndex: index
+      }))
+      state.feeTiers = indexedFeeTiers
+      return state
+    },
     addTokens(state, action: PayloadAction<Record<string, Token>>) {
       state.tokens = {
         ...state.tokens,
