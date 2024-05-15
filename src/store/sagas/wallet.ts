@@ -5,6 +5,7 @@ import { SignerOptions } from '@polkadot/api/types/submittable'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { TokenAirdropAmount, TokenList, getFaucetDeployer } from '@store/consts/static'
 import { createLoaderKey } from '@store/consts/utils'
+import { actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Status, actions, actions as walletActions } from '@store/reducers/wallet'
 import { address, status } from '@store/selectors/wallet'
@@ -329,13 +330,13 @@ export function* handleDisconnect(): Generator {
     yield* call(disconnectWallet)
     yield* put(actions.resetState())
 
-    // yield* put(positionsActions.setPositionsList([]))
-    // yield* put(
-    //   positionsActions.setCurrentPositionRangeTicks({
-    //     lowerTick: undefined,
-    //     upperTick: undefined
-    //   })
-    // )
+    yield* put(positionsActions.setPositionsList([]))
+    yield* put(
+      positionsActions.setCurrentPositionRangeTicks({
+        lowerTick: undefined,
+        upperTick: undefined
+      })
+    )
   } catch (error) {
     console.log(error)
   }

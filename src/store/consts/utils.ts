@@ -1,7 +1,17 @@
-import { Network, TokenAmount, priceToSqrtPrice } from '@invariant-labs/a0-sdk'
+import {
+  Invariant,
+  Network,
+  PSP22,
+  PoolKey,
+  TESTNET_INVARIANT_ADDRESS,
+  TokenAmount,
+  priceToSqrtPrice
+} from '@invariant-labs/a0-sdk'
+import { ApiPromise } from '@polkadot/api'
+import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
 import axios from 'axios'
-import { TokenPriceData, tokensPrices } from './static'
+import { Token, TokenPriceData, tokensPrices } from './static'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -126,15 +136,11 @@ export const trimZeros = (numStr: string): string => {
 
 export const PRICE_DECIMAL = 24
 
-export const calcYPerXPrice = (
-  sqrtPrice: TokenAmount,
-  xDecimal: bigint,
-  yDecimal: bigint
-): bigint => {
+export const calcYPerXPrice = (sqrtPrice: bigint, xDecimal: bigint, yDecimal: bigint): number => {
   const sqrt = +printAmount(sqrtPrice, PRICE_DECIMAL)
-  const proportion = BigInt(sqrt * sqrt)
+  const proportion = sqrt * sqrt
 
-  return proportion / 10n ** (yDecimal - xDecimal)
+  return proportion / 10 ** Number(yDecimal - xDecimal)
 }
 
 export const trimLeadingZeros = (amount: string): string => {
@@ -299,4 +305,55 @@ export const printBN = (amount: TokenAmount, decimals: bigint): string => {
 export const parseFeeToPathFee = (fee: bigint): string => {
   const parsedFee = (fee / BigInt(Math.pow(10, 8))).toString().padStart(3, '0')
   return parsedFee.slice(0, parsedFee.length - 2) + '_' + parsedFee.slice(parsedFee.length - 2)
+}
+
+export const getFullNewTokensData = async (
+  tokens: string[],
+  api: ApiPromise,
+  network: Network
+): Promise<Record<string, Token>> => {
+  const psp22 = await PSP22.load(api, network, '')
+
+  const promises: Promise<any>[] = []
+  tokens.map(token => {
+    psp22.setContractAddress(token)
+    promises.push(psp22.tokenSymbol())
+    promises.push(psp22.tokenName())
+    promises.push(psp22.tokenDecimals())
+  })
+  const results = await Promise.all(promises)
+
+  const newTokens: Record<string, Token> = {}
+  tokens.map((token, index) => {
+    newTokens[token] = {
+      symbol: results[index * 3 - 3] as string,
+      address: token,
+      name: results[index * 3 - 2] as string,
+      decimals: results[index * 3 - 1] as bigint,
+      logoURI: ''
+    }
+  })
+  return newTokens
+}
+
+export const getPoolsFromPoolKeys = async (
+  poolKeys: PoolKey[],
+  api: ApiPromise,
+  network: Network
+): Promise<PoolWithPoolKey[]> => {
+  const invariant = await Invariant.load(api, network, TESTNET_INVARIANT_ADDRESS)
+
+  const promises = poolKeys.map(poolKey =>
+    invariant.getPool(poolKey.tokenX, poolKey.tokenY, poolKey.feeTier)
+  )
+  const pools = await Promise.all(promises)
+
+  return pools.map((pool, index) => ({
+    ...pool,
+    poolKey: poolKeys[index]
+  }))
+}
+
+export const poolKeyToString = (poolKey: PoolKey): string => {
+  return poolKey.tokenX + poolKey.tokenY + poolKey.feeTier.fee + poolKey.feeTier.tickSpacing
 }

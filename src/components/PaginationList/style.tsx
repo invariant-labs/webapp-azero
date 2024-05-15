@@ -1,152 +1,76 @@
-import { Theme } from '@mui/material'
+import { Theme } from '@mui/material/styles/createTheme'
 import { colors, typography } from '@static/theme'
 import { makeStyles } from 'tss-react/mui'
 
 export const useStyles = makeStyles()((theme: Theme) => ({
   root: {
     width: 1122,
-
+    display: 'flex',
     [theme.breakpoints.down('md')]: {
       width: '100%'
-    }
-  },
-  header: {
-    paddingBottom: 16,
-    display: 'flex',
-    alignItems: 'flex-end'
-  },
-  titleBar: {
-    display: 'flex',
-    marginBottom: 20
-  },
-  title: {
-    color: colors.invariant.text,
-    ...typography.heading4,
-    fontWeight: 500
-  },
-  positionsNumber: {
-    width: 28,
-    height: 28,
-    color: colors.invariant.text,
-    background: colors.invariant.light,
-    marginLeft: 8,
-    borderRadius: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  searchRoot: {
-    width: '100%'
-  },
-  searchWrapper: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexWrap: 'nowrap'
-  },
-  searchBar: {
-    width: 221,
-    height: 32,
-    padding: '7px 12px',
-    borderRadius: 10,
-    background: colors.invariant.black,
-    border: '1px solid #202946',
-    color: colors.invariant.lightGrey,
-    ...typography.body2,
-    [theme.breakpoints.down('xs')]: {
-      maxWidth: 200
-    }
-  },
-  button: {
-    color: colors.invariant.dark,
-    ...typography.body1,
-    textTransform: 'none',
-    borderRadius: 14,
-    height: 40,
-    minWidth: 130,
-    paddingInline: 0,
-    marginLeft: 16,
-    background:
-      'linear-gradient(180deg, rgba(239, 132, 245, 0.8) 0%, rgba(156, 62, 189, 0.8) 100%)',
-
-    '&:hover': {
-      background: 'linear-gradient(180deg, #EF84F5 0%, #9C3EBD 100%)',
-      boxShadow: '0px 0px 16px rgba(239, 132, 245, 0.35)'
-    }
-  },
-
-  buttonSelectDisabled: {
-    ...typography.body1,
-    textTransform: 'none',
-    borderRadius: 14,
-    height: 40,
-    minWidth: 130,
-    paddingInline: 0,
-    cursor: 'auto',
-    marginLeft: 16,
-    background: `${colors.invariant.light} !important`,
-
-    '&:hover': {
-      filter: 'brightness(1.15)'
-    }
-  },
-  buttonText: {
-    WebkitPaddingBefore: '2px'
-  },
-  noPositionsText: {
-    ...typography.heading1,
-    textAlign: 'center',
-    color: colors.invariant.text
-  },
-  list: {
-    position: 'relative',
-    flex: 1
-  },
-  itemLink: {
-    textDecoration: 'none',
-    cursor: 'pointer',
-
-    '&:not(:last-child)': {
-      display: 'block',
-      marginBottom: 20,
-
-      [theme.breakpoints.down('sm')]: {
-        marginBottom: 16
-      }
-    }
-  },
-  searchIcon: {
-    width: 17
-  },
-  loading: {
-    width: 150,
-    height: 150,
-    margin: 'auto'
-  },
-  placeholder: {
-    margin: 'auto'
-  },
-  refreshIconBtn: {
-    padding: 0,
-    margin: 0,
-    minWidth: 'auto',
-    background: 'none',
-    marginRight: 7,
-    '&:hover': {
-      background: 'none'
     },
-    '&:disabled': {
-      opacity: 0.5
-    }
-  },
-  refreshIcon: {
-    width: 26,
-    height: 21,
-    cursor: 'pointer',
-    transition: 'filter 100ms',
-    '&:hover': {
-      filter: 'brightness(1.5)'
+    '& .MuiPagination-ul': {
+      flexWrap: 'nowrap',
+      margin: '10px 0 10px'
+    },
+
+    '& .MuiPaginationItem-icon': {
+      color: colors.black.full
+    },
+
+    '& .MuiPaginationItem-page': {
+      ...typography.heading4,
+
+      color: colors.invariant.light,
+      '&:hover': {
+        color: colors.invariant.lightGrey
+      }
+    },
+
+    '& .MuiPaginationItem-page:hover': {
+      color: colors.invariant.textGrey
+    },
+
+    '& .MuiPaginationItem-ellipsis': {
+      color: colors.invariant.light
+    },
+
+    '& .Mui-selected': {
+      color: colors.invariant.green
+    },
+    '& .Mui-selected:hover': {
+      color: `${colors.invariant.green} !important`
+    },
+
+    '& .MuiPaginationItem-page.Mui-selected': {
+      backgroundColor: 'transparent',
+      '&:hover': {
+        color: colors.invariant.green
+      }
+    },
+    '& li:first-child button': {
+      backgroundColor: colors.invariant.green,
+      minWidth: 40,
+      minHeight: 40,
+      opacity: 0.8
+    },
+    '& li:first-child button:hover': {
+      opacity: 1
+    },
+
+    '& li:last-child button': {
+      backgroundColor: colors.invariant.green,
+      minWidth: 40,
+      minHeight: 40,
+      opacity: 0.8
+    },
+
+    '& li:last-child button:hover': {
+      opacity: 1
+    },
+
+    '& svg': {
+      transform: 'scale(2.2)'
     }
   }
 }))
