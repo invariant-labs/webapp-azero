@@ -3,7 +3,7 @@ import { GuardPredicate } from '@redux-saga/types'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { ListPoolsResponse, ListType, actions as poolsActions } from '@store/reducers/pools'
 import { actions } from '@store/reducers/positions'
-import { network } from '@store/selectors/connection'
+import { networkType } from '@store/selectors/connection'
 import { address } from '@store/selectors/wallet'
 import { all, call, put, select, spawn, take, takeLatest } from 'typed-redux-saga'
 import { getConnection } from './connection'
@@ -11,18 +11,12 @@ import { getConnection } from './connection'
 export function* handleGetPositionsList() {
   try {
     const connection = yield* getConnection()
-    const networkType = yield* select(network)
-    const invariant = yield* call(
-      Invariant.load,
-      connection,
-      networkType,
-      TESTNET_INVARIANT_ADDRESS,
-      {
-        storageDepositLimit: 10000000000,
-        refTime: 10000000000,
-        proofSize: 10000000000
-      }
-    )
+    const network = yield* select(networkType)
+    const invariant = yield* call(Invariant.load, connection, network, TESTNET_INVARIANT_ADDRESS, {
+      storageDepositLimit: 10000000000,
+      refTime: 10000000000,
+      proofSize: 10000000000
+    })
     const walletAddress = yield* select(address)
 
     const positions = yield* call([invariant, invariant.getPositions], walletAddress)

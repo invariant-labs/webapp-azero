@@ -22,13 +22,8 @@ import { getConnection } from './connection'
 
 export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) {
   const connection = yield* call(getConnection)
-  const networkType = yield* select(network)
-  const newPools = yield* call(
-    getPoolsFromPoolKeys,
-    action.payload.poolKeys,
-    connection,
-    networkType
-  )
+  const network = yield* select(networkType)
+  const newPools = yield* call(getPoolsFromPoolKeys, action.payload.poolKeys, connection, network)
 
   const allTokens = yield* select(tokens)
   const unknownTokens = new Set<string>()
@@ -43,7 +38,7 @@ export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) 
     }
   })
 
-  const newTokens = yield* call(getFullNewTokensData, [...unknownTokens], connection, networkType)
+  const newTokens = yield* call(getFullNewTokensData, [...unknownTokens], connection, network)
   yield* put(actions.addTokens(newTokens))
 
   yield* put(actions.addPoolsForList({ data: newPools, listType: action.payload.listType }))
