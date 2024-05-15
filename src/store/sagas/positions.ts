@@ -1,4 +1,4 @@
-import { Invariant, TESTNET_INVARIANT_ADDRESS } from '@invariant-labs/a0-sdk'
+import { Invariant, PoolKey, TESTNET_INVARIANT_ADDRESS } from '@invariant-labs/a0-sdk'
 import { GuardPredicate } from '@redux-saga/types'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { ListPoolsResponse, ListType, actions as poolsActions } from '@store/reducers/pools'
@@ -21,7 +21,20 @@ export function* handleGetPositionsList() {
 
     const positions = yield* call([invariant, invariant.getPositions], walletAddress)
 
-    const pools = new Set(positions.map(position => position.poolKey))
+    const pools: PoolKey[] = []
+    for (let i = 0; i < positions.length; i++) {
+      let found = false
+
+      for (let j = 0; j < pools.length; j++) {
+        if (JSON.stringify(positions[i].poolKey) === JSON.stringify(pools[j])) {
+          found = true
+        }
+      }
+
+      if (!found) {
+        pools.push(positions[i].poolKey)
+      }
+    }
 
     yield* put(
       poolsActions.getPoolsDataForList({

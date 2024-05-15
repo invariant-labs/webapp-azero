@@ -161,5 +161,5 @@ export function* fetchFeeTiersHandler(): Generator {
 }
 
 export function* poolsSaga(): Generator {
-  yield all([initPoolHandler, fetchFeeTiersHandler, fetchPoolsDataForList].map(spawn))
+  yield all([initPoolHandler, fetchFeeTiersHandler, getPoolsDataForListHandler].map(spawn))
 }
