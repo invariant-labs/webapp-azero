@@ -19,8 +19,8 @@ export interface PositionsListStore {
   loading: boolean
 }
 export interface PlotTickData {
-  x: bigint
-  y: bigint
+  x: number
+  y: number
   index: bigint
 }
 

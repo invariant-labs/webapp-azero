@@ -2,6 +2,7 @@ import {
   Network,
   PoolKey,
   TokenAmount,
+  calculateSqrtPrice,
   getMaxTick,
   getMinTick,
   priceToSqrtPrice
@@ -187,21 +188,16 @@ export const toMaxNumericPlaces = (num: number, places: number): string => {
   return num.toFixed(places + Math.abs(log) - 1)
 }
 
-export const calcPrice = (
-  amount: TokenAmount,
-  isXtoY: boolean,
-  xDecimal: bigint,
-  yDecimal: bigint
-) => {
+export const calcPrice = (index: bigint, isXtoY: boolean, xDecimal: bigint, yDecimal: bigint) => {
   //TODO check if this is correct, in Solana sdk was method calculatePriceSqrt which takes index to calculate price
-  const price = calcYPerXPrice(priceToSqrtPrice(amount), xDecimal, yDecimal)
+  const price = calcYPerXPrice(calculateSqrtPrice(index), xDecimal, yDecimal)
 
-  return BigInt(isXtoY ? price : 1 / price)
+  return isXtoY ? price : price !== 0 ? 1 / price : Number.MAX_SAFE_INTEGER
 }
 
 export const createPlaceholderLiquidityPlot = (
   isXtoY: boolean,
-  yValueToFill: bigint,
+  yValueToFill: number,
   tickSpacing: number,
   tokenXDecimal: bigint,
   tokenYDecimal: bigint

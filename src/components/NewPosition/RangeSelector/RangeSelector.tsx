@@ -312,7 +312,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
               // autoZoomHandler(newLeft, rightRange)
             }}
             diffLabel='Min - Current price'
-            percentDiff={((+leftInput - Number(midPrice.x)) / Number(midPrice.x)) * 100}
+            percentDiff={((+leftInput - midPrice.x) / midPrice.x) * 100}
           />
           <RangeInput
             disabled={positionOpeningMethod === 'concentration'}
@@ -352,7 +352,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
               // autoZoomHandler(leftRange, newRight)
             }}
             diffLabel='Max - Current price'
-            percentDiff={((+rightInput - Number(midPrice.x)) / Number(midPrice.x)) * 100}
+            percentDiff={((+rightInput - midPrice.x) / midPrice.x) * 100}
           />
         </Grid>
         {positionOpeningMethod === 'concentration' ? (

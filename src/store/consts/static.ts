@@ -183,8 +183,8 @@ export const USDC: Token = {
 
 export const BTC_TEST: Token = {
   symbol: 'BTC',
-  address: '5GhF7vS1A2CFWMCck69J8LGh37DgRLjYjjQTA49pAMXUeZ5B',
-  decimals: 9n,
+  address: TESTNET_BTC_ADDRESS,
+  decimals: 8n,
   name: 'Bitcoin',
   logoURI:
     'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E/logo.png',
@@ -193,8 +193,8 @@ export const BTC_TEST: Token = {
 
 export const ETH_TEST: Token = {
   symbol: 'ETH',
-  address: '5E8qAJ4aU2LC7Dq31cb4H9zR9zM1t5fVBaUZr2qBkJSWeUuL',
-  decimals: 9n,
+  address: TESTNET_ETH_ADDRESS,
+  decimals: 18n,
   name: 'Ether',
   logoURI:
     'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk/logo.png',
@@ -203,10 +203,10 @@ export const ETH_TEST: Token = {
 
 export const USDC_TEST: Token = {
   symbol: 'USDC',
-  address: '5HJQP6MEFm2Hv42EG286r69LoCkomLgG23hRgYXo2VU2cYn6',
-  decimals: 12n,
-  name: 'USD Coin',
+  address: TETSNET_USDC_ADDRESS,
+  decimals: 6n,
+  name: 'USDC',
   logoURI:
     'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
-  coingeckoId: 'usd-coin'
+  coingeckoId: 'usdc'
 }

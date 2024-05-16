@@ -263,11 +263,9 @@ export const NewPosition: React.FC<INewPosition> = ({
     if (printIndex === null || calcIndex === null) {
       return '0.0'
     }
-    console.log(left)
-    console.log(amount)
+
     const result = calcAmount(amount, left, right, tokens[calcIndex].assetAddress)
-    console.log(result)
-    console.log(trimLeadingZeros(printBN(result, tokens[printIndex].decimals)))
+
     return trimLeadingZeros(printBN(result, tokens[printIndex].decimals))
   }
 
@@ -565,7 +563,7 @@ export const NewPosition: React.FC<INewPosition> = ({
               console.log(
                 isXtoY
                   ? BigInt(+tokenADeposit * 10 ** Number(tokens[tokenAIndex].decimals))
-                  : BigInt(+tokenBDeposit * 10 ** Number(tokens[tokenBIndex].decimals))
+                  : BigInt(Math.floor(+tokenBDeposit * 10 ** Number(tokens[tokenBIndex].decimals)))
               )
               console.log(
                 isXtoY
@@ -576,11 +574,11 @@ export const NewPosition: React.FC<INewPosition> = ({
                 leftRange,
                 rightRange,
                 isXtoY
-                  ? BigInt(+tokenADeposit * 10 ** Number(tokens[tokenAIndex].decimals))
-                  : BigInt(+tokenBDeposit * 10 ** Number(tokens[tokenBIndex].decimals)),
+                  ? BigInt(Math.floor(+tokenADeposit * 10 ** Number(tokens[tokenAIndex].decimals)))
+                  : BigInt(Math.floor(+tokenBDeposit * 10 ** Number(tokens[tokenBIndex].decimals))),
                 isXtoY
-                  ? BigInt(+tokenBDeposit * 10 ** Number(tokens[tokenBIndex].decimals))
-                  : BigInt(+tokenADeposit * 10 ** Number(tokens[tokenAIndex].decimals)),
+                  ? BigInt(Math.floor(+tokenBDeposit * 10 ** Number(tokens[tokenBIndex].decimals)))
+                  : BigInt(Math.floor(+tokenADeposit * 10 ** Number(tokens[tokenAIndex].decimals))),
                 1000n //TODO add real data
                 // { v: fromFee(new BN(Number(+slippTolerance * 1000))) }
               )

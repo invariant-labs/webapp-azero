@@ -3,6 +3,7 @@ import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import {
   PoolKey,
   TokenAmount,
+  calculateSqrtPrice,
   getLiquidityByX,
   getLiquidityByY,
   priceToSqrtPrice,
@@ -91,7 +92,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const [currentPairReversed, setCurrentPairReversed] = useState<boolean | null>(null)
 
   const isMountedRef = useRef(false)
-
+  const [openPosition, setOpenPosition] = useState(false)
   useEffect(() => {
     dispatch(poolsActions.getFeeTiers())
     dispatch(poolsActions.getPoolKeys())
@@ -192,7 +193,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
 
   const [midPrice, setMidPrice] = useState<TickPlotPositionData>({
     index: 0n,
-    x: 1n
+    x: 1
   })
 
   const isWaitingForNewPool = useMemo(() => {
@@ -234,12 +235,17 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       // }
     }
   }, [isWaitingForNewPool, tokenAIndex, tokenBIndex])
+  if (poolsData[poolKey]) {
+    console.log(
+      calcYPerXPrice(poolsData[poolKey].sqrtPrice, xDecimal, yDecimal) ** (isXtoY ? 1 : -1)
+    )
+  }
 
   useEffect(() => {
     if (poolsData[poolKey]) {
       setMidPrice({
         index: poolsData[poolKey].currentTickIndex,
-        x: poolsData[poolKey].sqrtPrice //TODO check if this is correct
+        x: calcYPerXPrice(poolsData[poolKey].sqrtPrice, xDecimal, yDecimal) ** (isXtoY ? 1 : -1)
       })
     }
   }, [poolIndex, isXtoY, xDecimal, yDecimal, allPools])
@@ -259,74 +265,74 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     // }
 
     if (currentPairReversed === true) {
-      return ticksData.map(tick => ({ ...tick, x: 1n / tick.x })).reverse()
+      return ticksData.map(tick => ({ ...tick, x: 1 / tick.x })).reverse()
     }
 
     // return ticksData
     return [
-      { x: 23325447974241n, y: 3515456564642n, index: -221800n },
-      { x: 17696332924783316n, y: 3515456564642n, index: -86400n },
-      { x: 17874175093441211n, y: 2888272708564642n, index: -86300n },
-      { x: 24614628971423147n, y: 2888272708564642n, index: -83100n },
-      { x: 24861997676075247n, y: 3122015160670114n, index: -83000n },
-      { x: 4058164786085533n, y: 3122015160670114n, index: -78100n },
-      { x: 4098947970918356n, y: 6798120298419236n, index: -78000n },
-      { x: 7104318581585853n, y: 6798120298419236n, index: -72500n },
-      { x: 7175714582302408n, y: 63116616687826810n, index: -72400n },
-      { x: 7247828089487176n, y: 103118211463775000n, index: -72300n },
-      { x: 7320666312581503n, y: 40008392896246605n, index: -72200n },
-      { x: 73942365351944686n, y: 6798120298419236n, index: -72100n },
-      { x: 1092093240067303n, y: 6798120298419236n, index: -68200n },
-      { x: 11030684080775426n, y: 18316683272818106n, index: -68100n },
-      { x: 11141538728478760n, y: 18478125267812714n, index: -68000n },
-      { x: 12944524133192408n, y: 18478125267812714n, index: -66500n },
-      { x: 13074612226521648n, y: 18441364216435223n, index: -66400n },
-      { x: 28520791689232563n, y: 18441364216435223n, index: -58600n },
-      { x: 28807416008258230n, y: 18412833034915223n, index: -58500n },
-      { x: 29096920804689200n, y: 20589212878235222n, index: -58400n },
-      { x: 36988992006560494n, y: 20589212878235222n, index: -56000n },
-      { x: 3736071887797880n, y: 23015275657525220n, index: -55900n },
-      { x: 39670857703556180n, y: 23015275657525220n, index: -55300n },
-      { x: 40069536418195060n, y: 23012938233004166n, index: -55200n },
-      { x: 43842859027650400n, y: 23012938233004166n, index: -54300n },
-      { x: 44283464945971560n, y: 23030260840727626n, index: -54200n },
-      { x: 53016456010412410n, y: 23030260840727626n, index: -52400n },
-      { x: 53549253478749060n, y: 20604198061437625n, index: -52300n },
-      { x: 172525208100713830n, y: 20604198061437625n, index: -40600n },
-      { x: 174259028142590950n, y: 20636237842975731n, index: -40500n },
-      { x: 176010272492480940n, y: 20636402425062337n, index: -40400n },
-      { x: 177779116254074920n, y: 23877003552284246n, index: -40300n },
-      { x: 179565736299052840n, y: 22320329676469790n, index: -40200n },
-      { x: 464282806208369300n, y: 22320329676469790n, index: -30700n },
-      { x: 468948691525652000n, y: 5565312432697905n, index: -30600n },
-      { x: 633005026986115800n, y: 5565312432697905n, index: -27600n },
-      { x: 639366513607153000n, y: 5586383981129444n, index: -27500n },
-      { x: 665458225183307600n, y: 5586383981129444n, index: -27100n },
-      { x: 672145855477764700n, y: 7299842445839966n, index: -27000n },
-      { x: 706605744005512500n, y: 7299842445839966n, index: -26500n },
-      { x: 713706892963306500n, y: 5567581673494276n, index: -26400n },
-      { x: 765453802791292800n, y: 5567581673494276n, index: -25700n },
-      { x: 773146354850896500n, y: 3854123208783754n, index: -25600n },
-      { x: 780916214466242200n, y: 3833051660352215n, index: -25500n },
-      { x: 982849853121744800n, y: 3833051660352215n, index: -23200n },
-      { x: 992727162034295100n, y: 3847037112753617n, index: -23100n },
-      { x: 2466142252901906000n, y: 3847037112753617n, index: -14000n },
-      { x: 2490926149202678500n, y: 5463588577173167n, index: -13900n },
-      { x: 2780550943345723000n, y: 5463588577173167n, index: -12800n },
-      { x: 2808494540741882200n, y: 2259610423362562n, index: -12700n },
-      { x: 2836718961863780400n, y: 2243152214701856n, index: -12600n },
-      { x: 2865227028872610400n, y: 2243152214701856n, index: -12500n },
-      { x: 2894021592325372200n, y: 1665691473385594n, index: -12400n },
-      { x: 8958390621002090000n, y: 1665691473385594n, index: -1100n },
-      { x: 9048419419599340000n, y: 4740153550385594n, index: -1000n },
-      { x: 10941693602297531000n, y: 4740153550385594n, index: 900n },
-      { x: 11051653925679804000n, y: 1665691473385594n, index: 1000n },
-      { x: 15840375539103381000n, y: 1665691473385594n, index: 4600n },
-      { x: 15999565960643864000n, y: 1651706020984192n, index: 4700n },
-      { x: 39746273853169480000n, y: 1651706020984192n, index: 13800n },
-      { x: 40145710474677010000n, y: 3515456564642n, index: 13900n },
-      { x: 4244507227635403000000n, y: 3515456564642n, index: 221700n },
-      { x: 4287163091019355000000n, y: 0n, index: 221800n }
+      { x: 23325447974241, y: 3515456564642, index: -221800n },
+      { x: 17696332924783316, y: 3515456564642, index: -86400n },
+      { x: 17874175093441211, y: 2888272708564642, index: -86300n },
+      { x: 24614628971423147, y: 2888272708564642, index: -83100n },
+      { x: 24861997676075247, y: 3122015160670114, index: -83000n },
+      { x: 4058164786085533, y: 3122015160670114, index: -78100n },
+      { x: 4098947970918356, y: 6798120298419236, index: -78000n },
+      { x: 7104318581585853, y: 6798120298419236, index: -72500n },
+      { x: 7175714582302408, y: 63116616687826810, index: -72400n },
+      { x: 7247828089487176, y: 103118211463775000, index: -72300n },
+      { x: 7320666312581503, y: 40008392896246605, index: -72200n },
+      { x: 73942365351944686, y: 6798120298419236, index: -72100n },
+      { x: 1092093240067303, y: 6798120298419236, index: -68200n },
+      { x: 11030684080775426, y: 18316683272818106, index: -68100n },
+      { x: 11141538728478760, y: 18478125267812714, index: -68000n },
+      { x: 12944524133192408, y: 18478125267812714, index: -66500n },
+      { x: 13074612226521648, y: 18441364216435223, index: -66400n },
+      { x: 28520791689232563, y: 18441364216435223, index: -58600n },
+      { x: 28807416008258230, y: 18412833034915223, index: -58500n },
+      { x: 29096920804689200, y: 20589212878235222, index: -58400n },
+      { x: 36988992006560494, y: 20589212878235222, index: -56000n },
+      { x: 3736071887797880, y: 23015275657525220, index: -55900n },
+      { x: 39670857703556180, y: 23015275657525220, index: -55300n },
+      { x: 40069536418195060, y: 23012938233004166, index: -55200n },
+      { x: 43842859027650400, y: 23012938233004166, index: -54300n },
+      { x: 44283464945971560, y: 23030260840727626, index: -54200n },
+      { x: 53016456010412410, y: 23030260840727626, index: -52400n },
+      { x: 53549253478749060, y: 20604198061437625, index: -52300n },
+      { x: 172525208100713830, y: 20604198061437625, index: -40600n },
+      { x: 174259028142590950, y: 20636237842975731, index: -40500n },
+      { x: 176010272492480940, y: 20636402425062337, index: -40400n },
+      { x: 177779116254074920, y: 23877003552284246, index: -40300n },
+      { x: 179565736299052840, y: 22320329676469790, index: -40200n },
+      { x: 464282806208369300, y: 22320329676469790, index: -30700n },
+      { x: 468948691525652000, y: 5565312432697905, index: -30600n },
+      { x: 633005026986115800, y: 5565312432697905, index: -27600n },
+      { x: 639366513607153000, y: 5586383981129444, index: -27500n },
+      { x: 665458225183307600, y: 5586383981129444, index: -27100n },
+      { x: 672145855477764700, y: 7299842445839966, index: -27000n },
+      { x: 706605744005512500, y: 7299842445839966, index: -26500n },
+      { x: 713706892963306500, y: 5567581673494276, index: -26400n },
+      { x: 765453802791292800, y: 5567581673494276, index: -25700n },
+      { x: 773146354850896500, y: 3854123208783754, index: -25600n },
+      { x: 780916214466242200, y: 3833051660352215, index: -25500n },
+      { x: 982849853121744800, y: 3833051660352215, index: -23200n },
+      { x: 992727162034295100, y: 3847037112753617, index: -23100n },
+      { x: 2466142252901906000, y: 3847037112753617, index: -14000n },
+      { x: 2490926149202678500, y: 5463588577173167, index: -13900n },
+      { x: 2780550943345723000, y: 5463588577173167, index: -12800n },
+      { x: 2808494540741882200, y: 2259610423362562, index: -12700n },
+      { x: 2836718961863780400, y: 2243152214701856, index: -12600n },
+      { x: 2865227028872610400, y: 2243152214701856, index: -12500n },
+      { x: 2894021592325372200, y: 1665691473385594, index: -12400n },
+      { x: 8958390621002090000, y: 1665691473385594, index: -1100n },
+      { x: 9048419419599340000, y: 4740153550385594, index: -1000n },
+      { x: 10941693602297531000, y: 4740153550385594, index: 900n },
+      { x: 11051653925679804000, y: 1665691473385594, index: 1000n },
+      { x: 15840375539103381000, y: 1665691473385594, index: 4600n },
+      { x: 15999565960643864000, y: 1651706020984192, index: 4700n },
+      { x: 39746273853169480000, y: 1651706020984192, index: 13800n },
+      { x: 40145710474677010000, y: 3515456564642, index: 13900n },
+      { x: 4244507227635403000000, y: 3515456564642, index: 221700n },
+      { x: 4287163091019355000000, y: 0, index: 221800n }
     ]
   }, [ticksData, ticksLoading, isXtoY, tickSpacing, xDecimal, yDecimal, currentPairReversed])
 
@@ -514,6 +520,10 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const [leftTick, setLeftTick] = useState(0n)
   const [rightTick, setRightTick] = useState(0n)
 
+  const mockAmount = 1200n
+  const mockLowerTick = -10n
+  const mockUpperTick = 10n
+
   const calcAmount = (
     amount: TokenAmount,
     left: number,
@@ -530,20 +540,27 @@ export const NewPositionWrapper: React.FC<IProps> = ({
 
     const lowerTick = BigInt(Math.min(left, right))
     const upperTick = BigInt(Math.max(left, right))
-    console.log(poolsData[poolKey])
+
     setLeftTick(lowerTick)
     setRightTick(upperTick)
     // console.log(priceToSqrtPrice(BigInt(midPrice.index)))
     // console.log(toSqrtPrice(BigInt(midPrice.index), 0n))
     try {
       // TODO Check why getLiquidityByX crashes
+      if (poolsData[poolKey]) {
+        console.log(poolsData[poolKey].sqrtPrice)
+      }
+
       if (byX) {
         const { amount: tokenYAmount, l: positionLiquidity } = getLiquidityByX(
+          // mockAmount,
+          // mockLowerTick,
+          // mockUpperTick,
           amount,
           lowerTick,
           upperTick,
-          // poolKey ? poolsData[poolKey].sqrtPrice : priceToSqrtPrice(midPrice.index),
-          toSqrtPrice(1n, 0n),
+          // toSqrtPrice(1n, 0n),
+          poolsData[poolKey] ? poolsData[poolKey].sqrtPrice : calculateSqrtPrice(midPrice.index),
           true
         )
 
@@ -552,15 +569,22 @@ export const NewPositionWrapper: React.FC<IProps> = ({
           console.log(tokenYAmount)
           liquidityRef.current = positionLiquidity
         }
+        setTokenAAmount(mockAmount)
+        setTokenBAmount(tokenYAmount)
         return tokenYAmount
       }
+
       console.log(lowerTick)
       const { amount: tokenXAmount, l: positionLiquidity } = getLiquidityByY(
+        // mockAmount,
+        // mockLowerTick,
+        // mockUpperTick,
+
         amount,
         lowerTick,
         upperTick,
-        // poolKey ? poolsData[poolKey].sqrtPrice : toSqrtPrice(midPrice.index, 0n), //TODO check how to fix toSqrtPrice(midPrice)
-        toSqrtPrice(1n, 0n),
+        // toSqrtPrice(1n, 0n),
+        poolsData[poolKey] ? poolsData[poolKey].sqrtPrice : calculateSqrtPrice(midPrice.index),
         true
       )
       console.log(tokenXAmount)
@@ -570,14 +594,14 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         liquidityRef.current = positionLiquidity
       }
       setTokenAAmount(tokenXAmount)
-      setTokenBAmount(amount)
+      setTokenBAmount(mockAmount)
       return tokenXAmount
     } catch (error) {
       const result = (byX ? getLiquidityByY : getLiquidityByX)(
         amount,
         lowerTick,
         upperTick,
-        poolKey ? poolsData[poolKey].sqrtPrice : priceToSqrtPrice(BigInt(midPrice.x)),
+        poolsData[poolKey] ? poolsData[poolKey].sqrtPrice : toSqrtPrice(midPrice.index, 0n),
         true
       )
       if (isMountedRef.current) {
@@ -590,6 +614,37 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   if (poolsData[poolKey]) {
     console.log(poolsData[poolKey].sqrtPrice)
   }
+
+  useEffect(() => {
+    if (openPosition && tokenAIndex !== null && tokenBIndex !== null) {
+      console.log(tokenAAmount)
+      console.log(tokenBAmount)
+      console.log(poolKey)
+      dispatch(
+        positionsActions.initPosition({
+          poolKeyData: {
+            tokenX: tokens[tokenAIndex].assetAddress.toString(),
+            tokenY: tokens[tokenBIndex].assetAddress.toString(),
+            feeTier: feeTiersArray[feeIndex].tier
+          },
+          // lowerTick: mockLowerTick,
+          // upperTick: mockUpperTick,
+          lowerTick: leftTick,
+          upperTick: rightTick,
+          liquidityDelta: liquidityRef.current,
+          spotSqrtPrice: poolsData[poolKey]
+            ? poolsData[poolKey].sqrtPrice
+            : toSqrtPrice(midPrice.index, 0n),
+          // spotSqrtPrice: toSqrtPrice(1n, 0n),
+          slippageTolerance: 500n,
+          tokenXAmount: tokenAAmount,
+          tokenYAmount: tokenBAmount,
+          initPool: poolKey === ''
+        })
+      )
+    }
+    setOpenPosition(false)
+  }, [openPosition])
 
   return (
     <NewPosition
@@ -754,26 +809,28 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         //     feeTier: feeTiersArray[feeIndex].tier
         //   })
         // )
-        dispatch(
-          positionsActions.initPosition({
-            poolKeyData: {
-              tokenX: tokens[tokenAIndex].assetAddress.toString(),
-              tokenY: tokens[tokenBIndex].assetAddress.toString(),
-              feeTier: feeTiersArray[feeIndex].tier
-            },
-            lowerTick: leftTick,
-            upperTick: rightTick,
-            liquidityDelta: liquidityRef.current,
-            // spotSqrtPrice: poolKey
-            //   ? poolsData[poolKey].sqrtPrice
-            //   : priceToSqrtPrice(BigInt(midPrice.x)),
-            spotSqrtPrice: toSqrtPrice(1n, 0n),
-            slippageTolerance: 500n,
-            tokenXAmount: tokenAAmount,
-            tokenYAmount: tokenBAmount,
-            initPool: poolKey === ''
-          })
-        )
+
+        // dispatch(
+        //   positionsActions.initPosition({
+        //     poolKeyData: {
+        //       tokenX: tokens[tokenAIndex].assetAddress.toString(),
+        //       tokenY: tokens[tokenBIndex].assetAddress.toString(),
+        //       feeTier: feeTiersArray[feeIndex].tier
+        //     },
+        //     lowerTick: -10n,
+        //     upperTick: 10n,
+        //     liquidityDelta: liquidityRef.current,
+        //     // spotSqrtPrice: poolKey
+        //     //   ? poolsData[poolKey].sqrtPrice
+        //     //   : priceToSqrtPrice(BigInt(midPrice.x)),
+        //     spotSqrtPrice: toSqrtPrice(1n, 0n),
+        //     slippageTolerance: 500n,
+        //     tokenXAmount: tokenAAmount,
+        //     tokenYAmount: tokenBAmount,
+        //     initPool: poolKey === ''
+        //   })
+        // )
+        setOpenPosition(true)
       }} // TODO - add real data
       showNoConnected={walletStatus !== Status.Initialized}
       poolKey={poolKey}

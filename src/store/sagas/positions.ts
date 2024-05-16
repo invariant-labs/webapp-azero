@@ -15,6 +15,7 @@ import {
   Keyring,
   PSP22,
   TESTNET_INVARIANT_ADDRESS,
+  getLiquidityByX,
   getLiquidityByY,
   newPoolKey,
   sendTx,
@@ -184,36 +185,41 @@ export function* handleInitPosition(action: PayloadAction<InitPositionData>): Ge
   const loaderCreatePosition = createLoaderKey()
   const loaderSigningTx = createLoaderKey()
 
-  const {
-    liquidityDelta,
-    lowerTick,
-    poolKeyData,
-    slippageTolerance,
-    spotSqrtPrice,
-    upperTick,
+  const { poolKeyData, initPool } = action.payload
+
+  // console.log(liquidityDelta)
+  // console.log(lowerTick)
+  // console.log(poolKeyData)
+  // console.log(slippageTolerance)
+  // console.log(spotSqrtPrice)
+  // console.log(upperTick)
+  // console.log(tokenXAmount)
+  // console.log(tokenYAmount)
+  // console.log(initPool)
+  const tokenXAmount = 1200n
+  const lowerTick = -10n
+  const upperTick = 10n
+  const spotSqrtPrice = toSqrtPrice(1n, 0n)
+  const slippageTolerance = 0n
+
+  const { amount: tokenYAmount, l: positionLiquidity } = getLiquidityByX(
     tokenXAmount,
-    tokenYAmount,
-    initPool
-  } = action.payload
-
-  console.log(liquidityDelta)
-  console.log(lowerTick)
-  console.log(poolKeyData)
-  console.log(slippageTolerance)
-  console.log(spotSqrtPrice)
-  console.log(upperTick)
-  console.log(tokenXAmount)
+    lowerTick,
+    upperTick,
+    toSqrtPrice(1n, 0n),
+    true
+  )
   console.log(tokenYAmount)
-  console.log(initPool)
-
+  console.log(positionLiquidity)
+  const liquidityDelta = positionLiquidity
   const { tokenX, tokenY, feeTier } = poolKeyData
 
   const poolKey = newPoolKey(tokenX, tokenY, feeTier)
-
+  console.log(initPool)
   if (initPool) {
-    return yield* call(handleInitPositionAndPool, action)
+    // return yield* call(handleInitPositionAndPool, action)
 
-    // return yield* put(poolActions.initPool(poolKey))
+    return yield* put(poolActions.initPool(poolKey))
   }
 
   try {
@@ -231,7 +237,7 @@ export function* handleInitPosition(action: PayloadAction<InitPositionData>): Ge
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
 
-    const psp22 = yield* call(PSP22.load, api, network, walletAddress, {
+    const psp22 = yield* call(PSP22.load, api, network, tokenX, {
       storageDepositLimit: 10000000000,
       refTime: 10000000000,
       proofSize: 10000000000
@@ -240,13 +246,13 @@ export function* handleInitPosition(action: PayloadAction<InitPositionData>): Ge
     yield* call([psp22, psp22.setContractAddress], tokenX)
     const XTokenTx = yield* call([psp22, psp22.approveTx], walletAddress, tokenXAmount)
 
-    yield* call([psp22, psp22.setContractAddress], tokenY)
-    const YTokenTx = yield* call([psp22, psp22.approveTx], walletAddress, tokenYAmount)
-
     const signedXTokenTx = yield* call([XTokenTx, XTokenTx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
     })
     const TxXResult = yield* call(sendTx, signedXTokenTx)
+
+    yield* call([psp22, psp22.setContractAddress], tokenY)
+    const YTokenTx = yield* call([psp22, psp22.approveTx], walletAddress, tokenYAmount)
 
     const signedYTokenTx = yield* call([YTokenTx, YTokenTx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
@@ -263,6 +269,7 @@ export function* handleInitPosition(action: PayloadAction<InitPositionData>): Ge
       TESTNET_INVARIANT_ADDRESS,
       { storageDepositLimit: 10000000000000, refTime: 100000000000, proofSize: 100000000000 }
     )
+
     console.log(invariant)
     console.log(poolKey)
     console.log(lowerTick)
@@ -270,17 +277,16 @@ export function* handleInitPosition(action: PayloadAction<InitPositionData>): Ge
     console.log(liquidityDelta)
     console.log(spotSqrtPrice)
     console.log(slippageTolerance)
-
+    const positionLiquidity = 1000000n
     const tx = yield* call(
       [invariant, invariant.createPositionTx],
       poolKey,
       lowerTick,
       upperTick,
-      liquidityDelta,
+      positionLiquidity,
       spotSqrtPrice,
       slippageTolerance
     )
-    console.log(tx)
 
     yield put(
       snackbarsActions.add({
@@ -294,7 +300,7 @@ export function* handleInitPosition(action: PayloadAction<InitPositionData>): Ge
     const signedTx = yield* call([tx, tx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
     })
-
+    console.log(signedTx.hash.toHex())
     const txResult = yield* call(sendTx, signedTx)
 
     console.log(txResult)
