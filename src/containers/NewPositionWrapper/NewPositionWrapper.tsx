@@ -181,10 +181,10 @@ export const NewPositionWrapper: React.FC<IProps> = ({
 
   const [feeIndex, setFeeIndex] = useState(0)
 
-  const fee = useMemo(
-    () => (feeTiersArray[feeIndex] ? feeTiersArray[feeIndex].tier.fee : 1n),
-    [feeIndex]
-  )
+  // const fee = useMemo(
+  //   () => (feeTiersArray[feeIndex] ? feeTiersArray[feeIndex].tier.fee : 1n),
+  //   [feeIndex]
+  // )
   const tickSpacing = useMemo(
     () => (feeTiersArray[feeIndex] ? feeTiersArray[feeIndex].tier.tickSpacing : 1n),
     [feeIndex]
@@ -205,18 +205,21 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   }, [isFetchingNewPool, poolIndex])
 
   console.log(poolKey)
+
   useEffect(() => {
     if (!isWaitingForNewPool && tokenAIndex !== null && tokenBIndex !== null) {
-      const { keyStringified, invertedKeyStringified } = stringifyPoolKey({
+      const keyStringified = stringifyPoolKey({
         tokenX: tokens[tokenAIndex].assetAddress.toString(),
         tokenY: tokens[tokenBIndex].assetAddress.toString(),
         feeTier: feeTiersArray[feeIndex].tier
       })
 
+      console.log(poolsData)
+      console.log(allPoolKeys)
+
+      console.log(keyStringified)
       if (allPoolKeys[keyStringified]) {
-        setPoolKey(poolKey)
-      } else if (allPoolKeys[invertedKeyStringified]) {
-        setPoolKey(invertedKeyStringified)
+        setPoolKey(keyStringified)
       } else {
         setPoolKey('')
       }
@@ -236,9 +239,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     if (poolsData[poolKey]) {
       setMidPrice({
         index: poolsData[poolKey].currentTickIndex,
-        x: BigInt(
-          calcYPerXPrice(poolsData[poolKey].sqrtPrice, xDecimal, yDecimal) ** (isXtoY ? 1 : -1)
-        )
+        x: poolsData[poolKey].sqrtPrice //TODO check if this is correct
       })
     }
   }, [poolIndex, isXtoY, xDecimal, yDecimal, allPools])
@@ -532,35 +533,33 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     console.log(poolsData[poolKey])
     setLeftTick(lowerTick)
     setRightTick(upperTick)
+    // console.log(priceToSqrtPrice(BigInt(midPrice.index)))
+    // console.log(toSqrtPrice(BigInt(midPrice.index), 0n))
     try {
       // TODO Check why getLiquidityByX crashes
-      // if (byX) {
-      //   const { amount: tokenYAmount, l: positionLiquidity } = getLiquidityByX(
-      //     amount,
-      //     lowerTick,
-      //     upperTick,
-      //     // poolKey ? poolsData[poolKey].sqrtPrice : priceToSqrtPrice(BigInt(midPrice.x)),
-      //     toSqrtPrice(100000000000n, 0n),
-      //     true
-      //   )
-      //   console.log(poolIndex)
-      //   console.log(poolIndex !== null)
-      //   console.log(toSqrtPrice(1n, 0n))
-      //   console.log(priceToSqrtPrice(BigInt(1004354354350045654)))
-      //   console.log(allPools[Number(poolIndex)].sqrtPrice)
-      //   if (isMountedRef.current) {
-      //     console.log(positionLiquidity)
-      //     console.log(tokenYAmount)
-      //     liquidityRef.current = positionLiquidity
-      //   }
-      //   return tokenYAmount
-      // }
+      if (byX) {
+        const { amount: tokenYAmount, l: positionLiquidity } = getLiquidityByX(
+          amount,
+          lowerTick,
+          upperTick,
+          // poolKey ? poolsData[poolKey].sqrtPrice : priceToSqrtPrice(midPrice.index),
+          toSqrtPrice(1n, 0n),
+          true
+        )
+
+        if (isMountedRef.current) {
+          console.log(positionLiquidity)
+          console.log(tokenYAmount)
+          liquidityRef.current = positionLiquidity
+        }
+        return tokenYAmount
+      }
       console.log(lowerTick)
       const { amount: tokenXAmount, l: positionLiquidity } = getLiquidityByY(
         amount,
         lowerTick,
         upperTick,
-        // poolKey ? poolsData[poolKey].sqrtPrice : toSqrtPrice(BigInt(midPrice.index), 0n), //TODO check how to fix toSqrtPrice(midPrice)
+        // poolKey ? poolsData[poolKey].sqrtPrice : toSqrtPrice(midPrice.index, 0n), //TODO check how to fix toSqrtPrice(midPrice)
         toSqrtPrice(1n, 0n),
         true
       )

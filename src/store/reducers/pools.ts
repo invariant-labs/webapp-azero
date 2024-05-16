@@ -129,7 +129,7 @@ const poolsSlice = createSlice({
     },
     setPoolKeys(state, action: PayloadAction<PoolKey[]>) {
       action.payload.map(poolKey => {
-        const { keyStringified } = stringifyPoolKey(poolKey)
+        const keyStringified = stringifyPoolKey(poolKey)
         state.poolKeys[keyStringified] = poolKey
       })
       return state
@@ -140,8 +140,7 @@ const poolsSlice = createSlice({
     addPool(state, action: PayloadAction<PoolWithPoolKey | undefined>) {
       if (action.payload) {
         const { poolKey } = action.payload
-
-        const { keyStringified } = stringifyPoolKey(poolKey)
+        const keyStringified = stringifyPoolKey(poolKey)
 
         // Check if a pool with the same PoolKey already exists
         if (!state.pools[keyStringified]) {

@@ -264,6 +264,12 @@ export function* handleInitPosition(action: PayloadAction<InitPositionData>): Ge
       { storageDepositLimit: 10000000000000, refTime: 100000000000, proofSize: 100000000000 }
     )
     console.log(invariant)
+    console.log(poolKey)
+    console.log(lowerTick)
+    console.log(upperTick)
+    console.log(liquidityDelta)
+    console.log(spotSqrtPrice)
+    console.log(slippageTolerance)
 
     const tx = yield* call(
       [invariant, invariant.createPositionTx],

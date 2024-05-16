@@ -396,9 +396,11 @@ export const nearestTickIndex = (
 }
 
 export const stringifyPoolKey = (poolKey: PoolKey) => {
-  const keyStringified = `${poolKey.tokenX}-${poolKey.tokenY}-${poolKey.feeTier.fee.toString()}`
-  const invertedKeyStringified = `${poolKey.tokenY}-${poolKey.tokenX}-${poolKey.feeTier.fee.toString()}`
-  return { keyStringified, invertedKeyStringified }
+  if (poolKey.tokenX > poolKey.tokenY) {
+    return `${poolKey.tokenX}-${poolKey.tokenY}-${poolKey.feeTier.fee.toString()}`
+  } else {
+    return `${poolKey.tokenY}-${poolKey.tokenX}-${poolKey.feeTier.fee.toString()}`
+  }
 }
 
 export const printBNtoBN = (amount: string, decimals: number): bigint => {
