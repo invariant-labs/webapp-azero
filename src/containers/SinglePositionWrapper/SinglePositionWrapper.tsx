@@ -2,7 +2,7 @@ import loader from '@static/gif/loader.gif'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import useStyles from './style'
-import { network } from '@store/selectors/connection'
+import { networkType } from '@store/selectors/connection'
 import {
   currentPositionRangeTicks,
   isLoadingPositionsList,
@@ -33,7 +33,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
 
   const dispatch = useDispatch()
 
-  const currentNetwork = useSelector(network)
+  const currentNetwork = useSelector(networkType)
   const position = useSelector(singlePositionData(id))
   const isLoadingList = useSelector(isLoadingPositionsList)
   const { data: ticksData, loading: ticksLoading, hasError: hasTicksError } = useSelector(plotTicks)

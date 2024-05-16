@@ -22,24 +22,26 @@ export const PlotTypeSwitch: React.FC<IPlotTypeSwitch> = ({ onSwitch, initialVal
   }
 
   return (
-    <Tabs
-      value={current}
-      onChange={handleChange}
-      variant='scrollable'
-      scrollButtons={false}
-      TabIndicatorProps={{ children: <span /> }}
-      classes={tabsClasses}>
-      <Tab
-        disableRipple
-        label={<img src={Continuous} className={classes.continuous} />}
-        classes={singleTabClasses}
-      />
-      <Tab
-        disableRipple
-        label={<img src={Discrete} className={classes.discrete} />}
-        classes={singleTabClasses}
-      />
-    </Tabs>
+    <>
+      <Tabs
+        value={current}
+        onChange={handleChange}
+        variant='scrollable'
+        scrollButtons={false}
+        TabIndicatorProps={{ children: <span /> }}
+        classes={tabsClasses}>
+        <Tab
+          disableRipple
+          label={<img src={Continuous} className={classes.continuous} />}
+          classes={singleTabClasses}
+        />
+        <Tab
+          disableRipple
+          label={<img src={Discrete} className={classes.discrete} />}
+          classes={singleTabClasses}
+        />
+      </Tabs>
+    </>
   )
 }
 

@@ -41,6 +41,10 @@ export const useSingleTabStyles = makeStyles()(() => ({
     minWidth: 46,
     width: 46,
 
+    '& img': {
+      minHeight: 'auto'
+    },
+
     '&:hover': {
       backgroundColor: `${colors.invariant.light}B0`,
       height: 26,

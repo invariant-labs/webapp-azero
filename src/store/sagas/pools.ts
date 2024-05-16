@@ -19,8 +19,9 @@ import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { closeSnackbar } from 'notistack'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { Signer } from '@polkadot/api/types'
+import { INVARIANT_LOAD_CONFIG, TokenList } from '@store/consts/static'
 
-export function* handleInitPool(action: PayloadAction<PoolKey>) {
+export function* handleInitPool(action: PayloadAction<PoolKey>): Generator {
   const loaderKey = createLoaderKey()
   const loaderSigningTx = createLoaderKey()
   try {
@@ -45,11 +46,7 @@ export function* handleInitPool(action: PayloadAction<PoolKey>) {
       api,
       network,
       TESTNET_INVARIANT_ADDRESS,
-      {
-        storageDepositLimit: 100000000000,
-        refTime: 100000000000,
-        proofSize: 100000000000
-      }
+      INVARIANT_LOAD_CONFIG
     )
 
     const poolKey = newPoolKey(tokenX, tokenY, feeTier)
@@ -97,8 +94,7 @@ export function* handleInitPool(action: PayloadAction<PoolKey>) {
   }
 }
 
-export function* fetchFeeTiers() {
-  console.log('test')
+export function* fetchFeeTiers(): Generator {
   try {
     const api = yield* getConnection()
     const network = yield* select(networkType)
@@ -109,17 +105,67 @@ export function* fetchFeeTiers() {
       api,
       network,
       TESTNET_INVARIANT_ADDRESS,
-      {
-        storageDepositLimit: 10000000000,
-        refTime: 10000000000,
-        proofSize: 10000000000
-      }
+      INVARIANT_LOAD_CONFIG
     )
 
     const feeTiers = yield* call([invariant, invariant.getFeeTiers], walletAddress)
-    console.log(feeTiers)
+
     yield put(actions.setFeeTiers(feeTiers))
   } catch (error) {
+    console.log(error)
+  }
+}
+
+export function* fetchPoolData(action: PayloadAction<PoolKey>): Generator {
+  const api = yield* getConnection()
+  const network = yield* select(networkType)
+  const { feeTier, tokenX, tokenY } = action.payload
+
+  try {
+    const invariant = yield* call(
+      [Invariant, Invariant.load],
+      api,
+      network,
+      TESTNET_INVARIANT_ADDRESS,
+      INVARIANT_LOAD_CONFIG
+    )
+    const pool = yield* call([invariant, invariant.getPool], tokenX, tokenY, feeTier)
+
+    if (pool) {
+      yield* put(
+        actions.addPool({
+          ...pool,
+          poolKey: action.payload
+        })
+      )
+    } else {
+      yield* put(actions.addPool())
+    }
+  } catch (error) {
+    console.log(error)
+    yield* put(actions.addPool())
+  }
+}
+
+export function* fetchAllPoolKeys(): Generator {
+  const api = yield* getConnection()
+  const network = yield* select(networkType)
+
+  try {
+    const invariant = yield* call(
+      [Invariant, Invariant.load],
+      api,
+      network,
+      TESTNET_INVARIANT_ADDRESS,
+      INVARIANT_LOAD_CONFIG
+    )
+    console.log(invariant)
+    const pools = yield* call([invariant, invariant.getPoolKeys], 100n, 1n)
+    console.log(pools as unknown as PoolKey[])
+
+    yield* put(actions.setPoolKeys(pools as unknown as PoolKey[])) //TODO
+  } catch (error) {
+    yield* put(actions.setPoolKeys([]))
     console.log(error)
   }
 }
@@ -132,6 +178,16 @@ export function* fetchFeeTiersHandler(): Generator {
   yield* takeLatest(actions.getFeeTiers, fetchFeeTiers)
 }
 
+export function* getPoolDataHandler(): Generator {
+  yield* takeLatest(actions.getPoolData, fetchPoolData)
+}
+
+export function* getPoolKeysHandler(): Generator {
+  yield* takeLatest(actions.getPoolKeys, fetchAllPoolKeys)
+}
+
 export function* poolsSaga(): Generator {
-  yield all([initPoolHandler, fetchFeeTiersHandler].map(spawn))
+  yield all(
+    [initPoolHandler, fetchFeeTiersHandler, getPoolDataHandler, getPoolKeysHandler].map(spawn)
+  )
 }

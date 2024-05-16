@@ -496,7 +496,11 @@ export const Swap: React.FC<ISwap> = ({
               //   : '- -'
               '- -'
             }
-            decimal={tokenFromIndex !== null ? tokens[tokenFromIndex].decimals : 6n}
+            decimal={
+              tokenFromIndex !== null && tokens[tokenFromIndex]
+                ? tokens[tokenFromIndex].decimals
+                : 6n
+            } //TODO check if this is correct
             className={classes.amountInput}
             setValue={value => {
               if (value.match(/^\d*\.?\d*$/)) {

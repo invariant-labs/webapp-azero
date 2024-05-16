@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import useStyles from './style'
-import { formatNumbers, showPrefix, toMaxNumericPlaces } from '@store/consts/utils'
+import {
+  formatNumbers,
+  nearestTickIndex,
+  showPrefix,
+  toMaxNumericPlaces
+} from '@store/consts/utils'
 import { Button, Grid, Typography } from '@mui/material'
 import SimpleInput from '@components/Inputs/SimpleInput/SimpleInput'
 import RangeInput from '@components/Inputs/RangeInput/RangeInput'
 import AnimatedNumber from '@components/AnimatedNumber'
-import { Price } from '@invariant-labs/a0-sdk/src'
+import { Price, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk/src'
 
 export interface IPoolInit {
   tokenASymbol: string
@@ -50,12 +55,14 @@ export const PoolInit: React.FC<IPoolInit> = ({
   const [rightInput, setRightInput] = useState('')
   const [midPriceInput, setMidPriceInput] = useState('')
 
-  const [leftInputRounded, setLeftInputRounded] = useState((+leftInput).toFixed(12))
-  const [rightInputRounded, setRightInputRounded] = useState((+rightInput).toFixed(12))
+  const [leftInputRounded, setLeftInputRounded] = useState(leftInput) //TODO add toFixed
+  const [rightInputRounded, setRightInputRounded] = useState(rightInput)
 
-  // useEffect(() => {
-  //   onChangeMidPrice(nearestTickIndex(+midPriceInput, tickSpacing, isXtoY, xDecimal, yDecimal))
-  // }, [midPriceInput])
+  useEffect(() => {
+    if (nearestTickIndex(+midPriceInput, tickSpacing, isXtoY, xDecimal, yDecimal)) {
+      onChangeMidPrice(nearestTickIndex(+midPriceInput, tickSpacing, isXtoY, xDecimal, yDecimal)!)
+    }
+  }, [midPriceInput])
 
   const setLeftInputValues = (val: string) => {
     setLeftInput(val)
@@ -83,7 +90,8 @@ export const PoolInit: React.FC<IPoolInit> = ({
 
     // setLeftInputValues(calcPrice(left, isXtoY, xDecimal, yDecimal).toString())
     // setRightInputValues(calcPrice(right, isXtoY, xDecimal, yDecimal).toString())
-
+    setLeftInputValues(left.toString())
+    setRightInputValues(right.toString())
     onChangeRange(left, right)
   }
 
@@ -179,15 +187,42 @@ export const PoolInit: React.FC<IPoolInit> = ({
             tokenToSymbol={tokenBSymbol}
             currentValue={leftInputRounded}
             setValue={onLeftInputChange}
-            decreaseValue={() => {}}
+            decreaseValue={() => {
+              const newLeft = isXtoY
+                ? Math.max(Number(getMinTick(tickSpacing)), Number(leftRange - tickSpacing))
+                : Math.min(Number(getMaxTick(tickSpacing)), Number(leftRange + tickSpacing))
+              console.log(getMaxTick(tickSpacing))
+              console.log(leftRange + tickSpacing)
+
+              changeRangeHandler(BigInt(newLeft), rightRange)
+              // autoZoomHandler(newLeft, rightRange)
+            }}
             increaseValue={() => {
               const newLeft = isXtoY
                 ? Math.min(Number(rightRange - tickSpacing), Number(leftRange + tickSpacing))
                 : Math.max(Number(rightRange + tickSpacing), Number(leftRange - tickSpacing))
-
+              console.log(rightRange + tickSpacing)
+              console.log(leftRange - tickSpacing)
+              console.log(newLeft)
               changeRangeHandler(BigInt(newLeft), rightRange)
+              // autoZoomHandler(newLeft, rightRange)
             }}
-            onBlur={() => {}}
+            onBlur={() => {
+              // const newLeft = isXtoY
+              //   ? Math.min(
+              //       Number(rightRange - tickSpacing),
+              //       Number(nearestTickIndex(+leftInput, tickSpacing, isXtoY, xDecimal, yDecimal))
+              //     )
+              //   : Math.max(
+              //       Number(rightRange + tickSpacing),
+              //       Number(nearestTickIndex(+leftInput, tickSpacing, isXtoY, xDecimal, yDecimal))
+              //     )
+
+              const newLeft = Math.floor(+leftInput)
+              console.log(newLeft)
+              changeRangeHandler(BigInt(newLeft), rightRange)
+              // autoZoomHandler(newLeft, rightRange)
+            }}
             diffLabel='Min - Current price'
             percentDiff={((+leftInput - price) / price) * 100}
           />
@@ -203,9 +238,30 @@ export const PoolInit: React.FC<IPoolInit> = ({
                 ? Math.max(Number(rightRange - tickSpacing), Number(leftRange + tickSpacing))
                 : Math.min(Number(rightRange + tickSpacing), Number(leftRange - tickSpacing))
               changeRangeHandler(leftRange, BigInt(newRight))
+              // autoZoomHandler(leftRange, newRight)
             }}
-            increaseValue={() => {}}
-            onBlur={() => {}}
+            increaseValue={() => {
+              const newRight = isXtoY
+                ? Math.min(Number(getMaxTick(tickSpacing)), Number(rightRange + tickSpacing))
+                : Math.max(Number(getMinTick(tickSpacing)), Number(rightRange - tickSpacing))
+              changeRangeHandler(leftRange, BigInt(newRight))
+              // autoZoomHandler(leftRange, newRight)
+            }}
+            onBlur={() => {
+              // const newRight = isXtoY
+              //   ? Math.max(
+              //       Number(leftRange + tickSpacing),
+              //       Number(nearestTickIndex(+rightInput, tickSpacing, isXtoY, xDecimal, yDecimal))
+              //     )
+              //   : Math.min(
+              //       Number(leftRange - tickSpacing),
+              //       Number(nearestTickIndex(+rightInput, tickSpacing, isXtoY, xDecimal, yDecimal))
+              //     )
+
+              const newRight = Math.floor(+rightInput)
+              changeRangeHandler(leftRange, BigInt(newRight))
+              // autoZoomHandler(leftRange, newRight)
+            }}
             diffLabel='Max - Current price'
             percentDiff={((+rightInput - price) / price) * 100}
           />
@@ -214,7 +270,16 @@ export const PoolInit: React.FC<IPoolInit> = ({
           <Button className={classes.button} onClick={resetRange}>
             Reset range
           </Button>
-          <Button className={classes.button} onClick={() => {}}>
+          <Button
+            className={classes.button}
+            onClick={() => {
+              const left = isXtoY ? getMinTick(tickSpacing) : getMaxTick(tickSpacing)
+              const right = isXtoY ? getMaxTick(tickSpacing) : getMinTick(tickSpacing)
+              console.log(left)
+              console.log(right)
+              changeRangeHandler(left, right)
+              // autoZoomHandler(left, right)
+            }}>
             Set full range
           </Button>
         </Grid>

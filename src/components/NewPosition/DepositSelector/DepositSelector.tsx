@@ -91,7 +91,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
 
   const [tokenAIndex, setTokenAIndex] = useState<number | null>(null)
   const [tokenBIndex, setTokenBIndex] = useState<number | null>(null)
-
+  console.log(tokenAIndex)
   const [isLoaded, setIsLoaded] = useState<boolean>(false)
 
   const getButtonMessage = useCallback(() => {
@@ -236,6 +236,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
 
         <FeeSwitch
           onSelect={fee => {
+            console.log(fee)
             setPositionTokens(tokenAIndex, tokenBIndex, fee)
           }}
           feeTiers={feeTiers}

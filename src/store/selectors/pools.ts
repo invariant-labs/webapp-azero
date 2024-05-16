@@ -6,6 +6,7 @@ const store = (s: AnyProps) => s[poolsSliceName] as IPoolsStore
 
 export const {
   pools,
+  poolKeys,
   tokens,
   poolTicks,
   isLoadingLatestPoolsForTransaction,
@@ -15,6 +16,7 @@ export const {
   feeTiers
 } = keySelectors(store, [
   'pools',
+  'poolKeys',
   'tokens',
   'poolTicks',
   'isLoadingLatestPoolsForTransaction',
@@ -33,6 +35,7 @@ export const hasTokens = createSelector(tokens, allTokens => !!Object.values(all
 
 export const poolsSelectors = {
   pools,
+  poolKeys,
   tokens,
   poolTicks,
   isLoadingLatestPoolsForTransaction,

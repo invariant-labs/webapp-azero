@@ -1,11 +1,13 @@
 import NewPosition from '@components/NewPosition/NewPosition'
 import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import {
+  PoolKey,
   TokenAmount,
   getLiquidityByX,
   getLiquidityByY,
   priceToSqrtPrice,
-  sqrtPriceToPrice
+  sqrtPriceToPrice,
+  toSqrtPrice
 } from '@invariant-labs/a0-sdk'
 import { AddressOrPair } from '@polkadot/api/types'
 import {
@@ -21,9 +23,10 @@ import {
   createPlaceholderLiquidityPlot,
   getCoingeckoTokenPrice,
   getMockedTokenPrice,
-  printBN
+  printBN,
+  stringifyPoolKey
 } from '@store/consts/utils'
-import { TickPlotPositionData } from '@store/reducers/positions'
+import { actions as positionsActions, TickPlotPositionData } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Status } from '@store/reducers/wallet'
 import { actions as poolsActions } from '@store/reducers/pools'
@@ -32,7 +35,9 @@ import {
   isLoadingLatestPoolsForTransaction,
   poolsArraySortedByFees,
   volumeRanges,
-  feeTiers
+  feeTiers,
+  poolKeys,
+  pools
 } from '@store/selectors/pools'
 import { initPosition, plotTicks } from '@store/selectors/positions'
 import { canCreateNewPool, canCreateNewPosition, status, swapTokens } from '@store/selectors/wallet'
@@ -40,6 +45,7 @@ import { getCurrentAlephZeroConnection } from '@utils/web3/connection'
 import { VariantType } from 'notistack'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { set } from 'remeda'
 
 export interface IProps {
   initialTokenFrom: string
@@ -60,6 +66,8 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const allPools = useSelector(poolsArraySortedByFees)
   const poolsVolumeRanges = useSelector(volumeRanges)
   const feeTiersArray = useSelector(feeTiers)
+  const allPoolKeys = useSelector(poolKeys)
+  const poolsData = useSelector(pools)
 
   const { success, inProgress } = useSelector(initPosition)
   const { data: ticksData, loading: ticksLoading, hasError: hasTicksError } = useSelector(plotTicks)
@@ -71,10 +79,14 @@ export const NewPositionWrapper: React.FC<IProps> = ({
 
   const [poolIndex, setPoolIndex] = useState<bigint | null>(null)
 
+  const [poolKey, setPoolKey] = useState<string>('')
   const [progress, setProgress] = useState<ProgressState>('none')
 
   const [tokenAIndex, setTokenAIndex] = useState<number | null>(null)
   const [tokenBIndex, setTokenBIndex] = useState<number | null>(null)
+
+  const [tokenAAmount, setTokenAAmount] = useState(0n)
+  const [tokenBAmount, setTokenBAmount] = useState(0n)
 
   const [currentPairReversed, setCurrentPairReversed] = useState<boolean | null>(null)
 
@@ -82,6 +94,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
 
   useEffect(() => {
     dispatch(poolsActions.getFeeTiers())
+    dispatch(poolsActions.getPoolKeys())
   }, [])
 
   useEffect(() => {
@@ -132,9 +145,15 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   }, [success, inProgress])
 
   const isXtoY = useMemo(() => {
-    if (tokenAIndex !== null && tokenBIndex !== null) {
+    if (
+      tokenAIndex !== null &&
+      tokenBIndex !== null &&
+      tokens[tokenAIndex] &&
+      tokens[tokenBIndex]
+    ) {
+      console.log(tokens[tokenAIndex].assetAddress)
       return (
-        tokens[tokenAIndex].assetAddress.toString() < tokens[tokenBIndex].assetAddress.toString()
+        tokens[tokenAIndex].assetAddress.toString() > tokens[tokenBIndex].assetAddress.toString()
       )
     }
     return true
@@ -180,21 +199,28 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     if (poolIndex !== null) {
       return false
     }
+    console.log(isFetchingNewPool)
 
     return isFetchingNewPool
   }, [isFetchingNewPool, poolIndex])
 
+  console.log(poolKey)
   useEffect(() => {
     if (!isWaitingForNewPool && tokenAIndex !== null && tokenBIndex !== null) {
-      // const index = allPools.findIndex(
-      //   pool =>
-      //     pool.fee.v.eq(fee) &&
-      //     ((pool.tokenX.equals(tokens[tokenAIndex].assetAddress) &&
-      //       pool.tokenY.equals(tokens[tokenBIndex].assetAddress)) ||
-      //       (pool.tokenX.equals(tokens[tokenBIndex].assetAddress) &&
-      //         pool.tokenY.equals(tokens[tokenAIndex].assetAddress)))
-      // )
-      // setPoolIndex(index !== -1 ? index : null)
+      const { keyStringified, invertedKeyStringified } = stringifyPoolKey({
+        tokenX: tokens[tokenAIndex].assetAddress.toString(),
+        tokenY: tokens[tokenBIndex].assetAddress.toString(),
+        feeTier: feeTiersArray[feeIndex].tier
+      })
+
+      if (allPoolKeys[keyStringified]) {
+        setPoolKey(poolKey)
+      } else if (allPoolKeys[invertedKeyStringified]) {
+        setPoolKey(invertedKeyStringified)
+      } else {
+        setPoolKey('')
+      }
+
       // if (index !== -1) {
       //   dispatch(
       //     actions.getCurrentPlotTicks({
@@ -204,26 +230,27 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       //   )
       // }
     }
-  }, [isWaitingForNewPool])
-  // useEffect(() => {
-  //   if (poolIndex !== null) {
-  //     setMidPrice({
-  //       index: allPools[poolIndex].currentTickIndex,
-  //       x:
-  //         calcYPerXPrice(allPools[poolIndex].sqrtPrice.toString(), xDecimal, yDecimal) **
-  //         (isXtoY ? 1 : -1)
-  //     })
-  //   }
-  // }, [poolIndex, isXtoY, xDecimal, yDecimal, allPools])
+  }, [isWaitingForNewPool, tokenAIndex, tokenBIndex])
 
-  // useEffect(() => {
-  //   if (poolIndex === null) {
-  //     setMidPrice({
-  //       index: 0,
-  //       x: calcPrice(0n, isXtoY, xDecimal, yDecimal)
-  //     })
-  //   }
-  // }, [poolIndex, isXtoY, xDecimal, yDecimal])
+  useEffect(() => {
+    if (poolsData[poolKey]) {
+      setMidPrice({
+        index: poolsData[poolKey].currentTickIndex,
+        x: BigInt(
+          calcYPerXPrice(poolsData[poolKey].sqrtPrice, xDecimal, yDecimal) ** (isXtoY ? 1 : -1)
+        )
+      })
+    }
+  }, [poolIndex, isXtoY, xDecimal, yDecimal, allPools])
+
+  useEffect(() => {
+    if (poolKey === '') {
+      setMidPrice({
+        index: 0n,
+        x: calcPrice(0n, isXtoY, xDecimal, yDecimal)
+      })
+    }
+  }, [poolIndex, isXtoY, xDecimal, yDecimal])
 
   const data = useMemo(() => {
     // if (ticksLoading) {
@@ -234,7 +261,72 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       return ticksData.map(tick => ({ ...tick, x: 1n / tick.x })).reverse()
     }
 
-    return ticksData
+    // return ticksData
+    return [
+      { x: 23325447974241n, y: 3515456564642n, index: -221800n },
+      { x: 17696332924783316n, y: 3515456564642n, index: -86400n },
+      { x: 17874175093441211n, y: 2888272708564642n, index: -86300n },
+      { x: 24614628971423147n, y: 2888272708564642n, index: -83100n },
+      { x: 24861997676075247n, y: 3122015160670114n, index: -83000n },
+      { x: 4058164786085533n, y: 3122015160670114n, index: -78100n },
+      { x: 4098947970918356n, y: 6798120298419236n, index: -78000n },
+      { x: 7104318581585853n, y: 6798120298419236n, index: -72500n },
+      { x: 7175714582302408n, y: 63116616687826810n, index: -72400n },
+      { x: 7247828089487176n, y: 103118211463775000n, index: -72300n },
+      { x: 7320666312581503n, y: 40008392896246605n, index: -72200n },
+      { x: 73942365351944686n, y: 6798120298419236n, index: -72100n },
+      { x: 1092093240067303n, y: 6798120298419236n, index: -68200n },
+      { x: 11030684080775426n, y: 18316683272818106n, index: -68100n },
+      { x: 11141538728478760n, y: 18478125267812714n, index: -68000n },
+      { x: 12944524133192408n, y: 18478125267812714n, index: -66500n },
+      { x: 13074612226521648n, y: 18441364216435223n, index: -66400n },
+      { x: 28520791689232563n, y: 18441364216435223n, index: -58600n },
+      { x: 28807416008258230n, y: 18412833034915223n, index: -58500n },
+      { x: 29096920804689200n, y: 20589212878235222n, index: -58400n },
+      { x: 36988992006560494n, y: 20589212878235222n, index: -56000n },
+      { x: 3736071887797880n, y: 23015275657525220n, index: -55900n },
+      { x: 39670857703556180n, y: 23015275657525220n, index: -55300n },
+      { x: 40069536418195060n, y: 23012938233004166n, index: -55200n },
+      { x: 43842859027650400n, y: 23012938233004166n, index: -54300n },
+      { x: 44283464945971560n, y: 23030260840727626n, index: -54200n },
+      { x: 53016456010412410n, y: 23030260840727626n, index: -52400n },
+      { x: 53549253478749060n, y: 20604198061437625n, index: -52300n },
+      { x: 172525208100713830n, y: 20604198061437625n, index: -40600n },
+      { x: 174259028142590950n, y: 20636237842975731n, index: -40500n },
+      { x: 176010272492480940n, y: 20636402425062337n, index: -40400n },
+      { x: 177779116254074920n, y: 23877003552284246n, index: -40300n },
+      { x: 179565736299052840n, y: 22320329676469790n, index: -40200n },
+      { x: 464282806208369300n, y: 22320329676469790n, index: -30700n },
+      { x: 468948691525652000n, y: 5565312432697905n, index: -30600n },
+      { x: 633005026986115800n, y: 5565312432697905n, index: -27600n },
+      { x: 639366513607153000n, y: 5586383981129444n, index: -27500n },
+      { x: 665458225183307600n, y: 5586383981129444n, index: -27100n },
+      { x: 672145855477764700n, y: 7299842445839966n, index: -27000n },
+      { x: 706605744005512500n, y: 7299842445839966n, index: -26500n },
+      { x: 713706892963306500n, y: 5567581673494276n, index: -26400n },
+      { x: 765453802791292800n, y: 5567581673494276n, index: -25700n },
+      { x: 773146354850896500n, y: 3854123208783754n, index: -25600n },
+      { x: 780916214466242200n, y: 3833051660352215n, index: -25500n },
+      { x: 982849853121744800n, y: 3833051660352215n, index: -23200n },
+      { x: 992727162034295100n, y: 3847037112753617n, index: -23100n },
+      { x: 2466142252901906000n, y: 3847037112753617n, index: -14000n },
+      { x: 2490926149202678500n, y: 5463588577173167n, index: -13900n },
+      { x: 2780550943345723000n, y: 5463588577173167n, index: -12800n },
+      { x: 2808494540741882200n, y: 2259610423362562n, index: -12700n },
+      { x: 2836718961863780400n, y: 2243152214701856n, index: -12600n },
+      { x: 2865227028872610400n, y: 2243152214701856n, index: -12500n },
+      { x: 2894021592325372200n, y: 1665691473385594n, index: -12400n },
+      { x: 8958390621002090000n, y: 1665691473385594n, index: -1100n },
+      { x: 9048419419599340000n, y: 4740153550385594n, index: -1000n },
+      { x: 10941693602297531000n, y: 4740153550385594n, index: 900n },
+      { x: 11051653925679804000n, y: 1665691473385594n, index: 1000n },
+      { x: 15840375539103381000n, y: 1665691473385594n, index: 4600n },
+      { x: 15999565960643864000n, y: 1651706020984192n, index: 4700n },
+      { x: 39746273853169480000n, y: 1651706020984192n, index: 13800n },
+      { x: 40145710474677010000n, y: 3515456564642n, index: 13900n },
+      { x: 4244507227635403000000n, y: 3515456564642n, index: 221700n },
+      { x: 4287163091019355000000n, y: 0n, index: 221800n }
+    ]
   }, [ticksData, ticksLoading, isXtoY, tickSpacing, xDecimal, yDecimal, currentPairReversed])
 
   useEffect(() => {
@@ -244,13 +336,13 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       poolIndex === null &&
       progress === 'approvedWithSuccess'
     ) {
-      // dispatch(
-      //   poolsActions.getPoolData(
-      //     new Pair(tokens[tokenAIndex].assetAddress, tokens[tokenBIndex].assetAddress, {
-      //       fee
-      //     })
-      //   )
-      // )
+      dispatch(
+        poolsActions.getPoolData({
+          tokenX: tokens[tokenAIndex].assetAddress.toString(),
+          tokenY: tokens[tokenBIndex].assetAddress.toString(),
+          feeTier: feeTiersArray[feeIndex].tier
+        })
+      )
     }
   }, [progress])
 
@@ -372,7 +464,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       return undefined
     }
 
-    const poolAddress = allPools[Number(poolIndex)].address.toString()
+    const poolAddress = allPools[Number(poolIndex)].poolKey.toString()
 
     if (!poolsVolumeRanges[poolAddress]) {
       return undefined
@@ -418,6 +510,9 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     localStorage.setItem('INVARIANT_NEW_POSITION_SLIPPAGE', slippage)
   }
 
+  const [leftTick, setLeftTick] = useState(0n)
+  const [rightTick, setRightTick] = useState(0n)
+
   const calcAmount = (
     amount: TokenAmount,
     left: number,
@@ -432,47 +527,58 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       tokenAddress ===
       (isXtoY ? tokens[tokenAIndex].assetAddress : tokens[tokenBIndex].assetAddress)
 
-    const lowerTick = Math.min(left, right)
-    const upperTick = Math.max(left, right)
-
-    //TODO check if this is correct
+    const lowerTick = BigInt(Math.min(left, right))
+    const upperTick = BigInt(Math.max(left, right))
+    console.log(poolsData[poolKey])
+    setLeftTick(lowerTick)
+    setRightTick(upperTick)
     try {
-      if (byX) {
-        const result = getLiquidityByX(
-          amount,
-          lowerTick,
-          upperTick,
-          poolIndex !== null
-            ? allPools[Number(poolIndex)].sqrtPrice
-            : priceToSqrtPrice(BigInt(midPrice.x)),
-          true
-        )
-        if (isMountedRef.current) {
-          liquidityRef.current = result.liquidity
-        }
-        return result.y
-      }
-      const result = getLiquidityByY(
+      // TODO Check why getLiquidityByX crashes
+      // if (byX) {
+      //   const { amount: tokenYAmount, l: positionLiquidity } = getLiquidityByX(
+      //     amount,
+      //     lowerTick,
+      //     upperTick,
+      //     // poolKey ? poolsData[poolKey].sqrtPrice : priceToSqrtPrice(BigInt(midPrice.x)),
+      //     toSqrtPrice(100000000000n, 0n),
+      //     true
+      //   )
+      //   console.log(poolIndex)
+      //   console.log(poolIndex !== null)
+      //   console.log(toSqrtPrice(1n, 0n))
+      //   console.log(priceToSqrtPrice(BigInt(1004354354350045654)))
+      //   console.log(allPools[Number(poolIndex)].sqrtPrice)
+      //   if (isMountedRef.current) {
+      //     console.log(positionLiquidity)
+      //     console.log(tokenYAmount)
+      //     liquidityRef.current = positionLiquidity
+      //   }
+      //   return tokenYAmount
+      // }
+      console.log(lowerTick)
+      const { amount: tokenXAmount, l: positionLiquidity } = getLiquidityByY(
         amount,
         lowerTick,
         upperTick,
-        poolIndex !== null
-          ? allPools[Number(poolIndex)].sqrtPrice
-          : priceToSqrtPrice(BigInt(midPrice.x)),
+        // poolKey ? poolsData[poolKey].sqrtPrice : toSqrtPrice(BigInt(midPrice.index), 0n), //TODO check how to fix toSqrtPrice(midPrice)
+        toSqrtPrice(1n, 0n),
         true
       )
+      console.log(tokenXAmount)
+      console.log(positionLiquidity)
+
       if (isMountedRef.current) {
-        liquidityRef.current = result.liquidity
+        liquidityRef.current = positionLiquidity
       }
-      return result.x
+      setTokenAAmount(tokenXAmount)
+      setTokenBAmount(amount)
+      return tokenXAmount
     } catch (error) {
       const result = (byX ? getLiquidityByY : getLiquidityByX)(
         amount,
         lowerTick,
         upperTick,
-        poolIndex !== null
-          ? allPools[Number(poolIndex)].sqrtPrice
-          : priceToSqrtPrice(BigInt(midPrice.x)),
+        poolKey ? poolsData[poolKey].sqrtPrice : priceToSqrtPrice(BigInt(midPrice.x)),
         true
       )
       if (isMountedRef.current) {
@@ -482,6 +588,10 @@ export const NewPositionWrapper: React.FC<IProps> = ({
 
     return BigInt(0)
   }
+  if (poolsData[poolKey]) {
+    console.log(poolsData[poolKey].sqrtPrice)
+  }
+
   return (
     <NewPosition
       initialTokenFrom={initialTokenFrom}
@@ -495,75 +605,93 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       midPrice={midPrice}
       setMidPrice={setMidPrice}
       onChangePositionTokens={(tokenA, tokenB, feeTierIndex) => {
+        // if (
+        //   tokenA !== null &&
+        //   tokenB !== null &&
+        //   tokenA !== tokenB &&
+        //   !(
+        //     tokenAIndex === tokenA &&
+        //     tokenBIndex === tokenB &&
+        //     fee === feeTiersArray[feeTierIndex].tier.fee
+        //   )
+        // ) {
+        //   const index = allPools.findIndex(
+        //     pool =>
+        //       pool.fee.v.eq(feeTiersArray[feeTierIndex].tier.fee) &&
+        //       ((pool.tokenX.equals(tokens[tokenA].assetAddress) &&
+        //         pool.tokenY.equals(tokens[tokenB].assetAddress)) ||
+        //         (pool.tokenX.equals(tokens[tokenB].assetAddress) &&
+        //           pool.tokenY.equals(tokens[tokenA].assetAddress)))
+        //   )
+        //   if (
+        //     index !== poolIndex &&
+        //     !(
+        //       tokenAIndex === tokenB &&
+        //       tokenBIndex === tokenA &&
+        //       fee.eq(ALL_FEE_TIERS_DATA[feeTierIndex].tier.fee)
+        //     )
+        //   ) {
+        //     if (isMountedRef.current) {
+        //       setPoolIndex(index !== -1 ? index : null)
+        //       setCurrentPairReversed(null)
+        //     }
+        //   } else if (
+        //     tokenAIndex === tokenB &&
+        //     tokenBIndex === tokenA &&
+        //     fee === feeTiersArray[feeTierIndex].tier.fee
+        //   ) {
+        //     if (isMountedRef.current) {
+        //       setCurrentPairReversed(currentPairReversed === null ? true : !currentPairReversed)
+        //     }
+        //   }
+        //   if (index !== -1 && index !== poolIndex) {
+        //     // dispatch(
+        //     //   actions.getCurrentPlotTicks({
+        //     //     poolIndex: index,
+        //     //     isXtoY: allPools[index].tokenX.equals(tokens[tokenA].assetAddress)
+        //     //   })
+        //     // )
+        //   } else if (
+        //     !(
+        //       tokenAIndex === tokenB &&
+        //       tokenBIndex === tokenA &&
+        //       fee === feeTiersArray[feeTierIndex].tier.fee &&
+        //     )
+        //   ) {
+        //     dispatch(
+        //       poolsActions.getPoolData({
+        //         tokenX: tokens[tokenAIndex].assetAddress.toString(),
+        //         tokenY: tokens[tokenBIndex].assetAddress.toString(),
+        //         feeTier: feeTiersArray[feeIndex].tier
+        //       })
+        //     )
+        //   }
+        // }
         if (
-          tokenA !== null &&
-          tokenB !== null &&
-          tokenA !== tokenB &&
-          !(
-            tokenAIndex === tokenA &&
-            tokenBIndex === tokenB &&
-            fee === feeTiersArray[feeTierIndex].tier.fee
-          )
+          // tokenAIndex === tokenB &&
+          // tokenBIndex === tokenA &&
+          // fee === feeTiersArray[feeTierIndex].tier.fee &&
+          // tokenA !== null &&
+          // tokenB !== null &&
+          // tokenA !== tokenB &&
+          tokenAIndex !== null &&
+          tokenBIndex !== null
         ) {
-          // const index = allPools.findIndex(
-          //   pool =>
-          //     pool.fee.v.eq(feeTiersArray[feeTierIndex].tier.fee) &&
-          //     ((pool.tokenX.equals(tokens[tokenA].assetAddress) &&
-          //       pool.tokenY.equals(tokens[tokenB].assetAddress)) ||
-          //       (pool.tokenX.equals(tokens[tokenB].assetAddress) &&
-          //         pool.tokenY.equals(tokens[tokenA].assetAddress)))
-          // )
-          // if (
-          //   index !== poolIndex &&
-          //   !(
-          //     tokenAIndex === tokenB &&
-          //     tokenBIndex === tokenA &&
-          //     fee.eq(ALL_FEE_TIERS_DATA[feeTierIndex].tier.fee)
-          //   )
-          // ) {
-          //   if (isMountedRef.current) {
-          //     setPoolIndex(index !== -1 ? index : null)
-          //     setCurrentPairReversed(null)
-          //   }
-          // } else if (
-          //   tokenAIndex === tokenB &&
-          //   tokenBIndex === tokenA &&
-          //   fee === feeTiersArray[feeTierIndex].tier.fee
-          // ) {
-          //   if (isMountedRef.current) {
-          //     setCurrentPairReversed(currentPairReversed === null ? true : !currentPairReversed)
-          //   }
-          // }
-          // if (index !== -1 && index !== poolIndex) {
-          //   // dispatch(
-          //   //   actions.getCurrentPlotTicks({
-          //   //     poolIndex: index,
-          //   //     isXtoY: allPools[index].tokenX.equals(tokens[tokenA].assetAddress)
-          //   //   })
-          //   // )
-          // } else if (
-          //   !(
-          //     tokenAIndex === tokenB &&
-          //     tokenBIndex === tokenA &&
-          //     fee === feeTiersArray[feeTierIndex].tier.fee
-          //   )
-          // ) {
-          //   // dispatch(
-          //   //   poolsActions.getPoolData(
-          //   //     new Pair(tokens[tokenA].assetAddress, tokens[tokenB].assetAddress, {
-          //   //       fee: ALL_FEE_TIERS_DATA[feeTierIndex].tier.fee,
-          //   //       tickSpacing: ALL_FEE_TIERS_DATA[feeTierIndex].tier.tickSpacing
-          //   //     })
-          //   //   )
-          //   // )
-          // }
+          dispatch(
+            poolsActions.getPoolData({
+              tokenX: tokens[tokenAIndex].assetAddress.toString(),
+              tokenY: tokens[tokenBIndex].assetAddress.toString(),
+              feeTier: feeTiersArray[feeIndex].tier
+            })
+          )
         }
 
         setTokenAIndex(tokenA)
         setTokenBIndex(tokenB)
         setFeeIndex(feeTierIndex)
       }}
-      isCurrentPoolExisting={poolIndex !== null}
+      isCurrentPoolExisting={poolKey !== ''}
+      calcAmount={calcAmount}
       feeTiers={feeTiersArray.map(tier => {
         return {
           feeValue: +printBN(tier.tier.fee, 10n)
@@ -574,13 +702,16 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       xDecimal={xDecimal}
       yDecimal={yDecimal}
       tickSpacing={tickSpacing}
-      isWaitingForNewPool={false}
+      isWaitingForNewPool={isWaitingForNewPool}
       poolIndex={poolIndex}
       currentPairReversed={null}
       bestTiers={bestTiers[currentNetwork]}
       initialIsDiscreteValue={initialIsDiscreteValue}
       onDiscreteChange={setIsDiscreteValue}
-      currentPriceSqrt={BigInt(5)} // TODO - add real data
+      currentPriceSqrt={
+        // poolKey  ? poolsData[poolKey].sqrtPrice : toSqrtPrice(midPrice.index, 0n)
+        toSqrtPrice(1n, 0n)
+      } // TODO - add real data
       canCreateNewPool={canUserCreateNewPool}
       canCreateNewPosition={canUserCreateNewPosition}
       handleAddToken={address => console.log(address)} // TODO - add real data
@@ -604,6 +735,9 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         if (tokenAIndex === null || tokenBIndex === null) {
           return
         }
+        console.log(leftTick)
+        console.log(leftTickIndex)
+        console.log(xAmount)
 
         if (progress === 'none') {
           setProgress('progress')
@@ -614,35 +748,36 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         // const lowerTick = Math.min(leftTickIndex, rightTickIndex)
         // const upperTick = Math.max(leftTickIndex, rightTickIndex)
 
-        dispatch(
-          poolsActions.initPool({
-            tokenX: tokens[tokenAIndex].assetAddress.toString(),
-            tokenY: tokens[tokenBIndex].assetAddress.toString(),
-            feeTier: feeTiersArray[feeIndex].tier
-          })
-        )
         // dispatch(
-        //   actions.initPosition({
-        //     tokenX: tokens[isXtoY ? tokenAIndex : tokenBIndex].assetAddress,
-        //     tokenY: tokens[isXtoY ? tokenBIndex : tokenAIndex].assetAddress,
-        //     fee,
-        //     lowerTick,
-        //     upperTick,
-        //     liquidityDelta: liquidityRef.current,
-        //     initPool: poolIndex === null,
-        //     initTick: poolIndex === null ? midPrice.index : undefined,
-        //     xAmount: Math.floor(xAmount),
-        //     yAmount: Math.floor(yAmount),
-        //     slippage,
-        //     tickSpacing,
-        //     knownPrice:
-        //       poolIndex === null
-        //         ? calculatePriceSqrt(midPrice.index)
-        //         : allPools[poolIndex].sqrtPrice
+        //   poolsActions.initPool({
+        //     tokenX: tokens[tokenAIndex].assetAddress.toString(),
+        //     tokenY: tokens[tokenBIndex].assetAddress.toString(),
+        //     feeTier: feeTiersArray[feeIndex].tier
         //   })
         // )
+        dispatch(
+          positionsActions.initPosition({
+            poolKeyData: {
+              tokenX: tokens[tokenAIndex].assetAddress.toString(),
+              tokenY: tokens[tokenBIndex].assetAddress.toString(),
+              feeTier: feeTiersArray[feeIndex].tier
+            },
+            lowerTick: leftTick,
+            upperTick: rightTick,
+            liquidityDelta: liquidityRef.current,
+            // spotSqrtPrice: poolKey
+            //   ? poolsData[poolKey].sqrtPrice
+            //   : priceToSqrtPrice(BigInt(midPrice.x)),
+            spotSqrtPrice: toSqrtPrice(1n, 0n),
+            slippageTolerance: 500n,
+            tokenXAmount: tokenAAmount,
+            tokenYAmount: tokenBAmount,
+            initPool: poolKey === ''
+          })
+        )
       }} // TODO - add real data
       showNoConnected={walletStatus !== Status.Initialized}
+      poolKey={poolKey}
     />
   )
 }

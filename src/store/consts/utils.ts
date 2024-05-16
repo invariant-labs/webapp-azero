@@ -1,4 +1,11 @@
-import { Network, TokenAmount, priceToSqrtPrice } from '@invariant-labs/a0-sdk'
+import {
+  Network,
+  PoolKey,
+  TokenAmount,
+  getMaxTick,
+  getMinTick,
+  priceToSqrtPrice
+} from '@invariant-labs/a0-sdk'
 import { PlotTickData } from '@store/reducers/positions'
 import axios from 'axios'
 import { BTC_TEST, ETH_TEST, Token, TokenPriceData, USDC_TEST, tokensPrices } from './static'
@@ -126,15 +133,11 @@ export const trimZeros = (numStr: string): string => {
 
 export const PRICE_DECIMAL = 24
 
-export const calcYPerXPrice = (
-  sqrtPrice: TokenAmount,
-  xDecimal: bigint,
-  yDecimal: bigint
-): bigint => {
+export const calcYPerXPrice = (sqrtPrice: bigint, xDecimal: bigint, yDecimal: bigint): number => {
   const sqrt = +printAmount(sqrtPrice, PRICE_DECIMAL)
-  const proportion = BigInt(sqrt * sqrt)
+  const proportion = sqrt * sqrt
 
-  return proportion / 10n ** (yDecimal - xDecimal)
+  return proportion / 10 ** Number(yDecimal - xDecimal)
 }
 
 export const trimLeadingZeros = (amount: string): string => {
@@ -193,7 +196,7 @@ export const calcPrice = (
   //TODO check if this is correct, in Solana sdk was method calculatePriceSqrt which takes index to calculate price
   const price = calcYPerXPrice(priceToSqrtPrice(amount), xDecimal, yDecimal)
 
-  return isXtoY ? price : 1n / price
+  return BigInt(isXtoY ? price : 1 / price)
 }
 
 export const createPlaceholderLiquidityPlot = (
@@ -302,7 +305,8 @@ export const parseFeeToPathFee = (fee: bigint): string => {
 }
 
 export const getNetworkTokensList = (networkType: Network): Record<string, Token> => {
-  const obj: Record<string, Token> = {}
+  console.log(networkType)
+
   switch (networkType) {
     case Network.Mainnet: {
     }
@@ -315,4 +319,98 @@ export const getNetworkTokensList = (networkType: Network): Record<string, Token
     default:
       return {}
   }
+}
+
+export const getPrimaryUnitsPrice = (
+  price: number,
+  isXtoY: boolean,
+  xDecimal: number,
+  yDecimal: number
+) => {
+  const xToYPrice = isXtoY ? price : 1 / price
+
+  return xToYPrice * 10 ** (yDecimal - xDecimal)
+}
+
+export const logBase = (x: number, b: number): number => Math.log(x) / Math.log(b)
+
+export const spacingMultiplicityLte = (arg: number, spacing: number): number => {
+  if (Math.abs(arg % spacing) === 0) {
+    return arg
+  }
+
+  if (arg >= 0) {
+    return arg - (arg % spacing)
+  }
+
+  return arg - (spacing - (Math.abs(arg) % spacing))
+}
+
+export const spacingMultiplicityGte = (arg: number, spacing: number): number => {
+  if (Math.abs(arg % spacing) === 0) {
+    return arg
+  }
+
+  if (arg >= 0) {
+    return arg + (spacing - (arg % spacing))
+  }
+
+  return arg + (Math.abs(arg) % spacing)
+}
+
+export const nearestSpacingMultiplicity = (arg: number, spacing: number) => {
+  const greater = spacingMultiplicityGte(arg, spacing)
+  const lower = spacingMultiplicityLte(arg, spacing)
+
+  const nearest = Math.abs(greater - arg) < Math.abs(lower - arg) ? greater : lower
+
+  return Math.max(Math.min(nearest, Number(getMaxTick(spacing))), Number(getMinTick(spacing)))
+}
+
+export const nearestTickIndex = (
+  price: number,
+  spacing: bigint,
+  isXtoY: boolean,
+  xDecimal: bigint,
+  yDecimal: bigint
+) => {
+  //TODO check if this is correct
+  try {
+    const minTick = getMinTick(spacing)
+    const maxTick = getMaxTick(spacing)
+    const base = Math.max(
+      price,
+      Number(calcPrice(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
+    )
+
+    const primaryUnitsPrice = getPrimaryUnitsPrice(base, isXtoY, Number(xDecimal), Number(yDecimal))
+    const log =
+      Math.round(logBase(primaryUnitsPrice, 1.0001)) >= 0
+        ? Math.round(logBase(primaryUnitsPrice, 1.0001))
+        : -Math.round(logBase(primaryUnitsPrice, 1.0001))
+
+    return BigInt(nearestSpacingMultiplicity(log, Number(spacing)))
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const stringifyPoolKey = (poolKey: PoolKey) => {
+  const keyStringified = `${poolKey.tokenX}-${poolKey.tokenY}-${poolKey.feeTier.fee.toString()}`
+  const invertedKeyStringified = `${poolKey.tokenY}-${poolKey.tokenX}-${poolKey.feeTier.fee.toString()}`
+  return { keyStringified, invertedKeyStringified }
+}
+
+export const printBNtoBN = (amount: string, decimals: number): bigint => {
+  const balanceString = amount.split('.')
+  if (balanceString.length !== 2) {
+    return BigInt(balanceString[0] + '0'.repeat(decimals))
+  }
+
+  if (balanceString[1].length <= decimals) {
+    return BigInt(
+      balanceString[0] + balanceString[1] + '0'.repeat(decimals - balanceString[1].length)
+    )
+  }
+  return 0n
 }
