@@ -18,6 +18,7 @@ import {
   getLiquidityByX,
   getLiquidityByY,
   newPoolKey,
+  sendAndDebugTx,
   sendTx,
   toSqrtPrice
 } from '@invariant-labs/a0-sdk'
@@ -301,7 +302,8 @@ export function* handleInitPosition(action: PayloadAction<InitPositionData>): Ge
       signer: adapter.signer as Signer
     })
     console.log(signedTx.hash.toHex())
-    const txResult = yield* call(sendTx, signedTx)
+    // const txResult = yield* call(sendTx, signedTx)
+    const txResult = yield* call(sendAndDebugTx, signedTx, api)
 
     console.log(txResult)
 
