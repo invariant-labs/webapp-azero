@@ -1,33 +1,30 @@
-import { call, put, takeEvery, take, select, all, spawn, takeLatest } from 'typed-redux-saga'
-import { actions as snackbarsActions } from '@store/reducers/snackbars'
+import {
+  Invariant,
+  PSP22,
+  TESTNET_INVARIANT_ADDRESS,
+  getLiquidityByX,
+  newPoolKey,
+  sendAndDebugTx,
+  sendTx,
+  toSqrtPrice
+} from '@invariant-labs/a0-sdk'
+import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
+import { createLoaderKey } from '@store/consts/utils'
+import { actions as poolActions } from '@store/reducers/pools'
 import {
   ClosePositionData,
   GetCurrentTicksData,
   InitPositionData,
   actions
 } from '@store/reducers/positions'
-import { actions as poolActions } from '@store/reducers/pools'
-import { createLoaderKey } from '@store/consts/utils'
-import { closeSnackbar } from 'notistack'
-import {
-  Invariant,
-  Keyring,
-  PSP22,
-  TESTNET_INVARIANT_ADDRESS,
-  getLiquidityByX,
-  getLiquidityByY,
-  newPoolKey,
-  sendAndDebugTx,
-  sendTx,
-  toSqrtPrice
-} from '@invariant-labs/a0-sdk'
-import { getConnection } from './connection'
+import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { networkType } from '@store/selectors/connection'
 import { address } from '@store/selectors/wallet'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
-import { INVARIANT_LOAD_CONFIG } from '@store/consts/static'
-import { Signer } from '@polkadot/api/types'
+import { closeSnackbar } from 'notistack'
+import { all, call, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
+import { getConnection } from './connection'
 import { fetchAllPoolKeys } from './pools'
 
 function* handleInitPositionAndPool(action: PayloadAction<InitPositionData>): Generator {
@@ -197,7 +194,7 @@ export function* handleInitPosition(action: PayloadAction<InitPositionData>): Ge
   // console.log(tokenXAmount)
   // console.log(tokenYAmount)
   // console.log(initPool)
-  const tokenXAmount = 1200n
+  const tokenXAmount = 1000000n
   const lowerTick = -10n
   const upperTick = 10n
   const spotSqrtPrice = toSqrtPrice(1n, 0n)
@@ -244,8 +241,18 @@ export function* handleInitPosition(action: PayloadAction<InitPositionData>): Ge
       proofSize: 10000000000
     })
 
+    console.log('token x amount', tokenXAmount)
+    console.log('token y amount', tokenYAmount)
     yield* call([psp22, psp22.setContractAddress], tokenX)
-    const XTokenTx = yield* call([psp22, psp22.approveTx], walletAddress, tokenXAmount)
+    const XTokenTx = yield* call([psp22, psp22.approveTx], TESTNET_INVARIANT_ADDRESS, tokenXAmount)
+    const myBalanceX = yield* call([psp22, psp22.balanceOf], walletAddress)
+    console.log('balance x', myBalanceX.toString())
+    const allowanceX = yield* call(
+      [psp22, psp22.allowance],
+      walletAddress,
+      TESTNET_INVARIANT_ADDRESS
+    )
+    console.log('allowance x', (allowanceX as string).toString())
 
     const signedXTokenTx = yield* call([XTokenTx, XTokenTx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
@@ -253,7 +260,15 @@ export function* handleInitPosition(action: PayloadAction<InitPositionData>): Ge
     const TxXResult = yield* call(sendTx, signedXTokenTx)
 
     yield* call([psp22, psp22.setContractAddress], tokenY)
-    const YTokenTx = yield* call([psp22, psp22.approveTx], walletAddress, tokenYAmount)
+    const YTokenTx = yield* call([psp22, psp22.approveTx], TESTNET_INVARIANT_ADDRESS, tokenYAmount)
+    const myBalanceY = yield* call([psp22, psp22.balanceOf], walletAddress)
+    console.log('balance y', myBalanceY.toString())
+    const allowanceY = yield* call(
+      [psp22, psp22.allowance],
+      walletAddress,
+      TESTNET_INVARIANT_ADDRESS
+    )
+    console.log('allowance y', (allowanceY as string).toString())
 
     const signedYTokenTx = yield* call([YTokenTx, YTokenTx.signAsync], walletAddress, {
       signer: adapter.signer as Signer

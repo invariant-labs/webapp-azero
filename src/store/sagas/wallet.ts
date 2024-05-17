@@ -6,7 +6,7 @@ import { PayloadAction } from '@reduxjs/toolkit'
 import { TokenAirdropAmount, TokenList, getFaucetDeployer } from '@store/consts/static'
 import { createLoaderKey } from '@store/consts/utils'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import { Status, actions, actions as walletActions } from '@store/reducers/wallet'
+import { Status, actions } from '@store/reducers/wallet'
 import { address, status } from '@store/selectors/wallet'
 import { disconnectWallet, getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
@@ -121,7 +121,6 @@ export function* handleAirdrop(): Generator {
   const connection = yield* getConnection()
   const faucetDeployer = getFaucetDeployer()
   const data = connection.createType('Vec<u8>', [])
-  const notAirdroppedTokens = []
 
   const psp22 = yield* call(PSP22.load, connection, Network.Testnet, '', {
     storageDepositLimit: 10000000000,
@@ -134,30 +133,13 @@ export function* handleAirdrop(): Generator {
     const airdropAmount = TokenAirdropAmount[ticker as keyof typeof TokenList]
 
     yield* call([psp22, psp22.setContractAddress], address)
-    const balance = yield* call([psp22, psp22.balanceOf], faucetDeployer.address, walletAddress)
-    yield* put(walletActions.setTokenAccount({ address, balance }))
-    const faucetAmount = airdropAmount
-    if (balance < faucetAmount) {
-      yield* call([psp22, psp22.mint], faucetDeployer, faucetAmount)
-      yield* call([psp22, psp22.transfer], faucetDeployer, walletAddress, faucetAmount, data)
+    yield* call([psp22, psp22.mint], faucetDeployer, airdropAmount)
+    yield* call([psp22, psp22.transfer], faucetDeployer, walletAddress, airdropAmount, data)
 
-      yield* put(
-        snackbarsActions.add({
-          message: `Airdropped ${ticker} tokens`,
-          variant: 'success',
-          persist: false
-        })
-      )
-    } else {
-      notAirdroppedTokens.push(ticker)
-    }
-  }
-
-  if (notAirdroppedTokens.length > 0) {
     yield* put(
       snackbarsActions.add({
-        message: `Didn't airdrop ${notAirdroppedTokens.join(', ')} ${notAirdroppedTokens.length === 1 ? 'token' : 'tokens'} due to high balance`,
-        variant: 'error',
+        message: `Airdropped ${ticker} tokens`,
+        variant: 'success',
         persist: false
       })
     )
