@@ -3,9 +3,11 @@ import { makeStyles } from 'tss-react/mui'
 
 export const useStyles = makeStyles()(() => ({
   continuous: {
+    display: 'block',
     width: 29
   },
   discrete: {
+    display: 'block',
     width: 22
   }
 }))
@@ -40,6 +42,10 @@ export const useSingleTabStyles = makeStyles()(() => ({
     paddingInline: 0,
     minWidth: 46,
     width: 46,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 0,
 
     '&:hover': {
       backgroundColor: `${colors.invariant.light}B0`,

@@ -30,6 +30,7 @@ export interface Token {
   decimals: bigint
   name: string
   logoURI: string
+  balance?: bigint
   coingeckoId?: string
   isUnknown?: boolean
 }

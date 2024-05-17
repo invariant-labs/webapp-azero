@@ -127,7 +127,7 @@ export const PositionsList: React.FC<IProps> = ({
               onClick={() => {
                 navigate(`/position/${element.id}`)
               }}
-              key={element.id + (page * 5 - 5 + index)}
+              key={element.id}
               className={classes.itemLink}>
               <PositionItem key={index} {...element} />
             </Grid>

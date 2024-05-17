@@ -8,10 +8,9 @@ import { status as connectionStatus } from '@store/selectors/connection'
 import { address, status } from '@store/selectors/wallet'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet } from 'react-router-dom'
 
 const RootPage: React.FC = () => {
-  const navigate = useNavigate()
   const dispatch = useDispatch()
   const signerStatus = useSelector(connectionStatus)
   const walletStatus = useSelector(status)
@@ -32,9 +31,6 @@ const RootPage: React.FC = () => {
     }
   }, [signerStatus, walletStatus, walletAddress])
 
-  useEffect(() => {
-    navigate('/swap')
-  }, [])
   return (
     <>
       {signerStatus === Status.Initialized && <EventsHandlers />}

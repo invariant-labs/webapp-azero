@@ -5,7 +5,7 @@ import {
   PoolKey,
   TESTNET_INVARIANT_ADDRESS,
   TokenAmount,
-  priceToSqrtPrice
+  calculateSqrtPrice
 } from '@invariant-labs/a0-sdk'
 import { ApiPromise } from '@polkadot/api'
 import { PoolWithPoolKey } from '@store/reducers/pools'
@@ -191,15 +191,14 @@ export const toMaxNumericPlaces = (num: number, places: number): string => {
 }
 
 export const calcPrice = (
-  amount: TokenAmount,
+  amount: bigint,
   isXtoY: boolean,
   xDecimal: bigint,
   yDecimal: bigint
-) => {
-  //TODO check if this is correct, in Solana sdk was method calculatePriceSqrt which takes index to calculate price
-  const price = calcYPerXPrice(priceToSqrtPrice(amount), xDecimal, yDecimal)
+): number => {
+  const price = calcYPerXPrice(calculateSqrtPrice(amount), xDecimal, yDecimal)
 
-  return isXtoY ? price : 1n / price
+  return isXtoY ? price : 1 / price
 }
 
 export const createPlaceholderLiquidityPlot = (
@@ -310,7 +309,8 @@ export const parseFeeToPathFee = (fee: bigint): string => {
 export const getFullNewTokensData = async (
   tokens: string[],
   api: ApiPromise,
-  network: Network
+  network: Network,
+  address: string
 ): Promise<Record<string, Token>> => {
   const psp22 = await PSP22.load(api, network, '')
 
@@ -320,20 +320,44 @@ export const getFullNewTokensData = async (
     promises.push(psp22.tokenSymbol())
     promises.push(psp22.tokenName())
     promises.push(psp22.tokenDecimals())
+    promises.push(psp22.balanceOf(address))
   })
   const results = await Promise.all(promises)
 
   const newTokens: Record<string, Token> = {}
   tokens.map((token, index) => {
     newTokens[token] = {
-      symbol: results[index * 3 - 3] as string,
+      symbol: results[index * 4 - 4] as string,
       address: token,
-      name: results[index * 3 - 2] as string,
-      decimals: results[index * 3 - 1] as bigint,
+      name: results[index * 4 - 3] as string,
+      decimals: results[index * 4 - 2] as bigint,
+      balance: results[index * 4 - 1] as bigint,
       logoURI: ''
     }
   })
   return newTokens
+}
+
+export const getTokenBalances = async (
+  tokens: string[],
+  api: ApiPromise,
+  network: Network,
+  address: string
+): Promise<[string, bigint][]> => {
+  const psp22 = await PSP22.load(api, network, '')
+
+  const promises: Promise<any>[] = []
+  tokens.map(token => {
+    psp22.setContractAddress(token)
+    promises.push(psp22.balanceOf(address))
+  })
+  const results = await Promise.all(promises)
+
+  const tokenBalances: [string, bigint][] = []
+  tokens.map((token, index) => {
+    tokenBalances.push([token, results[index]])
+  })
+  return tokenBalances
 }
 
 export const getPoolsFromPoolKeys = async (

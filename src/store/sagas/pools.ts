@@ -9,7 +9,12 @@ import {
 } from '@invariant-labs/a0-sdk'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { createLoaderKey, getFullNewTokensData, getPoolsFromPoolKeys } from '@store/consts/utils'
+import {
+  createLoaderKey,
+  getFullNewTokensData,
+  getPoolsFromPoolKeys,
+  getTokenBalances
+} from '@store/consts/utils'
 import { ListPoolsRequest, actions } from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { networkType } from '@store/selectors/connection'
@@ -21,25 +26,45 @@ import { all, call, put, select, spawn, takeEvery, takeLatest } from 'typed-redu
 import { getConnection } from './connection'
 
 export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) {
+  const walletAddress = yield* select(address)
   const connection = yield* call(getConnection)
   const network = yield* select(networkType)
   const newPools = yield* call(getPoolsFromPoolKeys, action.payload.poolKeys, connection, network)
 
   const allTokens = yield* select(tokens)
   const unknownTokens = new Set<string>()
+  const knownTokens = new Set<string>()
 
   action.payload.poolKeys.forEach(poolKey => {
     if (!allTokens[poolKey.tokenX]) {
       unknownTokens.add(poolKey.tokenX)
+    } else {
+      knownTokens.add(poolKey.tokenX)
     }
 
     if (!allTokens[poolKey.tokenY]) {
       unknownTokens.add(poolKey.tokenY)
+    } else {
+      knownTokens.add(poolKey.tokenY)
     }
   })
 
-  const newTokens = yield* call(getFullNewTokensData, [...unknownTokens], connection, network)
-  yield* put(actions.addTokens(newTokens))
+  const unknownTokensData = yield* call(
+    getFullNewTokensData,
+    [...unknownTokens],
+    connection,
+    network,
+    walletAddress
+  )
+  const knownTokenBalances = yield* call(
+    getTokenBalances,
+    [...knownTokens],
+    connection,
+    network,
+    walletAddress
+  )
+  yield* put(actions.addTokens(unknownTokensData))
+  yield* put(actions.updateTokenBalances(knownTokenBalances))
 
   yield* put(actions.addPoolsForList({ data: newPools, listType: action.payload.listType }))
 }

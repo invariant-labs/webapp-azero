@@ -8,8 +8,8 @@ export interface PositionsListStore {
   loading: boolean
 }
 export interface PlotTickData {
-  x: bigint
-  y: bigint
+  x: number
+  y: number
   index: bigint
 }
 
@@ -136,7 +136,7 @@ const positionsSlice = createSlice({
       state.positionsList.list[action.payload.index] = action.payload.position
       return state
     },
-    getCurrentPositionRangeTicks(state, _action: PayloadAction<string>) {
+    getCurrentPositionRangeTicks(state, _action: PayloadAction<number>) {
       state.currentPositionRangeTicks.loading = true
       return state
     },

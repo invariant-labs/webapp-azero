@@ -60,7 +60,7 @@ export const WrappedPositionsList: React.FC = () => {
         navigate('/newPosition')
       }}
       data={list
-        .map(position => {
+        .map((position, index) => {
           const pool = allPools[poolKeyToString(position.poolKey)]
           const tokenX = allTokens[position.poolKey.tokenX]
           const tokenY = allTokens[position.poolKey.tokenY]
@@ -136,7 +136,7 @@ export const WrappedPositionsList: React.FC = () => {
             tokenYLiq,
             valueX,
             valueY,
-            id: poolKeyToString(position.poolKey),
+            id: index,
             isActive: currentPrice >= min && currentPrice <= max
           }
         })

@@ -19,7 +19,7 @@ export interface IPositionItem {
   max: number
   valueX: number
   valueY: number
-  id: string
+  id: number
   isActive?: boolean
 }
 

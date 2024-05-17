@@ -124,6 +124,15 @@ const poolsSlice = createSlice({
       }
       return state
     },
+    updateTokenBalances(state, action: PayloadAction<[string, bigint][]>) {
+      action.payload.map(pair => {
+        state.tokens[pair[0]] = {
+          ...state.tokens[pair[0]],
+          balance: pair[1]
+        }
+      })
+      return state
+    },
     // setVolumeRanges(state, action: PayloadAction<Record<string, Range[]>>) {
     //   state.volumeRanges = action.payload
     //   return state

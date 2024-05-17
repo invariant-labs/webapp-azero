@@ -1,31 +1,42 @@
+import { EmptyPlaceholder } from '@components/EmptyPlaceholder/EmptyPlaceholder'
+import PositionDetails from '@components/PositionDetails/PositionDetails'
+import {
+  calculateFee,
+  calculateSqrtPrice,
+  getLiquidityByX,
+  getLiquidityByY
+} from '@invariant-labs/a0-sdk'
+import { Grid } from '@mui/material'
 import loader from '@static/gif/loader.gif'
-import React, { useEffect, useMemo, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import useStyles from './style'
-import { network } from '@store/selectors/connection'
+import { TokenPriceData } from '@store/consts/static'
+import {
+  calcPrice,
+  calcYPerXPrice,
+  getCoingeckoTokenPrice,
+  getMockedTokenPrice,
+  poolKeyToString,
+  printAmount
+} from '@store/consts/utils'
+import { actions } from '@store/reducers/positions'
+import { actions as snackbarsActions } from '@store/reducers/snackbars'
+import { Status } from '@store/reducers/wallet'
+import { networkType } from '@store/selectors/connection'
+import { volumeRanges } from '@store/selectors/pools'
 import {
   currentPositionRangeTicks,
   isLoadingPositionsList,
   plotTicks,
   singlePositionData
 } from '@store/selectors/positions'
-import { volumeRanges } from '@store/selectors/pools'
 import { status } from '@store/selectors/wallet'
-import { calcPrice, calcYPerXPrice, printBN } from '@store/consts/utils'
-import { TokenPriceData } from '@store/consts/static'
-import { Grid } from '@mui/material'
-import { EmptyPlaceholder } from '@components/EmptyPlaceholder/EmptyPlaceholder'
-import { Status } from '@store/reducers/wallet'
-import { Navigate } from 'react-router-dom'
 import { VariantType } from 'notistack'
-import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import PositionDetails from '@components/PositionDetails/PositionDetails'
-// import { hasFarms, hasUserStakes, stakesForPosition } from '@selectors/farms'
-// import { actions as farmsActions } from '@reducers/farms'
-// import { Status } from '@reducers/solanaWallet'
+import React, { useEffect, useMemo, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Navigate } from 'react-router-dom'
+import useStyles from './style'
 
 export interface IProps {
-  id: string
+  id: number
 }
 
 export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
@@ -33,7 +44,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
 
   const dispatch = useDispatch()
 
-  const currentNetwork = useSelector(network)
+  const currentNetwork = useSelector(networkType)
   const position = useSelector(singlePositionData(id))
   const isLoadingList = useSelector(isLoadingPositionsList)
   const { data: ticksData, loading: ticksLoading, hasError: hasTicksError } = useSelector(plotTicks)
@@ -51,18 +62,18 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
 
   const [isFinishedDelayRender, setIsFinishedDelayRender] = useState(false)
 
-  // useEffect(() => {
-  //   if (position?.id && waitingForTicksData === null) {
-  //     setWaitingForTicksData(true)
-  //     dispatch(actions.getCurrentPositionRangeTicks(id))
-  //     dispatch(
-  //       actions.getCurrentPlotTicks({
-  //         poolIndex: position.poolData.poolIndex,
-  //         isXtoY: true
-  //       })
-  //     )
-  //   }
-  // }, [position?.id])
+  useEffect(() => {
+    if (position && waitingForTicksData === null) {
+      setWaitingForTicksData(true)
+      dispatch(actions.getCurrentPositionRangeTicks(id))
+      // dispatch(
+      //   actions.getCurrentPlotTicks({
+      //     poolIndex: position.poolData.poolIndex,
+      //     isXtoY: true
+      //   })
+      // )
+    }
+  }, [position])
 
   useEffect(() => {
     if (waitingForTicksData === true && !rangeTicksLoading) {
@@ -84,7 +95,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
 
     return {
       index: 0n,
-      x: 0n
+      x: 0
     }
   }, [position?.poolKey])
 
@@ -103,7 +114,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
 
     return {
       index: 0n,
-      x: 0n
+      x: 0
     }
   }, [position?.poolKey])
 
@@ -122,32 +133,32 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
 
     return {
       index: 0n,
-      x: 0n
+      x: 0
     }
   }, [position?.poolKey])
 
-  // const min = useMemo(
-  //   () =>
-  //     position
-  //       ? calcYPerXPrice(
-  //           calculatePriceSqrt(position.lowerTickIndex).v,
-  //           position.tokenX.decimals,
-  //           position.tokenY.decimals
-  //         )
-  //       : 0,
-  //   [position?.lowerTickIndex]
-  // )
-  // const max = useMemo(
-  //   () =>
-  //     position
-  //       ? calcYPerXPrice(
-  //           calculatePriceSqrt(position.upperTickIndex).v,
-  //           position.tokenX.decimals,
-  //           position.tokenY.decimals
-  //         )
-  //       : 0,
-  //   [position?.upperTickIndex]
-  // )
+  const min = useMemo(
+    () =>
+      position
+        ? calcYPerXPrice(
+            calculateSqrtPrice(position.lowerTickIndex),
+            position.tokenX.decimals,
+            position.tokenY.decimals
+          )
+        : 0,
+    [position?.lowerTickIndex]
+  )
+  const max = useMemo(
+    () =>
+      position
+        ? calcYPerXPrice(
+            calculateSqrtPrice(position.upperTickIndex),
+            position.tokenX.decimals,
+            position.tokenY.decimals
+          )
+        : 0,
+    [position?.upperTickIndex]
+  )
   const current = useMemo(
     () =>
       position
@@ -156,73 +167,71 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
             position.tokenX.decimals,
             position.tokenY.decimals
           )
-        : 0n,
+        : 0,
     [position]
   )
 
-  // const tokenXLiquidity = useMemo(() => {
-  //   if (position) {
-  //     try {
-  //       return +printBN(
-  //         getX(
-  //           position.liquidity.v,
-  //           calculatePriceSqrt(position.upperTickIndex).v,
-  //           position.poolData.sqrtPrice.v,
-  //           calculatePriceSqrt(position.lowerTickIndex).v
-  //         ),
-  //         position.tokenX.decimals
-  //       )
-  //     } catch (error) {
-  //       return 0
-  //     }
-  //   }
+  const tokenXLiquidity = useMemo(() => {
+    if (position) {
+      try {
+        return +printAmount(
+          getLiquidityByX(
+            position.liquidity,
+            position.lowerTickIndex,
+            position.upperTickIndex,
+            position.poolData.sqrtPrice,
+            true
+          ).amount,
+          Number(position.tokenX.decimals)
+        )
+      } catch (error) {
+        return 0
+      }
+    }
 
-  //   return 0
-  // }, [position])
+    return 0
+  }, [position])
 
-  // const tokenYLiquidity = useMemo(() => {
-  //   if (position) {
-  //     try {
-  //       return +printBN(
-  //         getY(
-  //           position.liquidity.v,
-  //           calculatePriceSqrt(position.upperTickIndex).v,
-  //           position.poolData.sqrtPrice.v,
-  //           calculatePriceSqrt(position.lowerTickIndex).v
-  //         ),
-  //         position.tokenY.decimals
-  //       )
-  //     } catch (error) {
-  //       return 0
-  //     }
-  //   }
+  const tokenYLiquidity = useMemo(() => {
+    if (position) {
+      try {
+        return +printAmount(
+          getLiquidityByY(
+            position.liquidity,
+            position.lowerTickIndex,
+            position.upperTickIndex,
+            position.poolData.sqrtPrice,
+            true
+          ).amount,
+          Number(position.tokenY.decimals)
+        )
+      } catch (error) {
+        return 0
+      }
+    }
 
-  //   return 0
-  // }, [position])
+    return 0
+  }, [position])
 
-  // const [tokenXClaim, tokenYClaim] = useMemo(() => {
-  //   if (
-  //     waitingForTicksData === false &&
-  //     position &&
-  //     typeof lowerTick !== 'undefined' &&
-  //     typeof upperTick !== 'undefined'
-  //   ) {
-  //     const [bnX, bnY] = calculateClaimAmount({
-  //       position,
-  //       tickLower: lowerTick,
-  //       tickUpper: upperTick,
-  //       tickCurrent: position.poolData.currentTickIndex,
-  //       feeGrowthGlobalX: position.poolData.feeGrowthGlobalX,
-  //       feeGrowthGlobalY: position.poolData.feeGrowthGlobalY
-  //     })
+  const [tokenXClaim, tokenYClaim] = useMemo(() => {
+    if (
+      waitingForTicksData === false &&
+      position &&
+      typeof lowerTick !== 'undefined' &&
+      typeof upperTick !== 'undefined'
+    ) {
+      const [bnX, bnY] = calculateFee(position.poolData, position, lowerTick, upperTick)
 
-  //     setShowFeesLoader(false)
+      setShowFeesLoader(false)
 
-  //     return [+printBN(bnX, position.tokenX.decimals), +printBN(bnY, position.tokenY.decimals)]
-  //   }
+      return [
+        +printAmount(bnX, Number(position.tokenX.decimals)),
+        +printAmount(bnY, Number(position.tokenY.decimals))
+      ]
+    }
 
-  //   return [0, 0]
-  // }, [position, lowerTick, upperTick, waitingForTicksData])
+    return [0, 0]
+  }, [position, lowerTick, upperTick, waitingForTicksData])
 
   // const data = useMemo(() => {
   //   if (ticksLoading && position) {
@@ -291,33 +300,33 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   //   }
   // }, [poolsVolumeRanges, position])
 
-  // useEffect(() => {
-  //   if (!position) {
-  //     return
-  //   }
+  useEffect(() => {
+    if (!position) {
+      return
+    }
 
-  //   const xId = position.tokenX.coingeckoId ?? ''
-  //   if (xId.length) {
-  //     getCoingeckoTokenPrice(xId)
-  //       .then(data => setTokenXPriceData(data))
-  //       .catch(() =>
-  //         setTokenXPriceData(getMockedTokenPrice(position.tokenX.symbol, currentNetwork))
-  //       )
-  //   } else {
-  //     setTokenXPriceData(undefined)
-  //   }
+    const xId = position.tokenX.coingeckoId ?? ''
+    if (xId.length) {
+      getCoingeckoTokenPrice(xId)
+        .then(data => setTokenXPriceData(data))
+        .catch(() =>
+          setTokenXPriceData(getMockedTokenPrice(position.tokenX.symbol, currentNetwork))
+        )
+    } else {
+      setTokenXPriceData(undefined)
+    }
 
-  //   const yId = position.tokenY.coingeckoId ?? ''
-  //   if (yId.length) {
-  //     getCoingeckoTokenPrice(yId)
-  //       .then(data => setTokenYPriceData(data))
-  //       .catch(() =>
-  //         setTokenYPriceData(getMockedTokenPrice(position.tokenY.symbol, currentNetwork))
-  //       )
-  //   } else {
-  //     setTokenYPriceData(undefined)
-  //   }
-  // }, [position?.id])
+    const yId = position.tokenY.coingeckoId ?? ''
+    if (yId.length) {
+      getCoingeckoTokenPrice(yId)
+        .then(data => setTokenYPriceData(data))
+        .catch(() =>
+          setTokenYPriceData(getMockedTokenPrice(position.tokenY.symbol, currentNetwork))
+        )
+    } else {
+      setTokenYPriceData(undefined)
+    }
+  }, [position])
 
   const copyPoolAddressHandler = (message: string, variant: VariantType) => {
     dispatch(
@@ -348,11 +357,11 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   if (position) {
     return (
       <PositionDetails
-        tokenXAddress={position.tokenX.assetAddress}
-        tokenYAddress={position.tokenY.assetAddress}
-        poolAddress={position.poolData.address}
+        tokenXAddress={position.poolKey.tokenX}
+        tokenYAddress={position.poolKey.tokenY}
+        poolAddress={position ? poolKeyToString(position.poolKey) : ''}
         copyPoolAddressHandler={copyPoolAddressHandler}
-        detailsData={[{ x: 12n, y: 123n, index: -44364n }]}
+        detailsData={[{ x: 12, y: 123, index: -44364n }]} // add real data
         midPrice={midPrice}
         leftRange={leftRange}
         rightRange={rightRange}
@@ -360,36 +369,38 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
         onClickClaimFee={() => {}} // add real data
         closePosition={() => {}} // add real data
         ticksLoading={ticksLoading}
-        tickSpacing={1} // add real data
+        tickSpacing={Number(position.poolKey.feeTier.tickSpacing)}
         tokenX={{
           name: position.tokenX.symbol,
           icon: position.tokenX.logoURI,
           decimal: position.tokenX.decimals,
-          balance: +printBN(position.tokenX.balance, position.tokenX.decimals),
-          liqValue: 5.123, // add real data
-          claimValue: 1.23, // add real data
+          balance: +printAmount(position.tokenX.balance ?? 0n, Number(position.tokenX.decimals)),
+          liqValue: tokenXLiquidity,
+          claimValue: tokenXClaim,
           usdValue:
             typeof tokenXPriceData?.price === 'undefined'
               ? undefined
-              : tokenXPriceData.price * +printBN(position.tokenX.balance, position.tokenX.decimals)
+              : tokenXPriceData.price *
+                +printAmount(position.tokenX.balance ?? 0n, Number(position.tokenX.decimals))
         }}
         tokenXPriceData={tokenXPriceData}
         tokenY={{
           name: position.tokenY.symbol,
           icon: position.tokenY.logoURI,
           decimal: position.tokenY.decimals,
-          balance: +printBN(position.tokenY.balance, position.tokenY.decimals),
-          liqValue: 123.123, // add real data
-          claimValue: 12.23, // add real data
+          balance: +printAmount(position.tokenX.balance ?? 0n, Number(position.tokenY.decimals)),
+          liqValue: tokenYLiquidity,
+          claimValue: tokenYClaim,
           usdValue:
             typeof tokenYPriceData?.price === 'undefined'
               ? undefined
-              : tokenYPriceData.price * +printBN(position.tokenY.balance, position.tokenY.decimals)
+              : tokenYPriceData.price *
+                +printAmount(position.tokenX.balance ?? 0n, Number(position.tokenY.decimals))
         }}
         tokenYPriceData={tokenYPriceData}
-        fee={position.poolData.feeGrowthGlobalX} //TODO check if this is correct
-        min={0.0118541383040056} // add real data
-        max={1.23123} // add real data
+        fee={Number(position.poolKey.feeTier.fee)}
+        min={min}
+        max={max}
         initialIsDiscreteValue={initialIsDiscreteValue}
         onDiscreteChange={setIsDiscreteValue}
         showFeesLoader={showFeesLoader}
