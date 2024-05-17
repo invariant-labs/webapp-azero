@@ -6,9 +6,12 @@ import { useStyles } from './style'
 import AnimatedButton, { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import { PositionOpeningMethod } from '@store/consts/static'
 import { Grid, Typography } from '@mui/material'
-import { getScaleFromString, printBN } from '@store/consts/utils'
+import { getScaleFromString, printBN, printBNtoBN } from '@store/consts/utils'
 import DepositAmountInput from '@components/Inputs/DepositAmountInput/DepositAmountInput'
 import Select from '@components/Inputs/Select/Select'
+import { parsePathFeeToFeeString, tickerToAddress } from '@store/consts/uiUtiils'
+import { useSelector } from 'react-redux'
+import { feeTiers as feeTiersSelector } from '@store/selectors/pools'
 
 export interface InputState {
   value: string
@@ -94,6 +97,42 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
   console.log(tokenAIndex)
   const [isLoaded, setIsLoaded] = useState<boolean>(false)
 
+  const feeTiersArray = useSelector(feeTiersSelector)
+
+  useEffect(() => {
+    if (isLoaded || tokens.length === 0 || feeTiersArray.length === 0) {
+      return
+    }
+
+    let tokenAIndexFromPath = null
+    let tokenBIndexFromPath = null
+    let feeTierIndexFromPath = 0
+
+    tokens.forEach((token, index) => {
+      if (token.assetAddress.toString() === tickerToAddress(initialTokenFrom)) {
+        tokenAIndexFromPath = index
+      }
+
+      if (token.assetAddress.toString() === tickerToAddress(initialTokenTo)) {
+        tokenBIndexFromPath = index
+      }
+    })
+
+    const parsedFee = parsePathFeeToFeeString(initialFee)
+
+    feeTiersArray.forEach((feeTierData, index) => {
+      if (feeTierData.tier.fee.toString() === parsedFee) {
+        feeTierIndexFromPath = index
+      }
+    })
+
+    setTokenAIndex(tokenAIndexFromPath)
+    setTokenBIndex(tokenBIndexFromPath)
+    setPositionTokens(tokenAIndexFromPath, tokenBIndexFromPath, feeTierIndexFromPath)
+
+    setIsLoaded(true)
+  }, [tokens])
+
   const getButtonMessage = useCallback(() => {
     if (tokenAIndex === null || tokenBIndex === null) {
       return 'Select tokens'
@@ -117,19 +156,19 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
     }
 
     // if (
-    //   !tokenAInputState.blocked &&
-    //   printBNtoBN(tokenAInputState.value, tokens[tokenAIndex].decimals).gt(
-    //     tokens[tokenAIndex].balance
-    //   )
+    //   !tokenAInputState.blocked
+    //   // &&
+    //   // printBNtoBN(tokenAInputState.value, tokens[tokenAIndex].decimals).gt(
+    //   //   tokens[tokenAIndex].balance)
     // ) {
     //   return "You don't have enough token A"
     // }
 
     // if (
-    //   !tokenBInputState.blocked &&
-    //   printBNtoBN(tokenBInputState.value, tokens[tokenBIndex].decimals).gt(
-    //     tokens[tokenBIndex].balance
-    //   )
+    //   !tokenBInputState.blocked
+    //   // &&
+    //   // printBNtoBN(tokenBInputState.value, tokens[tokenBIndex].decimals).gt(
+    //   //   tokens[tokenBIndex].balance )
     // ) {
     //   return "You don't have enough token B"
     // }
@@ -236,7 +275,6 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
 
         <FeeSwitch
           onSelect={fee => {
-            console.log(fee)
             setPositionTokens(tokenAIndex, tokenBIndex, fee)
           }}
           feeTiers={feeTiers}
@@ -253,7 +291,40 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
           currency={tokenAIndex !== null ? tokens[tokenAIndex].symbol : null}
           currencyIconSrc={tokenAIndex !== null ? tokens[tokenAIndex].logoURI : undefined}
           placeholder='0.0'
-          onMaxClick={() => {}}
+          onMaxClick={() => {
+            if (tokenAIndex === null) {
+              return
+            }
+
+            // if (tokens[tokenAIndex].assetAddress === WRAPPED_ETH_ADDRESS) {
+            //   if (tokenBIndex !== null && poolIndex === null) {
+            //     tokenAInputState.setValue(
+            //       printBN(
+            //         tokens[tokenAIndex].balance.gt(WETH_POOL_INIT_LAMPORTS)
+            //           ? tokens[tokenAIndex].balance.sub(WETH_POOL_INIT_LAMPORTS)
+            //           : new BN(0),
+            //         tokens[tokenAIndex].decimals
+            //       )
+            //     )
+
+            //     return
+            //   }
+
+            //   tokenAInputState.setValue(
+            //     printBN(
+            //       tokens[tokenAIndex].balance.gt(WETH_MIN_DEPOSIT_SWAP_FROM_AMOUNT)
+            //         ? tokens[tokenAIndex].balance.sub(WETH_MIN_DEPOSIT_SWAP_FROM_AMOUNT)
+            //         : new BN(0),
+            //       tokens[tokenAIndex].decimals
+            //     )
+            //   )
+
+            //   return
+            // }
+            tokenAInputState.setValue(
+              printBN(tokens[tokenAIndex].balance, tokens[tokenAIndex].decimals)
+            )
+          }}
           balanceValue={
             tokenAIndex !== null
               ? printBN(tokens[tokenAIndex].balance, tokens[tokenAIndex].decimals)
@@ -280,7 +351,40 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
           currency={tokenBIndex !== null ? tokens[tokenBIndex].symbol : null}
           currencyIconSrc={tokenBIndex !== null ? tokens[tokenBIndex].logoURI : undefined}
           placeholder='0.0'
-          onMaxClick={() => {}}
+          onMaxClick={() => {
+            if (tokenBIndex === null) {
+              return
+            }
+
+            // if (tokens[tokenBIndex].assetAddress.equals(new PublicKey(WRAPPED_ETH_ADDRESS))) {
+            //   if (tokenAIndex !== null && poolIndex === null) {
+            //     tokenBInputState.setValue(
+            //       printBN(
+            //         tokens[tokenBIndex].balance.gt(WETH_POOL_INIT_LAMPORTS)
+            //           ? tokens[tokenBIndex].balance.sub(WETH_POOL_INIT_LAMPORTS)
+            //           : new BN(0),
+            //         tokens[tokenBIndex].decimals
+            //       )
+            //     )
+
+            //     return
+            //   }
+
+            //   tokenBInputState.setValue(
+            //     printBN(
+            //       tokens[tokenBIndex].balance.gt(WETH_MIN_DEPOSIT_SWAP_FROM_AMOUNT)
+            //         ? tokens[tokenBIndex].balance.sub(WETH_MIN_DEPOSIT_SWAP_FROM_AMOUNT)
+            //         : new BN(0),
+            //       tokens[tokenBIndex].decimals
+            //     )
+            //   )
+
+            //   return
+            // }
+            tokenBInputState.setValue(
+              printBN(tokens[tokenBIndex].balance, tokens[tokenBIndex].decimals)
+            )
+          }}
           balanceValue={
             tokenBIndex !== null
               ? printBN(tokens[tokenBIndex].balance, tokens[tokenBIndex].decimals)
@@ -310,9 +414,8 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
             onAddLiquidity()
           }
         }}
-        // disabled={getButtonMessage() !== 'Add Liquidity'}
-        // content={getButtonMessage()}
-        content='Test create pool'
+        disabled={getButtonMessage() !== 'Add Liquidity'}
+        content={getButtonMessage()}
         progress={progress}
       />
     </Grid>

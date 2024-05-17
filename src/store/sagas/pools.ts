@@ -159,9 +159,8 @@ export function* fetchAllPoolKeys(): Generator {
       TESTNET_INVARIANT_ADDRESS,
       INVARIANT_LOAD_CONFIG
     )
-    console.log(invariant)
+
     const pools = yield* call([invariant, invariant.getPoolKeys], 100n, 1n)
-    console.log(pools as unknown as PoolKey[])
 
     yield* put(actions.setPoolKeys(pools as unknown as PoolKey[])) //TODO
   } catch (error) {

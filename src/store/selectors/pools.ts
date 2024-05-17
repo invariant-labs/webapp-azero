@@ -27,8 +27,7 @@ export const {
 ])
 
 export const poolsArraySortedByFees = createSelector(pools, allPools =>
-  // TODO check if this is correct
-  Object.values(allPools).sort((a, b) => Number(a.feeReceiver) - Number(b.feeReceiver))
+  Object.values(allPools).sort((a, b) => Number(a.poolKey.feeTier.fee - b.poolKey.feeTier.fee))
 )
 
 export const hasTokens = createSelector(tokens, allTokens => !!Object.values(allTokens).length)

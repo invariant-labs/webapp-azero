@@ -24,3 +24,7 @@ export const initialXtoY = (tokenXAddress?: string, tokenYAddress?: string) => {
 
   return isTokeXStablecoin === isTokenYStablecoin || (!isTokeXStablecoin && !isTokenYStablecoin)
 }
+
+export const parsePathFeeToFeeString = (pathFee: string): string => {
+  return (+pathFee.replace('_', '') * Math.pow(10, 8)).toString()
+}

@@ -4,8 +4,7 @@ import {
   TokenAmount,
   calculateSqrtPrice,
   getMaxTick,
-  getMinTick,
-  priceToSqrtPrice
+  getMinTick
 } from '@invariant-labs/a0-sdk'
 import { PlotTickData } from '@store/reducers/positions'
 import axios from 'axios'
@@ -188,27 +187,28 @@ export const toMaxNumericPlaces = (num: number, places: number): string => {
   return num.toFixed(places + Math.abs(log) - 1)
 }
 
-export const calcPrice = (index: bigint, isXtoY: boolean, xDecimal: bigint, yDecimal: bigint) => {
-  //TODO check if this is correct, in Solana sdk was method calculatePriceSqrt which takes index to calculate price
-  const price = calcYPerXPrice(calculateSqrtPrice(index), xDecimal, yDecimal)
+export const calcPrice = (
+  amount: bigint,
+  isXtoY: boolean,
+  xDecimal: bigint,
+  yDecimal: bigint
+): number => {
+  const price = calcYPerXPrice(calculateSqrtPrice(amount), xDecimal, yDecimal)
 
-  return isXtoY ? price : price !== 0 ? 1 / price : Number.MAX_SAFE_INTEGER
+  return isXtoY ? price : 1 / price
 }
 
 export const createPlaceholderLiquidityPlot = (
   isXtoY: boolean,
   yValueToFill: number,
-  tickSpacing: number,
+  tickSpacing: bigint,
   tokenXDecimal: bigint,
   tokenYDecimal: bigint
 ) => {
   const ticksData: PlotTickData[] = []
 
-  // const min = getMinTick(tickSpacing) //TODO check if this is correct
-  // const max = getMaxTick(tickSpacing)
-
-  const min = 10n
-  const max = 1203n
+  const min = getMinTick(tickSpacing) //TODO check if this is correct
+  const max = getMaxTick(tickSpacing)
 
   const minPrice = calcPrice(min, isXtoY, tokenXDecimal, tokenYDecimal)
 
@@ -274,7 +274,7 @@ export const printBN = (amount: TokenAmount, decimals: bigint): string => {
 
   const balanceString = isNegative ? amountString.slice(1) : amountString
 
-  if (balanceString.length <= Number(decimals)) {
+  if (balanceString.length <= parsedDecimals) {
     return (
       // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
       (isNegative ? '-' : '') +
@@ -301,8 +301,6 @@ export const parseFeeToPathFee = (fee: bigint): string => {
 }
 
 export const getNetworkTokensList = (networkType: Network): Record<string, Token> => {
-  console.log(networkType)
-
   switch (networkType) {
     case Network.Mainnet: {
     }
@@ -360,7 +358,10 @@ export const nearestSpacingMultiplicity = (arg: number, spacing: number) => {
 
   const nearest = Math.abs(greater - arg) < Math.abs(lower - arg) ? greater : lower
 
-  return Math.max(Math.min(nearest, Number(getMaxTick(spacing))), Number(getMinTick(spacing)))
+  return Math.max(
+    Math.min(nearest, Number(getMaxTick(BigInt(spacing)))),
+    Number(getMinTick(BigInt(spacing)))
+  )
 }
 
 export const nearestTickIndex = (
@@ -370,20 +371,16 @@ export const nearestTickIndex = (
   xDecimal: bigint,
   yDecimal: bigint
 ) => {
-  //TODO check if this is correct
   try {
     const minTick = getMinTick(spacing)
     const maxTick = getMaxTick(spacing)
+
     const base = Math.max(
       price,
       Number(calcPrice(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
     )
-
     const primaryUnitsPrice = getPrimaryUnitsPrice(base, isXtoY, Number(xDecimal), Number(yDecimal))
-    const log =
-      Math.round(logBase(primaryUnitsPrice, 1.0001)) >= 0
-        ? Math.round(logBase(primaryUnitsPrice, 1.0001))
-        : -Math.round(logBase(primaryUnitsPrice, 1.0001))
+    const log = Math.round(logBase(primaryUnitsPrice, 1.0001))
 
     return BigInt(nearestSpacingMultiplicity(log, Number(spacing)))
   } catch (error) {
@@ -411,4 +408,31 @@ export const printBNtoBN = (amount: string, decimals: number): bigint => {
     )
   }
   return 0n
+}
+
+export enum PositionTokenBlock {
+  None,
+  A,
+  B
+}
+
+export const determinePositionTokenBlock = (
+  currentSqrtPrice: bigint,
+  lowerTick: bigint,
+  upperTick: bigint,
+  isXtoY: boolean
+) => {
+  const lowerPrice = calculateSqrtPrice(lowerTick)
+  const upperPrice = calculateSqrtPrice(upperTick)
+
+  //TODO check if this is correct
+  if (lowerPrice > currentSqrtPrice) {
+    return isXtoY ? PositionTokenBlock.B : PositionTokenBlock.A
+  }
+
+  if (upperPrice < currentSqrtPrice) {
+    return isXtoY ? PositionTokenBlock.A : PositionTokenBlock.B
+  }
+
+  return PositionTokenBlock.None
 }

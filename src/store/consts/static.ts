@@ -112,6 +112,7 @@ const mainnetBestTiersCreator = () => {
 }
 
 export const bestTiers: Record<Network, BestTier[]> = {
+  //TODO add best Tiers
   [Network.Testnet]: [],
   [Network.Mainnet]: [],
   [Network.Local]: []

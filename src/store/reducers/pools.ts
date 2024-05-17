@@ -1,19 +1,9 @@
-import {
-  FeeTier,
-  Pool,
-  PoolKey,
-  TESTNET_BTC_ADDRESS,
-  TESTNET_ETH_ADDRESS,
-  TETSNET_USDC_ADDRESS,
-  Tick
-} from '@invariant-labs/a0-sdk'
+import { FeeTier, Pool, PoolKey, Tick } from '@invariant-labs/a0-sdk'
 import { AddressOrPair } from '@polkadot/api/types'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
-import { BTC, ETH, Token, USDC } from '@store/consts/static'
+import { Token } from '@store/consts/static'
 import { PayloadType } from '@store/consts/types'
 import { stringifyPoolKey } from '@store/consts/utils'
-import { stat } from 'fs'
-import * as R from 'remeda'
 
 export interface PoolWithPoolKey extends Pool {
   poolKey: PoolKey
