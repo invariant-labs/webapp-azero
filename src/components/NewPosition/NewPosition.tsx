@@ -195,7 +195,7 @@ export const NewPosition: React.FC<INewPosition> = ({
 
   const [tokenAIndex, setTokenAIndex] = useState<number | null>(null)
   const [tokenBIndex, setTokenBIndex] = useState<number | null>(null)
-  console.log(leftRange)
+
   const [tokenADeposit, setTokenADeposit] = useState<string>('')
   const [tokenBDeposit, setTokenBDeposit] = useState<string>('')
 
@@ -246,8 +246,9 @@ export const NewPosition: React.FC<INewPosition> = ({
     right: number,
     byFirst: boolean
   ) => {
-    const printIndex = byFirst ? tokenBIndex : tokenAIndex
-    const calcIndex = byFirst ? tokenAIndex : tokenBIndex
+    const [printIndex, calcIndex] = byFirst
+      ? [tokenBIndex, tokenAIndex]
+      : [tokenAIndex, tokenBIndex]
     if (printIndex === null || calcIndex === null) {
       return '0.0'
     }
@@ -307,9 +308,7 @@ export const NewPosition: React.FC<INewPosition> = ({
 
       if (tokenBIndex !== null && +deposit !== 0) {
         setTokenADeposit(deposit)
-        console.log(amount)
         setTokenBDeposit(amount)
-
         return
       }
     }
@@ -327,7 +326,6 @@ export const NewPosition: React.FC<INewPosition> = ({
       )
 
       if (tokenAIndex !== null && +deposit !== 0) {
-        console.log(amount)
         setTokenBDeposit(deposit)
         setTokenADeposit(amount)
       }
@@ -370,13 +368,14 @@ export const NewPosition: React.FC<INewPosition> = ({
   const bestTierIndex =
     tokenAIndex === null || tokenBIndex === null
       ? undefined
-      : bestTiers.find(
-          tier =>
-            (tier.tokenX === tokens[tokenAIndex].assetAddress &&
-              tier.tokenY === tokens[tokenBIndex].assetAddress) ||
-            (tier.tokenX === tokens[tokenBIndex].assetAddress &&
-              tier.tokenY === tokens[tokenAIndex].assetAddress)
-        )?.bestTierIndex ?? undefined
+      : bestTiers.find(tier => {
+          const tokenA = tokens[tokenAIndex].assetAddress
+          const tokenB = tokens[tokenBIndex].assetAddress
+          return (
+            (tier.tokenX === tokenA && tier.tokenY === tokenB) ||
+            (tier.tokenX === tokenB && tier.tokenY === tokenA)
+          )
+        })?.bestTierIndex ?? undefined
 
   const getMinSliderIndex = () => {
     let minimumSliderIndex = 0
@@ -436,7 +435,7 @@ export const NewPosition: React.FC<INewPosition> = ({
 
   const updatePath = (index1: number | null, index2: number | null, fee: number) => {
     const parsedFee = feeTiers[fee].feeValue
-    console.log(parsedFee)
+
     if (index1 != null && index2 != null) {
       const address1 = addressToTicker(tokens[index1].assetAddress.toString())
       const address2 = addressToTicker(tokens[index2].assetAddress.toString())
@@ -486,7 +485,7 @@ export const NewPosition: React.FC<INewPosition> = ({
             style={{
               opacity: poolKey ? 1 : 0
             }}
-            disabled={!!poolKey}
+            disabled={poolKey === ''}
           />
           <Button onClick={handleClickSettings} className={classes.settingsIconBtn} disableRipple>
             <img src={settingIcon} className={classes.settingsIcon} />

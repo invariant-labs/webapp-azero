@@ -44,6 +44,7 @@ export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) 
   yield* put(actions.addPoolsForList({ data: pools, listType: action.payload.listType }))
 }
 
+//TODO check can it be deleted
 export function* handleInitPool(action: PayloadAction<PoolKey>): Generator {
   const loaderKey = createLoaderKey()
   const loaderSigningTx = createLoaderKey()
@@ -74,7 +75,6 @@ export function* handleInitPool(action: PayloadAction<PoolKey>): Generator {
 
     const poolKey = newPoolKey(tokenX, tokenY, feeTier)
 
-    const price = toPrice(1n, 0n)
     const initSqrtPrice = toSqrtPrice(1n, 0n)
 
     const tx = yield* call([invariant, invariant.createPoolTx], poolKey, initSqrtPrice)
@@ -189,7 +189,7 @@ export function* fetchAllPoolKeys(): Generator {
 
     const pools = yield* call([invariant, invariant.getPoolKeys], 100n, 1n)
 
-    yield* put(actions.setPoolKeys(pools as unknown as PoolKey[])) //TODO
+    yield* put(actions.setPoolKeys(pools))
   } catch (error) {
     yield* put(actions.setPoolKeys([]))
     console.log(error)

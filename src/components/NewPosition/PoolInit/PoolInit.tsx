@@ -58,8 +58,9 @@ export const PoolInit: React.FC<IPoolInit> = ({
   )
 
   useEffect(() => {
-    if (nearestTickIndex(+midPriceInput, tickSpacing, isXtoY, xDecimal, yDecimal)) {
-      onChangeMidPrice(nearestTickIndex(+midPriceInput, tickSpacing, isXtoY, xDecimal, yDecimal)!)
+    const TickIndex = nearestTickIndex(+leftInput, tickSpacing, isXtoY, xDecimal, yDecimal)
+    if (TickIndex) {
+      onChangeMidPrice(TickIndex!)
     }
   }, [midPriceInput])
 

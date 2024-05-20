@@ -83,7 +83,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
 
   const [poolKey, setPoolKey] = useState<string>('')
   const [progress, setProgress] = useState<ProgressState>('none')
-  console.log(progress)
+
   const [tokenAIndex, setTokenAIndex] = useState<number | null>(null)
   const [tokenBIndex, setTokenBIndex] = useState<number | null>(null)
 
@@ -218,8 +218,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
 
     return isFetchingNewPool
   }, [isFetchingNewPool, poolIndex])
-
-  console.log(poolKey)
 
   useEffect(() => {
     if (!isWaitingForNewPool && tokenAIndex !== null && tokenBIndex !== null) {
@@ -737,7 +735,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       }
       canCreateNewPool={canUserCreateNewPool}
       canCreateNewPosition={canUserCreateNewPosition}
-      handleAddToken={address => console.log(address)} // TODO - add real data
+      handleAddToken={address => console.log('Add token mock function')} // TODO - add real data
       commonTokens={commonTokensForNetworks[currentNetwork]}
       initialOpeningPositionMethod={initialIsConcentrationOpening ? 'concentration' : 'range'}
       onPositionOpeningMethodChange={setPositionOpeningMethod}
@@ -773,12 +771,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         if (progress === 'none') {
           setProgress('progress')
         }
-        if (tokenAIndex !== null) {
-          console.log()
-        }
-        const lowerTick = Math.min(Number(leftTickIndex), Number(rightTickIndex))
-        const upperTick = Math.max(Number(leftTickIndex), Number(rightTickIndex))
-
         // dispatch(
         //   poolsActions.initPool({
         //     tokenX: tokens[tokenAIndex].assetAddress.toString(),

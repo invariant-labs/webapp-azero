@@ -1,13 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { useEffect, useState } from 'react'
-import { poolTicks, poolsArraySortedByFees, tickMaps } from '@store/selectors/pools'
-import { networkType, rpcAddress, status } from '@store/selectors/connection'
-import { swap } from '@store/selectors/swap'
+import { useEffect } from 'react'
+import { networkType, status } from '@store/selectors/connection'
 import { getCurrentAlephZeroConnection } from '@utils/web3/connection'
-import { Status } from '@store/reducers/connection'
 import { getNetworkTokensList } from '@store/consts/utils'
-import { Token } from '@store/consts/static'
-import { action } from '@storybook/addon-actions'
 import { actions } from '@store/reducers/pools'
 
 const MarketEvents = () => {

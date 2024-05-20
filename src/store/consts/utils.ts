@@ -489,12 +489,11 @@ export const determinePositionTokenBlock = (
   const lowerPrice = calculateSqrtPrice(lowerTick)
   const upperPrice = calculateSqrtPrice(upperTick)
 
-  //TODO check if this is correct
-  if (lowerPrice > currentSqrtPrice) {
+  if (lowerPrice >= currentSqrtPrice) {
     return isXtoY ? PositionTokenBlock.B : PositionTokenBlock.A
   }
 
-  if (upperPrice < currentSqrtPrice) {
+  if (upperPrice <= currentSqrtPrice) {
     return isXtoY ? PositionTokenBlock.A : PositionTokenBlock.B
   }
 

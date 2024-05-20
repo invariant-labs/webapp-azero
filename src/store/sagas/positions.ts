@@ -27,8 +27,9 @@ import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { DEFAULT_CONTRACT_OPTIONS, TokenList } from '@store/consts/static'
 import { Signer } from '@polkadot/api/types'
 import { fetchAllPoolKeys } from './pools'
+import { tokens } from '@store/selectors/pools'
 
-function* handleInitPositionAndPool(action: PayloadAction<InitPositionData>): Generator {
+function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator {
   const loaderCreatePosition = createLoaderKey()
   const loaderTokenX = createLoaderKey()
   const loaderTokenY = createLoaderKey()
@@ -41,7 +42,8 @@ function* handleInitPositionAndPool(action: PayloadAction<InitPositionData>): Ge
     spotSqrtPrice,
     tokenXAmount,
     tokenYAmount,
-    liquidityDelta
+    liquidityDelta,
+    initPool
   } = action.payload
 
   const slippageTolerance = 0n //TODO delete when sdk will be fixed
@@ -64,13 +66,10 @@ function* handleInitPositionAndPool(action: PayloadAction<InitPositionData>): Ge
     const network = yield* select(networkType)
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
+    const tokensList = yield* select(tokens)
 
-    const tokenXName = Object.keys(TokenList).find(
-      key => TokenList[key as keyof typeof TokenList] === tokenX
-    )
-    const tokenYName = Object.keys(TokenList).find(
-      key => TokenList[key as keyof typeof TokenList] === tokenY
-    )
+    const tokenXName = tokensList[tokenX]?.symbol ?? 'first'
+    const tokenYName = tokensList[tokenY]?.symbol ?? 'second'
 
     const psp22 = yield* call(PSP22.load, api, network, walletAddress, DEFAULT_CONTRACT_OPTIONS)
 
@@ -122,10 +121,6 @@ function* handleInitPositionAndPool(action: PayloadAction<InitPositionData>): Ge
       DEFAULT_CONTRACT_OPTIONS
     )
 
-    const initSqrtPrice = toSqrtPrice(1n, 0n)
-
-    const createPoolTx = yield* call([invariant, invariant.createPoolTx], poolKey, initSqrtPrice)
-
     yield put(
       snackbarsActions.add({
         message: 'Signing transaction...',
@@ -135,16 +130,21 @@ function* handleInitPositionAndPool(action: PayloadAction<InitPositionData>): Ge
       })
     )
 
-    const signedCreatePoolTx = yield* call([createPoolTx, createPoolTx.signAsync], walletAddress, {
-      signer: adapter.signer as Signer
-    })
+    if (initPool) {
+      const createPoolTx = yield* call([invariant, invariant.createPoolTx], poolKey, spotSqrtPrice)
 
-    const createPoolResultTx = yield* call(sendTx, signedCreatePoolTx)
+      const signedCreatePoolTx = yield* call(
+        [createPoolTx, createPoolTx.signAsync],
+        walletAddress,
+        {
+          signer: adapter.signer as Signer
+        }
+      )
 
-    console.log(createPoolResultTx)
+      yield* call(sendTx, signedCreatePoolTx)
 
-    //update pool keys
-    yield* call(fetchAllPoolKeys)
+      yield* call(fetchAllPoolKeys)
+    }
 
     const tx = yield* call(
       [invariant, invariant.createPositionTx],
@@ -162,8 +162,6 @@ function* handleInitPositionAndPool(action: PayloadAction<InitPositionData>): Ge
 
     // const txResult = yield* call(sendTx, signedTx)
     const txResult = yield* call(sendAndDebugTx, signedTx, api)
-
-    console.log(txResult)
 
     yield* put(actions.setInitPositionSuccess(true))
 
@@ -184,185 +182,6 @@ function* handleInitPositionAndPool(action: PayloadAction<InitPositionData>): Ge
     console.log(error)
 
     yield* put(actions.setInitPositionSuccess(false))
-
-    closeSnackbar(loaderSigningTx)
-    yield put(snackbarsActions.remove(loaderSigningTx))
-    closeSnackbar(loaderCreatePosition)
-    yield put(snackbarsActions.remove(loaderCreatePosition))
-    closeSnackbar(loaderTokenX)
-    yield put(snackbarsActions.remove(loaderTokenX))
-    closeSnackbar(loaderTokenY)
-    yield put(snackbarsActions.remove(loaderTokenY))
-
-    yield put(
-      snackbarsActions.add({
-        message: 'Failed to send. Please try again.',
-        variant: 'error',
-        persist: false
-      })
-    )
-  }
-}
-
-export function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator {
-  const loaderCreatePosition = createLoaderKey()
-  const loaderTokenX = createLoaderKey()
-  const loaderTokenY = createLoaderKey()
-  const loaderSigningTx = createLoaderKey()
-
-  const {
-    poolKeyData,
-    initPool,
-    lowerTick,
-    upperTick,
-    spotSqrtPrice,
-    tokenXAmount,
-    tokenYAmount,
-    liquidityDelta
-  } = action.payload
-
-  const slippageTolerance = 0n //TODO delete when sdk will be fixed
-
-  const { tokenX, tokenY, feeTier } = poolKeyData
-
-  const poolKey = newPoolKey(tokenX, tokenY, feeTier)
-
-  if (initPool) {
-    return yield* call(handleInitPositionAndPool, action)
-  }
-
-  try {
-    yield put(
-      snackbarsActions.add({
-        message: 'Creating position',
-        variant: 'pending',
-        persist: true,
-        key: loaderCreatePosition
-      })
-    )
-
-    const api = yield* getConnection()
-    const network = yield* select(networkType)
-    const walletAddress = yield* select(address)
-    const adapter = yield* call(getAlephZeroWallet)
-
-    const tokenXName = Object.keys(TokenList).find(
-      key => TokenList[key as keyof typeof TokenList] === tokenX
-    )
-    const tokenYName = Object.keys(TokenList).find(
-      key => TokenList[key as keyof typeof TokenList] === tokenY
-    )
-
-    const psp22 = yield* call(PSP22.load, api, network, tokenX, DEFAULT_CONTRACT_OPTIONS)
-
-    yield put(
-      snackbarsActions.add({
-        message: `Approving ${tokenXName} token for transaction...`,
-        variant: 'pending',
-        persist: true,
-        key: loaderTokenX
-      })
-    )
-
-    yield* call([psp22, psp22.setContractAddress], tokenX)
-    const XTokenTx = yield* call([psp22, psp22.approveTx], TESTNET_INVARIANT_ADDRESS, tokenXAmount)
-    const myBalanceX = yield* call([psp22, psp22.balanceOf], walletAddress)
-
-    const signedXTokenTx = yield* call([XTokenTx, XTokenTx.signAsync], walletAddress, {
-      signer: adapter.signer as Signer
-    })
-    yield* call(sendTx, signedXTokenTx)
-
-    closeSnackbar(loaderTokenX)
-    yield put(snackbarsActions.remove(loaderTokenX))
-
-    yield put(
-      snackbarsActions.add({
-        message: `Approving ${tokenYName} token for transaction...`,
-        variant: 'pending',
-        persist: true,
-        key: loaderTokenY
-      })
-    )
-
-    yield* call([psp22, psp22.setContractAddress], tokenY)
-    const YTokenTx = yield* call([psp22, psp22.approveTx], TESTNET_INVARIANT_ADDRESS, tokenYAmount)
-    const myBalanceY = yield* call([psp22, psp22.balanceOf], walletAddress)
-
-    const signedYTokenTx = yield* call([YTokenTx, YTokenTx.signAsync], walletAddress, {
-      signer: adapter.signer as Signer
-    })
-
-    yield* call(sendTx, signedYTokenTx)
-
-    closeSnackbar(loaderTokenY)
-    yield put(snackbarsActions.remove(loaderTokenY))
-
-    const invariant = yield* call(
-      [Invariant, Invariant.load],
-      api,
-      network,
-      TESTNET_INVARIANT_ADDRESS,
-      DEFAULT_CONTRACT_OPTIONS
-    )
-
-    console.log('poolKey', poolKey)
-    console.log('lowerTick', lowerTick)
-    console.log('upperTick', upperTick)
-    console.log('spotSqrtPrice', spotSqrtPrice)
-    console.log('slippageTolerance', slippageTolerance)
-    console.log('tokenXAmount', tokenXAmount)
-    console.log('tokenYAmount', tokenYAmount)
-    console.log('myBalanceX ', myBalanceX)
-    console.log('myBalanceY ', myBalanceY)
-    console.log('liquidityDelta ', liquidityDelta)
-    const tx = yield* call(
-      [invariant, invariant.createPositionTx],
-      poolKey,
-      lowerTick,
-      upperTick,
-      liquidityDelta,
-      spotSqrtPrice,
-      slippageTolerance
-    )
-
-    yield put(
-      snackbarsActions.add({
-        message: 'Signing transaction...',
-        variant: 'pending',
-        persist: true,
-        key: loaderSigningTx
-      })
-    )
-
-    const signedTx = yield* call([tx, tx.signAsync], walletAddress, {
-      signer: adapter.signer as Signer
-    })
-
-    // const txResult = yield* call(sendTx, signedTx)
-    const txResult = yield* call(sendAndDebugTx, signedTx, api)
-
-    console.log(txResult)
-
-    yield put(
-      snackbarsActions.add({
-        message: 'Position successfully created',
-        variant: 'success',
-        persist: false,
-        txid: txResult.hash
-      })
-    )
-
-    yield* put(actions.setInitPositionSuccess(true))
-
-    closeSnackbar(loaderSigningTx)
-    yield put(snackbarsActions.remove(loaderSigningTx))
-    closeSnackbar(loaderCreatePosition)
-    yield put(snackbarsActions.remove(loaderCreatePosition))
-  } catch (error) {
-    console.log(error)
-
-    yield put(actions.setInitPositionSuccess(false))
 
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
