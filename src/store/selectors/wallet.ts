@@ -46,7 +46,7 @@ export const tokenAccountsAddress = () =>
   })
 
 export interface SwapToken {
-  balance: TokenAmount // TODO check if this is correct type
+  balance: TokenAmount
   decimals: bigint
   symbol: string
   assetAddress: AddressOrPair

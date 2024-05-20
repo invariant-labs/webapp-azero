@@ -13,6 +13,7 @@ export enum Status {
 export interface ITokenAccount {
   address: string
   balance: bigint
+  symbol: string
 }
 // export interface ITokenData {
 //   programId: string
@@ -81,16 +82,16 @@ const walletSlice = createSlice({
     ) {
       return state
     },
-    // addTokenAccount(state, action: PayloadAction<ITokenAccount>) {
-    //   state.accounts[action.payload.programId.toString()] = action.payload
-    //   return state
-    // },
-    // addTokenAccounts(state, action: PayloadAction<ITokenAccount[]>) {
-    //   action.payload.forEach(account => {
-    //     state.accounts[account.programId.toString()] = account
-    //   })
-    //   return state
-    // },
+    addTokenAccount(state, action: PayloadAction<ITokenAccount>) {
+      state.accounts[action.payload.address] = action.payload
+      return state
+    },
+    addTokenAccounts(state, action: PayloadAction<ITokenAccount[]>) {
+      action.payload.forEach(account => {
+        state.accounts[account.address] = account
+      })
+      return state
+    },
     setTokenAccount(state, action: PayloadAction<ITokenAccount>) {
       state.accounts[action.payload.address.toString()] = action.payload
       return state

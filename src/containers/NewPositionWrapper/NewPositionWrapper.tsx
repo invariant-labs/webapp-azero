@@ -75,7 +75,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const { data: ticksData, loading: ticksLoading, hasError: hasTicksError } = useSelector(plotTicks)
   const isFetchingNewPool = useSelector(isLoadingLatestPoolsForTransaction)
   const currentNetwork = useSelector(networkType)
-  console.log(inProgress)
+
   const canUserCreateNewPool = useSelector(canCreateNewPool(currentNetwork))
   const canUserCreateNewPosition = useSelector(canCreateNewPosition(currentNetwork))
 

@@ -12,7 +12,7 @@ import {
 import { createLoaderKey } from '@store/consts/utils'
 import { actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import { Status, actions } from '@store/reducers/wallet'
+import { ITokenAccount, Status, actions } from '@store/reducers/wallet'
 import { address, status } from '@store/selectors/wallet'
 import { disconnectWallet, getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
@@ -27,6 +27,7 @@ import {
   takeLeading
 } from 'typed-redux-saga'
 import { getConnection } from './connection'
+import { networkType } from '@store/selectors/connection'
 
 export function* getWallet(): SagaGenerator<NightlyConnectAdapter> {
   const wallet = yield* call(getAlephZeroWallet)
@@ -267,6 +268,31 @@ export function* signAndSend(
   return txId.toString()
 }
 
+export function* fetchTokensAccounts(): Generator {
+  const api = yield* getConnection()
+  const network = yield* select(networkType)
+  const walletAddress = yield* select(address)
+
+  const psp22 = yield* call(PSP22.load, api, network, walletAddress, DEFAULT_CONTRACT_OPTIONS)
+
+  let tokens: ITokenAccount[] = []
+
+  for (const ticker in TokenList) {
+    const address = TokenList[ticker as keyof typeof TokenList]
+
+    yield* call([psp22, psp22.setContractAddress], address)
+    const balance = yield* call([psp22, psp22.balanceOf], walletAddress)
+
+    tokens.push({
+      address,
+      balance,
+      symbol: ticker as keyof typeof TokenList
+    })
+  }
+
+  yield* put(actions.addTokenAccounts(tokens))
+}
+
 export function* init(): Generator {
   try {
     yield* put(actions.setStatus(Status.Init))
@@ -282,7 +308,7 @@ export function* init(): Generator {
 
     yield* put(actions.setBalance(BigInt(balance)))
     yield* put(actions.setStatus(Status.Initialized))
-    // // yield* call(fetchTokensAccounts)
+    yield* call(fetchTokensAccounts)
     yield* put(actions.setIsBalanceLoading(false))
   } catch (error) {
     console.log(error)

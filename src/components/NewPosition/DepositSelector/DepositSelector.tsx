@@ -155,23 +155,21 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
       return 'Insufficient SOL'
     }
 
-    // if (
-    //   !tokenAInputState.blocked
-    //   // &&
-    //   // printBNtoBN(tokenAInputState.value, tokens[tokenAIndex].decimals).gt(
-    //   //   tokens[tokenAIndex].balance)
-    // ) {
-    //   return "You don't have enough token A"
-    // }
+    if (
+      !tokenAInputState.blocked &&
+      printBNtoBN(tokenAInputState.value, tokens[tokenAIndex].decimals) >=
+        tokens[tokenAIndex].balance
+    ) {
+      return "You don't have enough token A"
+    }
 
-    // if (
-    //   !tokenBInputState.blocked
-    //   // &&
-    //   // printBNtoBN(tokenBInputState.value, tokens[tokenBIndex].decimals).gt(
-    //   //   tokens[tokenBIndex].balance )
-    // ) {
-    //   return "You don't have enough token B"
-    // }
+    if (
+      !tokenBInputState.blocked &&
+      printBNtoBN(tokenBInputState.value, tokens[tokenBIndex].decimals) >=
+        tokens[tokenBIndex].balance
+    ) {
+      return "You don't have enough token B"
+    }
 
     if (
       !tokenAInputState.blocked &&
