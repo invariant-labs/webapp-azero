@@ -112,22 +112,22 @@ const positionsSlice = createSlice({
       state.initPosition.success = action.payload
       return state
     },
-    setPlotTicks(state, action: PayloadAction<PlotTickData[]>) {
-      state.plotTicks.data = action.payload
-      state.plotTicks.loading = false
-      state.plotTicks.hasError = false
-      return state
-    },
-    setErrorPlotTicks(state, action: PayloadAction<PlotTickData[]>) {
-      state.plotTicks.data = action.payload
-      state.plotTicks.loading = false
-      state.plotTicks.hasError = true
-      return state
-    },
-    getCurrentPlotTicks(state, action: PayloadAction<GetCurrentTicksData>) {
-      state.plotTicks.loading = !action.payload.disableLoading
-      return state
-    },
+    // setPlotTicks(state, action: PayloadAction<PlotTickData[]>) {
+    //   state.plotTicks.data = action.payload
+    //   state.plotTicks.loading = false
+    //   state.plotTicks.hasError = false
+    //   return state
+    // },
+    // setErrorPlotTicks(state, action: PayloadAction<PlotTickData[]>) {
+    //   state.plotTicks.data = action.payload
+    //   state.plotTicks.loading = false
+    //   state.plotTicks.hasError = true
+    //   return state
+    // },
+    // getCurrentPlotTicks(state, action: PayloadAction<GetCurrentTicksData>) {
+    //   state.plotTicks.loading = !action.payload.disableLoading
+    //   return state
+    // },
     setPositionsList(state, action: PayloadAction<Position[]>) {
       state.positionsList.list = action.payload
       state.positionsList.loading = false
@@ -137,17 +137,17 @@ const positionsSlice = createSlice({
       state.positionsList.loading = true
       return state
     },
-    getSinglePosition(state, _action: PayloadAction<number>) {
-      return state
-    },
-    setSinglePosition(state, action: PayloadAction<SetPositionData>) {
-      state.positionsList.list[action.payload.index] = action.payload.position
-      return state
-    },
-    getCurrentPositionRangeTicks(state, _action: PayloadAction<string>) {
-      state.currentPositionRangeTicks.loading = true
-      return state
-    },
+    // getSinglePosition(state, _action: PayloadAction<number>) {
+    //   return state
+    // },
+    // setSinglePosition(state, action: PayloadAction<SetPositionData>) {
+    //   state.positionsList.list[action.payload.index] = action.payload.position
+    //   return state
+    // },
+    // getCurrentPositionRangeTicks(state, _action: PayloadAction<string>) {
+    //   state.currentPositionRangeTicks.loading = true
+    //   return state
+    // },
     setCurrentPositionRangeTicks(
       state,
       action: PayloadAction<{ lowerTick?: Tick; upperTick?: Tick }>
@@ -157,17 +157,17 @@ const positionsSlice = createSlice({
         loading: false
       }
       return state
-    },
-    claimFee(state, _action: PayloadAction<number>) {
-      return state
-    },
-    closePosition(state, _action: PayloadAction<ClosePositionData>) {
-      return state
-    },
-    resetState(state) {
-      state = defaultState
-      return state
     }
+    // claimFee(state, _action: PayloadAction<number>) {
+    //   return state
+    // },
+    // closePosition(state, _action: PayloadAction<ClosePositionData>) {
+    //   return state
+    // },
+    // resetState(state) {
+    //   state = defaultState
+    //   return state
+    // }
   }
 })
 

@@ -235,20 +235,20 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   }
 
   useEffect(() => {
-    // if (positionOpeningMethod === 'concentration' && isMountedRef.current) {
-    //   setConcentrationIndex(0)
-    //   const { leftRange, rightRange } = calculateConcentrationRange(
-    //     tickSpacing,
-    //     concentrationArray[0],
-    //     2,
-    //     midPrice.index,
-    //     isXtoY
-    //   )
-    //   changeRangeHandler(leftRange, rightRange)
-    //   autoZoomHandler(leftRange, rightRange, true)
-    // } else {
-    //   changeRangeHandler(leftRange, rightRange)
-    // }
+    if (positionOpeningMethod === 'concentration' && isMountedRef.current) {
+      setConcentrationIndex(0)
+      // const { leftRange, rightRange } = calculateConcentrationRange(
+      //   tickSpacing,
+      //   concentrationArray[0],
+      //   2,
+      //   midPrice.index,
+      //   isXtoY
+      // )
+      changeRangeHandler(leftRange, rightRange)
+      // autoZoomHandler(leftRange, rightRange, true)
+    } else {
+      changeRangeHandler(leftRange, rightRange)
+    }
   }, [positionOpeningMethod])
 
   useEffect(() => {

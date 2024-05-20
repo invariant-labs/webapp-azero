@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect'
-import { IPositionsStore, positionsSliceName, PositionWithAddress } from '../reducers/positions'
+import { IPositionsStore, positionsSliceName } from '../reducers/positions'
 import { AnyProps, keySelectors } from './helpers'
 import { poolsArraySortedByFees } from './pools'
 import { PoolWithPoolKey } from '@store/reducers/pools'
@@ -24,12 +24,12 @@ export interface PoolWithAddressAndIndex extends PoolWithPoolKey {
   poolIndex: number
 }
 
-export interface PositionWithPoolData extends PositionWithAddress {
-  poolData: PoolWithAddressAndIndex
-  tokenX: SwapToken
-  tokenY: SwapToken
-  positionIndex: number
-}
+// export interface PositionWithPoolData extends PositionWithAddress {
+//   poolData: PoolWithAddressAndIndex
+//   tokenX: SwapToken
+//   tokenY: SwapToken
+//   positionIndex: number
+// }
 
 // export const positionsWithPoolsData = createSelector(
 //   poolsArraySortedByFees,

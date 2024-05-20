@@ -94,7 +94,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
 
   const [tokenAIndex, setTokenAIndex] = useState<number | null>(null)
   const [tokenBIndex, setTokenBIndex] = useState<number | null>(null)
-  console.log(tokenAIndex)
+
   const [isLoaded, setIsLoaded] = useState<boolean>(false)
 
   const feeTiersArray = useSelector(feeTiersSelector)
