@@ -3,6 +3,7 @@ import {
   TESTNET_ETH_ADDRESS,
   TETSNET_USDC_ADDRESS
 } from '@invariant-labs/a0-sdk'
+
 import { Network } from '@invariant-labs/a0-sdk/src'
 import { Keyring } from '@polkadot/api'
 import { AddressOrPair } from '@polkadot/api/types'
@@ -140,12 +141,6 @@ export const TokenAirdropAmount = {
   USDC: 50000000n
 }
 
-export const INVARIANT_LOAD_CONFIG = {
-  storageDepositLimit: 100000000000,
-  refTime: 100000000000,
-  proofSize: 100000000000
-}
-
 export const TokenList = {
   BTC: TESTNET_BTC_ADDRESS,
   ETH: TESTNET_ETH_ADDRESS,
@@ -210,4 +205,10 @@ export const USDC_TEST: Token = {
   logoURI:
     'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
   coingeckoId: 'usdc'
+}
+
+export const DEFAULT_CONTRACT_OPTIONS = {
+  storageDepositLimit: 100000000000,
+  refTime: 100000000000,
+  proofSize: 100000000000
 }

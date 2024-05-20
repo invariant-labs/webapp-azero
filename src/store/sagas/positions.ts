@@ -7,27 +7,24 @@ import {
   InitPositionData,
   actions
 } from '@store/reducers/positions'
-import { actions as poolActions } from '@store/reducers/pools'
-import { createLoaderKey } from '@store/consts/utils'
+import { ListType, actions as poolsActions } from '@store/reducers/pools'
+import { createLoaderKey, stringifyPoolKey } from '@store/consts/utils'
 import { closeSnackbar } from 'notistack'
 import {
   Invariant,
-  Keyring,
   PSP22,
+  PoolKey,
   TESTNET_INVARIANT_ADDRESS,
-  getLiquidityByX,
-  getLiquidityByY,
   newPoolKey,
   sendAndDebugTx,
   sendTx,
-  signAndSendTx,
   toSqrtPrice
 } from '@invariant-labs/a0-sdk'
 import { getConnection } from './connection'
 import { networkType } from '@store/selectors/connection'
 import { address } from '@store/selectors/wallet'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
-import { INVARIANT_LOAD_CONFIG } from '@store/consts/static'
+import { DEFAULT_CONTRACT_OPTIONS } from '@store/consts/static'
 import { Signer } from '@polkadot/api/types'
 import { fetchAllPoolKeys } from './pools'
 
@@ -66,7 +63,7 @@ function* handleInitPositionAndPool(action: PayloadAction<InitPositionData>): Ge
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
 
-    const psp22 = yield* call(PSP22.load, api, network, walletAddress, INVARIANT_LOAD_CONFIG)
+    const psp22 = yield* call(PSP22.load, api, network, walletAddress, DEFAULT_CONTRACT_OPTIONS)
 
     yield* call([psp22, psp22.setContractAddress], tokenX)
     const XTokenTx = yield* call([psp22, psp22.approveTx], TESTNET_INVARIANT_ADDRESS, tokenXAmount)
@@ -91,7 +88,7 @@ function* handleInitPositionAndPool(action: PayloadAction<InitPositionData>): Ge
       api,
       network,
       TESTNET_INVARIANT_ADDRESS,
-      INVARIANT_LOAD_CONFIG
+      DEFAULT_CONTRACT_OPTIONS
     )
 
     const initSqrtPrice = toSqrtPrice(1n, 0n)
@@ -210,7 +207,7 @@ export function* handleInitPosition(action: PayloadAction<InitPositionData>): Ge
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
 
-    const psp22 = yield* call(PSP22.load, api, network, tokenX, INVARIANT_LOAD_CONFIG)
+    const psp22 = yield* call(PSP22.load, api, network, tokenX, DEFAULT_CONTRACT_OPTIONS)
 
     yield* call([psp22, psp22.setContractAddress], tokenX)
     const XTokenTx = yield* call([psp22, psp22.approveTx], TESTNET_INVARIANT_ADDRESS, tokenXAmount)
@@ -236,7 +233,7 @@ export function* handleInitPosition(action: PayloadAction<InitPositionData>): Ge
       api,
       network,
       TESTNET_INVARIANT_ADDRESS,
-      INVARIANT_LOAD_CONFIG
+      DEFAULT_CONTRACT_OPTIONS
     )
 
     console.log('poolKey', poolKey)
@@ -310,9 +307,46 @@ export function* handleInitPosition(action: PayloadAction<InitPositionData>): Ge
   }
 }
 
-export function* handleGetCurrentPlotTicks(action: PayloadAction<GetCurrentTicksData>): Generator {}
+export function* handleGetPositionsList() {
+  try {
+    const connection = yield* getConnection()
+    const network = yield* select(networkType)
+    const invariant = yield* call(
+      Invariant.load,
+      connection,
+      network,
+      TESTNET_INVARIANT_ADDRESS,
+      DEFAULT_CONTRACT_OPTIONS
+    )
+    const walletAddress = yield* select(address)
 
-export function* handleGetPositionsList() {}
+    const positions = yield* call([invariant, invariant.getPositions], walletAddress)
+
+    const pools: PoolKey[] = []
+    const poolSet: Set<string> = new Set()
+    for (let i = 0; i < positions.length; i++) {
+      const poolKeyString = stringifyPoolKey(positions[i].poolKey)
+
+      if (!poolSet.has(poolKeyString)) {
+        poolSet.add(poolKeyString)
+        pools.push(positions[i].poolKey)
+      }
+    }
+
+    yield* put(
+      poolsActions.getPoolsDataForList({
+        poolKeys: Array.from(pools),
+        listType: ListType.POSITIONS
+      })
+    )
+
+    yield* put(actions.setPositionsList(positions))
+  } catch (e) {
+    yield* put(actions.setPositionsList([]))
+  }
+}
+
+export function* handleGetCurrentPlotTicks(action: PayloadAction<GetCurrentTicksData>): Generator {}
 
 export function* handleClaimFee(action: PayloadAction<number>) {}
 

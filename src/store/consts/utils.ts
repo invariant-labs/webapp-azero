@@ -1,14 +1,28 @@
 import {
+  Invariant,
   Network,
+  PSP22,
   PoolKey,
+  TESTNET_INVARIANT_ADDRESS,
   TokenAmount,
+  priceToSqrtPrice,
   calculateSqrtPrice,
   getMaxTick,
   getMinTick
 } from '@invariant-labs/a0-sdk'
+import { ApiPromise } from '@polkadot/api'
+import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
 import axios from 'axios'
-import { BTC_TEST, ETH_TEST, Token, TokenPriceData, USDC_TEST, tokensPrices } from './static'
+import {
+  BTC_TEST,
+  DEFAULT_CONTRACT_OPTIONS,
+  ETH_TEST,
+  Token,
+  TokenPriceData,
+  USDC_TEST,
+  tokensPrices
+} from './static'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -300,6 +314,56 @@ export const parseFeeToPathFee = (fee: bigint): string => {
   return parsedFee.slice(0, parsedFee.length - 2) + '_' + parsedFee.slice(parsedFee.length - 2)
 }
 
+export const getTokenDataByAddresses = async (
+  tokens: string[],
+  api: ApiPromise,
+  network: Network
+): Promise<Record<string, Token>> => {
+  const psp22 = await PSP22.load(api, network, '', DEFAULT_CONTRACT_OPTIONS)
+
+  const promises = tokens.flatMap(token => {
+    psp22.setContractAddress(token)
+    return [psp22.tokenSymbol(), psp22.tokenName(), psp22.tokenDecimals()]
+  })
+  const results = await Promise.all(promises)
+
+  const newTokens: Record<string, Token> = {}
+  tokens.forEach((token, index) => {
+    const baseIndex = index * 3
+    newTokens[token] = {
+      symbol: results[baseIndex] as string,
+      address: token,
+      name: results[baseIndex + 1] as string,
+      decimals: results[baseIndex + 2] as bigint,
+      logoURI: ''
+    }
+  })
+  return newTokens
+}
+
+export const getPoolsByPoolKeys = async (
+  poolKeys: PoolKey[],
+  api: ApiPromise,
+  network: Network
+): Promise<PoolWithPoolKey[]> => {
+  const invariant = await Invariant.load(
+    api,
+    network,
+    TESTNET_INVARIANT_ADDRESS,
+    DEFAULT_CONTRACT_OPTIONS
+  )
+
+  const promises = poolKeys.map(({ tokenX, tokenY, feeTier }) =>
+    invariant.getPool(tokenX, tokenY, feeTier)
+  )
+  const pools = await Promise.all(promises)
+
+  return pools.map((pool, index) => ({
+    ...pool,
+    poolKey: poolKeys[index]
+  }))
+}
+
 export const getNetworkTokensList = (networkType: Network): Record<string, Token> => {
   switch (networkType) {
     case Network.Mainnet: {
@@ -390,9 +454,9 @@ export const nearestTickIndex = (
 
 export const stringifyPoolKey = (poolKey: PoolKey) => {
   if (poolKey.tokenX > poolKey.tokenY) {
-    return `${poolKey.tokenX}-${poolKey.tokenY}-${poolKey.feeTier.fee.toString()}`
+    return `${poolKey.tokenX}-${poolKey.tokenY}-${poolKey.feeTier.fee.toString()}-${poolKey.feeTier.tickSpacing.toString()}`
   } else {
-    return `${poolKey.tokenY}-${poolKey.tokenX}-${poolKey.feeTier.fee.toString()}`
+    return `${poolKey.tokenY}-${poolKey.tokenX}-${poolKey.feeTier.fee.toString()}-${poolKey.feeTier.tickSpacing.toString()}`
   }
 }
 

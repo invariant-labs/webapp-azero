@@ -10,9 +10,6 @@ import {
 import { AddressOrPair } from '@polkadot/api/types'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/consts/types'
-export interface PositionWithAddress extends Position {
-  address: AddressOrPair
-}
 
 export interface PositionsListStore {
   list: Position[]

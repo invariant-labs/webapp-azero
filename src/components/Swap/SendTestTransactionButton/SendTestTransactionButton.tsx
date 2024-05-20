@@ -1,6 +1,11 @@
 import { Network, PSP22, initPolkadotApi, sendTx } from '@invariant-labs/a0-sdk'
 import { Button } from '@mui/material'
-import { AlephZeroNetworks, TokenList, getFaucetDeployer } from '@store/consts/static'
+import {
+  AlephZeroNetworks,
+  DEFAULT_CONTRACT_OPTIONS,
+  TokenList,
+  getFaucetDeployer
+} from '@store/consts/static'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { address } from '@store/selectors/wallet'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
@@ -23,19 +28,14 @@ export const SendTestTransactionButton: React.FC = () => {
     }
 
     const api = await initPolkadotApi(Network.Testnet, AlephZeroNetworks.TEST)
-    const psp22 = await PSP22.load(api, Network.Testnet, TokenList.BTC, {
-      storageDepositLimit: 10000000000,
-      refTime: 10000000000,
-      proofSize: 10000000000
-    })
+    const psp22 = await PSP22.load(api, Network.Testnet, TokenList.BTC, DEFAULT_CONTRACT_OPTIONS)
 
     const adapter = await getAlephZeroWallet()
 
     const data = api.createType('Vec<u8>', [])
     const tx = psp22.transferTx(getFaucetDeployer().address, 1000n, data)
 
-    const faucetDeployer = getFaucetDeployer()
-    console.log(await psp22.balanceOf(faucetDeployer.address, walletAddress))
+    console.log(await psp22.balanceOf(walletAddress))
 
     const signedTx = await tx.signAsync(walletAddress, { signer: adapter.signer })
 
