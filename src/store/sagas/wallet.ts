@@ -3,7 +3,12 @@ import { NightlyConnectAdapter } from '@nightlylabs/wallet-selector-polkadot'
 import { AddressOrPair, SubmittableExtrinsic } from '@polkadot/api/types'
 import { SignerOptions } from '@polkadot/api/types/submittable'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { TokenAirdropAmount, TokenList, getFaucetDeployer } from '@store/consts/static'
+import {
+  DEFAULT_CONTRACT_OPTIONS,
+  TokenAirdropAmount,
+  TokenList,
+  getFaucetDeployer
+} from '@store/consts/static'
 import { createLoaderKey } from '@store/consts/utils'
 import { actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
@@ -124,11 +129,7 @@ export function* handleAirdrop(): Generator {
   const data = connection.createType('Vec<u8>', [])
   const notAirdroppedTokens = []
 
-  const psp22 = yield* call(PSP22.load, connection, Network.Testnet, '', {
-    storageDepositLimit: 10000000000,
-    refTime: 10000000000,
-    proofSize: 10000000000
-  })
+  const psp22 = yield* call(PSP22.load, connection, Network.Testnet, '', DEFAULT_CONTRACT_OPTIONS)
 
   for (const ticker in TokenList) {
     const address = TokenList[ticker as keyof typeof TokenList]

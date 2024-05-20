@@ -9,11 +9,12 @@ import {
 } from '@invariant-labs/a0-sdk'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
+import { DEFAULT_CONTRACT_OPTIONS } from '@store/consts/static'
 import {
   createLoaderKey,
-  getFullNewTokensData,
-  getPoolsFromPoolKeys,
-  getTokenBalances
+  getPoolsByPoolKeys,
+  getTokenBalances,
+  getTokenDataByAddresses
 } from '@store/consts/utils'
 import { ListPoolsRequest, actions } from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
@@ -29,28 +30,22 @@ export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) 
   const walletAddress = yield* select(address)
   const connection = yield* call(getConnection)
   const network = yield* select(networkType)
-  const newPools = yield* call(getPoolsFromPoolKeys, action.payload.poolKeys, connection, network)
+  const pools = yield* call(getPoolsByPoolKeys, action.payload.poolKeys, connection, network)
 
   const allTokens = yield* select(tokens)
-  const unknownTokens = new Set<string>()
-  const knownTokens = new Set<string>()
-
-  action.payload.poolKeys.forEach(poolKey => {
-    if (!allTokens[poolKey.tokenX]) {
-      unknownTokens.add(poolKey.tokenX)
-    } else {
-      knownTokens.add(poolKey.tokenX)
-    }
-
-    if (!allTokens[poolKey.tokenY]) {
-      unknownTokens.add(poolKey.tokenY)
-    } else {
-      knownTokens.add(poolKey.tokenY)
-    }
-  })
+  const unknownTokens = new Set(
+    action.payload.poolKeys.flatMap(({ tokenX, tokenY }) =>
+      [tokenX, tokenY].filter(token => !allTokens[token])
+    )
+  )
+  const knownTokens = new Set(
+    action.payload.poolKeys.flatMap(({ tokenX, tokenY }) =>
+      [tokenX, tokenY].filter(token => allTokens[token])
+    )
+  )
 
   const unknownTokensData = yield* call(
-    getFullNewTokensData,
+    getTokenDataByAddresses,
     [...unknownTokens],
     connection,
     network,
@@ -66,7 +61,7 @@ export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) 
   yield* put(actions.addTokens(unknownTokensData))
   yield* put(actions.updateTokenBalances(knownTokenBalances))
 
-  yield* put(actions.addPoolsForList({ data: newPools, listType: action.payload.listType }))
+  yield* put(actions.addPoolsForList({ data: pools, listType: action.payload.listType }))
 }
 
 export function* handleInitPool(action: PayloadAction<PoolKey>) {
@@ -94,11 +89,7 @@ export function* handleInitPool(action: PayloadAction<PoolKey>) {
       api,
       network,
       TESTNET_INVARIANT_ADDRESS,
-      {
-        storageDepositLimit: 100000000000,
-        refTime: 100000000000,
-        proofSize: 100000000000
-      }
+      DEFAULT_CONTRACT_OPTIONS
     )
 
     const poolKey = newPoolKey(tokenX, tokenY, feeTier)
@@ -158,11 +149,7 @@ export function* fetchFeeTiers() {
       api,
       network,
       TESTNET_INVARIANT_ADDRESS,
-      {
-        storageDepositLimit: 10000000000,
-        refTime: 10000000000,
-        proofSize: 10000000000
-      }
+      DEFAULT_CONTRACT_OPTIONS
     )
 
     const feeTiers = yield* call([invariant, invariant.getFeeTiers], walletAddress)

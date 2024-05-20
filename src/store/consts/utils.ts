@@ -11,7 +11,15 @@ import { ApiPromise } from '@polkadot/api'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
 import axios from 'axios'
-import { BTC_TEST, ETH_TEST, Token, TokenPriceData, USDC_TEST, tokensPrices } from './static'
+import {
+  BTC_TEST,
+  DEFAULT_CONTRACT_OPTIONS,
+  ETH_TEST,
+  Token,
+  TokenPriceData,
+  USDC_TEST,
+  tokensPrices
+} from './static'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -306,32 +314,29 @@ export const parseFeeToPathFee = (fee: bigint): string => {
   return parsedFee.slice(0, parsedFee.length - 2) + '_' + parsedFee.slice(parsedFee.length - 2)
 }
 
-export const getFullNewTokensData = async (
+export const getTokenDataByAddresses = async (
   tokens: string[],
   api: ApiPromise,
   network: Network,
   address: string
 ): Promise<Record<string, Token>> => {
-  const psp22 = await PSP22.load(api, network, '')
+  const psp22 = await PSP22.load(api, network, '', DEFAULT_CONTRACT_OPTIONS)
 
-  const promises: Promise<any>[] = []
-  tokens.map(token => {
+  const promises = tokens.flatMap(token => {
     psp22.setContractAddress(token)
-    promises.push(psp22.tokenSymbol())
-    promises.push(psp22.tokenName())
-    promises.push(psp22.tokenDecimals())
-    promises.push(psp22.balanceOf(address))
+    return [psp22.tokenSymbol(), psp22.tokenName(), psp22.tokenDecimals(), psp22.balanceOf(address)]
   })
   const results = await Promise.all(promises)
 
   const newTokens: Record<string, Token> = {}
-  tokens.map((token, index) => {
+  tokens.forEach((token, index) => {
+    const baseIndex = index * 4
     newTokens[token] = {
-      symbol: results[index * 4 - 4] as string,
+      symbol: results[baseIndex] as string,
       address: token,
-      name: results[index * 4 - 3] as string,
-      decimals: results[index * 4 - 2] as bigint,
-      balance: results[index * 4 - 1] as bigint,
+      name: results[baseIndex + 1] as string,
+      decimals: results[baseIndex + 2] as bigint,
+      balance: results[baseIndex + 3] as bigint,
       logoURI: ''
     }
   })
@@ -360,15 +365,20 @@ export const getTokenBalances = async (
   return tokenBalances
 }
 
-export const getPoolsFromPoolKeys = async (
+export const getPoolsByPoolKeys = async (
   poolKeys: PoolKey[],
   api: ApiPromise,
   network: Network
 ): Promise<PoolWithPoolKey[]> => {
-  const invariant = await Invariant.load(api, network, TESTNET_INVARIANT_ADDRESS)
+  const invariant = await Invariant.load(
+    api,
+    network,
+    TESTNET_INVARIANT_ADDRESS,
+    DEFAULT_CONTRACT_OPTIONS
+  )
 
-  const promises = poolKeys.map(poolKey =>
-    invariant.getPool(poolKey.tokenX, poolKey.tokenY, poolKey.feeTier)
+  const promises = poolKeys.map(({ tokenX, tokenY, feeTier }) =>
+    invariant.getPool(tokenX, tokenY, feeTier)
   )
   const pools = await Promise.all(promises)
 

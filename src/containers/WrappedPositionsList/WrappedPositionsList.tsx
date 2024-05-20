@@ -49,6 +49,94 @@ export const WrappedPositionsList: React.FC = () => {
     dispatch(actions.getPositionsList())
   }
 
+  const data = list
+    .map(position => {
+      const pool = allPools[poolKeyToString(position.poolKey)]
+      const tokenX = allTokens[position.poolKey.tokenX]
+      const tokenY = allTokens[position.poolKey.tokenY]
+
+      const lowerPrice = Number(
+        calcYPerXPrice(
+          calculateSqrtPrice(position.lowerTickIndex),
+          allTokens[position.poolKey.tokenX].decimals,
+          allTokens[position.poolKey.tokenY].decimals
+        )
+      )
+      const upperPrice = Number(
+        calcYPerXPrice(
+          calculateSqrtPrice(position.upperTickIndex),
+          allTokens[position.poolKey.tokenX].decimals,
+          allTokens[position.poolKey.tokenY].decimals
+        )
+      )
+
+      const min = Math.min(lowerPrice, upperPrice)
+      const max = Math.max(lowerPrice, upperPrice)
+
+      let tokenXLiq, tokenYLiq
+
+      try {
+        tokenXLiq = +printAmount(
+          getLiquidityByX(
+            position.liquidity,
+            position.lowerTickIndex,
+            position.upperTickIndex,
+            pool.sqrtPrice,
+            true
+          ).amount,
+          Number(allTokens[position.poolKey.tokenX].decimals)
+        )
+      } catch (error) {
+        tokenXLiq = 0
+      }
+
+      try {
+        tokenYLiq = +printAmount(
+          getLiquidityByY(
+            position.liquidity,
+            position.lowerTickIndex,
+            position.upperTickIndex,
+            pool.sqrtPrice,
+            true
+          ).amount,
+          Number(allTokens[position.poolKey.tokenY].decimals)
+        )
+      } catch (error) {
+        tokenYLiq = 0
+      }
+
+      const currentPrice = calcYPerXPrice(
+        pool?.sqrtPrice ?? 0n,
+        allTokens[position.poolKey.tokenX].decimals,
+        allTokens[position.poolKey.tokenY].decimals
+      )
+
+      const valueX = tokenXLiq + tokenYLiq / currentPrice
+      const valueY = tokenYLiq + tokenXLiq * currentPrice
+
+      return {
+        tokenXName: tokenX.symbol,
+        tokenYName: tokenY.symbol,
+        tokenXIcon: tokenX.logoURI,
+        tokenYIcon: tokenY.logoURI,
+        fee: +printAmount(position.poolKey.feeTier.fee, Number(PERCENTAGE_SCALE) - 2),
+        min,
+        max,
+        tokenXLiq,
+        tokenYLiq,
+        valueX,
+        valueY,
+        id: poolKeyToString(position.poolKey),
+        isActive: currentPrice >= min && currentPrice <= max
+      }
+    })
+    .filter(item => {
+      return (
+        item.tokenXName.toLowerCase().includes(value) ||
+        item.tokenYName.toLowerCase().includes(value)
+      )
+    })
+
   return (
     <PositionsList
       initialPage={lastPage}
@@ -59,93 +147,7 @@ export const WrappedPositionsList: React.FC = () => {
       onAddPositionClick={() => {
         navigate('/newPosition')
       }}
-      data={list
-        .map((position, index) => {
-          const pool = allPools[poolKeyToString(position.poolKey)]
-          const tokenX = allTokens[position.poolKey.tokenX]
-          const tokenY = allTokens[position.poolKey.tokenY]
-
-          const lowerPrice = Number(
-            calcYPerXPrice(
-              calculateSqrtPrice(position.lowerTickIndex),
-              allTokens[position.poolKey.tokenX].decimals,
-              allTokens[position.poolKey.tokenY].decimals
-            )
-          )
-          const upperPrice = Number(
-            calcYPerXPrice(
-              calculateSqrtPrice(position.upperTickIndex),
-              allTokens[position.poolKey.tokenX].decimals,
-              allTokens[position.poolKey.tokenY].decimals
-            )
-          )
-
-          const min = Math.min(lowerPrice, upperPrice)
-          const max = Math.max(lowerPrice, upperPrice)
-
-          let tokenXLiq, tokenYLiq
-
-          try {
-            tokenXLiq = +printAmount(
-              getLiquidityByX(
-                position.liquidity,
-                position.lowerTickIndex,
-                position.upperTickIndex,
-                pool.sqrtPrice,
-                true
-              ).amount,
-              Number(allTokens[position.poolKey.tokenX].decimals)
-            )
-          } catch (error) {
-            tokenXLiq = 0
-          }
-
-          try {
-            tokenYLiq = +printAmount(
-              getLiquidityByY(
-                position.liquidity,
-                position.lowerTickIndex,
-                position.upperTickIndex,
-                pool.sqrtPrice,
-                true
-              ).amount,
-              Number(allTokens[position.poolKey.tokenY].decimals)
-            )
-          } catch (error) {
-            tokenYLiq = 0
-          }
-
-          const currentPrice = calcYPerXPrice(
-            pool?.sqrtPrice ?? 0n,
-            allTokens[position.poolKey.tokenX].decimals,
-            allTokens[position.poolKey.tokenY].decimals
-          )
-
-          const valueX = tokenXLiq + tokenYLiq / currentPrice
-          const valueY = tokenYLiq + tokenXLiq * currentPrice
-
-          return {
-            tokenXName: tokenX.symbol,
-            tokenYName: tokenY.symbol,
-            tokenXIcon: tokenX.logoURI,
-            tokenYIcon: tokenY.logoURI,
-            fee: +printAmount(position.poolKey.feeTier.fee, Number(PERCENTAGE_SCALE) - 2),
-            min,
-            max,
-            tokenXLiq,
-            tokenYLiq,
-            valueX,
-            valueY,
-            id: index,
-            isActive: currentPrice >= min && currentPrice <= max
-          }
-        })
-        .filter(item => {
-          return (
-            item.tokenXName.toLowerCase().includes(value) ||
-            item.tokenYName.toLowerCase().includes(value)
-          )
-        })}
+      data={data}
       loading={isLoading}
       showNoConnected={walletStatus !== Status.Initialized}
       itemsPerPage={POSITIONS_PER_PAGE}

@@ -205,3 +205,9 @@ export const USDC_TEST: Token = {
     'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
   coingeckoId: 'usd-coin'
 }
+
+export const DEFAULT_CONTRACT_OPTIONS = {
+  storageDepositLimit: 100000000000,
+  refTime: 100000000000,
+  proofSize: 100000000000
+}
