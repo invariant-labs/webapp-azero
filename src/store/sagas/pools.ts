@@ -61,6 +61,8 @@ export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) 
   yield* put(actions.addTokens(unknownTokensData))
   yield* put(actions.updateTokenBalances(knownTokenBalances))
 
+  console.log(yield* select(tokens))
+
   yield* put(actions.addPoolsForList({ data: pools, listType: action.payload.listType }))
 }
 

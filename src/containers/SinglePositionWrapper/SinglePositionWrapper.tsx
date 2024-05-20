@@ -1,11 +1,6 @@
 import { EmptyPlaceholder } from '@components/EmptyPlaceholder/EmptyPlaceholder'
 import PositionDetails from '@components/PositionDetails/PositionDetails'
-import {
-  calculateFee,
-  calculateSqrtPrice,
-  getLiquidityByX,
-  getLiquidityByY
-} from '@invariant-labs/a0-sdk'
+import { calculateFee, getLiquidityByX, getLiquidityByY } from '@invariant-labs/a0-sdk'
 import { Grid } from '@mui/material'
 import loader from '@static/gif/loader.gif'
 import { TokenPriceData } from '@store/consts/static'
@@ -23,7 +18,7 @@ import { Status } from '@store/reducers/wallet'
 import { networkType } from '@store/selectors/connection'
 import { volumeRanges } from '@store/selectors/pools'
 import {
-  currentPositionRangeTicks,
+  currentPositionTicks,
   isLoadingPositionsList,
   plotTicks,
   singlePositionData
@@ -36,6 +31,7 @@ import { Navigate } from 'react-router-dom'
 import useStyles from './style'
 
 export interface IProps {
+  address: string
   id: number
 }
 
@@ -51,8 +47,8 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   const {
     lowerTick,
     upperTick,
-    loading: rangeTicksLoading
-  } = useSelector(currentPositionRangeTicks)
+    loading: currentPositionTicksLoading
+  } = useSelector(currentPositionTicks)
   const poolsVolumeRanges = useSelector(volumeRanges)
   const walletStatus = useSelector(status)
 
@@ -65,7 +61,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   useEffect(() => {
     if (position && waitingForTicksData === null) {
       setWaitingForTicksData(true)
-      dispatch(actions.getCurrentPositionRangeTicks(id))
+      dispatch(actions.getCurrentPositionTicks(id))
       // dispatch(
       //   actions.getCurrentPlotTicks({
       //     poolIndex: position.poolData.poolIndex,
@@ -76,17 +72,17 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   }, [position])
 
   useEffect(() => {
-    if (waitingForTicksData === true && !rangeTicksLoading) {
+    if (waitingForTicksData === true && !currentPositionTicksLoading) {
       setWaitingForTicksData(false)
     }
-  }, [rangeTicksLoading])
+  }, [currentPositionTicksLoading])
 
   const midPrice = useMemo(() => {
-    if (position) {
+    if (position?.poolData) {
       return {
         index: position.poolData.currentTickIndex,
         x: calcYPerXPrice(
-          position.poolData.sqrtPrice,
+          position.poolData.currentTickIndex,
           position.tokenX.decimals,
           position.tokenY.decimals
         )
@@ -141,7 +137,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
     () =>
       position
         ? calcYPerXPrice(
-            calculateSqrtPrice(position.lowerTickIndex),
+            position.lowerTickIndex,
             position.tokenX.decimals,
             position.tokenY.decimals
           )
@@ -152,7 +148,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
     () =>
       position
         ? calcYPerXPrice(
-            calculateSqrtPrice(position.upperTickIndex),
+            position.upperTickIndex,
             position.tokenX.decimals,
             position.tokenY.decimals
           )
@@ -161,9 +157,9 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   )
   const current = useMemo(
     () =>
-      position
+      position?.poolData
         ? calcYPerXPrice(
-            position.poolData.sqrtPrice,
+            position.poolData.currentTickIndex,
             position.tokenX.decimals,
             position.tokenY.decimals
           )
@@ -388,14 +384,14 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
           name: position.tokenY.symbol,
           icon: position.tokenY.logoURI,
           decimal: position.tokenY.decimals,
-          balance: +printAmount(position.tokenX.balance ?? 0n, Number(position.tokenY.decimals)),
+          balance: +printAmount(position.tokenY.balance ?? 0n, Number(position.tokenY.decimals)),
           liqValue: tokenYLiquidity,
           claimValue: tokenYClaim,
           usdValue:
             typeof tokenYPriceData?.price === 'undefined'
               ? undefined
               : tokenYPriceData.price *
-                +printAmount(position.tokenX.balance ?? 0n, Number(position.tokenY.decimals))
+                +printAmount(position.tokenY.balance ?? 0n, Number(position.tokenY.decimals))
         }}
         tokenYPriceData={tokenYPriceData}
         fee={Number(position.poolKey.feeTier.fee)}

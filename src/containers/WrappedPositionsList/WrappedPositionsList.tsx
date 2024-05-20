@@ -1,5 +1,5 @@
 import { PositionsList } from '@components/PositionsList/PositionsList'
-import { calculateSqrtPrice, getLiquidityByX, getLiquidityByY } from '@invariant-labs/a0-sdk'
+import { getLiquidityByX, getLiquidityByY } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/src/consts'
 import { POSITIONS_PER_PAGE } from '@store/consts/static'
 import { calcYPerXPrice, poolKeyToString, printAmount } from '@store/consts/utils'
@@ -7,7 +7,7 @@ import { actions } from '@store/reducers/positions'
 import { Status } from '@store/reducers/wallet'
 import { pools, tokens } from '@store/selectors/pools'
 import { isLoadingPositionsList, lastPageSelector, positionsList } from '@store/selectors/positions'
-import { status } from '@store/selectors/wallet'
+import { address, status } from '@store/selectors/wallet'
 import { openWalletSelectorModal } from '@utils/web3/selector'
 
 import React, { useEffect, useState } from 'react'
@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 export const WrappedPositionsList: React.FC = () => {
+  const walletAddress = useSelector(address)
   const { list } = useSelector(positionsList)
   const isLoading = useSelector(isLoadingPositionsList)
   const lastPage = useSelector(lastPageSelector)
@@ -50,21 +51,21 @@ export const WrappedPositionsList: React.FC = () => {
   }
 
   const data = list
-    .map(position => {
+    .map((position, index) => {
       const pool = allPools[poolKeyToString(position.poolKey)]
       const tokenX = allTokens[position.poolKey.tokenX]
       const tokenY = allTokens[position.poolKey.tokenY]
 
       const lowerPrice = Number(
         calcYPerXPrice(
-          calculateSqrtPrice(position.lowerTickIndex),
+          position.lowerTickIndex,
           allTokens[position.poolKey.tokenX].decimals,
           allTokens[position.poolKey.tokenY].decimals
         )
       )
       const upperPrice = Number(
         calcYPerXPrice(
-          calculateSqrtPrice(position.upperTickIndex),
+          position.upperTickIndex,
           allTokens[position.poolKey.tokenX].decimals,
           allTokens[position.poolKey.tokenY].decimals
         )
@@ -106,7 +107,7 @@ export const WrappedPositionsList: React.FC = () => {
       }
 
       const currentPrice = calcYPerXPrice(
-        pool?.sqrtPrice ?? 0n,
+        pool?.currentTickIndex ?? 0n,
         allTokens[position.poolKey.tokenX].decimals,
         allTokens[position.poolKey.tokenY].decimals
       )
@@ -126,7 +127,8 @@ export const WrappedPositionsList: React.FC = () => {
         tokenYLiq,
         valueX,
         valueY,
-        id: poolKeyToString(position.poolKey),
+        address: walletAddress,
+        id: index,
         isActive: currentPrice >= min && currentPrice <= max
       }
     })

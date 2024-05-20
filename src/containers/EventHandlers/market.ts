@@ -1,14 +1,8 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { useEffect, useState } from 'react'
-import { poolTicks, poolsArraySortedByFees, tickMaps } from '@store/selectors/pools'
-import { networkType, rpcAddress, status } from '@store/selectors/connection'
-import { swap } from '@store/selectors/swap'
-import { getCurrentAlephZeroConnection } from '@utils/web3/connection'
 import { Status } from '@store/reducers/connection'
-import { getNetworkTokensList } from '@store/consts/utils'
-import { Token } from '@store/consts/static'
-import { action } from '@storybook/addon-actions'
-import { actions } from '@store/reducers/pools'
+import { networkType, status } from '@store/selectors/connection'
+import { getCurrentAlephZeroConnection } from '@utils/web3/connection'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 const MarketEvents = () => {
   const dispatch = useDispatch()
@@ -21,15 +15,15 @@ const MarketEvents = () => {
     console.log(connection)
 
     const connectEvents = () => {
-      let tokens = getNetworkTokensList(network)
+      // let tokens = getNetworkTokensList(network)
 
-      const currentListStr = localStorage.getItem(`CUSTOM_TOKENS_${network}`)
-      const currentList: [] =
-        currentListStr !== null
-          ? JSON.parse(currentListStr)
-              .filter((address: string) => !tokens[address])
-              .map((address: string) => address)
-          : []
+      // const currentListStr = localStorage.getItem(`CUSTOM_TOKENS_${network}`)
+      // const currentList: [] =
+      //   currentListStr !== null
+      //     ? JSON.parse(currentListStr)
+      //         .filter((address: string) => !tokens[address])
+      //         .map((address: string) => address)
+      //     : []
 
       const lastTokenFrom = localStorage.getItem(`INVARIANT_LAST_TOKEN_FROM_${network}`)
       const lastTokenTo = localStorage.getItem(`INVARIANT_LAST_TOKEN_FROM_${network}`)
@@ -68,7 +62,7 @@ const MarketEvents = () => {
       //       console.log(error)
       //     })
 
-      dispatch(actions.addTokens(tokens))
+      // dispatch(actions.addTokens(tokens))
     }
 
     connectEvents()

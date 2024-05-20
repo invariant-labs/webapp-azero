@@ -5,13 +5,13 @@ import { useParams } from 'react-router-dom'
 import useStyles from './styles'
 
 const SinglePositionPage: React.FC = () => {
-  const { id } = useParams()
+  const { address, id } = useParams()
   const { classes } = useStyles()
 
   return (
     <Grid container className={classes.container} justifyContent='center'>
       <Grid item>
-        <SinglePositionWrapper id={id ? +id : -1} />
+        <SinglePositionWrapper address={address ?? ''} id={id ? +id : -1} />
       </Grid>
     </Grid>
   )

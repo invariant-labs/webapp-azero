@@ -13,7 +13,7 @@ export const router = createBrowserRouter(
       <Route path='/pool' element={<ListPage />} />
       <Route path='/stats' element={<StatsPage />} />
       <Route path='/newPosition/:item1?/:item2?/:item3?' element={<NewPositionPage />} />
-      <Route path='/position/:id' element={<SinglePositionPage />} />
+      <Route path='/position/:address/:id' element={<SinglePositionPage />} />
       <Route path='*' element={<Navigate to='/swap' replace />} />
     </Route>
   )

@@ -11,15 +11,7 @@ import { ApiPromise } from '@polkadot/api'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
 import axios from 'axios'
-import {
-  BTC_TEST,
-  DEFAULT_CONTRACT_OPTIONS,
-  ETH_TEST,
-  Token,
-  TokenPriceData,
-  USDC_TEST,
-  tokensPrices
-} from './static'
+import { DEFAULT_CONTRACT_OPTIONS, Token, TokenPriceData, tokensPrices } from './static'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -144,8 +136,8 @@ export const trimZeros = (numStr: string): string => {
 
 export const PRICE_DECIMAL = 24
 
-export const calcYPerXPrice = (sqrtPrice: bigint, xDecimal: bigint, yDecimal: bigint): number => {
-  const sqrt = +printAmount(sqrtPrice, PRICE_DECIMAL)
+export const calcYPerXPrice = (tickIndex: bigint, xDecimal: bigint, yDecimal: bigint): number => {
+  const sqrt = +printAmount(calculateSqrtPrice(tickIndex), PRICE_DECIMAL)
   const proportion = sqrt * sqrt
 
   return proportion / 10 ** Number(yDecimal - xDecimal)
@@ -204,7 +196,7 @@ export const calcPrice = (
   xDecimal: bigint,
   yDecimal: bigint
 ): number => {
-  const price = calcYPerXPrice(calculateSqrtPrice(amount), xDecimal, yDecimal)
+  const price = calcYPerXPrice(amount, xDecimal, yDecimal)
 
   return isXtoY ? price : 1 / price
 }
@@ -390,20 +382,4 @@ export const getPoolsByPoolKeys = async (
 
 export const poolKeyToString = (poolKey: PoolKey): string => {
   return poolKey.tokenX + poolKey.tokenY + poolKey.feeTier.fee + poolKey.feeTier.tickSpacing
-}
-
-export const getNetworkTokensList = (networkType: Network): Record<string, Token> => {
-  const obj: Record<string, Token> = {}
-  switch (networkType) {
-    case Network.Mainnet: {
-    }
-    case Network.Testnet:
-      return {
-        [USDC_TEST.address.toString()]: USDC_TEST,
-        [BTC_TEST.address.toString()]: BTC_TEST,
-        [ETH_TEST.address.toString()]: ETH_TEST
-      }
-    default:
-      return {}
-  }
 }

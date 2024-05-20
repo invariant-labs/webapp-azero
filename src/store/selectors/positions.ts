@@ -9,12 +9,12 @@ import { poolsArraySortedByFees, tokens } from './pools'
 
 const store = (s: AnyProps) => s[positionsSliceName] as IPositionsStore
 
-export const { lastPage, positionsList, plotTicks, currentPositionRangeTicks, initPosition } =
+export const { lastPage, positionsList, plotTicks, currentPositionTicks, initPosition } =
   keySelectors(store, [
     'lastPage',
     'positionsList',
     'plotTicks',
-    'currentPositionRangeTicks',
+    'currentPositionTicks',
     'initPosition'
   ])
 
@@ -64,7 +64,7 @@ export const singlePositionData = (id: number) =>
 export const positionsSelectors = {
   positionsList,
   plotTicks,
-  currentPositionRangeTicks,
+  currentPositionTicks,
   initPosition
 }
 

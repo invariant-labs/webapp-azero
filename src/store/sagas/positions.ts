@@ -47,7 +47,7 @@ export function* handleGetPositionsList() {
   }
 }
 
-export function* handleGetCurrentPositionRangeTicks(action: PayloadAction<bigint>) {
+export function* handleGetCurrentPositionTicks(action: PayloadAction<bigint>) {
   const walletAddress = yield* select(address)
   const connection = yield* getConnection()
   const network = yield* select(networkType)
@@ -71,7 +71,7 @@ export function* handleGetCurrentPositionRangeTicks(action: PayloadAction<bigint
   )
 
   yield put(
-    actions.setCurrentPositionRangeTicks({
+    actions.setCurrentPositionTicks({
       lowerTick,
       upperTick
     })
@@ -82,10 +82,10 @@ export function* getPositionsListHandler(): Generator {
   yield* takeLatest(actions.getPositionsList, handleGetPositionsList)
 }
 
-export function* getCurrentPositionRangeTicksHandler(): Generator {
-  yield* takeEvery(actions.getCurrentPositionRangeTicks, handleGetCurrentPositionRangeTicks)
+export function* getCurrentPositionTicksHandler(): Generator {
+  yield* takeEvery(actions.getCurrentPositionTicks, handleGetCurrentPositionTicks)
 }
 
 export function* positionsSaga(): Generator {
-  yield all([getPositionsListHandler, getCurrentPositionRangeTicksHandler].map(spawn))
+  yield all([getPositionsListHandler, getCurrentPositionTicksHandler].map(spawn))
 }

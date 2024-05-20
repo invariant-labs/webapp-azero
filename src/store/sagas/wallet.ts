@@ -333,7 +333,7 @@ export function* handleDisconnect(): Generator {
 
     yield* put(positionsActions.setPositionsList([]))
     yield* put(
-      positionsActions.setCurrentPositionRangeTicks({
+      positionsActions.setCurrentPositionTicks({
         lowerTick: undefined,
         upperTick: undefined
       })
