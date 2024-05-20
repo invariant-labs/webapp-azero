@@ -1,3 +1,8 @@
+import {
+  TESTNET_BTC_ADDRESS,
+  TESTNET_ETH_ADDRESS,
+  TETSNET_USDC_ADDRESS
+} from '@invariant-labs/a0-sdk'
 import { Network } from '@invariant-labs/a0-sdk/src'
 import { Keyring } from '@polkadot/api'
 import { AddressOrPair } from '@polkadot/api/types'
@@ -134,10 +139,40 @@ export const TokenAirdropAmount = {
   USDC: 50000000n
 }
 
-export enum TokenList {
-  BTC = '5GhF7vS1A2CFWMCck69J8LGh37DgRLjYjjQTA49pAMXUeZ5B',
-  ETH = '5E8qAJ4aU2LC7Dq31cb4H9zR9zM1t5fVBaUZr2qBkJSWeUuL',
-  USDC = '5HJQP6MEFm2Hv42EG286r69LoCkomLgG23hRgYXo2VU2cYn6'
+export const TokenList = {
+  BTC: TESTNET_BTC_ADDRESS,
+  ETH: TESTNET_ETH_ADDRESS,
+  USDC: TETSNET_USDC_ADDRESS
+}
+
+export const BTC: Token = {
+  symbol: 'BTC',
+  address: TESTNET_BTC_ADDRESS,
+  decimals: 8n,
+  name: 'Bitcoin',
+  logoURI:
+    'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E/logo.png',
+  coingeckoId: 'bitcoin'
+}
+
+export const ETH: Token = {
+  symbol: 'ETH',
+  address: TESTNET_ETH_ADDRESS,
+  decimals: 18n,
+  name: 'Ether',
+  logoURI:
+    'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk/logo.png',
+  coingeckoId: 'ethereum'
+}
+
+export const USDC: Token = {
+  symbol: 'USDC',
+  address: TETSNET_USDC_ADDRESS,
+  decimals: 6n,
+  name: 'USDC',
+  logoURI:
+    'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
+  coingeckoId: 'usdc'
 }
 
 export const BTC_TEST: Token = {
@@ -168,4 +203,10 @@ export const USDC_TEST: Token = {
   logoURI:
     'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
   coingeckoId: 'usd-coin'
+}
+
+export const DEFAULT_CONTRACT_OPTIONS = {
+  storageDepositLimit: 100000000000,
+  refTime: 100000000000,
+  proofSize: 100000000000
 }

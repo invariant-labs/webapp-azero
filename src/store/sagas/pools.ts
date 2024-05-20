@@ -1,24 +1,48 @@
-import { call, put, all, spawn, takeEvery, select, takeLatest } from 'typed-redux-saga'
-import { PayloadAction } from '@reduxjs/toolkit'
-import { actions } from '@store/reducers/pools'
-import { getConnection } from './connection'
-import { networkType } from '@store/selectors/connection'
-import { address } from '@store/selectors/wallet'
 import {
   Invariant,
-  newPoolKey,
-  toPrice,
-  sendTx,
-  TESTNET_INVARIANT_ADDRESS,
   PoolKey,
+  TESTNET_INVARIANT_ADDRESS,
+  newPoolKey,
+  sendTx,
+  toPrice,
   toSqrtPrice
 } from '@invariant-labs/a0-sdk'
-
-import { createLoaderKey } from '@store/consts/utils'
-import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import { closeSnackbar } from 'notistack'
-import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { Signer } from '@polkadot/api/types'
+import { PayloadAction } from '@reduxjs/toolkit'
+import { DEFAULT_CONTRACT_OPTIONS } from '@store/consts/static'
+import { createLoaderKey, getPoolsByPoolKeys, getTokenDataByAddresses } from '@store/consts/utils'
+import { ListPoolsRequest, actions } from '@store/reducers/pools'
+import { actions as snackbarsActions } from '@store/reducers/snackbars'
+import { networkType } from '@store/selectors/connection'
+import { tokens } from '@store/selectors/pools'
+import { address } from '@store/selectors/wallet'
+import { getAlephZeroWallet } from '@utils/web3/wallet'
+import { closeSnackbar } from 'notistack'
+import { all, call, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
+import { getConnection } from './connection'
+
+export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) {
+  const connection = yield* call(getConnection)
+  const network = yield* select(networkType)
+  const pools = yield* call(getPoolsByPoolKeys, action.payload.poolKeys, connection, network)
+
+  const allTokens = yield* select(tokens)
+  const unknownTokens = new Set(
+    action.payload.poolKeys.flatMap(({ tokenX, tokenY }) =>
+      [tokenX, tokenY].filter(token => !allTokens[token])
+    )
+  )
+
+  const unknownTokensData = yield* call(
+    getTokenDataByAddresses,
+    [...unknownTokens],
+    connection,
+    network
+  )
+  yield* put(actions.addTokens(unknownTokensData))
+
+  yield* put(actions.addPoolsForList({ data: pools, listType: action.payload.listType }))
+}
 
 export function* handleInitPool(action: PayloadAction<PoolKey>) {
   const loaderKey = createLoaderKey()
@@ -45,11 +69,7 @@ export function* handleInitPool(action: PayloadAction<PoolKey>) {
       api,
       network,
       TESTNET_INVARIANT_ADDRESS,
-      {
-        storageDepositLimit: 100000000000,
-        refTime: 100000000000,
-        proofSize: 100000000000
-      }
+      DEFAULT_CONTRACT_OPTIONS
     )
 
     const poolKey = newPoolKey(tokenX, tokenY, feeTier)
@@ -109,11 +129,7 @@ export function* fetchFeeTiers() {
       api,
       network,
       TESTNET_INVARIANT_ADDRESS,
-      {
-        storageDepositLimit: 10000000000,
-        refTime: 10000000000,
-        proofSize: 10000000000
-      }
+      DEFAULT_CONTRACT_OPTIONS
     )
 
     const feeTiers = yield* call([invariant, invariant.getFeeTiers], walletAddress)
@@ -122,6 +138,10 @@ export function* fetchFeeTiers() {
   } catch (error) {
     console.log(error)
   }
+}
+
+export function* getPoolsDataForListHandler(): Generator {
+  yield* takeEvery(actions.getPoolsDataForList, fetchPoolsDataForList)
 }
 
 export function* initPoolHandler(): Generator {
@@ -133,5 +153,5 @@ export function* fetchFeeTiersHandler(): Generator {
 }
 
 export function* poolsSaga(): Generator {
-  yield all([initPoolHandler, fetchFeeTiersHandler].map(spawn))
+  yield all([initPoolHandler, fetchFeeTiersHandler, getPoolsDataForListHandler].map(spawn))
 }
