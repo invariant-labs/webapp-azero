@@ -59,16 +59,10 @@ export function* handleGetCurrentPositionTicks(action: PayloadAction<bigint>) {
 
   const position = yield* call([invariant, invariant.getPosition], walletAddress, 0n)
 
-  const lowerTick = yield* call(
-    [invariant, invariant.getTick],
-    position.poolKey,
-    position.lowerTickIndex
-  )
-  const upperTick = yield* call(
-    [invariant, invariant.getTick],
-    position.poolKey,
-    position.upperTickIndex
-  )
+  const [lowerTick, upperTick] = yield* all([
+    call([invariant, invariant.getTick], position.poolKey, position.lowerTickIndex),
+    call([invariant, invariant.getTick], position.poolKey, position.upperTickIndex)
+  ])
 
   yield put(
     actions.setCurrentPositionTicks({
