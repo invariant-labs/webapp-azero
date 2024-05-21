@@ -1,18 +1,20 @@
+import { Position } from '@invariant-labs/a0-sdk'
+import { Token } from '@store/consts/static'
+import { poolKeyToString } from '@store/consts/utils'
+import { PoolWithPoolKey } from '@store/reducers/pools'
 import { createSelector } from 'reselect'
-import { IPositionsStore, positionsSliceName, PositionWithAddress } from '../reducers/positions'
+import { IPositionsStore, positionsSliceName } from '../reducers/positions'
 import { AnyProps, keySelectors } from './helpers'
-import { poolsArraySortedByFees } from './pools'
-import { PoolWithAddress } from '@store/reducers/pools'
-import { SwapToken, swapTokensDict } from './wallet'
+import { poolsArraySortedByFees, tokens } from './pools'
 
 const store = (s: AnyProps) => s[positionsSliceName] as IPositionsStore
 
-export const { lastPage, positionsList, plotTicks, currentPositionRangeTicks, initPosition } =
+export const { lastPage, positionsList, plotTicks, currentPositionTicks, initPosition } =
   keySelectors(store, [
     'lastPage',
     'positionsList',
     'plotTicks',
-    'currentPositionRangeTicks',
+    'currentPositionTicks',
     'initPosition'
   ])
 
@@ -20,53 +22,49 @@ export const lastPageSelector = createSelector(lastPage, s => s)
 
 export const isLoadingPositionsList = createSelector(positionsList, s => s.loading)
 
-export interface PoolWithAddressAndIndex extends PoolWithAddress {
+export interface PoolWithPoolKeyAndIndex extends PoolWithPoolKey {
   poolIndex: number
 }
 
-export interface PositionWithPoolData extends PositionWithAddress {
-  poolData: PoolWithAddressAndIndex
-  tokenX: SwapToken
-  tokenY: SwapToken
+export interface PositionWithPoolData extends Position {
+  poolData: PoolWithPoolKeyAndIndex
+  tokenX: Token
+  tokenY: Token
   positionIndex: number
 }
 
 export const positionsWithPoolsData = createSelector(
   poolsArraySortedByFees,
   positionsList,
-  swapTokensDict,
+  tokens,
   (allPools, { list }, tokens) => {
-    const poolsByKey: Record<string, PoolWithAddressAndIndex> = {}
+    const poolsByKey: Record<string, PoolWithPoolKeyAndIndex> = {}
     allPools.forEach((pool, index) => {
-      poolsByKey[pool.address.toString()] = {
+      poolsByKey[poolKeyToString(pool.poolKey)] = {
         ...pool,
         poolIndex: index
       }
     })
 
-    //TODO check if this is correct
     return list.map((position, index) => ({
       ...position,
-      poolData: poolsByKey[position.toString()],
-      tokenX: tokens[poolsByKey[position.tokensOwedX.toString()].poolIndex.toString()],
-      tokenY: tokens[poolsByKey[position.tokensOwedY.toString()].poolIndex.toString()],
+      poolData: poolsByKey[poolKeyToString(position.poolKey)],
+      tokenX: tokens[position.poolKey.tokenX],
+      tokenY: tokens[position.poolKey.tokenY],
       positionIndex: index
     }))
   }
 )
 
-export const singlePositionData = (id: string) =>
+export const singlePositionData = (id: number) =>
   createSelector(positionsWithPoolsData, positions =>
-    // TODO check if this is correct
-    positions.find(
-      position => id === position.address.toString() + '_' + position.poolKey.toString()
-    )
+    positions.find(position => id === position.positionIndex)
   )
 
 export const positionsSelectors = {
   positionsList,
   plotTicks,
-  currentPositionRangeTicks,
+  currentPositionTicks,
   initPosition
 }
 

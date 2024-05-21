@@ -1,21 +1,18 @@
-import React, { useState, useEffect } from 'react'
-import LiquidationRangeInfo from '@components/PositionDetails/LiquidationRangeInfo/LiquidationRangeInfo'
-import { ILiquidityToken } from '../SinglePositionInfo/consts'
-
-import activeLiquidity from '@static/svg/activeLiquidity.svg'
-import useStyles from './style'
-import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
-import { calcPrice } from '@store/consts/utils'
-import { Card, Grid, Tooltip, Typography } from '@mui/material'
-import PriceRangePlot from '@components/PriceRangePlot/PriceRangePlot'
 import PlotTypeSwitch from '@components/PlotTypeSwitch/PlotTypeSwitch'
+import LiquidationRangeInfo from '@components/PositionDetails/LiquidationRangeInfo/LiquidationRangeInfo'
+import { Card, Grid, Tooltip, Typography } from '@mui/material'
+import activeLiquidity from '@static/svg/activeLiquidity.svg'
+import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
+import React, { useState } from 'react'
+import { ILiquidityToken } from '../SinglePositionInfo/consts'
+import useStyles from './style'
 
 export interface ISinglePositionPlot {
   data: PlotTickData[]
   leftRange: TickPlotPositionData
   rightRange: TickPlotPositionData
   midPrice: TickPlotPositionData
-  currentPrice: bigint
+  currentPrice: number
   tokenY: Pick<ILiquidityToken, 'name' | 'decimal'>
   tokenX: Pick<ILiquidityToken, 'name' | 'decimal'>
   ticksLoading: boolean

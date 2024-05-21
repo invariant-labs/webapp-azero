@@ -5,21 +5,13 @@ import {
   PoolKey,
   TESTNET_INVARIANT_ADDRESS,
   TokenAmount,
-  priceToSqrtPrice
+  calculateSqrtPrice
 } from '@invariant-labs/a0-sdk'
 import { ApiPromise } from '@polkadot/api'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
 import axios from 'axios'
-import {
-  BTC_TEST,
-  DEFAULT_CONTRACT_OPTIONS,
-  ETH_TEST,
-  Token,
-  TokenPriceData,
-  USDC_TEST,
-  tokensPrices
-} from './static'
+import { DEFAULT_CONTRACT_OPTIONS, Token, TokenPriceData, tokensPrices } from './static'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -144,8 +136,8 @@ export const trimZeros = (numStr: string): string => {
 
 export const PRICE_DECIMAL = 24
 
-export const calcYPerXPrice = (sqrtPrice: bigint, xDecimal: bigint, yDecimal: bigint): number => {
-  const sqrt = +printAmount(sqrtPrice, PRICE_DECIMAL)
+export const calcYPerXPrice = (tickIndex: bigint, xDecimal: bigint, yDecimal: bigint): number => {
+  const sqrt = +printAmount(calculateSqrtPrice(tickIndex), PRICE_DECIMAL)
   const proportion = sqrt * sqrt
 
   return proportion / 10 ** Number(yDecimal - xDecimal)
@@ -199,15 +191,14 @@ export const toMaxNumericPlaces = (num: number, places: number): string => {
 }
 
 export const calcPrice = (
-  amount: TokenAmount,
+  amount: bigint,
   isXtoY: boolean,
   xDecimal: bigint,
   yDecimal: bigint
-) => {
-  //TODO check if this is correct, in Solana sdk was method calculatePriceSqrt which takes index to calculate price
-  const price = calcYPerXPrice(priceToSqrtPrice(amount), xDecimal, yDecimal)
+): number => {
+  const price = calcYPerXPrice(amount, xDecimal, yDecimal)
 
-  return isXtoY ? price : 1n / price
+  return isXtoY ? price : 1 / price
 }
 
 export const createPlaceholderLiquidityPlot = (
@@ -318,28 +309,52 @@ export const parseFeeToPathFee = (fee: bigint): string => {
 export const getTokenDataByAddresses = async (
   tokens: string[],
   api: ApiPromise,
-  network: Network
+  network: Network,
+  address: string
 ): Promise<Record<string, Token>> => {
   const psp22 = await PSP22.load(api, network, '', DEFAULT_CONTRACT_OPTIONS)
 
   const promises = tokens.flatMap(token => {
     psp22.setContractAddress(token)
-    return [psp22.tokenSymbol(), psp22.tokenName(), psp22.tokenDecimals()]
+    return [psp22.tokenSymbol(), psp22.tokenName(), psp22.tokenDecimals(), psp22.balanceOf(address)]
   })
   const results = await Promise.all(promises)
 
   const newTokens: Record<string, Token> = {}
   tokens.forEach((token, index) => {
-    const baseIndex = index * 3
+    const baseIndex = index * 4
     newTokens[token] = {
       symbol: results[baseIndex] as string,
       address: token,
       name: results[baseIndex + 1] as string,
       decimals: results[baseIndex + 2] as bigint,
+      balance: results[baseIndex + 3] as bigint,
       logoURI: ''
     }
   })
   return newTokens
+}
+
+export const getTokenBalances = async (
+  tokens: string[],
+  api: ApiPromise,
+  network: Network,
+  address: string
+): Promise<[string, bigint][]> => {
+  const psp22 = await PSP22.load(api, network, '')
+
+  const promises: Promise<any>[] = []
+  tokens.map(token => {
+    psp22.setContractAddress(token)
+    promises.push(psp22.balanceOf(address))
+  })
+  const results = await Promise.all(promises)
+
+  const tokenBalances: [string, bigint][] = []
+  tokens.map((token, index) => {
+    tokenBalances.push([token, results[index]])
+  })
+  return tokenBalances
 }
 
 export const getPoolsByPoolKeys = async (
@@ -367,20 +382,4 @@ export const getPoolsByPoolKeys = async (
 
 export const poolKeyToString = (poolKey: PoolKey): string => {
   return poolKey.tokenX + poolKey.tokenY + poolKey.feeTier.fee + poolKey.feeTier.tickSpacing
-}
-
-export const getNetworkTokensList = (networkType: Network): Record<string, Token> => {
-  const obj: Record<string, Token> = {}
-  switch (networkType) {
-    case Network.Mainnet: {
-    }
-    case Network.Testnet:
-      return {
-        [USDC_TEST.address.toString()]: USDC_TEST,
-        [BTC_TEST.address.toString()]: BTC_TEST,
-        [ETH_TEST.address.toString()]: ETH_TEST
-      }
-    default:
-      return {}
-  }
 }

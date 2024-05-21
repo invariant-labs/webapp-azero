@@ -1,20 +1,19 @@
+import MarketIdLabel from '@components/NewPosition/MarketIdLabel/MarketIdLabel'
 import SinglePositionInfo from '@components/PositionDetails/SinglePositionInfo/SinglePositionInfo'
 import SinglePositionPlot from '@components/PositionDetails/SinglePositionPlot/SinglePositionPlot'
 import { TickPlotPositionData } from '@components/PriceRangePlot/PriceRangePlot'
+import { Box, Button, Grid, Typography } from '@mui/material'
+import { AddressOrPair } from '@polkadot/api/types'
 import backIcon from '@static/svg/back-arrow.svg'
+import { TokenPriceData } from '@store/consts/static'
+import { addressToTicker, initialXtoY } from '@store/consts/uiUtiils'
+import { parseFeeToPathFee } from '@store/consts/utils'
+import { PlotTickData } from '@store/reducers/positions'
+import { VariantType } from 'notistack'
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ILiquidityToken } from './SinglePositionInfo/consts'
-import MarketIdLabel from '@components/NewPosition/MarketIdLabel/MarketIdLabel'
-import { VariantType } from 'notistack'
-import { TokenPriceData } from '@store/consts/static'
-import { Percentage } from '@invariant-labs/a0-sdk/src'
 import { useStyles } from './style'
-import { addressToTicker, initialXtoY } from '@store/consts/uiUtiils'
-import { Box, Button, Grid, Typography } from '@mui/material'
-import { parseFeeToPathFee } from '@store/consts/utils'
-import { PlotTickData } from '@store/reducers/positions'
-import { AddressOrPair } from '@polkadot/api/types'
 
 interface IProps {
   tokenXAddress: AddressOrPair
@@ -25,7 +24,7 @@ interface IProps {
   leftRange: TickPlotPositionData
   rightRange: TickPlotPositionData
   midPrice: TickPlotPositionData
-  currentPrice: bigint
+  currentPrice: number
   tokenX: ILiquidityToken
   tokenY: ILiquidityToken
   tokenXPriceData?: TokenPriceData
@@ -34,7 +33,7 @@ interface IProps {
   closePosition: (claimFarmRewards?: boolean) => void
   ticksLoading: boolean
   tickSpacing: number
-  fee: Percentage
+  fee: number
   min: number
   max: number
   initialIsDiscreteValue: boolean
@@ -154,22 +153,22 @@ const PositionDetails: React.FC<IProps> = ({
             detailsData.length
               ? xToY
                 ? detailsData
-                : detailsData.map(tick => ({ ...tick, x: 1n / tick.x })).reverse()
+                : detailsData.map(tick => ({ ...tick, x: 1 / tick.x })).reverse()
               : Array(100)
                   .fill(1)
                   .map((_e, index) => ({
-                    x: BigInt(index),
-                    y: BigInt(index),
+                    x: index,
+                    y: index,
                     index: BigInt(index)
                   }))
           }
-          leftRange={xToY ? leftRange : { ...rightRange, x: 1n / rightRange.x }}
-          rightRange={xToY ? rightRange : { ...leftRange, x: 1n / leftRange.x }}
+          leftRange={xToY ? leftRange : { ...rightRange, x: 1 / rightRange.x }}
+          rightRange={xToY ? rightRange : { ...leftRange, x: 1 / leftRange.x }}
           midPrice={{
             ...midPrice,
-            x: midPrice.x ** (xToY ? 1n : -1n)
+            x: midPrice.x ** (xToY ? 1 : -1)
           }}
-          currentPrice={currentPrice ** (xToY ? 1n : -1n)}
+          currentPrice={currentPrice ** (xToY ? 1 : -1)}
           tokenY={tokenY}
           tokenX={tokenX}
           ticksLoading={ticksLoading}

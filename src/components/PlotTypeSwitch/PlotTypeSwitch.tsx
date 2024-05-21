@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
-import { useSingleTabStyles, useTabsStyles, useStyles } from './style'
+import { Tab, Tabs } from '@mui/material'
 import Continuous from '@static/svg/continuous.svg'
 import Discrete from '@static/svg/discrete.svg'
-import { Tab, Tabs } from '@mui/material'
+import React, { useState } from 'react'
+import { useSingleTabStyles, useStyles, useTabsStyles } from './style'
 
 export interface IPlotTypeSwitch {
   onSwitch: (isDiscrete: boolean) => void
@@ -31,12 +31,20 @@ export const PlotTypeSwitch: React.FC<IPlotTypeSwitch> = ({ onSwitch, initialVal
       classes={tabsClasses}>
       <Tab
         disableRipple
-        label={<img src={Continuous} className={classes.continuous} />}
+        label={
+          <div>
+            <img src={Continuous} className={classes.continuous} />
+          </div>
+        }
         classes={singleTabClasses}
       />
       <Tab
         disableRipple
-        label={<img src={Discrete} className={classes.discrete} />}
+        label={
+          <div>
+            <img src={Discrete} className={classes.discrete} />
+          </div>
+        }
         classes={singleTabClasses}
       />
     </Tabs>
