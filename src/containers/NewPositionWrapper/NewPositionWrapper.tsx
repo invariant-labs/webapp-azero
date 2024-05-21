@@ -246,12 +246,13 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   }, [isWaitingForNewPool, tokenAIndex, tokenBIndex, feeIndex])
 
   useEffect(() => {
-    if (poolsData[poolKey]) {
-      setMidPrice({
-        index: poolsData[poolKey].currentTickIndex,
-        x: calcYPerXPrice(poolsData[poolKey].sqrtPrice, xDecimal, yDecimal) ** (isXtoY ? 1 : -1)
-      })
-    }
+    //TODO - check if this is needed
+    // if (poolsData[poolKey]) {
+    //   setMidPrice({
+    //     index: poolsData[poolKey].currentTickIndex,
+    //     x: calcYPerXPrice(poolsData[poolKey].sqrtPrice, xDecimal, yDecimal) ** (isXtoY ? 1 : -1)
+    //   })
+    // }
   }, [poolIndex, isXtoY, xDecimal, yDecimal, poolsData])
 
   useEffect(() => {
