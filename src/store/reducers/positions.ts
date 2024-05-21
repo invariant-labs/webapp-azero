@@ -55,13 +55,13 @@ export interface GetCurrentTicksData {
 }
 
 export interface ClosePositionData {
-  positionIndex: number
+  positionIndex: bigint
   claimFarmRewards?: boolean
   onSuccess: () => void
 }
 
 export interface SetPositionData {
-  index: number
+  index: bigint
   position: Position
 }
 
@@ -129,14 +129,14 @@ const positionsSlice = createSlice({
       state.positionsList.loading = true
       return state
     },
-    getSinglePosition(state, _action: PayloadAction<number>) {
+    getSinglePosition(state, _action: PayloadAction<bigint>) {
       return state
     },
     setSinglePosition(state, action: PayloadAction<SetPositionData>) {
-      state.positionsList.list[action.payload.index] = action.payload.position
+      state.positionsList.list[Number(action.payload.index)] = action.payload.position
       return state
     },
-    getCurrentPositionTicks(state, _action: PayloadAction<number>) {
+    getCurrentPositionTicks(state, _action: PayloadAction<bigint>) {
       state.currentPositionTicks.loading = true
       return state
     },
@@ -147,7 +147,7 @@ const positionsSlice = createSlice({
       }
       return state
     },
-    claimFee(state, _action: PayloadAction<number>) {
+    claimFee(state, _action: PayloadAction<bigint>) {
       return state
     },
     closePosition(state, _action: PayloadAction<ClosePositionData>) {

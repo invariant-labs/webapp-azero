@@ -2,12 +2,13 @@ import MarketIdLabel from '@components/NewPosition/MarketIdLabel/MarketIdLabel'
 import SinglePositionInfo from '@components/PositionDetails/SinglePositionInfo/SinglePositionInfo'
 import SinglePositionPlot from '@components/PositionDetails/SinglePositionPlot/SinglePositionPlot'
 import { TickPlotPositionData } from '@components/PriceRangePlot/PriceRangePlot'
+import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { Box, Button, Grid, Typography } from '@mui/material'
 import { AddressOrPair } from '@polkadot/api/types'
 import backIcon from '@static/svg/back-arrow.svg'
 import { TokenPriceData } from '@store/consts/static'
 import { addressToTicker, initialXtoY } from '@store/consts/uiUtiils'
-import { parseFeeToPathFee } from '@store/consts/utils'
+import { parseFeeToPathFee, printAmount } from '@store/consts/utils'
 import { PlotTickData } from '@store/reducers/positions'
 import { VariantType } from 'notistack'
 import React, { useState } from 'react'
@@ -33,7 +34,7 @@ interface IProps {
   closePosition: (claimFarmRewards?: boolean) => void
   ticksLoading: boolean
   tickSpacing: number
-  fee: number
+  fee: bigint
   min: number
   max: number
   initialIsDiscreteValue: boolean
@@ -96,7 +97,7 @@ const PositionDetails: React.FC<IProps> = ({
         </Link>
 
         <SinglePositionInfo
-          fee={1n} //add real data
+          fee={+printAmount(fee, Number(PERCENTAGE_SCALE) - 2)}
           onClickClaimFee={onClickClaimFee}
           closePosition={closePosition}
           tokenX={tokenX}
