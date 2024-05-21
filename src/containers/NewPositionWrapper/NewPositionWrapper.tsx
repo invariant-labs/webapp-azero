@@ -1,19 +1,15 @@
 import NewPosition from '@components/NewPosition/NewPosition'
 import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import {
-  PoolKey,
   TokenAmount,
   calculateSqrtPrice,
   getLiquidityByX,
   getLiquidityByY,
-  priceToSqrtPrice,
-  sqrtPriceToPrice,
-  toSqrtPrice
+  newPoolKey
 } from '@invariant-labs/a0-sdk'
 import { AddressOrPair } from '@polkadot/api/types'
 import {
   PositionOpeningMethod,
-  TokenList,
   TokenPriceData,
   bestTiers,
   commonTokensForNetworks
@@ -28,7 +24,6 @@ import {
   stringifyPoolKey
 } from '@store/consts/utils'
 import { actions as positionsActions, TickPlotPositionData } from '@store/reducers/positions'
-import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Status } from '@store/reducers/wallet'
 import { actions as poolsActions } from '@store/reducers/pools'
 import { networkType } from '@store/selectors/connection'
@@ -43,10 +38,8 @@ import {
 import { initPosition, plotTicks } from '@store/selectors/positions'
 import { canCreateNewPool, canCreateNewPosition, status, swapTokens } from '@store/selectors/wallet'
 import { getCurrentAlephZeroConnection } from '@utils/web3/connection'
-import { VariantType } from 'notistack'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { set } from 'remeda'
 import { openWalletSelectorModal } from '@utils/web3/selector'
 
 export interface IProps {
@@ -356,11 +349,13 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       progress === 'approvedWithSuccess'
     ) {
       dispatch(
-        poolsActions.getPoolData({
-          tokenX: tokens[tokenAIndex].assetAddress.toString(),
-          tokenY: tokens[tokenBIndex].assetAddress.toString(),
-          feeTier: feeTiersArray[feeIndex].tier
-        })
+        poolsActions.getPoolData(
+          newPoolKey(
+            tokens[tokenAIndex].assetAddress.toString(),
+            tokens[tokenBIndex].assetAddress.toString(),
+            feeTiersArray[feeIndex].tier
+          )
+        )
       )
     }
   }, [progress])
@@ -593,11 +588,11 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     if (openPosition && tokenAIndex !== null && tokenBIndex !== null) {
       dispatch(
         positionsActions.initPosition({
-          poolKeyData: {
-            tokenX: tokens[tokenAIndex].assetAddress.toString(),
-            tokenY: tokens[tokenBIndex].assetAddress.toString(),
-            feeTier: feeTiersArray[feeIndex].tier
-          },
+          poolKeyData: newPoolKey(
+            tokens[tokenAIndex].assetAddress.toString(),
+            tokens[tokenBIndex].assetAddress.toString(),
+            feeTiersArray[feeIndex].tier
+          ),
           lowerTick: leftTick,
           upperTick: rightTick,
           liquidityDelta: liquidityRef.current,
@@ -699,11 +694,13 @@ export const NewPositionWrapper: React.FC<IProps> = ({
           tokenBIndex !== null
         ) {
           dispatch(
-            poolsActions.getPoolData({
-              tokenX: tokens[tokenAIndex].assetAddress.toString(),
-              tokenY: tokens[tokenBIndex].assetAddress.toString(),
-              feeTier: feeTiersArray[feeIndex].tier
-            })
+            poolsActions.getPoolData(
+              newPoolKey(
+                tokens[tokenAIndex].assetAddress.toString(),
+                tokens[tokenBIndex].assetAddress.toString(),
+                feeTiersArray[feeIndex].tier
+              )
+            )
           )
         }
 

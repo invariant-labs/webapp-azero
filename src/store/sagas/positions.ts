@@ -48,9 +48,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
 
   const slippageTolerance = 0n //TODO delete when sdk will be fixed
 
-  const { tokenX, tokenY, feeTier } = poolKeyData
-
-  const poolKey = newPoolKey(tokenX, tokenY, feeTier)
+  const { tokenX, tokenY } = poolKeyData
 
   try {
     yield put(
@@ -131,7 +129,11 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     )
 
     if (initPool) {
-      const createPoolTx = yield* call([invariant, invariant.createPoolTx], poolKey, spotSqrtPrice)
+      const createPoolTx = yield* call(
+        [invariant, invariant.createPoolTx],
+        poolKeyData,
+        spotSqrtPrice
+      )
 
       const signedCreatePoolTx = yield* call(
         [createPoolTx, createPoolTx.signAsync],
@@ -148,7 +150,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
 
     const tx = yield* call(
       [invariant, invariant.createPositionTx],
-      poolKey,
+      poolKeyData,
       lowerTick,
       upperTick,
       liquidityDelta,
