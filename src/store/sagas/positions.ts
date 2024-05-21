@@ -24,10 +24,10 @@ import { getConnection } from './connection'
 import { networkType } from '@store/selectors/connection'
 import { address } from '@store/selectors/wallet'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
-import { DEFAULT_CONTRACT_OPTIONS, TokenList } from '@store/consts/static'
 import { Signer } from '@polkadot/api/types'
 import { fetchAllPoolKeys } from './pools'
 import { tokens } from '@store/selectors/pools'
+import { DEFAULT_CONTRACT_OPTIONS } from '@store/consts/static'
 
 function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator {
   const loaderCreatePosition = createLoaderKey()
@@ -243,48 +243,45 @@ export function* handleGetPositionsList() {
   }
 }
 
-export function* handleGetCurrentPlotTicks(action: PayloadAction<GetCurrentTicksData>): Generator {}
+export function* handleGetCurrentPositionTicks(action: PayloadAction<number>) {
+  const walletAddress = yield* select(address)
+  const connection = yield* getConnection()
+  const network = yield* select(networkType)
+  const invariant = yield* call(Invariant.load, connection, network, TESTNET_INVARIANT_ADDRESS, {
+    storageDepositLimit: 10000000000,
+    refTime: 10000000000,
+    proofSize: 10000000000
+  })
 
-export function* handleClaimFee(action: PayloadAction<number>) {}
+  const position = yield* call([invariant, invariant.getPosition], walletAddress, 0n)
 
-export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {}
+  const [lowerTick, upperTick] = yield* all([
+    call([invariant, invariant.getTick], position.poolKey, position.lowerTickIndex),
+    call([invariant, invariant.getTick], position.poolKey, position.upperTickIndex)
+  ])
 
-export function* handleGetSinglePosition(action: PayloadAction<number>) {}
-
-export function* handleGetCurrentPositionRangeTicks(action: PayloadAction<string>) {}
+  yield put(
+    actions.setCurrentPositionTicks({
+      lowerTick,
+      upperTick
+    })
+  )
+}
 
 export function* initPositionHandler(): Generator {
   yield* takeEvery(actions.initPosition, handleInitPosition)
 }
-// export function* getCurrentPlotTicksHandler(): Generator {
-//   yield* takeLatest(actions.getCurrentPlotTicks, handleGetCurrentPlotTicks)
-// }
+
 export function* getPositionsListHandler(): Generator {
   yield* takeLatest(actions.getPositionsList, handleGetPositionsList)
 }
-// export function* claimFeeHandler(): Generator {
-//   yield* takeEvery(actions.claimFee, handleClaimFee)
-// }
-// export function* closePositionHandler(): Generator {
-//   yield* takeEvery(actions.closePosition, handleClosePosition)
-// }
-// export function* getSinglePositionHandler(): Generator {
-//   yield* takeEvery(actions.getSinglePosition, handleGetSinglePosition)
-// }
-// export function* getCurrentPositionRangeTicksHandler(): Generator {
-//   yield* takeEvery(actions.getCurrentPositionRangeTicks, handleGetCurrentPositionRangeTicks)
-// }
+
+export function* getCurrentPositionTicksHandler(): Generator {
+  yield* takeEvery(actions.getCurrentPositionTicks, handleGetCurrentPositionTicks)
+}
 
 export function* positionsSaga(): Generator {
   yield all(
-    [
-      initPositionHandler,
-      // getCurrentPlotTicksHandler,
-      getPositionsListHandler
-      // claimFeeHandler,
-      // closePositionHandler,
-      // getSinglePositionHandler,
-      // getCurrentPositionRangeTicksHandler
-    ].map(spawn)
+    [initPositionHandler, getPositionsListHandler, getCurrentPositionTicksHandler].map(spawn)
   )
 }

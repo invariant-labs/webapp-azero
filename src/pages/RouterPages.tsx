@@ -1,9 +1,10 @@
-import { Route, createBrowserRouter, createRoutesFromElements } from 'react-router-dom'
-import SwapPage from './SwapPage'
-import StatsPage from './Stats'
-import RootPage from './RootPage'
+import { Navigate, Route, createBrowserRouter, createRoutesFromElements } from 'react-router-dom'
 import ListPage from './ListPage'
 import NewPositionPage from './NewPositionPage'
+import RootPage from './RootPage'
+import SinglePositionPage from './SinglePositionPage'
+import StatsPage from './Stats'
+import SwapPage from './SwapPage'
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -12,6 +13,8 @@ export const router = createBrowserRouter(
       <Route path='/pool' element={<ListPage />} />
       <Route path='/stats' element={<StatsPage />} />
       <Route path='/newPosition/:item1?/:item2?/:item3?' element={<NewPositionPage />} />
+      <Route path='/position/:address/:id' element={<SinglePositionPage />} />
+      <Route path='*' element={<Navigate to='/swap' replace />} />
     </Route>
   )
 )

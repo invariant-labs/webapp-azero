@@ -9,7 +9,12 @@ import {
 } from '@invariant-labs/a0-sdk'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { createLoaderKey, getPoolsByPoolKeys, getTokenDataByAddresses } from '@store/consts/utils'
+import {
+  createLoaderKey,
+  getPoolsByPoolKeys,
+  getTokenBalances,
+  getTokenDataByAddresses
+} from '@store/consts/utils'
 import { ListPoolsRequest, actions } from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { networkType } from '@store/selectors/connection'
@@ -22,6 +27,7 @@ import { getConnection } from './connection'
 import { DEFAULT_CONTRACT_OPTIONS, TokenList } from '@store/consts/static'
 
 export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) {
+  const walletAddress = yield* select(address)
   const connection = yield* call(getConnection)
   const network = yield* select(networkType)
   const pools = yield* call(getPoolsByPoolKeys, action.payload.poolKeys, connection, network)
@@ -32,14 +38,30 @@ export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) 
       [tokenX, tokenY].filter(token => !allTokens[token])
     )
   )
+  const knownTokens = new Set(
+    action.payload.poolKeys.flatMap(({ tokenX, tokenY }) =>
+      [tokenX, tokenY].filter(token => allTokens[token])
+    )
+  )
 
   const unknownTokensData = yield* call(
     getTokenDataByAddresses,
     [...unknownTokens],
     connection,
-    network
+    network,
+    walletAddress
+  )
+  const knownTokenBalances = yield* call(
+    getTokenBalances,
+    [...knownTokens],
+    connection,
+    network,
+    walletAddress
   )
   yield* put(actions.addTokens(unknownTokensData))
+  yield* put(actions.updateTokenBalances(knownTokenBalances))
+
+  console.log(yield* select(tokens))
 
   yield* put(actions.addPoolsForList({ data: pools, listType: action.payload.listType }))
 }

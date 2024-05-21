@@ -1,9 +1,8 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { useEffect } from 'react'
+import { Status } from '@store/reducers/connection'
 import { networkType, status } from '@store/selectors/connection'
 import { getCurrentAlephZeroConnection } from '@utils/web3/connection'
-import { getNetworkTokensList } from '@store/consts/utils'
-import { actions } from '@store/reducers/pools'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 const MarketEvents = () => {
   const dispatch = useDispatch()
@@ -14,15 +13,15 @@ const MarketEvents = () => {
     const connection = getCurrentAlephZeroConnection()
 
     const connectEvents = () => {
-      let tokens = getNetworkTokensList(network)
+      // let tokens = getNetworkTokensList(network)
 
-      const currentListStr = localStorage.getItem(`CUSTOM_TOKENS_${network}`)
-      const currentList: [] =
-        currentListStr !== null
-          ? JSON.parse(currentListStr)
-              .filter((address: string) => !tokens[address])
-              .map((address: string) => address)
-          : []
+      // const currentListStr = localStorage.getItem(`CUSTOM_TOKENS_${network}`)
+      // const currentList: [] =
+      //   currentListStr !== null
+      //     ? JSON.parse(currentListStr)
+      //         .filter((address: string) => !tokens[address])
+      //         .map((address: string) => address)
+      //     : []
 
       const lastTokenFrom = localStorage.getItem(`INVARIANT_LAST_TOKEN_FROM_${network}`)
       const lastTokenTo = localStorage.getItem(`INVARIANT_LAST_TOKEN_FROM_${network}`)
@@ -61,7 +60,7 @@ const MarketEvents = () => {
       //       console.log(error)
       //     })
 
-      dispatch(actions.addTokens(tokens))
+      // dispatch(actions.addTokens(tokens))
     }
 
     connectEvents()

@@ -12,7 +12,7 @@ import {
 import { createLoaderKey, getTokenBalances } from '@store/consts/utils'
 import { actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import { Status, actions } from '@store/reducers/wallet'
+import { ITokenBalance, Status, actions } from '@store/reducers/wallet'
 import { address, status } from '@store/selectors/wallet'
 import { disconnectWallet, getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
@@ -274,9 +274,14 @@ export function* fetchTokensBalances(): Generator {
   const walletAddress = yield* select(address)
 
   const tokens = Object.values(TokenList)
-  const promises = yield* call(getTokenBalances, tokens, api, network, walletAddress)
+  const balances = yield* call(getTokenBalances, tokens, api, network, walletAddress)
 
-  yield* put(actions.addTokenBalances(promises))
+  const convertedBalances: ITokenBalance[] = balances.map(balance => ({
+    address: balance[0],
+    balance: balance[1]
+  }))
+
+  yield* put(actions.addTokenBalances(convertedBalances))
 }
 
 export function* init(): Generator {
@@ -327,7 +332,7 @@ export function* handleDisconnect(): Generator {
 
     yield* put(positionsActions.setPositionsList([]))
     yield* put(
-      positionsActions.setCurrentPositionRangeTicks({
+      positionsActions.setCurrentPositionTicks({
         lowerTick: undefined,
         upperTick: undefined
       })

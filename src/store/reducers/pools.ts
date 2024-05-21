@@ -114,6 +114,15 @@ const poolsSlice = createSlice({
       }
       return state
     },
+    updateTokenBalances(state, action: PayloadAction<[string, bigint][]>) {
+      action.payload.map(pair => {
+        state.tokens[pair[0]] = {
+          ...state.tokens[pair[0]],
+          balance: pair[1]
+        }
+      })
+      return state
+    },
     setPoolKeys(state, action: PayloadAction<PoolKey[]>) {
       action.payload.map(poolKey => {
         const keyStringified = stringifyPoolKey(poolKey)

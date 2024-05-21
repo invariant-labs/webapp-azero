@@ -125,9 +125,9 @@ export const PositionsList: React.FC<IProps> = ({
           paginator(page).data.map((element, index) => (
             <Grid
               onClick={() => {
-                navigate(`/position/${element.id}`)
+                navigate(`/position/${element.address}/${element.id}`)
               }}
-              key={element.id + (page * 5 - 5 + index)}
+              key={element.address + element.id}
               className={classes.itemLink}>
               <PositionItem key={index} {...element} />
             </Grid>

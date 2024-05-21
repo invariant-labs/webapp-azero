@@ -32,6 +32,7 @@ export interface Token {
   decimals: bigint
   name: string
   logoURI: string
+  balance?: bigint
   coingeckoId?: string
   isUnknown?: boolean
 }
@@ -169,36 +170,6 @@ export const ETH: Token = {
 }
 
 export const USDC: Token = {
-  symbol: 'USDC',
-  address: TESTNET_USDC_ADDRESS,
-  decimals: 6n,
-  name: 'USDC',
-  logoURI:
-    'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
-  coingeckoId: 'usdc'
-}
-
-export const BTC_TEST: Token = {
-  symbol: 'BTC',
-  address: TESTNET_BTC_ADDRESS,
-  decimals: 8n,
-  name: 'Bitcoin',
-  logoURI:
-    'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E/logo.png',
-  coingeckoId: 'bitcoin'
-}
-
-export const ETH_TEST: Token = {
-  symbol: 'ETH',
-  address: TESTNET_ETH_ADDRESS,
-  decimals: 18n,
-  name: 'Ether',
-  logoURI:
-    'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk/logo.png',
-  coingeckoId: 'ethereum'
-}
-
-export const USDC_TEST: Token = {
   symbol: 'USDC',
   address: TESTNET_USDC_ADDRESS,
   decimals: 6n,

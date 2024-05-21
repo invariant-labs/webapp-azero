@@ -1,15 +1,14 @@
+import ClosePositionWarning from '@components/Modals/ClosePositionWarning/ClosePositionWarning'
+import { Percentage } from '@invariant-labs/a0-sdk/src'
+import { Button, Grid, Typography } from '@mui/material'
 import icons from '@static/icons'
+import { TokenPriceData } from '@store/consts/static'
+import { blurContent, unblurContent } from '@utils/uiUtils'
 import classNames from 'classnames'
 import React, { useState } from 'react'
 import { BoxInfo } from './BoxInfo'
 import { ILiquidityToken } from './consts'
 import useStyles from './style'
-import { TokenPriceData } from '@store/consts/static'
-import { Box, Button, Grid, Typography } from '@mui/material'
-import { blurContent, unblurContent } from '@utils/uiUtils'
-import { useNavigate } from 'react-router-dom'
-import ClosePositionWarning from '@components/Modals/ClosePositionWarning/ClosePositionWarning'
-import { Percentage } from '@invariant-labs/a0-sdk/src'
 
 interface IProp {
   fee: Percentage
@@ -41,7 +40,6 @@ const SinglePositionInfo: React.FC<IProp> = ({
   const [isModalOpen, setIsModalOpen] = useState(false)
   const { classes } = useStyles()
 
-  const navigate = useNavigate()
   return (
     <Grid className={classes.root}>
       <ClosePositionWarning
@@ -102,18 +100,6 @@ const SinglePositionInfo: React.FC<IProp> = ({
             }}>
             Close position
           </Button>
-          {/* Test it */}
-          <Box sx={{ display: { sm: 'none', md: 'block' } }}>
-            {' '}
-            <Button
-              className={classes.button}
-              variant='contained'
-              onClick={() => {
-                navigate('/newPosition')
-              }}>
-              <span className={classes.buttonText}>+ Add Liquidity</span>
-            </Button>
-          </Box>
         </Grid>
       </Grid>
       <Grid className={classes.bottomGrid}>
