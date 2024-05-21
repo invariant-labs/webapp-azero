@@ -10,10 +10,9 @@ export enum Status {
   Initialized = 'initalized'
 }
 
-export interface ITokenAccount {
+export interface ITokenBalance {
   address: string
   balance: bigint
-  symbol: string
 }
 // export interface ITokenData {
 //   programId: string
@@ -34,7 +33,7 @@ export interface IAlephZeroWallet {
   status: Status
   address: string
   balance: TokenAmount
-  accounts: { [key in string]: ITokenAccount }
+  tokensBalances: { [key in string]: ITokenBalance }
   balanceLoading: boolean
 }
 
@@ -42,7 +41,7 @@ export const defaultState: IAlephZeroWallet = {
   status: Status.Uninitialized,
   address: '',
   balance: 0n,
-  accounts: {},
+  tokensBalances: {},
   balanceLoading: false
 }
 export const walletSliceName = 'wallet'
@@ -82,18 +81,18 @@ const walletSlice = createSlice({
     ) {
       return state
     },
-    addTokenAccount(state, action: PayloadAction<ITokenAccount>) {
-      state.accounts[action.payload.address] = action.payload
+    addTokenBalance(state, action: PayloadAction<ITokenBalance>) {
+      state.tokensBalances[action.payload.address] = action.payload
       return state
     },
-    addTokenAccounts(state, action: PayloadAction<ITokenAccount[]>) {
+    addTokenBalances(state, action: PayloadAction<ITokenBalance[]>) {
       action.payload.forEach(account => {
-        state.accounts[account.address] = account
+        state.tokensBalances[account.address] = account
       })
       return state
     },
-    setTokenAccount(state, action: PayloadAction<ITokenAccount>) {
-      state.accounts[action.payload.address.toString()] = action.payload
+    setTokenBalance(state, action: PayloadAction<ITokenBalance>) {
+      state.tokensBalances[action.payload.address.toString()] = action.payload
       return state
     },
     // Triggers rescan for tokens that we control

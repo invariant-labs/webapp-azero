@@ -18,13 +18,7 @@ import {
   Typography,
   useMediaQuery
 } from '@mui/material'
-import {
-  FormatNumberThreshold,
-  formatNumbers,
-  printAmount,
-  printBN,
-  showPrefix
-} from '@store/consts/utils'
+import { FormatNumberThreshold, formatNumbers, printBigint, showPrefix } from '@store/consts/utils'
 import AddTokenModal from '@components/Modals/AddTokenModal/AddTokenModal'
 import { SwapToken } from '@store/selectors/wallet'
 
@@ -128,8 +122,8 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
       )
     })
     const sorted = list.sort((a, b) => {
-      const aBalance = +printAmount(a.balance, Number(a.decimals))
-      const bBalance = +printAmount(b.balance, Number(b.decimals))
+      const aBalance = +printBigint(a.balance, a.decimals)
+      const bBalance = +printBigint(b.balance, b.decimals)
       if ((aBalance === 0 && bBalance === 0) || (aBalance > 0 && bBalance > 0)) {
         if (value.length) {
           if (
@@ -272,7 +266,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
               outerRef={outerRef}>
               {({ index, style }: { index: number; style: React.CSSProperties }) => {
                 const token = filteredTokens[index]
-                const tokenBalance = printAmount(token.balance, Number(token.decimals)) // TODO check if printBN  is needed, and instead of that can be used printAmount?
+                const tokenBalance = printBigint(token.balance, token.decimals)
 
                 return (
                   <Grid

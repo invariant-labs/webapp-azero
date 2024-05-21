@@ -19,10 +19,12 @@ import {
   DEFAULT_CONTRACT_OPTIONS,
   ETH_TEST,
   Token,
+  TokenList,
   TokenPriceData,
   USDC_TEST,
   tokensPrices
 } from './static'
+import { ITokenBalance } from '@store/reducers/wallet'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -115,40 +117,16 @@ export const formatNumbers =
     return num < 0 && threshold ? '-' + formatted : formatted
   }
 
-export const printAmount = (amount: TokenAmount, decimals: number): string => {
-  const amountString = amount.toString()
-  const isNegative = amountString.length > 0 && amountString[0] === '-'
-
-  const balanceString = isNegative ? amountString.slice(1) : amountString
-
-  if (balanceString.length <= decimals) {
-    return (
-      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-      (isNegative ? '-' : '') + '0.' + '0'.repeat(decimals - balanceString.length) + balanceString
-    )
-  } else {
-    return (
-      (isNegative ? '-' : '') +
-      trimZeros(
-        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-        balanceString.substring(0, balanceString.length - decimals) +
-          '.' +
-          balanceString.substring(balanceString.length - decimals)
-      )
-    )
-  }
-}
-
 export const trimZeros = (numStr: string): string => {
   numStr = numStr.replace(/(\.\d*?)0+$/, '$1')
 
   return numStr
 }
 
-export const PRICE_DECIMAL = 24
+export const PRICE_DECIMAL = 24n
 
 export const calcYPerXPrice = (sqrtPrice: bigint, xDecimal: bigint, yDecimal: bigint): number => {
-  const sqrt = +printAmount(sqrtPrice, PRICE_DECIMAL)
+  const sqrt = +printBigint(sqrtPrice, PRICE_DECIMAL)
   const proportion = sqrt * sqrt
 
   return proportion / 10 ** Number(yDecimal - xDecimal)
@@ -281,7 +259,7 @@ export const getMockedTokenPrice = (symbol: string, network: Network): TokenPric
   }
 }
 
-export const printBN = (amount: TokenAmount, decimals: bigint): string => {
+export const printBigint = (amount: TokenAmount, decimals: bigint): string => {
   const parsedDecimals = Number(decimals)
   const amountString = amount.toString()
   const isNegative = amountString.length > 0 && amountString[0] === '-'
@@ -460,7 +438,7 @@ export const stringifyPoolKey = (poolKey: PoolKey) => {
   }
 }
 
-export const printBNtoBN = (amount: string, decimals: number): bigint => {
+export const convertBalanceToBigint = (amount: string, decimals: bigint | number): bigint => {
   const balanceString = amount.split('.')
   if (balanceString.length !== 2) {
     return BigInt(balanceString[0] + '0'.repeat(Number(decimals)))
@@ -498,4 +476,30 @@ export const determinePositionTokenBlock = (
   }
 
   return PositionTokenBlock.None
+}
+
+export const getTokenBalances = async (
+  tokens: string[],
+  api: ApiPromise,
+  network: Network,
+  address: string
+): Promise<ITokenBalance[]> => {
+  const psp22 = await PSP22.load(api, network, '', DEFAULT_CONTRACT_OPTIONS)
+  let promises: Promise<any>[] = []
+  tokens.map(token => {
+    psp22.setContractAddress(token)
+    promises.push(psp22.balanceOf(address))
+  })
+
+  const results = await Promise.all(promises)
+
+  const tokenBalances: ITokenBalance[] = []
+  tokens.map((token, index) => {
+    tokenBalances.push({
+      address: token,
+      balance: BigInt(results[index])
+    })
+  })
+
+  return tokenBalances
 }

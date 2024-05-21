@@ -17,7 +17,12 @@ import DepositSelector from './DepositSelector/DepositSelector'
 import PoolInit from './PoolInit/PoolInit'
 import RangeSelector from './RangeSelector/RangeSelector'
 import useStyles from './style'
-import { calcPrice, printBN, printBNtoBN, trimLeadingZeros } from '@store/consts/utils'
+import {
+  calcPrice,
+  convertBalanceToBigint,
+  printBigint,
+  trimLeadingZeros
+} from '@store/consts/utils'
 import { AddressOrPair } from '@polkadot/api/types'
 
 export interface INewPosition {
@@ -255,7 +260,7 @@ export const NewPosition: React.FC<INewPosition> = ({
 
     const result = calcAmount(amount, left, right, tokens[calcIndex].assetAddress)
 
-    return trimLeadingZeros(printBN(result, tokens[printIndex].decimals))
+    return trimLeadingZeros(printBigint(result, tokens[printIndex].decimals))
   }
 
   const getTicksInsideRange = (left: bigint, right: bigint, isXtoY: boolean) => {
@@ -300,7 +305,7 @@ export const NewPosition: React.FC<INewPosition> = ({
     ) {
       const deposit = tokenADeposit
       const amount = getOtherTokenAmount(
-        printBNtoBN(deposit, Number(tokens[tokenAIndex].decimals)),
+        convertBalanceToBigint(deposit, Number(tokens[tokenAIndex].decimals)),
         Number(leftRange),
         Number(rightRange),
         true
@@ -319,7 +324,7 @@ export const NewPosition: React.FC<INewPosition> = ({
     ) {
       const deposit = tokenBDeposit
       const amount = getOtherTokenAmount(
-        printBNtoBN(deposit, Number(tokens[tokenBIndex].decimals)),
+        convertBalanceToBigint(deposit, Number(tokens[tokenBIndex].decimals)),
         Number(leftRange),
         Number(rightRange),
         false
@@ -339,7 +344,7 @@ export const NewPosition: React.FC<INewPosition> = ({
     if (tokenAIndex !== null && (isXtoY ? rightRange > mid : rightRange < mid)) {
       const deposit = tokenADeposit
       const amount = getOtherTokenAmount(
-        printBNtoBN(deposit, Number(tokens[tokenAIndex].decimals)),
+        convertBalanceToBigint(deposit, Number(tokens[tokenAIndex].decimals)),
         Number(leftRange),
         Number(rightRange),
         true
@@ -353,7 +358,7 @@ export const NewPosition: React.FC<INewPosition> = ({
     if (tokenBIndex !== null && (isXtoY ? leftRange < mid : leftRange > mid)) {
       const deposit = tokenBDeposit
       const amount = getOtherTokenAmount(
-        printBNtoBN(deposit, Number(tokens[tokenBIndex].decimals)),
+        convertBalanceToBigint(deposit, Number(tokens[tokenBIndex].decimals)),
         Number(leftRange),
         Number(rightRange),
         false
@@ -525,12 +530,12 @@ export const NewPosition: React.FC<INewPosition> = ({
                 leftRange,
                 rightRange,
                 isXtoY
-                  ? BigInt(+tokenADeposit * 10 ** Number(tokens[tokenAIndex].decimals))
-                  : BigInt(+tokenBDeposit * 10 ** Number(tokens[tokenBIndex].decimals)),
+                  ? convertBalanceToBigint(tokenADeposit, tokens[tokenAIndex].decimals)
+                  : convertBalanceToBigint(tokenBDeposit, tokens[tokenBIndex].decimals),
                 isXtoY
-                  ? BigInt(+tokenBDeposit * 10 ** Number(tokens[tokenBIndex].decimals))
-                  : BigInt(+tokenADeposit * 10 ** Number(tokens[tokenAIndex].decimals)),
-                BigInt(+slippTolerance * 1000) // TODO check if its correct
+                  ? convertBalanceToBigint(tokenBDeposit, tokens[tokenBIndex].decimals)
+                  : convertBalanceToBigint(tokenADeposit, tokens[tokenAIndex].decimals),
+                BigInt(+slippTolerance * 1000)
               )
             }
           }}
@@ -544,7 +549,7 @@ export const NewPosition: React.FC<INewPosition> = ({
               setTokenADeposit(value)
               setTokenBDeposit(
                 getOtherTokenAmount(
-                  printBNtoBN(value, Number(tokens[tokenAIndex].decimals)),
+                  convertBalanceToBigint(value, tokens[tokenAIndex].decimals),
                   Number(leftRange),
                   Number(rightRange),
                   true
@@ -574,7 +579,7 @@ export const NewPosition: React.FC<INewPosition> = ({
               setTokenBDeposit(value)
               setTokenADeposit(
                 getOtherTokenAmount(
-                  printBNtoBN(value, Number(tokens[tokenBIndex].decimals)),
+                  convertBalanceToBigint(value, Number(tokens[tokenBIndex].decimals)),
                   Number(leftRange),
                   Number(rightRange),
                   false

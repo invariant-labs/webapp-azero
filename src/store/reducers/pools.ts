@@ -4,7 +4,7 @@ import {
   PoolKey,
   TESTNET_BTC_ADDRESS,
   TESTNET_ETH_ADDRESS,
-  TETSNET_USDC_ADDRESS,
+  TESTNET_USDC_ADDRESS,
   Tick
 } from '@invariant-labs/a0-sdk'
 import { AddressOrPair } from '@polkadot/api/types'
@@ -33,7 +33,6 @@ export interface IPoolsStore {
   isLoadingLatestPoolsForTransaction: boolean
   tickMaps: { [key in string]: bigint[] }
   volumeRanges: Record<string, Range[]>
-  feeTiers: IndexedFeeTier[]
 }
 
 export interface UpdatePool {
@@ -70,15 +69,14 @@ export interface FetchTicksAndTickMaps {
 }
 
 export const defaultState: IPoolsStore = {
-  tokens: { [TESTNET_BTC_ADDRESS]: BTC, [TESTNET_ETH_ADDRESS]: ETH, [TETSNET_USDC_ADDRESS]: USDC },
+  tokens: { [TESTNET_BTC_ADDRESS]: BTC, [TESTNET_ETH_ADDRESS]: ETH, [TESTNET_USDC_ADDRESS]: USDC },
   pools: {},
   poolKeys: {},
   poolTicks: {},
   nearestPoolTicksForPair: {},
   isLoadingLatestPoolsForTransaction: false,
   tickMaps: {},
-  volumeRanges: {},
-  feeTiers: []
+  volumeRanges: {}
 }
 
 export interface PairTokens {
@@ -107,17 +105,6 @@ const poolsSlice = createSlice({
   initialState: defaultState,
   reducers: {
     initPool(state, _action: PayloadAction<PoolKey>) {
-      return state
-    },
-    getFeeTiers(state) {
-      return state
-    },
-    setFeeTiers(state, action: PayloadAction<FeeTier[]>) {
-      const indexedFeeTiers = action.payload.map((tier, index) => ({
-        tier,
-        primaryIndex: index
-      }))
-      state.feeTiers = indexedFeeTiers
       return state
     },
     addTokens(state, action: PayloadAction<Record<string, Token>>) {

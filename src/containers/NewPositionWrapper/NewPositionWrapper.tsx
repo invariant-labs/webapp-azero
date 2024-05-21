@@ -1,6 +1,7 @@
 import NewPosition from '@components/NewPosition/NewPosition'
 import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import {
+  FEE_TIERS,
   TokenAmount,
   calculateSqrtPrice,
   getLiquidityByX,
@@ -9,6 +10,7 @@ import {
 } from '@invariant-labs/a0-sdk'
 import { AddressOrPair } from '@polkadot/api/types'
 import {
+  ALL_FEE_TIERS_DATA,
   PositionOpeningMethod,
   TokenPriceData,
   bestTiers,
@@ -20,7 +22,7 @@ import {
   createPlaceholderLiquidityPlot,
   getCoingeckoTokenPrice,
   getMockedTokenPrice,
-  printBN,
+  printBigint,
   stringifyPoolKey
 } from '@store/consts/utils'
 import { actions as positionsActions, TickPlotPositionData } from '@store/reducers/positions'
@@ -31,7 +33,6 @@ import {
   isLoadingLatestPoolsForTransaction,
   poolsArraySortedByFees,
   volumeRanges,
-  feeTiers,
   poolKeys,
   pools
 } from '@store/selectors/pools'
@@ -60,7 +61,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const walletStatus = useSelector(status)
   const allPools = useSelector(poolsArraySortedByFees)
   const poolsVolumeRanges = useSelector(volumeRanges)
-  const feeTiersArray = useSelector(feeTiers)
   const allPoolKeys = useSelector(poolKeys)
   const poolsData = useSelector(pools)
 
@@ -92,7 +92,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const [rightTick, setRightTick] = useState(0n)
 
   useEffect(() => {
-    dispatch(poolsActions.getFeeTiers())
     dispatch(poolsActions.getPoolKeys())
   }, [])
 
@@ -190,12 +189,12 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const [feeIndex, setFeeIndex] = useState(0)
 
   const fee = useMemo(
-    () => (feeTiersArray[feeIndex] ? feeTiersArray[feeIndex].tier.fee : 1n),
+    () => (ALL_FEE_TIERS_DATA[feeIndex] ? ALL_FEE_TIERS_DATA[feeIndex].tier.fee : 1n),
     [feeIndex]
   )
 
   const tickSpacing = useMemo(
-    () => (feeTiersArray[feeIndex] ? feeTiersArray[feeIndex].tier.tickSpacing : 1n),
+    () => (ALL_FEE_TIERS_DATA[feeIndex] ? ALL_FEE_TIERS_DATA[feeIndex].tier.tickSpacing : 1n),
     [feeIndex]
   )
 
@@ -217,7 +216,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       const keyStringified = stringifyPoolKey({
         tokenX: tokens[tokenAIndex].assetAddress.toString(),
         tokenY: tokens[tokenBIndex].assetAddress.toString(),
-        feeTier: feeTiersArray[feeIndex].tier
+        feeTier: ALL_FEE_TIERS_DATA[feeIndex].tier
       })
 
       if (allPoolKeys[keyStringified]) {
@@ -353,7 +352,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
           newPoolKey(
             tokens[tokenAIndex].assetAddress.toString(),
             tokens[tokenBIndex].assetAddress.toString(),
-            feeTiersArray[feeIndex].tier
+            ALL_FEE_TIERS_DATA[feeIndex].tier
           )
         )
       )
@@ -591,7 +590,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
           poolKeyData: newPoolKey(
             tokens[tokenAIndex].assetAddress.toString(),
             tokens[tokenBIndex].assetAddress.toString(),
-            feeTiersArray[feeIndex].tier
+            ALL_FEE_TIERS_DATA[feeIndex].tier
           ),
           lowerTick: leftTick,
           upperTick: rightTick,
@@ -698,7 +697,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
               newPoolKey(
                 tokens[tokenAIndex].assetAddress.toString(),
                 tokens[tokenBIndex].assetAddress.toString(),
-                feeTiersArray[feeIndex].tier
+                ALL_FEE_TIERS_DATA[feeIndex].tier
               )
             )
           )
@@ -710,9 +709,9 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       }}
       isCurrentPoolExisting={poolKey !== ''}
       calcAmount={calcAmount}
-      feeTiers={feeTiersArray.map(tier => {
+      feeTiers={ALL_FEE_TIERS_DATA.map(tier => {
         return {
-          feeValue: +printBN(tier.tier.fee, 10n) //TODO replace 10n with DECIMAL - n
+          feeValue: +printBigint(tier.tier.fee, 10n) //TODO replace 10n with DECIMAL - n
         }
       })}
       ticksLoading={ticksLoading}
@@ -727,7 +726,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       initialIsDiscreteValue={initialIsDiscreteValue}
       onDiscreteChange={setIsDiscreteValue}
       currentPriceSqrt={
-        poolsData[poolKey] ? poolsData[poolKey].sqrtPrice : calculateSqrtPrice(midPrice.index) /////////////////////////////////////////////////////////
+        poolsData[poolKey] ? poolsData[poolKey].sqrtPrice : calculateSqrtPrice(midPrice.index)
         // toSqrtPrice(1n, 0n)
       }
       canCreateNewPool={canUserCreateNewPool}
@@ -768,34 +767,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         if (progress === 'none') {
           setProgress('progress')
         }
-        // dispatch(
-        //   poolsActions.initPool({
-        //     tokenX: tokens[tokenAIndex].assetAddress.toString(),
-        //     tokenY: tokens[tokenBIndex].assetAddress.toString(),
-        //     feeTier: feeTiersArray[feeIndex].tier
-        //   })
-        // )
 
-        // dispatch(
-        //   positionsActions.initPosition({
-        //     poolKeyData: {
-        //       tokenX: tokens[tokenAIndex].assetAddress.toString(),
-        //       tokenY: tokens[tokenBIndex].assetAddress.toString(),
-        //       feeTier: feeTiersArray[feeIndex].tier
-        //     },
-        //     lowerTick: -10n,
-        //     upperTick: 10n,
-        //     liquidityDelta: liquidityRef.current,
-        //     // spotSqrtPrice: poolKey
-        //     //   ? poolsData[poolKey].sqrtPrice
-        //     //   : priceToSqrtPrice(BigInt(midPrice.x)),
-        //     spotSqrtPrice:  poolsData[poolKey] ? poolsData[poolKey].sqrtPrice : calculateSqrtPrice(midPrice.index),
-        //     slippageTolerance: 500n,
-        //     tokenXAmount: tokenAAmount,
-        //     tokenYAmount: tokenBAmount,
-        //     initPool: poolKey === ''
-        //   })
-        // )
         setOpenPosition(true)
       }}
       showNoConnected={walletStatus !== Status.Initialized}

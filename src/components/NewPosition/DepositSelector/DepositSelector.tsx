@@ -4,15 +4,12 @@ import React, { useCallback, useEffect, useState } from 'react'
 import FeeSwitch from '../FeeSwitch/FeeSwitch'
 import { useStyles } from './style'
 import AnimatedButton, { ProgressState } from '@components/AnimatedButton/AnimatedButton'
-import { PositionOpeningMethod } from '@store/consts/static'
+import { ALL_FEE_TIERS_DATA, PositionOpeningMethod } from '@store/consts/static'
 import { Grid, Typography } from '@mui/material'
-import { getScaleFromString, printBN, printBNtoBN } from '@store/consts/utils'
+import { getScaleFromString, printBigint, convertBalanceToBigint } from '@store/consts/utils'
 import DepositAmountInput from '@components/Inputs/DepositAmountInput/DepositAmountInput'
 import Select from '@components/Inputs/Select/Select'
 import { parsePathFeeToFeeString, tickerToAddress } from '@store/consts/uiUtiils'
-import { useSelector } from 'react-redux'
-import { feeTiers as feeTiersSelector } from '@store/selectors/pools'
-
 export interface InputState {
   value: string
   setValue: (value: string) => void
@@ -97,10 +94,8 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
 
   const [isLoaded, setIsLoaded] = useState<boolean>(false)
 
-  const feeTiersArray = useSelector(feeTiersSelector)
-
   useEffect(() => {
-    if (isLoaded || tokens.length === 0 || feeTiersArray.length === 0) {
+    if (isLoaded || tokens.length === 0 || ALL_FEE_TIERS_DATA.length === 0) {
       return
     }
 
@@ -120,7 +115,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
 
     const parsedFee = parsePathFeeToFeeString(initialFee)
 
-    feeTiersArray.forEach((feeTierData, index) => {
+    ALL_FEE_TIERS_DATA.forEach((feeTierData, index) => {
       if (feeTierData.tier.fee.toString() === parsedFee) {
         feeTierIndexFromPath = index
       }
@@ -157,7 +152,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
 
     if (
       !tokenAInputState.blocked &&
-      printBNtoBN(tokenAInputState.value, tokens[tokenAIndex].decimals) >=
+      convertBalanceToBigint(tokenAInputState.value, tokens[tokenAIndex].decimals) >=
         tokens[tokenAIndex].balance
     ) {
       return "You don't have enough token A"
@@ -165,7 +160,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
 
     if (
       !tokenBInputState.blocked &&
-      printBNtoBN(tokenBInputState.value, tokens[tokenBIndex].decimals) >=
+      convertBalanceToBigint(tokenBInputState.value, tokens[tokenBIndex].decimals) >=
         tokens[tokenBIndex].balance
     ) {
       return "You don't have enough token B"
@@ -297,7 +292,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
             // if (tokens[tokenAIndex].assetAddress === WRAPPED_ETH_ADDRESS) {
             //   if (tokenBIndex !== null && poolIndex === null) {
             //     tokenAInputState.setValue(
-            //       printBN(
+            //       printBigint(
             //         tokens[tokenAIndex].balance.gt(WETH_POOL_INIT_LAMPORTS)
             //           ? tokens[tokenAIndex].balance.sub(WETH_POOL_INIT_LAMPORTS)
             //           : new BN(0),
@@ -309,7 +304,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
             //   }
 
             //   tokenAInputState.setValue(
-            //     printBN(
+            //     printBigint(
             //       tokens[tokenAIndex].balance.gt(WETH_MIN_DEPOSIT_SWAP_FROM_AMOUNT)
             //         ? tokens[tokenAIndex].balance.sub(WETH_MIN_DEPOSIT_SWAP_FROM_AMOUNT)
             //         : new BN(0),
@@ -320,12 +315,12 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
             //   return
             // }
             tokenAInputState.setValue(
-              printBN(tokens[tokenAIndex].balance, tokens[tokenAIndex].decimals)
+              printBigint(tokens[tokenAIndex].balance, tokens[tokenAIndex].decimals)
             )
           }}
           balanceValue={
             tokenAIndex !== null
-              ? printBN(tokens[tokenAIndex].balance, tokens[tokenAIndex].decimals)
+              ? printBigint(tokens[tokenAIndex].balance, tokens[tokenAIndex].decimals)
               : ''
           }
           style={{
@@ -357,7 +352,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
             // if (tokens[tokenBIndex].assetAddress.equals(new PublicKey(WRAPPED_ETH_ADDRESS))) {
             //   if (tokenAIndex !== null && poolIndex === null) {
             //     tokenBInputState.setValue(
-            //       printBN(
+            //       printBigint(
             //         tokens[tokenBIndex].balance.gt(WETH_POOL_INIT_LAMPORTS)
             //           ? tokens[tokenBIndex].balance.sub(WETH_POOL_INIT_LAMPORTS)
             //           : new BN(0),
@@ -369,7 +364,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
             //   }
 
             //   tokenBInputState.setValue(
-            //     printBN(
+            //     printBigint(
             //       tokens[tokenBIndex].balance.gt(WETH_MIN_DEPOSIT_SWAP_FROM_AMOUNT)
             //         ? tokens[tokenBIndex].balance.sub(WETH_MIN_DEPOSIT_SWAP_FROM_AMOUNT)
             //         : new BN(0),
@@ -380,12 +375,12 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
             //   return
             // }
             tokenBInputState.setValue(
-              printBN(tokens[tokenBIndex].balance, tokens[tokenBIndex].decimals)
+              printBigint(tokens[tokenBIndex].balance, tokens[tokenBIndex].decimals)
             )
           }}
           balanceValue={
             tokenBIndex !== null
-              ? printBN(tokens[tokenBIndex].balance, tokens[tokenBIndex].decimals)
+              ? printBigint(tokens[tokenBIndex].balance, tokens[tokenBIndex].decimals)
               : ''
           }
           onBlur={() => {

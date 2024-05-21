@@ -1,7 +1,8 @@
 import {
+  FEE_TIERS,
   TESTNET_BTC_ADDRESS,
   TESTNET_ETH_ADDRESS,
-  TETSNET_USDC_ADDRESS
+  TESTNET_USDC_ADDRESS
 } from '@invariant-labs/a0-sdk'
 
 import { Network } from '@invariant-labs/a0-sdk/src'
@@ -144,7 +145,7 @@ export const TokenAirdropAmount = {
 export const TokenList = {
   BTC: TESTNET_BTC_ADDRESS,
   ETH: TESTNET_ETH_ADDRESS,
-  USDC: TETSNET_USDC_ADDRESS
+  USDC: TESTNET_USDC_ADDRESS
 }
 
 export const BTC: Token = {
@@ -169,7 +170,7 @@ export const ETH: Token = {
 
 export const USDC: Token = {
   symbol: 'USDC',
-  address: TETSNET_USDC_ADDRESS,
+  address: TESTNET_USDC_ADDRESS,
   decimals: 6n,
   name: 'USDC',
   logoURI:
@@ -199,7 +200,7 @@ export const ETH_TEST: Token = {
 
 export const USDC_TEST: Token = {
   symbol: 'USDC',
-  address: TETSNET_USDC_ADDRESS,
+  address: TESTNET_USDC_ADDRESS,
   decimals: 6n,
   name: 'USDC',
   logoURI:
@@ -212,3 +213,8 @@ export const DEFAULT_CONTRACT_OPTIONS = {
   refTime: 100000000000,
   proofSize: 100000000000
 }
+
+export const ALL_FEE_TIERS_DATA = FEE_TIERS.map((tier, index) => ({
+  tier,
+  primaryIndex: index
+}))

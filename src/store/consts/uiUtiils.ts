@@ -1,3 +1,4 @@
+import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/src/consts'
 import { STABLECOIN_ADDRESSES } from './static'
 
 export const tickerToAddress = (ticker: string): string => {
@@ -26,5 +27,5 @@ export const initialXtoY = (tokenXAddress?: string, tokenYAddress?: string) => {
 }
 
 export const parsePathFeeToFeeString = (pathFee: string): string => {
-  return (+pathFee.replace('_', '') * Math.pow(10, 8)).toString()
+  return (+pathFee.replace('_', '') * Math.pow(10, Number(PERCENTAGE_SCALE) - 4)).toString()
 }

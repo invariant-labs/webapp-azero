@@ -2,16 +2,16 @@ import { Network, TESTNET_WAZERO_ADDRESS, TokenAmount } from '@invariant-labs/a0
 import { AddressOrPair } from '@polkadot/api/types'
 import { BN } from '@polkadot/util'
 import { createSelector } from '@reduxjs/toolkit'
-import { IAlephZeroWallet, ITokenAccount, walletSliceName } from '@store/reducers/wallet'
+import { IAlephZeroWallet, ITokenBalance, walletSliceName } from '@store/reducers/wallet'
 import { AnyProps, keySelectors } from './helpers'
 import { tokens } from './pools'
 
 const store = (s: AnyProps) => s[walletSliceName] as IAlephZeroWallet
 
-export const { address, balance, accounts, status, balanceLoading } = keySelectors(store, [
+export const { address, balance, tokensBalances, status, balanceLoading } = keySelectors(store, [
   'address',
   'balance',
-  'accounts',
+  'tokensBalances',
   'status',
   'balanceLoading'
 ])
@@ -31,15 +31,15 @@ export const { address, balance, accounts, status, balanceLoading } = keySelecto
 //     }
 //   })
 
-export const tokenAccount = (tokenAddress: AddressOrPair) =>
-  createSelector(accounts, tokensAccounts => {
+export const tokenBalance = (tokenAddress: AddressOrPair) =>
+  createSelector(tokensBalances, tokensAccounts => {
     if (tokensAccounts[tokenAddress.toString()]) {
       return tokensAccounts[tokenAddress.toString()]
     }
   })
 
-export const tokenAccountsAddress = () =>
-  createSelector(accounts, tokenAccounts => {
+export const tokenBalanceAddress = () =>
+  createSelector(tokensBalances, tokenAccounts => {
     return Object.values(tokenAccounts).map(item => {
       return item.address
     })
@@ -57,7 +57,7 @@ export interface SwapToken {
 }
 
 export const swapTokens = createSelector(
-  accounts,
+  tokensBalances,
   tokens,
   balance,
   (allAccounts, tokens, a0Balance) => {
@@ -73,12 +73,11 @@ export const swapTokens = createSelector(
 )
 
 export const swapTokensDict = createSelector(
-  accounts,
+  tokensBalances,
   tokens,
   balance,
   (allAccounts, tokens, a0Balance) => {
     const swapTokens: Record<string, SwapToken> = {}
-    //TODO check if this is correct
     Object.entries(tokens).forEach(([key, val]) => {
       swapTokens[key] = {
         ...val,
@@ -123,7 +122,7 @@ export const canCreateNewPosition = (network: Network) =>
     return true
   })
 
-export type TokenAccounts = ITokenAccount & {
+export type TokenBalances = ITokenBalance & {
   symbol: string
   usdValue: BN
   assetDecimals: number
@@ -132,9 +131,9 @@ export type TokenAccounts = ITokenAccount & {
 export const alephZeroWalletSelectors = {
   address,
   balance,
-  accounts,
+  tokensBalances,
   status,
-  tokenAccount,
+  tokenBalance,
   balanceLoading
 }
 export default alephZeroWalletSelectors

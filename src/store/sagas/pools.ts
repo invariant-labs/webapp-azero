@@ -117,28 +117,6 @@ export function* handleInitPool(action: PayloadAction<PoolKey>): Generator {
   }
 }
 
-export function* fetchFeeTiers(): Generator {
-  try {
-    const api = yield* getConnection()
-    const network = yield* select(networkType)
-    const walletAddress = yield* select(address)
-
-    const invariant = yield* call(
-      [Invariant, Invariant.load],
-      api,
-      network,
-      TESTNET_INVARIANT_ADDRESS,
-      DEFAULT_CONTRACT_OPTIONS
-    )
-
-    const feeTiers = yield* call([invariant, invariant.getFeeTiers], walletAddress)
-
-    yield put(actions.setFeeTiers(feeTiers))
-  } catch (error) {
-    console.log(error)
-  }
-}
-
 export function* getPoolsDataForListHandler(): Generator {
   yield* takeEvery(actions.getPoolsDataForList, fetchPoolsDataForList)
 }
@@ -200,10 +178,6 @@ export function* initPoolHandler(): Generator {
   yield* takeLatest(actions.initPool, handleInitPool)
 }
 
-export function* fetchFeeTiersHandler(): Generator {
-  yield* takeLatest(actions.getFeeTiers, fetchFeeTiers)
-}
-
 export function* getPoolDataHandler(): Generator {
   yield* takeLatest(actions.getPoolData, fetchPoolData)
 }
@@ -214,12 +188,6 @@ export function* getPoolKeysHandler(): Generator {
 
 export function* poolsSaga(): Generator {
   yield all(
-    [
-      initPoolHandler,
-      fetchFeeTiersHandler,
-      getPoolDataHandler,
-      getPoolKeysHandler,
-      getPoolsDataForListHandler
-    ].map(spawn)
+    [initPoolHandler, getPoolDataHandler, getPoolKeysHandler, getPoolsDataForListHandler].map(spawn)
   )
 }

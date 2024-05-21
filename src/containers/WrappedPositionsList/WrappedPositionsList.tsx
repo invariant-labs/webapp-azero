@@ -2,7 +2,7 @@ import { PositionsList } from '@components/PositionsList/PositionsList'
 import { calculateSqrtPrice, getLiquidityByX, getLiquidityByY } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/src/consts'
 import { POSITIONS_PER_PAGE } from '@store/consts/static'
-import { calcYPerXPrice, printAmount, stringifyPoolKey } from '@store/consts/utils'
+import { calcYPerXPrice, printBigint, stringifyPoolKey } from '@store/consts/utils'
 import { actions } from '@store/reducers/positions'
 import { Status } from '@store/reducers/wallet'
 import { pools, tokens } from '@store/selectors/pools'
@@ -76,7 +76,7 @@ export const WrappedPositionsList: React.FC = () => {
       let tokenXLiq, tokenYLiq
 
       try {
-        tokenXLiq = +printAmount(
+        tokenXLiq = +printBigint(
           getLiquidityByX(
             position.liquidity,
             position.lowerTickIndex,
@@ -84,14 +84,14 @@ export const WrappedPositionsList: React.FC = () => {
             pool.sqrtPrice,
             true
           ).amount,
-          Number(allTokens[position.poolKey.tokenX].decimals)
+          allTokens[position.poolKey.tokenX].decimals
         )
       } catch (error) {
         tokenXLiq = 0
       }
 
       try {
-        tokenYLiq = +printAmount(
+        tokenYLiq = +printBigint(
           getLiquidityByY(
             position.liquidity,
             position.lowerTickIndex,
@@ -99,7 +99,7 @@ export const WrappedPositionsList: React.FC = () => {
             pool.sqrtPrice,
             true
           ).amount,
-          Number(allTokens[position.poolKey.tokenY].decimals)
+          allTokens[position.poolKey.tokenY].decimals
         )
       } catch (error) {
         tokenYLiq = 0
@@ -119,7 +119,7 @@ export const WrappedPositionsList: React.FC = () => {
         tokenYName: tokenY.symbol,
         tokenXIcon: tokenX.logoURI,
         tokenYIcon: tokenY.logoURI,
-        fee: +printAmount(position.poolKey.feeTier.fee, Number(PERCENTAGE_SCALE) - 2),
+        fee: +printBigint(position.poolKey.feeTier.fee, PERCENTAGE_SCALE - 2n),
         min,
         max,
         tokenXLiq,

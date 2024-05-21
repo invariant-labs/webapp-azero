@@ -31,37 +31,37 @@ export interface PoolWithAddressAndIndex extends PoolWithPoolKey {
 //   positionIndex: number
 // }
 
-// export const positionsWithPoolsData = createSelector(
-//   poolsArraySortedByFees,
-//   positionsList,
-//   swapTokensDict,
-//   (allPools, { list }, tokens) => {
-//     const poolsByKey: Record<string, PoolWithAddressAndIndex> = {}
-//     allPools.forEach((pool, index) => {
-//       poolsByKey[pool.address.toString()] = {
-//         ...pool,
-//         poolIndex: index
-//       }
-//     })
+export const positionsWithPoolsData = createSelector(
+  poolsArraySortedByFees,
+  positionsList,
+  swapTokensDict,
+  (allPools, { list }, tokens) => {
+    const poolsByKey: Record<string, PoolWithAddressAndIndex> = {}
+    allPools.forEach((pool, index) => {
+      poolsByKey[pool.poolKey.toString()] = {
+        ...pool,
+        poolIndex: index
+      }
+    })
 
-//     //TODO check if this is correct
-//     return list.map((position, index) => ({
-//       ...position,
-//       poolData: poolsByKey[position.toString()],
-//       tokenX: tokens[poolsByKey[position.tokensOwedX.toString()].poolIndex.toString()],
-//       tokenY: tokens[poolsByKey[position.tokensOwedY.toString()].poolIndex.toString()],
-//       positionIndex: index
-//     }))
-//   }
-// )
+    //TODO check if this is correct
+    return list.map((position, index) => ({
+      ...position,
+      poolData: poolsByKey[position.toString()],
+      tokenX: tokens[poolsByKey[position.tokensOwedX.toString()].poolIndex.toString()],
+      tokenY: tokens[poolsByKey[position.tokensOwedY.toString()].poolIndex.toString()],
+      positionIndex: index
+    }))
+  }
+)
 
-// export const singlePositionData = (id: string) =>
-//   createSelector(positionsWithPoolsData, positions =>
-//     // TODO check if this is correct
-//     positions.find(
-//       position => id === position.address.toString() + '_' + position.poolKey.toString()
-//     )
-//   )
+export const singlePositionData = (id: string) =>
+  createSelector(positionsWithPoolsData, positions =>
+    // TODO check if this is correct
+    positions.find(
+      position => id === position.positionIndex.toString() + '_' + position.poolKey.toString()
+    )
+  )
 
 export const positionsSelectors = {
   positionsList,

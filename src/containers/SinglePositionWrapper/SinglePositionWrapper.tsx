@@ -11,7 +11,7 @@ import {
 } from '@store/selectors/positions'
 import { volumeRanges } from '@store/selectors/pools'
 import { status } from '@store/selectors/wallet'
-import { calcPrice, calcYPerXPrice, printBN } from '@store/consts/utils'
+import { calcPrice, calcYPerXPrice, printBigint } from '@store/consts/utils'
 import { TokenPriceData } from '@store/consts/static'
 import { Grid } from '@mui/material'
 import { EmptyPlaceholder } from '@components/EmptyPlaceholder/EmptyPlaceholder'
@@ -163,7 +163,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   // const tokenXLiquidity = useMemo(() => {
   //   if (position) {
   //     try {
-  //       return +printBN(
+  //       return +printBigint(
   //         getX(
   //           position.liquidity.v,
   //           calculatePriceSqrt(position.upperTickIndex).v,
@@ -183,7 +183,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   // const tokenYLiquidity = useMemo(() => {
   //   if (position) {
   //     try {
-  //       return +printBN(
+  //       return +printBigint(
   //         getY(
   //           position.liquidity.v,
   //           calculatePriceSqrt(position.upperTickIndex).v,
@@ -218,7 +218,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
 
   //     setShowFeesLoader(false)
 
-  //     return [+printBN(bnX, position.tokenX.decimals), +printBN(bnY, position.tokenY.decimals)]
+  //     return [+printBigint(bnX, position.tokenX.decimals), +printBigint(bnY, position.tokenY.decimals)]
   //   }
 
   //   return [0, 0]
@@ -350,9 +350,8 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
       <PositionDetails
         tokenXAddress={position.tokenX.assetAddress}
         tokenYAddress={position.tokenY.assetAddress}
-        poolAddress={position.poolData.address}
         copyPoolAddressHandler={copyPoolAddressHandler}
-        detailsData={[{ x: 12n, y: 123n, index: -44364n }]}
+        detailsData={[{ x: 12, y: 123, index: -44364n }]} // add real data
         midPrice={midPrice}
         leftRange={leftRange}
         rightRange={rightRange}
@@ -365,26 +364,28 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
           name: position.tokenX.symbol,
           icon: position.tokenX.logoURI,
           decimal: position.tokenX.decimals,
-          balance: +printBN(position.tokenX.balance, position.tokenX.decimals),
+          balance: +printBigint(position.tokenX.balance, position.tokenX.decimals),
           liqValue: 5.123, // add real data
           claimValue: 1.23, // add real data
           usdValue:
             typeof tokenXPriceData?.price === 'undefined'
               ? undefined
-              : tokenXPriceData.price * +printBN(position.tokenX.balance, position.tokenX.decimals)
+              : tokenXPriceData.price *
+                +printBigint(position.tokenX.balance, position.tokenX.decimals)
         }}
         tokenXPriceData={tokenXPriceData}
         tokenY={{
           name: position.tokenY.symbol,
           icon: position.tokenY.logoURI,
           decimal: position.tokenY.decimals,
-          balance: +printBN(position.tokenY.balance, position.tokenY.decimals),
+          balance: +printBigint(position.tokenY.balance, position.tokenY.decimals),
           liqValue: 123.123, // add real data
           claimValue: 12.23, // add real data
           usdValue:
             typeof tokenYPriceData?.price === 'undefined'
               ? undefined
-              : tokenYPriceData.price * +printBN(position.tokenY.balance, position.tokenY.decimals)
+              : tokenYPriceData.price *
+                +printBigint(position.tokenY.balance, position.tokenY.decimals)
         }}
         tokenYPriceData={tokenYPriceData}
         fee={position.poolData.feeGrowthGlobalX} //TODO check if this is correct
