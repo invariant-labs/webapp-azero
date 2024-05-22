@@ -70,7 +70,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const canUserCreateNewPool = useSelector(canCreateNewPool(currentNetwork))
   const canUserCreateNewPosition = useSelector(canCreateNewPosition(currentNetwork))
 
-  const [poolIndex, setPoolIndex] = useState<bigint | null>(null)
+  const [poolIndex, setPoolIndex] = useState<number | null>(null)
 
   const [poolKey, setPoolKey] = useState<string>('')
   const [progress, setProgress] = useState<ProgressState>('none')
@@ -192,7 +192,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     }
 
     return isFetchingNewPool
-  }, [isFetchingNewPool, poolIndex])
+  }, [isFetchingNewPool, poolKey])
 
   useEffect(() => {
     if (!isWaitingForNewPool && tokenAIndex !== null && tokenBIndex !== null) {
@@ -210,15 +210,18 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       } else {
         setPoolKey('')
       }
-      // const index = allPools.findIndex( //TODO check if its better to leave pool index or replace it with pool key?
-      //   pool =>
-      //     pool.fee.v.eq(fee) &&
-      //     ((pool.tokenX.equals(tokens[tokenAIndex].assetAddress) &&
-      //       pool.tokenY.equals(tokens[tokenBIndex].assetAddress)) ||
-      //       (pool.tokenX.equals(tokens[tokenBIndex].assetAddress) &&
-      //         pool.tokenY.equals(tokens[tokenAIndex].assetAddress)))
-      // )
-      // setPoolIndex(index !== -1 ? index : null)
+
+      const index = allPools.findIndex(pool => {
+        return (
+          pool.poolKey.feeTier.fee === fee &&
+          ((pool.poolKey.tokenX === tokens[tokenAIndex].assetAddress &&
+            pool.poolKey.tokenY === tokens[tokenBIndex].assetAddress) ||
+            (pool.poolKey.tokenX === tokens[tokenBIndex].assetAddress &&
+              pool.poolKey.tokenY === tokens[tokenAIndex].assetAddress))
+        )
+      })
+
+      setPoolIndex(index !== -1 ? index : null)
 
       // if (index !== -1) {
       //   dispatch(
@@ -229,7 +232,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       //   )
       // }
     }
-  }, [isWaitingForNewPool, tokenAIndex, tokenBIndex, feeIndex])
+  }, [isWaitingForNewPool, tokenAIndex, tokenBIndex, feeIndex, poolIndex, poolKey])
 
   useEffect(() => {
     //TODO - check if this is needed
@@ -248,16 +251,16 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         x: calcPrice(0n, isXtoY, xDecimal, yDecimal)
       })
     }
-  }, [poolIndex, isXtoY, xDecimal, yDecimal])
+  }, [poolIndex, isXtoY, xDecimal, yDecimal, poolKey])
 
   const data = useMemo(() => {
     if (ticksLoading) {
       return createPlaceholderLiquidityPlot(isXtoY, 10, tickSpacing, xDecimal, yDecimal)
     }
 
-    if (currentPairReversed === true) {
-      return ticksData.map(tick => ({ ...tick, x: 1 / tick.x })).reverse()
-    }
+    // if (currentPairReversed === true) {
+    //   return ticksData.map(tick => ({ ...tick, x: 1 / tick.x })).reverse()
+    // }
 
     // return ticksData
     return [
@@ -607,87 +610,71 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       midPrice={midPrice}
       setMidPrice={setMidPrice}
       onChangePositionTokens={(tokenA, tokenB, feeTierIndex) => {
-        // if (
-        //   tokenA !== null &&
-        //   tokenB !== null &&
-        //   tokenA !== tokenB &&
-        //   !(
-        //     tokenAIndex === tokenA &&
-        //     tokenBIndex === tokenB &&
-        //     fee === feeTiersArray[feeTierIndex].tier.fee
-        //   )
-        // ) {
-        //   const index = poolsData.findIndex(
-        //     pool =>
-        //       pool.fee.v.eq(feeTiersArray[feeTierIndex].tier.fee) &&
-        //       ((pool.tokenX.equals(tokens[tokenA].assetAddress) &&
-        //         pool.tokenY.equals(tokens[tokenB].assetAddress)) ||
-        //         (pool.tokenX.equals(tokens[tokenB].assetAddress) &&
-        //           pool.tokenY.equals(tokens[tokenA].assetAddress)))
-        //   )
-        //   if (
-        //     index !== poolIndex &&
-        //     !(
-        //       tokenAIndex === tokenB &&
-        //       tokenBIndex === tokenA &&
-        //       fee.eq(feeTiersArray[feeTierIndex].tier.fee)
-        //     )
-        //   ) {
-        //     if (isMountedRef.current) {
-        //       setPoolIndex(index !== -1 ? index : null)
-        //       setCurrentPairReversed(null)
-        //     }
-        //   } else if (
-        //     tokenAIndex === tokenB &&
-        //     tokenBIndex === tokenA &&
-        //     fee === feeTiersArray[feeTierIndex].tier.fee
-        //   ) {
-        //     if (isMountedRef.current) {
-        //       setCurrentPairReversed(currentPairReversed === null ? true : !currentPairReversed)
-        //     }
-        //   }
-        //   if (index !== -1 && index !== poolIndex) {
-        //     // dispatch(
-        //     //   actions.getCurrentPlotTicks({
-        //     //     poolIndex: index,
-        //     //     isXtoY: allPools[index].tokenX.equals(tokens[tokenA].assetAddress)
-        //     //   })
-        //     // )
-        //   } else if (
-        //     !(
-        //       tokenAIndex === tokenB &&
-        //       tokenBIndex === tokenA &&
-        //       fee === feeTiersArray[feeTierIndex].tier.fee &&
-        //     )
-        //   ) {
-        //     dispatch(
-        //       poolsActions.getPoolData({
-        //         tokenX: tokens[tokenAIndex].assetAddress.toString(),
-        //         tokenY: tokens[tokenBIndex].assetAddress.toString(),
-        //         feeTier: feeTiersArray[feeIndex].tier
-        //       })
-        //     )
-        //   }
-        // }
         if (
-          // tokenAIndex === tokenB &&
-          // tokenBIndex === tokenA &&
-          // fee === feeTiersArray[feeTierIndex].tier.fee &&
-          // tokenA !== null &&
-          // tokenB !== null &&
-          // tokenA !== tokenB &&
-          tokenAIndex !== null &&
-          tokenBIndex !== null
+          tokenA !== null &&
+          tokenB !== null &&
+          tokenA !== tokenB &&
+          !(
+            tokenAIndex === tokenA &&
+            tokenBIndex === tokenB &&
+            fee === ALL_FEE_TIERS_DATA[feeTierIndex].tier.fee
+          )
         ) {
-          dispatch(
-            poolsActions.getPoolData(
-              newPoolKey(
-                tokens[tokenAIndex].assetAddress.toString(),
-                tokens[tokenBIndex].assetAddress.toString(),
-                ALL_FEE_TIERS_DATA[feeIndex].tier
+          const index = allPools.findIndex(
+            pool =>
+              pool.poolKey.feeTier.fee === fee &&
+              ((pool.poolKey.tokenX === tokens[tokenA].assetAddress &&
+                pool.poolKey.tokenY === tokens[tokenB].assetAddress) ||
+                (pool.poolKey.tokenX === tokens[tokenA].assetAddress &&
+                  pool.poolKey.tokenY === tokens[tokenB].assetAddress))
+          )
+
+          if (
+            index !== poolIndex &&
+            !(
+              tokenAIndex === tokenB &&
+              tokenBIndex === tokenA &&
+              fee === ALL_FEE_TIERS_DATA[feeTierIndex].tier.fee
+            )
+          ) {
+            if (isMountedRef.current) {
+              setPoolIndex(index !== -1 ? index : null)
+              setCurrentPairReversed(null)
+            }
+          } else if (
+            tokenAIndex === tokenB &&
+            tokenBIndex === tokenA &&
+            fee === ALL_FEE_TIERS_DATA[feeTierIndex].tier.fee
+          ) {
+            if (isMountedRef.current) {
+              setCurrentPairReversed(currentPairReversed === null ? true : !currentPairReversed)
+            }
+          }
+
+          if (index !== -1 && index !== poolIndex) {
+            // dispatch(
+            //   actions.getCurrentPlotTicks({
+            //     poolIndex: index,
+            //     isXtoY: allPools[index].tokenX.equals(tokens[tokenA].assetAddress)
+            //   })
+            // )
+          } else if (
+            !(
+              tokenAIndex === tokenB &&
+              tokenBIndex === tokenA &&
+              fee === ALL_FEE_TIERS_DATA[feeTierIndex].tier.fee
+            )
+          ) {
+            dispatch(
+              poolsActions.getPoolData(
+                newPoolKey(
+                  tokens[tokenA].address.toString(),
+                  tokens[tokenB].address.toString(),
+                  ALL_FEE_TIERS_DATA[feeTierIndex].tier
+                )
               )
             )
-          )
+          }
         }
 
         setTokenAIndex(tokenA)

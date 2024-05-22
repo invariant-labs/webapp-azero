@@ -28,7 +28,7 @@ export interface IRangeSelector {
   initialIsDiscreteValue: boolean
   onDiscreteChange: (val: boolean) => void
   positionOpeningMethod?: PositionOpeningMethod
-  poolIndex: bigint | null
+  poolIndex: number | null
   hasTicksError?: boolean
   reloadHandler: () => void
   volumeRange?: {
@@ -174,14 +174,20 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   }
 
   const resetPlot = () => {
-    //TODO change to correct values
-    changeRangeHandler(
-      tickSpacing * 10n * (isXtoY ? -1n : 1n),
-      tickSpacing * 10n * (isXtoY ? 1n : -1n)
+    const higherTick = BigInt(
+      Math.max(Number(getMinTick(tickSpacing)), Number(midPrice.index) - Number(tickSpacing) * 10)
     )
+
+    const lowerTick = BigInt(
+      Math.min(Number(getMinTick(tickSpacing)), Number(midPrice.index) - Number(tickSpacing) * 10)
+    )
+
+    changeRangeHandler(isXtoY ? higherTick : lowerTick, isXtoY ? lowerTick : higherTick)
   }
 
-  const reversePlot = () => {}
+  const reversePlot = () => {
+    changeRangeHandler(rightRange, leftRange)
+  }
 
   useEffect(() => {
     if (currentPairReversed !== null && isMountedRef.current) {
