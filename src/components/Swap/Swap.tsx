@@ -2,7 +2,7 @@ import AnimatedButton, { ProgressState } from '@components/AnimatedButton/Animat
 import ChangeWalletButton from '@components/Header/HeaderButton/ChangeWalletButton'
 import ExchangeAmountInput from '@components/Inputs/ExchangeAmountInput/ExchangeAmountInput'
 import Slippage from '@components/Modals/Slippage/Slippage'
-import { Percentage, Price, Tick, TokenAmount } from '@invariant-labs/a0-sdk'
+import { Price, Tick, TokenAmount } from '@invariant-labs/a0-sdk'
 import { Box, Button, CardMedia, Grid, Typography } from '@mui/material'
 import { AddressOrPair } from '@polkadot/api/types'
 import infoIcon from '@static/svg/info.svg'
@@ -22,6 +22,7 @@ import TestTransaction from './TestTransaction/TestTransaction'
 import TransactionDetailsBox from './TransactionDetailsBox/TransactionDetailsBox'
 import useStyles from './style'
 import { PoolWithPoolKey } from '@store/reducers/pools'
+import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 
 export interface Pools {
   tokenX: AddressOrPair
@@ -52,7 +53,7 @@ export interface ISwap {
   pools: PoolWithPoolKey[]
   tickmap: { [x: string]: bigint[] } //TODO check if this is correct
   onSwap: (
-    slippage: Percentage,
+    slippage: bigint,
     knownPrice: Price,
     tokenFrom: AddressOrPair,
     tokenTo: AddressOrPair,
@@ -496,11 +497,7 @@ export const Swap: React.FC<ISwap> = ({
               //   : '- -'
               '- -'
             }
-            decimal={
-              tokenFromIndex !== null && tokens[tokenFromIndex]
-                ? tokens[tokenFromIndex].decimals
-                : 6n
-            } //TODO check if this is correct
+            decimal={tokenFromIndex !== null ? tokens[tokenFromIndex].decimals : PERCENTAGE_SCALE}
             className={classes.amountInput}
             setValue={value => {
               if (value.match(/^\d*\.?\d*$/)) {

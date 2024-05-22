@@ -1,7 +1,6 @@
 import NewPosition from '@components/NewPosition/NewPosition'
 import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import {
-  FEE_TIERS,
   TokenAmount,
   calculateSqrtPrice,
   getLiquidityByX,
@@ -18,12 +17,11 @@ import {
 } from '@store/consts/static'
 import {
   calcPrice,
-  calcYPerXPrice,
   createPlaceholderLiquidityPlot,
   getCoingeckoTokenPrice,
   getMockedTokenPrice,
-  printBigint,
-  stringifyPoolKey
+  poolKeyToString,
+  printBigint
 } from '@store/consts/utils'
 import { actions as positionsActions, TickPlotPositionData } from '@store/reducers/positions'
 import { Status } from '@store/reducers/wallet'
@@ -143,12 +141,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   }, [success, inProgress])
 
   const isXtoY = useMemo(() => {
-    if (
-      tokenAIndex !== null &&
-      tokenBIndex !== null &&
-      tokens[tokenAIndex] &&
-      tokens[tokenBIndex]
-    ) {
+    if (tokenAIndex !== null && tokenBIndex !== null) {
       return (
         tokens[tokenAIndex].assetAddress.toString() < tokens[tokenBIndex].assetAddress.toString()
       )
@@ -157,12 +150,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   }, [tokenAIndex, tokenBIndex])
 
   const xDecimal = useMemo(() => {
-    if (
-      tokenAIndex !== null &&
-      tokenBIndex !== null &&
-      tokens[tokenAIndex] &&
-      tokens[tokenBIndex]
-    ) {
+    if (tokenAIndex !== null && tokenBIndex !== null) {
       return tokens[tokenAIndex].assetAddress.toString() <
         tokens[tokenBIndex].assetAddress.toString()
         ? tokens[tokenAIndex].decimals
@@ -172,12 +160,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   }, [tokenAIndex, tokenBIndex, tokens])
 
   const yDecimal = useMemo(() => {
-    if (
-      tokenAIndex !== null &&
-      tokenBIndex !== null &&
-      tokens[tokenAIndex] &&
-      tokens[tokenBIndex]
-    ) {
+    if (tokenAIndex !== null && tokenBIndex !== null) {
       return tokens[tokenAIndex].assetAddress.toString() <
         tokens[tokenBIndex].assetAddress.toString()
         ? tokens[tokenBIndex].decimals
@@ -213,9 +196,12 @@ export const NewPositionWrapper: React.FC<IProps> = ({
 
   useEffect(() => {
     if (!isWaitingForNewPool && tokenAIndex !== null && tokenBIndex !== null) {
-      const keyStringified = stringifyPoolKey({
-        tokenX: tokens[tokenAIndex].assetAddress.toString(),
-        tokenY: tokens[tokenBIndex].assetAddress.toString(),
+      const tokenA = tokens[tokenAIndex].assetAddress.toString()
+      const tokenB = tokens[tokenBIndex].assetAddress.toString()
+
+      const keyStringified = poolKeyToString({
+        tokenX: isXtoY ? tokenA : tokenB,
+        tokenY: isXtoY ? tokenB : tokenA,
         feeTier: ALL_FEE_TIERS_DATA[feeIndex].tier
       })
 

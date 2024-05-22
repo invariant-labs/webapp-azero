@@ -1,7 +1,7 @@
 import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import Slippage from '@components/Modals/Slippage/Slippage'
 import { INoConnected, NoConnected } from '@components/NoConnected/NoConnected'
-import { Percentage, TokenAmount, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
+import { TokenAmount, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
 import { Button, Grid, Typography } from '@mui/material'
 import backIcon from '@static/svg/back-arrow.svg'
 import settingIcon from '@static/svg/settings.svg'
@@ -39,7 +39,7 @@ export interface INewPosition {
     rightTickIndex: bigint,
     xAmount: TokenAmount,
     yAmount: TokenAmount,
-    slippage: Percentage
+    slippage: bigint
   ) => void
   onChangePositionTokens: (
     tokenAIndex: number | null,
@@ -526,15 +526,18 @@ export const NewPosition: React.FC<INewPosition> = ({
           }}
           onAddLiquidity={() => {
             if (tokenAIndex !== null && tokenBIndex !== null) {
+              const tokenADecimals = tokens[tokenAIndex].decimals
+              const tokenBDecimals = tokens[tokenBIndex].decimals
+
               addLiquidityHandler(
                 leftRange,
                 rightRange,
                 isXtoY
-                  ? convertBalanceToBigint(tokenADeposit, tokens[tokenAIndex].decimals)
-                  : convertBalanceToBigint(tokenBDeposit, tokens[tokenBIndex].decimals),
+                  ? convertBalanceToBigint(tokenADeposit, tokenADecimals)
+                  : convertBalanceToBigint(tokenBDeposit, tokenBDecimals),
                 isXtoY
-                  ? convertBalanceToBigint(tokenBDeposit, tokens[tokenBIndex].decimals)
-                  : convertBalanceToBigint(tokenADeposit, tokens[tokenAIndex].decimals),
+                  ? convertBalanceToBigint(tokenBDeposit, tokenBDecimals)
+                  : convertBalanceToBigint(tokenADeposit, tokenADecimals),
                 BigInt(+slippTolerance * 1000)
               )
             }

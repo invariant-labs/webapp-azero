@@ -22,6 +22,7 @@ import {
   USDC,
   tokensPrices
 } from './static'
+import { PRICE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -120,10 +121,8 @@ export const trimZeros = (numStr: string): string => {
   return numStr
 }
 
-export const PRICE_DECIMAL = 24n
-
 export const calcYPerXPrice = (tickIndex: bigint, xDecimal: bigint, yDecimal: bigint): number => {
-  const sqrt = +printBigint(calculateSqrtPrice(tickIndex), PRICE_DECIMAL)
+  const sqrt = +printBigint(calculateSqrtPrice(tickIndex), PRICE_SCALE)
   const proportion = sqrt * sqrt
 
   return proportion / 10 ** Number(yDecimal - xDecimal)
@@ -183,8 +182,6 @@ export const calcPrice = (
   yDecimal: bigint
 ): number => {
   const price = calcYPerXPrice(amount, xDecimal, yDecimal)
-  // ): number => {
-  //   const price = calcYPerXPrice(calculateSqrtPrice(amount), xDecimal, yDecimal)
 
   return isXtoY ? price : 1 / price
 }
@@ -198,7 +195,7 @@ export const createPlaceholderLiquidityPlot = (
 ) => {
   const ticksData: PlotTickData[] = []
 
-  const min = getMinTick(tickSpacing) //TODO check if this is correct
+  const min = getMinTick(tickSpacing)
   const max = getMaxTick(tickSpacing)
 
   const minPrice = calcPrice(min, isXtoY, tokenXDecimal, tokenYDecimal)
@@ -397,38 +394,48 @@ export const getPrimaryUnitsPrice = (
 
 export const logBase = (x: number, b: number): number => Math.log(x) / Math.log(b)
 
+export const adjustToSpacing = (baseTick: number, spacing: number, isGreater: boolean): number => {
+  const remainder = baseTick % spacing
+
+  if (Math.abs(remainder) === 0) {
+    return baseTick
+  }
+
+  let adjustment: number
+  if (isGreater) {
+    if (baseTick >= 0) {
+      adjustment = spacing - remainder
+    } else {
+      adjustment = Math.abs(remainder)
+    }
+  } else {
+    if (baseTick >= 0) {
+      adjustment = -remainder
+    } else {
+      adjustment = -(spacing - Math.abs(remainder))
+    }
+  }
+
+  return baseTick + adjustment
+}
+
 export const spacingMultiplicityLte = (arg: number, spacing: number): number => {
-  if (Math.abs(arg % spacing) === 0) {
-    return arg
-  }
-
-  if (arg >= 0) {
-    return arg - (arg % spacing)
-  }
-
-  return arg - (spacing - (Math.abs(arg) % spacing))
+  return adjustToSpacing(arg, spacing, false)
 }
 
 export const spacingMultiplicityGte = (arg: number, spacing: number): number => {
-  if (Math.abs(arg % spacing) === 0) {
-    return arg
-  }
-
-  if (arg >= 0) {
-    return arg + (spacing - (arg % spacing))
-  }
-
-  return arg + (Math.abs(arg) % spacing)
+  return adjustToSpacing(arg, spacing, true)
 }
 
-export const nearestSpacingMultiplicity = (arg: number, spacing: number) => {
-  const greater = spacingMultiplicityGte(arg, spacing)
-  const lower = spacingMultiplicityLte(arg, spacing)
+export const nearestSpacingMultiplicity = (centerTick: number, spacing: number) => {
+  const greaterTick = spacingMultiplicityGte(centerTick, spacing)
+  const lowerTick = spacingMultiplicityLte(centerTick, spacing)
 
-  const nearest = Math.abs(greater - arg) < Math.abs(lower - arg) ? greater : lower
+  const nearestTick =
+    Math.abs(greaterTick - centerTick) < Math.abs(lowerTick - centerTick) ? greaterTick : lowerTick
 
   return Math.max(
-    Math.min(nearest, Number(getMaxTick(BigInt(spacing)))),
+    Math.min(nearestTick, Number(getMaxTick(BigInt(spacing)))),
     Number(getMinTick(BigInt(spacing)))
   )
 }
@@ -444,24 +451,21 @@ export const nearestTickIndex = (
     const minTick = getMinTick(spacing)
     const maxTick = getMaxTick(spacing)
 
-    const base = Math.max(
+    const basePrice = Math.max(
       price,
       Number(calcPrice(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
     )
-    const primaryUnitsPrice = getPrimaryUnitsPrice(base, isXtoY, Number(xDecimal), Number(yDecimal))
-    const log = Math.round(logBase(primaryUnitsPrice, 1.0001))
+    const primaryUnitsPrice = getPrimaryUnitsPrice(
+      basePrice,
+      isXtoY,
+      Number(xDecimal),
+      Number(yDecimal)
+    )
+    const tick = Math.round(logBase(primaryUnitsPrice, 1.0001))
 
-    return BigInt(nearestSpacingMultiplicity(log, Number(spacing)))
+    return BigInt(nearestSpacingMultiplicity(tick, Number(spacing)))
   } catch (error) {
     console.log(error)
-  }
-}
-
-export const stringifyPoolKey = (poolKey: PoolKey) => {
-  if (poolKey.tokenX > poolKey.tokenY) {
-    return `${poolKey.tokenX}-${poolKey.tokenY}-${poolKey.feeTier.fee.toString()}-${poolKey.feeTier.tickSpacing.toString()}`
-  } else {
-    return `${poolKey.tokenY}-${poolKey.tokenX}-${poolKey.feeTier.fee.toString()}-${poolKey.feeTier.tickSpacing.toString()}`
   }
 }
 
@@ -477,6 +481,17 @@ export const convertBalanceToBigint = (amount: string, decimals: bigint | number
     )
   }
   return 0n
+}
+export const convertBalanceToBigint2 = (amount: string, decimals: bigint | number): bigint => {
+  const [integerPart, fractionalPart = ''] = amount.split('.')
+  const decimalsNumber = Number(decimals)
+
+  if (fractionalPart.length > decimalsNumber) {
+    return 0n
+  }
+  const paddedFractionalPart = fractionalPart.padEnd(decimalsNumber, '0')
+
+  return BigInt(integerPart + paddedFractionalPart)
 }
 
 export enum PositionTokenBlock {
@@ -494,11 +509,13 @@ export const determinePositionTokenBlock = (
   const lowerPrice = calculateSqrtPrice(lowerTick)
   const upperPrice = calculateSqrtPrice(upperTick)
 
-  if (lowerPrice >= currentSqrtPrice) {
+  const isBelowLowerPrice = lowerPrice >= currentSqrtPrice
+  const isAboveUpperPrice = upperPrice <= currentSqrtPrice
+
+  if (isBelowLowerPrice) {
     return isXtoY ? PositionTokenBlock.B : PositionTokenBlock.A
   }
-
-  if (upperPrice <= currentSqrtPrice) {
+  if (isAboveUpperPrice) {
     return isXtoY ? PositionTokenBlock.A : PositionTokenBlock.B
   }
 

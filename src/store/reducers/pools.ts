@@ -11,7 +11,7 @@ import { AddressOrPair } from '@polkadot/api/types'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { BTC, ETH, Token, USDC } from '@store/consts/static'
 import { PayloadType } from '@store/consts/types'
-import { stringifyPoolKey } from '@store/consts/utils'
+import { poolKeyToString } from '@store/consts/utils'
 
 import * as R from 'remeda'
 
@@ -125,7 +125,7 @@ const poolsSlice = createSlice({
     },
     setPoolKeys(state, action: PayloadAction<PoolKey[]>) {
       action.payload.map(poolKey => {
-        const keyStringified = stringifyPoolKey(poolKey)
+        const keyStringified = poolKeyToString(poolKey)
         state.poolKeys[keyStringified] = poolKey
       })
       return state
@@ -136,7 +136,7 @@ const poolsSlice = createSlice({
     addPool(state, action: PayloadAction<PoolWithPoolKey | undefined>) {
       if (action.payload) {
         const { poolKey } = action.payload
-        const keyStringified = stringifyPoolKey(poolKey)
+        const keyStringified = poolKeyToString(poolKey)
 
         // Check if a pool with the same PoolKey already exists
         if (!state.pools[keyStringified]) {
@@ -191,7 +191,7 @@ const poolsSlice = createSlice({
       const newData = action.payload.data.reduce(
         (acc, pool) => ({
           ...acc,
-          [stringifyPoolKey(pool.poolKey)]: pool
+          [poolKeyToString(pool.poolKey)]: pool
         }),
         {}
       )

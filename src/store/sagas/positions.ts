@@ -1,24 +1,17 @@
 import { call, put, takeEvery, take, select, all, spawn, takeLatest } from 'typed-redux-saga'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { PayloadAction } from '@reduxjs/toolkit'
-import {
-  ClosePositionData,
-  GetCurrentTicksData,
-  InitPositionData,
-  actions
-} from '@store/reducers/positions'
+import { InitPositionData, actions } from '@store/reducers/positions'
 import { ListType, actions as poolsActions } from '@store/reducers/pools'
-import { createLoaderKey, stringifyPoolKey } from '@store/consts/utils'
+import { createLoaderKey, poolKeyToString } from '@store/consts/utils'
 import { closeSnackbar } from 'notistack'
 import {
   Invariant,
   PSP22,
   PoolKey,
   TESTNET_INVARIANT_ADDRESS,
-  newPoolKey,
   sendAndDebugTx,
-  sendTx,
-  toSqrtPrice
+  sendTx
 } from '@invariant-labs/a0-sdk'
 import { getConnection } from './connection'
 import { networkType } from '@store/selectors/connection'
@@ -222,7 +215,7 @@ export function* handleGetPositionsList() {
     const pools: PoolKey[] = []
     const poolSet: Set<string> = new Set()
     for (let i = 0; i < positions.length; i++) {
-      const poolKeyString = stringifyPoolKey(positions[i].poolKey)
+      const poolKeyString = poolKeyToString(positions[i].poolKey)
 
       if (!poolSet.has(poolKeyString)) {
         poolSet.add(poolKeyString)
