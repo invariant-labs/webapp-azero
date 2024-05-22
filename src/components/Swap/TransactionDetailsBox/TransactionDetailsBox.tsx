@@ -37,7 +37,7 @@ const TransactionDetailsBox: React.FC<IProps> = ({
   const { classes } = useStyles({ open })
 
   // const feePercent = percentValueDisplay(fee)
-  // const impact = +printBN(priceImpact, DECIMAL - 2)
+  // const impact = +printBigint(priceImpact, DECIMAL - 2)
 
   return (
     <Grid container className={classes.wrapper}>
@@ -58,7 +58,7 @@ const TransactionDetailsBox: React.FC<IProps> = ({
         <Grid container justifyContent='space-between' className={classes.row}>
           <Typography className={classes.label}>Fee:</Typography>
           <Typography className={classes.value}>
-            {/* {printBN(feePercent.value, feePercent.decimal)}% */}
+            {/* {printBigint(feePercent.value, feePercent.decimal)}% */}
             {'0.3%'}
           </Typography>
         </Grid>
@@ -74,7 +74,7 @@ const TransactionDetailsBox: React.FC<IProps> = ({
         {/* <Grid container justifyContent='space-between' className={classes.row}>
           <Typography className={classes.label}>Minimum received:</Typography>
           <Typography className={classes.value}>
-            {printBN(minimumReceived.val, minimumReceived.decimal)} {minimumReceived.symbol}
+            {printBigint(minimumReceived.val, minimumReceived.decimal)} {minimumReceived.symbol}
           </Typography>
         </Grid> */}
 

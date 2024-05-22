@@ -9,7 +9,6 @@ import {
 } from '@invariant-labs/a0-sdk'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { DEFAULT_CONTRACT_OPTIONS } from '@store/consts/static'
 import {
   createLoaderKey,
   getPoolsByPoolKeys,
@@ -25,6 +24,7 @@ import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
 import { getConnection } from './connection'
+import { DEFAULT_CONTRACT_OPTIONS, TokenList } from '@store/consts/static'
 
 export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) {
   const walletAddress = yield* select(address)
@@ -66,7 +66,8 @@ export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) 
   yield* put(actions.addPoolsForList({ data: pools, listType: action.payload.listType }))
 }
 
-export function* handleInitPool(action: PayloadAction<PoolKey>) {
+//TODO check can it be deleted
+export function* handleInitPool(action: PayloadAction<PoolKey>): Generator {
   const loaderKey = createLoaderKey()
   const loaderSigningTx = createLoaderKey()
   try {
@@ -96,7 +97,6 @@ export function* handleInitPool(action: PayloadAction<PoolKey>) {
 
     const poolKey = newPoolKey(tokenX, tokenY, feeTier)
 
-    const price = toPrice(1n, 0n)
     const initSqrtPrice = toSqrtPrice(1n, 0n)
 
     const tx = yield* call([invariant, invariant.createPoolTx], poolKey, initSqrtPrice)
@@ -139,13 +139,46 @@ export function* handleInitPool(action: PayloadAction<PoolKey>) {
   }
 }
 
-export function* fetchFeeTiers() {
-  console.log('test')
-  try {
-    const api = yield* getConnection()
-    const network = yield* select(networkType)
-    const walletAddress = yield* select(address)
+export function* getPoolsDataForListHandler(): Generator {
+  yield* takeEvery(actions.getPoolsDataForList, fetchPoolsDataForList)
+}
 
+export function* fetchPoolData(action: PayloadAction<PoolKey>): Generator {
+  const api = yield* getConnection()
+  const network = yield* select(networkType)
+  const { feeTier, tokenX, tokenY } = action.payload
+
+  try {
+    const invariant = yield* call(
+      [Invariant, Invariant.load],
+      api,
+      network,
+      TESTNET_INVARIANT_ADDRESS,
+      DEFAULT_CONTRACT_OPTIONS
+    )
+    const pool = yield* call([invariant, invariant.getPool], tokenX, tokenY, feeTier)
+
+    if (pool) {
+      yield* put(
+        actions.addPool({
+          ...pool,
+          poolKey: action.payload
+        })
+      )
+    } else {
+      yield* put(actions.addPool())
+    }
+  } catch (error) {
+    console.log(error)
+    yield* put(actions.addPool())
+  }
+}
+
+export function* fetchAllPoolKeys(): Generator {
+  const api = yield* getConnection()
+  const network = yield* select(networkType)
+
+  try {
     const invariant = yield* call(
       [Invariant, Invariant.load],
       api,
@@ -154,26 +187,30 @@ export function* fetchFeeTiers() {
       DEFAULT_CONTRACT_OPTIONS
     )
 
-    const feeTiers = yield* call([invariant, invariant.getFeeTiers], walletAddress)
-    console.log(feeTiers)
-    yield put(actions.setFeeTiers(feeTiers))
+    //TODO: in the future handle more than 100 pools
+    const pools = yield* call([invariant, invariant.getPoolKeys], 100n, 0n)
+
+    yield* put(actions.setPoolKeys(pools))
   } catch (error) {
+    yield* put(actions.setPoolKeys([]))
     console.log(error)
   }
-}
-
-export function* getPoolsDataForListHandler(): Generator {
-  yield* takeEvery(actions.getPoolsDataForList, fetchPoolsDataForList)
 }
 
 export function* initPoolHandler(): Generator {
   yield* takeLatest(actions.initPool, handleInitPool)
 }
 
-export function* fetchFeeTiersHandler(): Generator {
-  yield* takeLatest(actions.getFeeTiers, fetchFeeTiers)
+export function* getPoolDataHandler(): Generator {
+  yield* takeLatest(actions.getPoolData, fetchPoolData)
+}
+
+export function* getPoolKeysHandler(): Generator {
+  yield* takeLatest(actions.getPoolKeys, fetchAllPoolKeys)
 }
 
 export function* poolsSaga(): Generator {
-  yield all([initPoolHandler, fetchFeeTiersHandler, getPoolsDataForListHandler].map(spawn))
+  yield all(
+    [initPoolHandler, getPoolDataHandler, getPoolKeysHandler, getPoolsDataForListHandler].map(spawn)
+  )
 }

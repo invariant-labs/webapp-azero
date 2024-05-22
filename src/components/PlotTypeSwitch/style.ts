@@ -47,6 +47,10 @@ export const useSingleTabStyles = makeStyles()(() => ({
     alignItems: 'center',
     padding: 0,
 
+    '& img': {
+      minHeight: 'auto'
+    },
+
     '&:hover': {
       backgroundColor: `${colors.invariant.light}B0`,
       height: 26,

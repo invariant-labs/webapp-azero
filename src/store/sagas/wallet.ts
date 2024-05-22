@@ -9,10 +9,10 @@ import {
   TokenList,
   getFaucetDeployer
 } from '@store/consts/static'
-import { createLoaderKey } from '@store/consts/utils'
+import { createLoaderKey, getTokenBalances } from '@store/consts/utils'
 import { actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import { Status, actions, actions as walletActions } from '@store/reducers/wallet'
+import { ITokenBalance, Status, actions } from '@store/reducers/wallet'
 import { address, status } from '@store/selectors/wallet'
 import { disconnectWallet, getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
@@ -27,6 +27,7 @@ import {
   takeLeading
 } from 'typed-redux-saga'
 import { getConnection } from './connection'
+import { networkType } from '@store/selectors/connection'
 
 export function* getWallet(): SagaGenerator<NightlyConnectAdapter> {
   const wallet = yield* call(getAlephZeroWallet)
@@ -127,7 +128,6 @@ export function* handleAirdrop(): Generator {
   const connection = yield* getConnection()
   const faucetDeployer = getFaucetDeployer()
   const data = connection.createType('Vec<u8>', [])
-  const notAirdroppedTokens = []
 
   const psp22 = yield* call(PSP22.load, connection, Network.Testnet, '', DEFAULT_CONTRACT_OPTIONS)
 
@@ -136,30 +136,13 @@ export function* handleAirdrop(): Generator {
     const airdropAmount = TokenAirdropAmount[ticker as keyof typeof TokenList]
 
     yield* call([psp22, psp22.setContractAddress], address)
-    const balance = yield* call([psp22, psp22.balanceOf], faucetDeployer.address, walletAddress)
-    yield* put(walletActions.setTokenAccount({ address, balance }))
-    const faucetAmount = airdropAmount
-    if (balance < faucetAmount) {
-      yield* call([psp22, psp22.mint], faucetDeployer, faucetAmount)
-      yield* call([psp22, psp22.transfer], faucetDeployer, walletAddress, faucetAmount, data)
+    yield* call([psp22, psp22.mint], faucetDeployer, airdropAmount)
+    yield* call([psp22, psp22.transfer], faucetDeployer, walletAddress, airdropAmount, data)
 
-      yield* put(
-        snackbarsActions.add({
-          message: `Airdropped ${ticker} tokens`,
-          variant: 'success',
-          persist: false
-        })
-      )
-    } else {
-      notAirdroppedTokens.push(ticker)
-    }
-  }
-
-  if (notAirdroppedTokens.length > 0) {
     yield* put(
       snackbarsActions.add({
-        message: `Didn't airdrop ${notAirdroppedTokens.join(', ')} ${notAirdroppedTokens.length === 1 ? 'token' : 'tokens'} due to high balance`,
-        variant: 'error',
+        message: `Airdropped ${ticker} tokens`,
+        variant: 'success',
         persist: false
       })
     )
@@ -285,6 +268,22 @@ export function* signAndSend(
   return txId.toString()
 }
 
+export function* fetchTokensBalances(): Generator {
+  const api = yield* getConnection()
+  const network = yield* select(networkType)
+  const walletAddress = yield* select(address)
+
+  const tokens = Object.values(TokenList)
+  const balances = yield* call(getTokenBalances, tokens, api, network, walletAddress)
+
+  const convertedBalances: ITokenBalance[] = balances.map(balance => ({
+    address: balance[0],
+    balance: balance[1]
+  }))
+
+  yield* put(actions.addTokenBalances(convertedBalances))
+}
+
 export function* init(): Generator {
   try {
     yield* put(actions.setStatus(Status.Init))
@@ -300,7 +299,7 @@ export function* init(): Generator {
 
     yield* put(actions.setBalance(BigInt(balance)))
     yield* put(actions.setStatus(Status.Initialized))
-    // // yield* call(fetchTokensAccounts)
+    yield* call(fetchTokensBalances)
     yield* put(actions.setIsBalanceLoading(false))
   } catch (error) {
     console.log(error)

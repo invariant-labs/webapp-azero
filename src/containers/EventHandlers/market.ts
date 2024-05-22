@@ -11,8 +11,6 @@ const MarketEvents = () => {
 
   useEffect(() => {
     const connection = getCurrentAlephZeroConnection()
-    console.log(networkStatus !== Status.Initialized)
-    console.log(connection)
 
     const connectEvents = () => {
       // let tokens = getNetworkTokensList(network)

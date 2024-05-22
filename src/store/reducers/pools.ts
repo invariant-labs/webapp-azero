@@ -4,7 +4,7 @@ import {
   PoolKey,
   TESTNET_BTC_ADDRESS,
   TESTNET_ETH_ADDRESS,
-  TETSNET_USDC_ADDRESS,
+  TESTNET_USDC_ADDRESS,
   Tick
 } from '@invariant-labs/a0-sdk'
 import { AddressOrPair } from '@polkadot/api/types'
@@ -12,6 +12,7 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { BTC, ETH, Token, USDC } from '@store/consts/static'
 import { PayloadType } from '@store/consts/types'
 import { poolKeyToString } from '@store/consts/utils'
+
 import * as R from 'remeda'
 
 export interface PoolWithPoolKey extends Pool {
@@ -26,16 +27,16 @@ export interface IndexedFeeTier {
 export interface IPoolsStore {
   tokens: Record<string, Token>
   pools: { [key in string]: PoolWithPoolKey }
+  poolKeys: { [key in string]: PoolKey }
   poolTicks: { [key in string]: Tick[] }
   nearestPoolTicksForPair: { [key in string]: Tick[] }
   isLoadingLatestPoolsForTransaction: boolean
   tickMaps: { [key in string]: bigint[] }
   volumeRanges: Record<string, Range[]>
-  feeTiers: IndexedFeeTier[]
 }
 
 export interface UpdatePool {
-  address: AddressOrPair
+  poolKey: PoolKey
   poolStructure: Pool
 }
 
@@ -68,14 +69,14 @@ export interface FetchTicksAndTickMaps {
 }
 
 export const defaultState: IPoolsStore = {
-  tokens: { [TESTNET_BTC_ADDRESS]: BTC, [TESTNET_ETH_ADDRESS]: ETH, [TETSNET_USDC_ADDRESS]: USDC },
+  tokens: { [TESTNET_BTC_ADDRESS]: BTC, [TESTNET_ETH_ADDRESS]: ETH, [TESTNET_USDC_ADDRESS]: USDC },
   pools: {},
+  poolKeys: {},
   poolTicks: {},
   nearestPoolTicksForPair: {},
   isLoadingLatestPoolsForTransaction: false,
   tickMaps: {},
-  volumeRanges: {},
-  feeTiers: []
+  volumeRanges: {}
 }
 
 export interface PairTokens {
@@ -106,17 +107,6 @@ const poolsSlice = createSlice({
     initPool(state, _action: PayloadAction<PoolKey>) {
       return state
     },
-    getFeeTiers(state) {
-      return state
-    },
-    setFeeTiers(state, action: PayloadAction<FeeTier[]>) {
-      const indexedFeeTiers = action.payload.map((tier, index) => ({
-        tier,
-        primaryIndex: index
-      }))
-      state.feeTiers = indexedFeeTiers
-      return state
-    },
     addTokens(state, action: PayloadAction<Record<string, Token>>) {
       state.tokens = {
         ...state.tokens,
@@ -131,6 +121,36 @@ const poolsSlice = createSlice({
           balance: pair[1]
         }
       })
+      return state
+    },
+    setPoolKeys(state, action: PayloadAction<PoolKey[]>) {
+      action.payload.map(poolKey => {
+        const keyStringified = poolKeyToString(poolKey)
+        state.poolKeys[keyStringified] = poolKey
+      })
+      return state
+    },
+    getPoolKeys(state) {
+      return state
+    },
+    addPool(state, action: PayloadAction<PoolWithPoolKey | undefined>) {
+      if (action.payload) {
+        const { poolKey } = action.payload
+        const keyStringified = poolKeyToString(poolKey)
+
+        // Check if a pool with the same PoolKey already exists
+        if (!state.pools[keyStringified]) {
+          // If the pool does not exist, add it to the pools object
+          state.pools[keyStringified] = action.payload
+        }
+      }
+
+      // TODO add new pool, but not repeat existing ones
+      state.isLoadingLatestPoolsForTransaction = false
+      return state
+    },
+    getPoolData(state, _action: PayloadAction<PoolKey>) {
+      state.isLoadingLatestPoolsForTransaction = true
       return state
     },
     // setVolumeRanges(state, action: PayloadAction<Record<string, Range[]>>) {
@@ -183,10 +203,7 @@ const poolsSlice = createSlice({
     //     state.poolTicks[action.payload.address].findIndex(e => e.index === action.payload.index)
     //   ] = action.payload.tick
     // },
-    // getPoolData(state, _action: PayloadAction<Pair>) {
-    //   state.isLoadingLatestPoolsForTransaction = true
-    //   return state
-    // },
+
     // getAllPoolsForPairData(state, _action: PayloadAction<PairTokens>) {
     //   state.isLoadingLatestPoolsForTransaction = true
     //   return state

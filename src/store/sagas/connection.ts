@@ -7,10 +7,6 @@ import { ApiPromise } from '@polkadot/api'
 import { initPolkadotApi } from '@invariant-labs/a0-sdk/src'
 
 export function* getConnection(): SagaGenerator<ApiPromise> {
-  //   const rpc = yield* select(rpcAddress)
-  //   const connection = yield* call(getAlephZeroConnection, rpc)
-  //   console.log(connection)
-  //   console.log(rpc)
   const rpc = yield* select(rpcAddress)
   const network = yield* select(networkType)
   const connection = yield* call(initPolkadotApi, network, rpc)
@@ -22,9 +18,8 @@ export function* initConnection(): Generator {
   try {
     const rpc = yield* select(rpcAddress)
     const network = yield* select(networkType)
-    const connection = yield* call(initPolkadotApi, network, rpc)
-    // const connection = yield* call(getConnection)
-    console.log(connection)
+    yield* call(initPolkadotApi, network, rpc)
+
     yield* put(
       snackbarsActions.add({
         message: 'Aleph-Zero network connected.',

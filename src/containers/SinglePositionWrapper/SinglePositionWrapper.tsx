@@ -10,7 +10,7 @@ import {
   getCoingeckoTokenPrice,
   getMockedTokenPrice,
   poolKeyToString,
-  printAmount
+  printBigint
 } from '@store/consts/utils'
 import { actions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
@@ -170,7 +170,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   const tokenXLiquidity = useMemo(() => {
     if (position) {
       try {
-        return +printAmount(
+        return +printBigint(
           getLiquidityByX(
             position.liquidity,
             position.lowerTickIndex,
@@ -178,7 +178,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
             position.poolData.sqrtPrice,
             true
           ).amount,
-          Number(position.tokenX.decimals)
+          position.tokenX.decimals
         )
       } catch (error) {
         return 0
@@ -191,7 +191,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   const tokenYLiquidity = useMemo(() => {
     if (position) {
       try {
-        return +printAmount(
+        return +printBigint(
           getLiquidityByY(
             position.liquidity,
             position.lowerTickIndex,
@@ -199,7 +199,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
             position.poolData.sqrtPrice,
             true
           ).amount,
-          Number(position.tokenY.decimals)
+          position.tokenY.decimals
         )
       } catch (error) {
         return 0
@@ -221,8 +221,8 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
       setShowFeesLoader(false)
 
       return [
-        +printAmount(bnX, Number(position.tokenX.decimals)),
-        +printAmount(bnY, Number(position.tokenY.decimals))
+        +printBigint(bnX, position.tokenX.decimals),
+        +printBigint(bnY, position.tokenY.decimals)
       ]
     }
 
@@ -370,28 +370,28 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
           name: position.tokenX.symbol,
           icon: position.tokenX.logoURI,
           decimal: position.tokenX.decimals,
-          balance: +printAmount(position.tokenX.balance ?? 0n, Number(position.tokenX.decimals)),
+          balance: +printBigint(position.tokenX.balance ?? 0n, position.tokenX.decimals),
           liqValue: tokenXLiquidity,
           claimValue: tokenXClaim,
           usdValue:
             typeof tokenXPriceData?.price === 'undefined'
               ? undefined
               : tokenXPriceData.price *
-                +printAmount(position.tokenX.balance ?? 0n, Number(position.tokenX.decimals))
+                +printBigint(position.tokenX.balance ?? 0n, position.tokenX.decimals)
         }}
         tokenXPriceData={tokenXPriceData}
         tokenY={{
           name: position.tokenY.symbol,
           icon: position.tokenY.logoURI,
           decimal: position.tokenY.decimals,
-          balance: +printAmount(position.tokenY.balance ?? 0n, Number(position.tokenY.decimals)),
+          balance: +printBigint(position.tokenY.balance ?? 0n, position.tokenY.decimals),
           liqValue: tokenYLiquidity,
           claimValue: tokenYClaim,
           usdValue:
             typeof tokenYPriceData?.price === 'undefined'
               ? undefined
               : tokenYPriceData.price *
-                +printAmount(position.tokenY.balance ?? 0n, Number(position.tokenY.decimals))
+                +printBigint(position.tokenY.balance ?? 0n, position.tokenY.decimals)
         }}
         tokenYPriceData={tokenYPriceData}
         fee={Number(position.poolKey.feeTier.fee)}

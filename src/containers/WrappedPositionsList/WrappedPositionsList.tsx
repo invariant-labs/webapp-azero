@@ -2,7 +2,7 @@ import { PositionsList } from '@components/PositionsList/PositionsList'
 import { getLiquidityByX, getLiquidityByY } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/src/consts'
 import { POSITIONS_PER_PAGE } from '@store/consts/static'
-import { calcYPerXPrice, printAmount } from '@store/consts/utils'
+import { calcYPerXPrice, printBigint } from '@store/consts/utils'
 import { actions } from '@store/reducers/positions'
 import { Status } from '@store/reducers/wallet'
 import {
@@ -65,7 +65,7 @@ export const WrappedPositionsList: React.FC = () => {
       let tokenXLiq, tokenYLiq
 
       try {
-        tokenXLiq = +printAmount(
+        tokenXLiq = +printBigint(
           getLiquidityByX(
             position.liquidity,
             position.lowerTickIndex,
@@ -73,14 +73,14 @@ export const WrappedPositionsList: React.FC = () => {
             position.poolData.sqrtPrice,
             true
           ).amount,
-          Number(position.tokenX.decimals)
+          position.tokenX.decimals
         )
       } catch (error) {
         tokenXLiq = 0
       }
 
       try {
-        tokenYLiq = +printAmount(
+        tokenYLiq = +printBigint(
           getLiquidityByY(
             position.liquidity,
             position.lowerTickIndex,
@@ -88,7 +88,7 @@ export const WrappedPositionsList: React.FC = () => {
             position.poolData.sqrtPrice,
             true
           ).amount,
-          Number(position.tokenY.decimals)
+          position.tokenY.decimals
         )
       } catch (error) {
         tokenYLiq = 0
@@ -108,7 +108,7 @@ export const WrappedPositionsList: React.FC = () => {
         tokenYName: position.tokenY.symbol,
         tokenXIcon: position.tokenX.logoURI,
         tokenYIcon: position.tokenY.logoURI,
-        fee: +printAmount(position.poolKey.feeTier.fee, Number(PERCENTAGE_SCALE) - 2),
+        fee: +printBigint(position.poolKey.feeTier.fee, PERCENTAGE_SCALE - 2n),
         min,
         max,
         tokenXLiq,
