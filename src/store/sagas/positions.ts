@@ -26,7 +26,8 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
   const loaderCreatePosition = createLoaderKey()
   const loaderTokenX = createLoaderKey()
   const loaderTokenY = createLoaderKey()
-  const loaderSigningTx = createLoaderKey()
+  const loaderSingingPositionTx = createLoaderKey()
+  const loaderCreatePool = createLoaderKey()
 
   const {
     poolKeyData,
@@ -46,7 +47,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
   try {
     yield put(
       snackbarsActions.add({
-        message: 'Creating position',
+        message: 'Creating position...',
         variant: 'pending',
         persist: true,
         key: loaderCreatePosition
@@ -79,10 +80,19 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     const signedXTokenTx = yield* call([XTokenTx, XTokenTx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
     })
-    yield* call(sendTx, signedXTokenTx)
+    const tokenXtx = yield* call(sendTx, signedXTokenTx)
 
     closeSnackbar(loaderTokenX)
     yield put(snackbarsActions.remove(loaderTokenX))
+
+    yield put(
+      snackbarsActions.add({
+        message: `${tokenXName} token successfully approved`,
+        variant: 'success',
+        persist: false,
+        txid: tokenXtx.hash
+      })
+    )
 
     yield put(
       snackbarsActions.add({
@@ -99,10 +109,19 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     const signedYTokenTx = yield* call([YTokenTx, YTokenTx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
     })
-    yield* call(sendTx, signedYTokenTx)
+    const tokenYtx = yield* call(sendTx, signedYTokenTx)
 
     closeSnackbar(loaderTokenY)
     yield put(snackbarsActions.remove(loaderTokenY))
+
+    yield put(
+      snackbarsActions.add({
+        message: `${tokenYName} token successfully approved`,
+        variant: 'success',
+        persist: false,
+        txid: tokenYtx.hash
+      })
+    )
 
     const invariant = yield* call(
       [Invariant, Invariant.load],
@@ -112,16 +131,15 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       DEFAULT_CONTRACT_OPTIONS
     )
 
-    yield put(
-      snackbarsActions.add({
-        message: 'Signing transaction...',
-        variant: 'pending',
-        persist: true,
-        key: loaderSigningTx
-      })
-    )
-
     if (initPool) {
+      yield put(
+        snackbarsActions.add({
+          message: 'Creating new pool...',
+          variant: 'pending',
+          persist: true,
+          key: loaderCreatePool
+        })
+      )
       const createPoolTx = yield* call(
         [invariant, invariant.createPoolTx],
         poolKeyData,
@@ -136,7 +154,19 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
         }
       )
 
-      yield* call(sendTx, signedCreatePoolTx)
+      const createPoolTX = yield* call(sendTx, signedCreatePoolTx)
+
+      closeSnackbar(loaderCreatePool)
+      yield put(snackbarsActions.remove(loaderCreatePool))
+
+      yield put(
+        snackbarsActions.add({
+          message: `Pool successfully created`,
+          variant: 'success',
+          persist: false,
+          txid: createPoolTX.hash
+        })
+      )
 
       yield* call(fetchAllPoolKeys)
     }
@@ -151,9 +181,21 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       slippageTolerance
     )
 
+    yield put(
+      snackbarsActions.add({
+        message: 'Singing new position transaction...',
+        variant: 'pending',
+        persist: true,
+        key: loaderSingingPositionTx
+      })
+    )
+
     const signedTx = yield* call([tx, tx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
     })
+
+    closeSnackbar(loaderSingingPositionTx)
+    yield put(snackbarsActions.remove(loaderSingingPositionTx))
 
     // const txResult = yield* call(sendTx, signedTx)
     const txResult = yield* call(sendAndDebugTx, signedTx, api)
@@ -169,23 +211,22 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       })
     )
 
-    closeSnackbar(loaderSigningTx)
-    yield put(snackbarsActions.remove(loaderSigningTx))
     closeSnackbar(loaderCreatePosition)
     yield put(snackbarsActions.remove(loaderCreatePosition))
   } catch (error) {
     console.log(error)
 
     yield* put(actions.setInitPositionSuccess(false))
-
-    closeSnackbar(loaderSigningTx)
-    yield put(snackbarsActions.remove(loaderSigningTx))
     closeSnackbar(loaderCreatePosition)
     yield put(snackbarsActions.remove(loaderCreatePosition))
     closeSnackbar(loaderTokenX)
     yield put(snackbarsActions.remove(loaderTokenX))
     closeSnackbar(loaderTokenY)
     yield put(snackbarsActions.remove(loaderTokenY))
+    closeSnackbar(loaderSingingPositionTx)
+    yield put(snackbarsActions.remove(loaderSingingPositionTx))
+    closeSnackbar(loaderCreatePool)
+    yield put(snackbarsActions.remove(loaderCreatePool))
 
     yield put(
       snackbarsActions.add({
