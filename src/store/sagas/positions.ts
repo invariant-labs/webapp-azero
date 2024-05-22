@@ -16,6 +16,7 @@ import {
 import { getConnection } from './connection'
 import { networkType } from '@store/selectors/connection'
 import { address } from '@store/selectors/wallet'
+import { actions as walletActions } from '@store/reducers/wallet'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { Signer } from '@polkadot/api/types'
 import { fetchAllPoolKeys } from './pools'
@@ -210,6 +211,8 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
         txid: txResult.hash
       })
     )
+
+    yield put(walletActions.getTokens())
 
     closeSnackbar(loaderCreatePosition)
     yield put(snackbarsActions.remove(loaderCreatePosition))

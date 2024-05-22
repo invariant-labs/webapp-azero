@@ -95,6 +95,9 @@ const walletSlice = createSlice({
       state.tokensBalances[action.payload.address.toString()] = action.payload
       return state
     },
+    getTokens(state) {
+      return state
+    },
     // Triggers rescan for tokens that we control
     rescanTokens() {},
     airdrop() {},

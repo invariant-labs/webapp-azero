@@ -361,11 +361,22 @@ export function* initSaga(): Generator {
 // export function* handleBalanceSaga(): Generator {
 //   yield takeLeading(actions.getBalance, handleBalance)
 // }
+
+export function* handleFetchTokensBalances(): Generator {
+  yield takeLeading(actions.getTokens, fetchTokensBalances)
+}
 export function* handleTestTransaction(): Generator {
   yield takeLeading(actions.initTestTransaction, testTransaction)
 }
 export function* walletSaga(): Generator {
   yield all(
-    [initSaga, airdropSaga, connectHandler, disconnectHandler, handleTestTransaction].map(spawn)
+    [
+      initSaga,
+      airdropSaga,
+      connectHandler,
+      disconnectHandler,
+      handleTestTransaction,
+      handleFetchTokensBalances
+    ].map(spawn)
   )
 }
