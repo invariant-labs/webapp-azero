@@ -26,7 +26,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
   const loaderCreatePosition = createLoaderKey()
   const loaderTokenX = createLoaderKey()
   const loaderTokenY = createLoaderKey()
-  const loaderSingingPositionTx = createLoaderKey()
+  const loaderSigningPositionTx = createLoaderKey()
   const loaderCreatePool = createLoaderKey()
 
   const {
@@ -183,10 +183,10 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
 
     yield put(
       snackbarsActions.add({
-        message: 'Singing new position transaction...',
+        message: 'Signing new position transaction...',
         variant: 'pending',
         persist: true,
-        key: loaderSingingPositionTx
+        key: loaderSigningPositionTx
       })
     )
 
@@ -194,8 +194,8 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       signer: adapter.signer as Signer
     })
 
-    closeSnackbar(loaderSingingPositionTx)
-    yield put(snackbarsActions.remove(loaderSingingPositionTx))
+    closeSnackbar(loaderSigningPositionTx)
+    yield put(snackbarsActions.remove(loaderSigningPositionTx))
 
     // const txResult = yield* call(sendTx, signedTx)
     const txResult = yield* call(sendAndDebugTx, signedTx, api)
@@ -223,8 +223,8 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     yield put(snackbarsActions.remove(loaderTokenX))
     closeSnackbar(loaderTokenY)
     yield put(snackbarsActions.remove(loaderTokenY))
-    closeSnackbar(loaderSingingPositionTx)
-    yield put(snackbarsActions.remove(loaderSingingPositionTx))
+    closeSnackbar(loaderSigningPositionTx)
+    yield put(snackbarsActions.remove(loaderSigningPositionTx))
     closeSnackbar(loaderCreatePool)
     yield put(snackbarsActions.remove(loaderCreatePool))
 
