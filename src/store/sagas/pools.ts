@@ -187,7 +187,8 @@ export function* fetchAllPoolKeys(): Generator {
       DEFAULT_CONTRACT_OPTIONS
     )
 
-    const pools = yield* call([invariant, invariant.getPoolKeys], 100n, 1n)
+    //TODO: in the future handle more than 100 pools
+    const pools = yield* call([invariant, invariant.getPoolKeys], 100n, 0n)
 
     yield* put(actions.setPoolKeys(pools))
   } catch (error) {
