@@ -1,5 +1,12 @@
-import { Position, Tick, TokenAmount } from '@invariant-labs/a0-sdk'
-import { AddressOrPair } from '@polkadot/api/types'
+import {
+  Liquidity,
+  Percentage,
+  PoolKey,
+  Position,
+  SqrtPrice,
+  Tick,
+  TokenAmount
+} from '@invariant-labs/a0-sdk'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/consts/types'
 
@@ -37,16 +44,16 @@ export interface IPositionsStore {
   currentPositionTicks: CurrentPositionTicksStore
   initPosition: InitPositionStore
 }
-export interface InitPositionData
-  extends Omit<Position, 'poolKey' | 'tokensOwedX' | 'tokensOwedY'> {
-  tokenX: AddressOrPair
-  tokenY: AddressOrPair
-  fee: TokenAmount
-  tickSpacing: number
+export interface InitPositionData {
+  poolKeyData: PoolKey
+  lowerTick: bigint
+  upperTick: bigint
+  liquidityDelta: Liquidity
+  spotSqrtPrice: SqrtPrice
+  slippageTolerance: Percentage
+  tokenXAmount: TokenAmount
+  tokenYAmount: TokenAmount
   initPool?: boolean
-  initTick?: number
-  xAmount: number
-  yAmount: number
 }
 export interface GetCurrentTicksData {
   poolIndex: number
@@ -104,22 +111,22 @@ const positionsSlice = createSlice({
       state.initPosition.success = action.payload
       return state
     },
-    setPlotTicks(state, action: PayloadAction<PlotTickData[]>) {
-      state.plotTicks.data = action.payload
-      state.plotTicks.loading = false
-      state.plotTicks.hasError = false
-      return state
-    },
-    setErrorPlotTicks(state, action: PayloadAction<PlotTickData[]>) {
-      state.plotTicks.data = action.payload
-      state.plotTicks.loading = false
-      state.plotTicks.hasError = true
-      return state
-    },
-    getCurrentPlotTicks(state, action: PayloadAction<GetCurrentTicksData>) {
-      state.plotTicks.loading = !action.payload.disableLoading
-      return state
-    },
+    // setPlotTicks(state, action: PayloadAction<PlotTickData[]>) {
+    //   state.plotTicks.data = action.payload
+    //   state.plotTicks.loading = false
+    //   state.plotTicks.hasError = false
+    //   return state
+    // },
+    // setErrorPlotTicks(state, action: PayloadAction<PlotTickData[]>) {
+    //   state.plotTicks.data = action.payload
+    //   state.plotTicks.loading = false
+    //   state.plotTicks.hasError = true
+    //   return state
+    // },
+    // getCurrentPlotTicks(state, action: PayloadAction<GetCurrentTicksData>) {
+    //   state.plotTicks.loading = !action.payload.disableLoading
+    //   return state
+    // },
     setPositionsList(state, action: PayloadAction<Position[]>) {
       state.positionsList.list = action.payload
       state.positionsList.loading = false

@@ -1,5 +1,6 @@
 import { Network, PSP22, initPolkadotApi, sendTx } from '@invariant-labs/a0-sdk'
 import { Button } from '@mui/material'
+import { Signer } from '@polkadot/api/types'
 import {
   AlephZeroNetworks,
   DEFAULT_CONTRACT_OPTIONS,
@@ -35,9 +36,7 @@ export const SendTestTransactionButton: React.FC = () => {
     const data = api.createType('Vec<u8>', [])
     const tx = psp22.transferTx(getFaucetDeployer().address, 1000n, data)
 
-    console.log(await psp22.balanceOf(walletAddress))
-
-    const signedTx = await tx.signAsync(walletAddress, { signer: adapter.signer })
+    const signedTx = await tx.signAsync(walletAddress, { signer: adapter.signer as Signer })
 
     dispatch(
       snackbarsActions.add({
@@ -66,8 +65,6 @@ export const SendTestTransactionButton: React.FC = () => {
         })
       )
     }
-
-    console.log(await psp22.balanceOf(walletAddress, walletAddress))
   }
 
   return (

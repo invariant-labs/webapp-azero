@@ -6,40 +6,39 @@ const store = (s: AnyProps) => s[poolsSliceName] as IPoolsStore
 
 export const {
   pools,
+  poolKeys,
   tokens,
   poolTicks,
   isLoadingLatestPoolsForTransaction,
   tickMaps,
   volumeRanges,
-  nearestPoolTicksForPair,
-  feeTiers
+  nearestPoolTicksForPair
 } = keySelectors(store, [
   'pools',
+  'poolKeys',
   'tokens',
   'poolTicks',
   'isLoadingLatestPoolsForTransaction',
   'tickMaps',
   'volumeRanges',
-  'nearestPoolTicksForPair',
-  'feeTiers'
+  'nearestPoolTicksForPair'
 ])
 
 export const poolsArraySortedByFees = createSelector(pools, allPools =>
-  // TODO check if this is correct
-  Object.values(allPools).sort((a, b) => Number(a.feeReceiver) - Number(b.feeReceiver))
+  Object.values(allPools).sort((a, b) => Number(a.poolKey.feeTier.fee - b.poolKey.feeTier.fee))
 )
 
 export const hasTokens = createSelector(tokens, allTokens => !!Object.values(allTokens).length)
 
 export const poolsSelectors = {
   pools,
+  poolKeys,
   tokens,
   poolTicks,
   isLoadingLatestPoolsForTransaction,
   tickMaps,
   volumeRanges,
-  nearestPoolTicksForPair,
-  feeTiers
+  nearestPoolTicksForPair
 }
 
 export default poolsSelectors

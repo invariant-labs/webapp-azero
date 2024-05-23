@@ -5,13 +5,24 @@ import {
   PoolKey,
   TESTNET_INVARIANT_ADDRESS,
   TokenAmount,
-  calculateSqrtPrice
+  calculateSqrtPrice,
+  getMaxTick,
+  getMinTick
 } from '@invariant-labs/a0-sdk'
 import { ApiPromise } from '@polkadot/api'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
 import axios from 'axios'
-import { DEFAULT_CONTRACT_OPTIONS, Token, TokenPriceData, tokensPrices } from './static'
+import {
+  BTC,
+  DEFAULT_CONTRACT_OPTIONS,
+  ETH,
+  Token,
+  TokenPriceData,
+  USDC,
+  tokensPrices
+} from './static'
+import { PRICE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -104,40 +115,30 @@ export const formatNumbers =
     return num < 0 && threshold ? '-' + formatted : formatted
   }
 
-export const printAmount = (amount: TokenAmount, decimals: number): string => {
-  const amountString = amount.toString()
-  const isNegative = amountString.length > 0 && amountString[0] === '-'
-
-  const balanceString = isNegative ? amountString.slice(1) : amountString
-
-  if (balanceString.length <= decimals) {
-    return (
-      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-      (isNegative ? '-' : '') + '0.' + '0'.repeat(decimals - balanceString.length) + balanceString
-    )
-  } else {
-    return (
-      (isNegative ? '-' : '') +
-      trimZeros(
-        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-        balanceString.substring(0, balanceString.length - decimals) +
-          '.' +
-          balanceString.substring(balanceString.length - decimals)
-      )
-    )
-  }
-}
-
 export const trimZeros = (numStr: string): string => {
   numStr = numStr.replace(/(\.\d*?)0+$/, '$1')
 
   return numStr
 }
 
-export const PRICE_DECIMAL = 24
+export const calcYPerXPriceByTickIndex = (
+  tickIndex: bigint,
+  xDecimal: bigint,
+  yDecimal: bigint
+): number => {
+  const sqrt = +printBigint(calculateSqrtPrice(tickIndex), PRICE_SCALE)
 
-export const calcYPerXPrice = (tickIndex: bigint, xDecimal: bigint, yDecimal: bigint): number => {
-  const sqrt = +printAmount(calculateSqrtPrice(tickIndex), PRICE_DECIMAL)
+  const proportion = sqrt * sqrt
+
+  return proportion / 10 ** Number(yDecimal - xDecimal)
+}
+export const calcYPerXPriceBySqrtPrice = (
+  sqrtPrice: bigint,
+  xDecimal: bigint,
+  yDecimal: bigint
+): number => {
+  const sqrt = +printBigint(sqrtPrice, PRICE_SCALE)
+
   const proportion = sqrt * sqrt
 
   return proportion / 10 ** Number(yDecimal - xDecimal)
@@ -191,30 +192,27 @@ export const toMaxNumericPlaces = (num: number, places: number): string => {
 }
 
 export const calcPrice = (
-  amount: bigint,
+  amountTickIndex: bigint,
   isXtoY: boolean,
   xDecimal: bigint,
   yDecimal: bigint
 ): number => {
-  const price = calcYPerXPrice(amount, xDecimal, yDecimal)
+  const price = calcYPerXPriceByTickIndex(amountTickIndex, xDecimal, yDecimal)
 
   return isXtoY ? price : 1 / price
 }
 
 export const createPlaceholderLiquidityPlot = (
   isXtoY: boolean,
-  yValueToFill: bigint,
-  tickSpacing: number,
+  yValueToFill: number,
+  tickSpacing: bigint,
   tokenXDecimal: bigint,
   tokenYDecimal: bigint
 ) => {
   const ticksData: PlotTickData[] = []
 
-  // const min = getMinTick(tickSpacing) //TODO check if this is correct
-  // const max = getMaxTick(tickSpacing)
-
-  const min = 10n
-  const max = 1203n
+  const min = getMinTick(tickSpacing)
+  const max = getMaxTick(tickSpacing)
 
   const minPrice = calcPrice(min, isXtoY, tokenXDecimal, tokenYDecimal)
 
@@ -273,14 +271,14 @@ export const getMockedTokenPrice = (symbol: string, network: Network): TokenPric
   }
 }
 
-export const printBN = (amount: TokenAmount, decimals: bigint): string => {
+export const printBigint = (amount: TokenAmount, decimals: bigint): string => {
   const parsedDecimals = Number(decimals)
   const amountString = amount.toString()
   const isNegative = amountString.length > 0 && amountString[0] === '-'
 
   const balanceString = isNegative ? amountString.slice(1) : amountString
 
-  if (balanceString.length <= Number(decimals)) {
+  if (balanceString.length <= parsedDecimals) {
     return (
       // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
       (isNegative ? '-' : '') +
@@ -382,4 +380,160 @@ export const getPoolsByPoolKeys = async (
 
 export const poolKeyToString = (poolKey: PoolKey): string => {
   return poolKey.tokenX + poolKey.tokenY + poolKey.feeTier.fee + poolKey.feeTier.tickSpacing
+}
+
+export const getNetworkTokensList = (networkType: Network): Record<string, Token> => {
+  switch (networkType) {
+    case Network.Mainnet: {
+    }
+    case Network.Testnet:
+      return {
+        [USDC.address.toString()]: USDC,
+        [BTC.address.toString()]: BTC,
+        [ETH.address.toString()]: ETH
+      }
+    default:
+      return {}
+  }
+}
+
+export const getPrimaryUnitsPrice = (
+  price: number,
+  isXtoY: boolean,
+  xDecimal: number,
+  yDecimal: number
+) => {
+  const xToYPrice = isXtoY ? price : 1 / price
+
+  return xToYPrice * 10 ** (yDecimal - xDecimal)
+}
+
+export const logBase = (x: number, b: number): number => Math.log(x) / Math.log(b)
+
+export const adjustToSpacing = (baseTick: number, spacing: number, isGreater: boolean): number => {
+  const remainder = baseTick % spacing
+
+  if (Math.abs(remainder) === 0) {
+    return baseTick
+  }
+
+  let adjustment: number
+  if (isGreater) {
+    if (baseTick >= 0) {
+      adjustment = spacing - remainder
+    } else {
+      adjustment = Math.abs(remainder)
+    }
+  } else {
+    if (baseTick >= 0) {
+      adjustment = -remainder
+    } else {
+      adjustment = -(spacing - Math.abs(remainder))
+    }
+  }
+
+  return baseTick + adjustment
+}
+
+export const spacingMultiplicityLte = (arg: number, spacing: number): number => {
+  return adjustToSpacing(arg, spacing, false)
+}
+
+export const spacingMultiplicityGte = (arg: number, spacing: number): number => {
+  return adjustToSpacing(arg, spacing, true)
+}
+
+export const nearestSpacingMultiplicity = (centerTick: number, spacing: number) => {
+  const greaterTick = spacingMultiplicityGte(centerTick, spacing)
+  const lowerTick = spacingMultiplicityLte(centerTick, spacing)
+
+  const nearestTick =
+    Math.abs(greaterTick - centerTick) < Math.abs(lowerTick - centerTick) ? greaterTick : lowerTick
+
+  return Math.max(
+    Math.min(nearestTick, Number(getMaxTick(BigInt(spacing)))),
+    Number(getMinTick(BigInt(spacing)))
+  )
+}
+
+export const nearestTickIndex = (
+  price: number,
+  spacing: bigint,
+  isXtoY: boolean,
+  xDecimal: bigint,
+  yDecimal: bigint
+) => {
+  try {
+    const minTick = getMinTick(spacing)
+    const maxTick = getMaxTick(spacing)
+
+    const basePrice = Math.max(
+      price,
+      Number(calcPrice(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
+    )
+    const primaryUnitsPrice = getPrimaryUnitsPrice(
+      basePrice,
+      isXtoY,
+      Number(xDecimal),
+      Number(yDecimal)
+    )
+    const tick = Math.round(logBase(primaryUnitsPrice, 1.0001))
+
+    return BigInt(nearestSpacingMultiplicity(tick, Number(spacing)))
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const convertBalanceToBigint = (amount: string, decimals: bigint | number): bigint => {
+  const balanceString = amount.split('.')
+  if (balanceString.length !== 2) {
+    return BigInt(balanceString[0] + '0'.repeat(Number(decimals)))
+  }
+
+  if (balanceString[1].length <= decimals) {
+    return BigInt(
+      balanceString[0] + balanceString[1] + '0'.repeat(Number(decimals) - balanceString[1].length)
+    )
+  }
+  return 0n
+}
+export const convertBalanceToBigint2 = (amount: string, decimals: bigint | number): bigint => {
+  const [integerPart, fractionalPart = ''] = amount.split('.')
+  const decimalsNumber = Number(decimals)
+
+  if (fractionalPart.length > decimalsNumber) {
+    return 0n
+  }
+  const paddedFractionalPart = fractionalPart.padEnd(decimalsNumber, '0')
+
+  return BigInt(integerPart + paddedFractionalPart)
+}
+
+export enum PositionTokenBlock {
+  None,
+  A,
+  B
+}
+
+export const determinePositionTokenBlock = (
+  currentSqrtPrice: bigint,
+  lowerTick: bigint,
+  upperTick: bigint,
+  isXtoY: boolean
+) => {
+  const lowerPrice = calculateSqrtPrice(lowerTick)
+  const upperPrice = calculateSqrtPrice(upperTick)
+
+  const isBelowLowerPrice = lowerPrice >= currentSqrtPrice
+  const isAboveUpperPrice = upperPrice <= currentSqrtPrice
+
+  if (isBelowLowerPrice) {
+    return isXtoY ? PositionTokenBlock.B : PositionTokenBlock.A
+  }
+  if (isAboveUpperPrice) {
+    return isXtoY ? PositionTokenBlock.A : PositionTokenBlock.B
+  }
+
+  return PositionTokenBlock.None
 }

@@ -2,7 +2,7 @@ import AnimatedButton, { ProgressState } from '@components/AnimatedButton/Animat
 import ChangeWalletButton from '@components/Header/HeaderButton/ChangeWalletButton'
 import ExchangeAmountInput from '@components/Inputs/ExchangeAmountInput/ExchangeAmountInput'
 import Slippage from '@components/Modals/Slippage/Slippage'
-import { Percentage, Price, Tick, TokenAmount } from '@invariant-labs/a0-sdk'
+import { Price, Tick, TokenAmount } from '@invariant-labs/a0-sdk'
 import { Box, Button, CardMedia, Grid, Typography } from '@mui/material'
 import { AddressOrPair } from '@polkadot/api/types'
 import infoIcon from '@static/svg/info.svg'
@@ -10,7 +10,6 @@ import refreshIcon from '@static/svg/refresh.svg'
 import settingIcon from '@static/svg/settings.svg'
 import SwapArrows from '@static/svg/swap-arrows.svg'
 import { TokenPriceData } from '@store/consts/static'
-import { PoolWithAddress } from '@store/reducers/pools'
 import { Swap as SwapData } from '@store/reducers/swap'
 import { Status } from '@store/reducers/wallet'
 import { SwapToken } from '@store/selectors/wallet'
@@ -22,6 +21,8 @@ import SendTestTransactionButton from './SendTestTransactionButton/SendTestTrans
 import TestTransaction from './TestTransaction/TestTransaction'
 import TransactionDetailsBox from './TransactionDetailsBox/TransactionDetailsBox'
 import useStyles from './style'
+import { PoolWithPoolKey } from '@store/reducers/pools'
+import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 
 export interface Pools {
   tokenX: AddressOrPair
@@ -49,10 +50,10 @@ export interface ISwap {
   walletStatus: Status
   swapData: SwapData
   tokens: SwapToken[]
-  pools: PoolWithAddress[]
+  pools: PoolWithPoolKey[]
   tickmap: { [x: string]: bigint[] } //TODO check if this is correct
   onSwap: (
-    slippage: Percentage,
+    slippage: bigint,
     knownPrice: Price,
     tokenFrom: AddressOrPair,
     tokenTo: AddressOrPair,
@@ -276,7 +277,7 @@ export const Swap: React.FC<ISwap> = ({
   //           },
   //           tokens[tokenFromIndex].address,
   //           tokens[tokenToIndex].address,
-  //           printBNtoBN(amountFrom, tokens[tokenFromIndex].decimals),
+  //           convertBalanceToBigint(amountFrom, tokens[tokenFromIndex].decimals),
   //           true
   //         )
   //       )
@@ -291,7 +292,7 @@ export const Swap: React.FC<ISwap> = ({
   //           },
   //           tokens[tokenFromIndex].address,
   //           tokens[tokenToIndex].address,
-  //           printBNtoBN(amountTo, tokens[tokenToIndex].decimals),
+  //           convertBalanceToBigint(amountTo, tokens[tokenToIndex].decimals),
   //           false
   //         )
   //       )
@@ -353,8 +354,8 @@ export const Swap: React.FC<ISwap> = ({
     }
 
     // if (
-    //   printBNtoBN(amountFrom, tokens[tokenFromIndex].decimals).gt(
-    //     printBNtoBN(
+    //   convertBalanceToBigint(amountFrom, tokens[tokenFromIndex].decimals).gt(
+    //     convertBalanceToBigint(
     //       printBN(tokens[tokenFromIndex].balance, tokens[tokenFromIndex].decimals),
     //       tokens[tokenFromIndex].decimals
     //     )
@@ -364,7 +365,7 @@ export const Swap: React.FC<ISwap> = ({
     // }
 
     // if (
-    //   (printBNtoBN(amountFrom, tokens[tokenFromIndex].decimals).eqn(0) ||
+    //   (convertBalanceToBigint(amountFrom, tokens[tokenFromIndex].decimals).eqn(0) ||
     //     isError('Amount out is zero')) &&
     //   !simulateResult.error.length
     // ) {
@@ -492,11 +493,11 @@ export const Swap: React.FC<ISwap> = ({
             value={amountFrom}
             balance={
               // tokenFromIndex !== null
-              //   ? printBN(tokens[tokenFromIndex].balance, tokens[tokenFromIndex].decimals)
+              //   ? printBigint(tokens[tokenFromIndex].balance, tokens[tokenFromIndex].decimals)
               //   : '- -'
               '- -'
             }
-            decimal={tokenFromIndex !== null ? tokens[tokenFromIndex].decimals : 6n}
+            decimal={tokenFromIndex !== null ? tokens[tokenFromIndex].decimals : PERCENTAGE_SCALE}
             className={classes.amountInput}
             setValue={value => {
               if (value.match(/^\d*\.?\d*$/)) {
@@ -509,7 +510,7 @@ export const Swap: React.FC<ISwap> = ({
               if (tokenFromIndex !== null) {
                 setInputRef(inputTarget.FROM)
                 // setAmountFrom(
-                //   printBN(
+                //   printBigint(
                 //     tokens[tokenFromIndex].assetAddress.equals(new PublicKey(WRAPPED_ETH_ADDRESS))
                 //       ? tokens[tokenFromIndex].balance.gt(WETH_MIN_DEPOSIT_SWAP_FROM_AMOUNT)
                 //         ? tokens[tokenFromIndex].balance.sub(WETH_MIN_DEPOSIT_SWAP_FROM_AMOUNT)
@@ -570,12 +571,13 @@ export const Swap: React.FC<ISwap> = ({
             value={amountTo}
             balance={
               // tokenToIndex !== null
-              //   ? printBN(tokens[tokenToIndex].balance, tokens[tokenToIndex].decimals)
+              //   ? printBigint(tokens[tokenToIndex].balance, tokens[tokenToIndex].decimals)
               //   : '- -'
               '- -'
             }
             className={classes.amountInput}
-            decimal={tokenToIndex !== null ? tokens[tokenToIndex].decimals : 6n}
+            // decimal={tokenToIndex !== null ? tokens[tokenToIndex].decimals : 6n}
+            decimal={6n} //TODO add real value
             setValue={value => {
               if (value.match(/^\d*\.?\d*$/)) {
                 setAmountTo(value)
@@ -587,7 +589,7 @@ export const Swap: React.FC<ISwap> = ({
               if (tokenFromIndex !== null) {
                 setInputRef(inputTarget.FROM)
                 // setAmountFrom(
-                //   printBN(
+                //   printBigint(
                 //     tokens[tokenFromIndex].assetAddress.equals(new PublicKey(WRAPPED_ETH_ADDRESS))
                 //       ? tokens[tokenFromIndex].balance.gt(WETH_MIN_DEPOSIT_SWAP_FROM_AMOUNT)
                 //         ? tokens[tokenFromIndex].balance.sub(WETH_MIN_DEPOSIT_SWAP_FROM_AMOUNT)
@@ -707,8 +709,8 @@ export const Swap: React.FC<ISwap> = ({
               //   tokens[tokenFromIndex].address,
               //   tokens[tokenToIndex].address,
               //   simulateResult.poolIndex,
-              //   printBNtoBN(amountFrom, tokens[tokenFromIndex].decimals),
-              //   printBNtoBN(amountTo, tokens[tokenToIndex].decimals),
+              //   convertBalanceToBigint(amountFrom, tokens[tokenFromIndex].decimals),
+              //   convertBalanceToBigint(amountTo, tokens[tokenToIndex].decimals),
               //   inputRef === inputTarget.FROM
               // )
             }}

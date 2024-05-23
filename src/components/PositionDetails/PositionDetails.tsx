@@ -8,7 +8,7 @@ import { AddressOrPair } from '@polkadot/api/types'
 import backIcon from '@static/svg/back-arrow.svg'
 import { TokenPriceData } from '@store/consts/static'
 import { addressToTicker, initialXtoY } from '@store/consts/uiUtiils'
-import { parseFeeToPathFee, printAmount } from '@store/consts/utils'
+import { parseFeeToPathFee, printBigint } from '@store/consts/utils'
 import { PlotTickData } from '@store/reducers/positions'
 import { VariantType } from 'notistack'
 import React, { useState } from 'react'
@@ -97,7 +97,7 @@ const PositionDetails: React.FC<IProps> = ({
         </Link>
 
         <SinglePositionInfo
-          fee={+printAmount(fee, Number(PERCENTAGE_SCALE) - 2)}
+          fee={+printBigint(fee, PERCENTAGE_SCALE - 2n)}
           onClickClaimFee={onClickClaimFee}
           closePosition={closePosition}
           tokenX={tokenX}
