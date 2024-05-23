@@ -3,7 +3,7 @@ import useStyles from './style'
 import { ISelectNetwork } from '@store/consts/types'
 import { blurContent, unblurContent } from '@utils/uiUtils'
 import { Button } from '@mui/material'
-import SelectMainnetRPC from '@components/Modals/SelectMainnetRPC/SelectMainnetRPC'
+import SelectTestnetRPC from '@components/Modals/SelectTestnetRPC/SelectTestnetRPC'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import { Network } from '@invariant-labs/a0-sdk'
 
@@ -21,17 +21,17 @@ export const SelectRPCButton: React.FC<IProps> = ({
 }) => {
   const { classes } = useStyles()
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
-  const [openMainnetRpcs, setOpenMainnetRpcs] = React.useState<boolean>(false)
+  const [openTestnetRpcs, setOpenTestnetRpcs] = React.useState<boolean>(false)
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
     blurContent()
-    setOpenMainnetRpcs(true)
+    setOpenTestnetRpcs(true)
   }
 
   const handleClose = () => {
     unblurContent()
-    setOpenMainnetRpcs(false)
+    setOpenTestnetRpcs(false)
   }
 
   return (
@@ -45,9 +45,9 @@ export const SelectRPCButton: React.FC<IProps> = ({
         onClick={handleClick}>
         RPC
       </Button>
-      <SelectMainnetRPC
+      <SelectTestnetRPC
         networks={networks}
-        open={openMainnetRpcs}
+        open={openTestnetRpcs}
         anchorEl={anchorEl}
         onSelect={onSelect}
         handleClose={handleClose}

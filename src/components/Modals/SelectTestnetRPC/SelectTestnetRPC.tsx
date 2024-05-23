@@ -4,10 +4,10 @@ import React, { useState } from 'react'
 import useStyles from './styles'
 import { ISelectNetwork } from '@store/consts/types'
 import { Button, Grid, Input, Popover, Typography } from '@mui/material'
-import DotIcon from '@mui/icons-material/FiberManualRecordRounded'
+import DotIcon from '@mui/icons-material/FiberManualRecord'
 import { Network } from '@invariant-labs/a0-sdk'
 
-export interface ISelectMainnetRpc {
+export interface ISelectTestnetRPC {
   networks: ISelectNetwork[]
   open: boolean
   anchorEl: HTMLButtonElement | null
@@ -15,7 +15,7 @@ export interface ISelectMainnetRpc {
   handleClose: () => void
   activeRPC: string
 }
-export const SelectMainnetRPC: React.FC<ISelectMainnetRpc> = ({
+export const SelectTestnetRPC: React.FC<ISelectTestnetRPC> = ({
   networks,
   anchorEl,
   open,
@@ -34,6 +34,7 @@ export const SelectMainnetRPC: React.FC<ISelectMainnetRpc> = ({
 
     return urlRegex.test(address)
   }
+  console.log(networks)
 
   return (
     <Popover
@@ -50,7 +51,7 @@ export const SelectMainnetRPC: React.FC<ISelectMainnetRpc> = ({
         horizontal: 'center'
       }}>
       <Grid className={classes.root}>
-        <Typography className={classes.title}>Select mainnet RPC to use</Typography>
+        <Typography className={classes.title}>Select testnet RPC to use</Typography>
         <Grid className={classes.list} container alignContent='space-around' direction='column'>
           {networks.map(({ networkType, rpc, rpcName }) => (
             <Grid
@@ -103,4 +104,4 @@ export const SelectMainnetRPC: React.FC<ISelectMainnetRpc> = ({
     </Popover>
   )
 }
-export default SelectMainnetRPC
+export default SelectTestnetRPC
