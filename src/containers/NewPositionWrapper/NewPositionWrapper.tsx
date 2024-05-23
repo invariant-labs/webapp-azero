@@ -17,6 +17,7 @@ import {
 } from '@store/consts/static'
 import {
   calcPrice,
+  calcYPerXSqrtPrice,
   createPlaceholderLiquidityPlot,
   getCoingeckoTokenPrice,
   getMockedTokenPrice,
@@ -235,14 +236,13 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   }, [isWaitingForNewPool, tokenAIndex, tokenBIndex, feeIndex, poolIndex, poolKey])
 
   useEffect(() => {
-    //TODO - check if this is needed
-    // if (poolsData[poolKey]) {
-    //   setMidPrice({
-    //     index: poolsData[poolKey].currentTickIndex,
-    //     x: calcYPerXPrice(poolsData[poolKey].sqrtPrice, xDecimal, yDecimal) ** (isXtoY ? 1 : -1)
-    //   })
-    // }
-  }, [poolIndex, isXtoY, xDecimal, yDecimal, poolsData])
+    if (poolsData[poolKey]) {
+      setMidPrice({
+        index: poolsData[poolKey].currentTickIndex,
+        x: calcYPerXSqrtPrice(poolsData[poolKey].sqrtPrice, xDecimal, yDecimal) ** (isXtoY ? 1 : -1)
+      })
+    }
+  }, [poolKey, isXtoY, xDecimal, yDecimal, poolsData])
 
   useEffect(() => {
     if (poolKey === '') {
@@ -701,7 +701,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       onDiscreteChange={setIsDiscreteValue}
       currentPriceSqrt={
         poolsData[poolKey] ? poolsData[poolKey].sqrtPrice : calculateSqrtPrice(midPrice.index)
-        // toSqrtPrice(1n, 0n)
       }
       canCreateNewPool={canUserCreateNewPool}
       canCreateNewPosition={canUserCreateNewPosition}

@@ -123,6 +123,18 @@ export const trimZeros = (numStr: string): string => {
 
 export const calcYPerXPrice = (tickIndex: bigint, xDecimal: bigint, yDecimal: bigint): number => {
   const sqrt = +printBigint(calculateSqrtPrice(tickIndex), PRICE_SCALE)
+
+  const proportion = sqrt * sqrt
+
+  return proportion / 10 ** Number(yDecimal - xDecimal)
+}
+export const calcYPerXSqrtPrice = (
+  sqrtPrice: bigint,
+  xDecimal: bigint,
+  yDecimal: bigint
+): number => {
+  const sqrt = +printBigint(sqrtPrice, PRICE_SCALE)
+
   const proportion = sqrt * sqrt
 
   return proportion / 10 ** Number(yDecimal - xDecimal)
