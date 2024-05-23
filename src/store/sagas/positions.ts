@@ -212,7 +212,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       })
     )
 
-    yield put(walletActions.getTokens())
+    yield put(walletActions.getSelectedTokens([tokenX, tokenY]))
 
     closeSnackbar(loaderCreatePosition)
     yield put(snackbarsActions.remove(loaderCreatePosition))

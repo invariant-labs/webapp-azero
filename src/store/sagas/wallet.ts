@@ -268,6 +268,22 @@ export function* signAndSend(
   return txId.toString()
 }
 
+export function* fetchSelectedTokensBalances(action: PayloadAction<string[]>): Generator {
+  const api = yield* getConnection()
+  const network = yield* select(networkType)
+  const walletAddress = yield* select(address)
+
+  const tokens = action.payload
+  const balances = yield* call(getTokenBalances, tokens, api, network, walletAddress)
+
+  const convertedBalances: ITokenBalance[] = balances.map(balance => ({
+    address: balance[0],
+    balance: balance[1]
+  }))
+
+  yield* put(actions.addTokenBalances(convertedBalances))
+}
+
 export function* fetchTokensBalances(): Generator {
   const api = yield* getConnection()
   const network = yield* select(networkType)
@@ -365,6 +381,11 @@ export function* initSaga(): Generator {
 export function* handleFetchTokensBalances(): Generator {
   yield takeLeading(actions.getTokens, fetchTokensBalances)
 }
+
+export function* handleFetchSelectedTokensBalances(): Generator {
+  yield takeLeading(actions.getSelectedTokens, fetchSelectedTokensBalances)
+}
+
 export function* handleTestTransaction(): Generator {
   yield takeLeading(actions.initTestTransaction, testTransaction)
 }
@@ -376,7 +397,8 @@ export function* walletSaga(): Generator {
       connectHandler,
       disconnectHandler,
       handleTestTransaction,
-      handleFetchTokensBalances
+      handleFetchTokensBalances,
+      handleFetchSelectedTokensBalances
     ].map(spawn)
   )
 }
