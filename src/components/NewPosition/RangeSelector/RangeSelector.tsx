@@ -151,9 +151,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   const changeRangeHandler = (left: bigint, right: bigint) => {
     let leftRange: bigint
     let rightRange: bigint
-    console.log(left)
-    console.log(right)
-    console.log(midPrice)
+
     // if (positionOpeningMethod === 'range') {
     //   const { leftInRange, rightInRange } = getTicksInsideRange(left, right, isXtoY)
     //   leftRange = leftInRange
