@@ -1,21 +1,26 @@
 import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import { Swap } from '@components/Swap/Swap'
-import { balanceLoading, status, swapTokens, swapTokensDict } from '@store/selectors/wallet'
-import { getCurrentAlephZeroConnection } from '@utils/web3/connection'
-import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { swap as swapPool } from '@store/selectors/swap'
-import {
-  isLoadingLatestPoolsForTransaction,
-  nearestPoolTicksForPair,
-  poolsArraySortedByFees,
-  tickMaps
-} from '@store/selectors/pools'
-import { networkType } from '@store/selectors/connection'
+import { initPolkadotApi } from '@invariant-labs/a0-sdk'
+import { ApiPromise } from '@polkadot/api'
 import { AddressOrPair } from '@polkadot/api/types'
 import { TokenPriceData, commonTokensForNetworks } from '@store/consts/static'
 import { getCoingeckoTokenPrice, getMockedTokenPrice } from '@store/consts/utils'
+import { actions as poolsActions } from '@store/reducers/pools'
+import { actions } from '@store/reducers/swap'
+import { actions as walletActions } from '@store/reducers/wallet'
+import { networkType, rpcAddress } from '@store/selectors/connection'
+import {
+  isLoadingLatestPoolsForTransaction,
+  poolsArraySortedByFees,
+  tickMaps
+} from '@store/selectors/pools'
+import { swap as swapPool } from '@store/selectors/swap'
+import { balanceLoading, status, swapTokens, swapTokensDict } from '@store/selectors/wallet'
+import { getCurrentAlephZeroConnection } from '@utils/web3/connection'
 import { openWalletSelectorModal } from '@utils/web3/selector'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+
 export const WrappedSwap = () => {
   const dispatch = useDispatch()
 
@@ -32,10 +37,13 @@ export const WrappedSwap = () => {
   const { success, inProgress } = useSelector(swapPool)
   const isFetchingNewPool = useSelector(isLoadingLatestPoolsForTransaction)
   const network = useSelector(networkType)
+  const rpc = useSelector(rpcAddress)
 
   const [progress, setProgress] = useState<ProgressState>('none')
   const [tokenFrom, setTokenFrom] = useState<AddressOrPair | null>(null)
   const [tokenTo, setTokenTo] = useState<AddressOrPair | null>(null)
+  const [api, setApi] = useState<ApiPromise | null>(null)
+
   useEffect(() => {
     let timeoutId1: NodeJS.Timeout
     let timeoutId2: NodeJS.Timeout
@@ -59,27 +67,25 @@ export const WrappedSwap = () => {
     }
   }, [success, inProgress])
 
-  // useEffect(() => {
-  //   if (tokenFrom !== null && tokenTo !== null && !isFetchingNewPool) {
-  //     dispatch(
-  //       actions.setPair({
-  //         tokenFrom,
-  //         tokenTo
-  //       })
-  //     )
-  //   }
-  // }, [isFetchingNewPool])
+  useEffect(() => {
+    if (tokenFrom !== null && tokenTo !== null && !isFetchingNewPool) {
+      dispatch(
+        actions.setPair({
+          tokenFrom,
+          tokenTo
+        })
+      )
+    }
+  }, [isFetchingNewPool])
   const lastTokenFrom = localStorage.getItem(`INVARIANT_LAST_TOKEN_FROM_${networkType}`)
   const lastTokenTo = localStorage.getItem(`INVARIANT_LAST_TOKEN_TO_${networkType}`)
 
-  // const initialTokenFromIndex =
-  //   lastTokenFrom === null
-  //     ? null
-  //     : tokensList.findIndex(token => token.assetAddress.equals(new PublicKey(lastTokenFrom)))
-  // const initialTokenToIndex =
-  //   lastTokenTo === null
-  //     ? null
-  //     : tokensList.findIndex(token => token.assetAddress.equals(new PublicKey(lastTokenTo)))
+  const initialTokenFromIndex =
+    lastTokenFrom === null
+      ? null
+      : tokensList.findIndex(token => token.assetAddress === lastTokenFrom)
+  const initialTokenToIndex =
+    lastTokenTo === null ? null : tokensList.findIndex(token => token.assetAddress === lastTokenTo)
 
   // const addTokenHandler = (address: string) => {
   //   if (
@@ -180,18 +186,18 @@ export const WrappedSwap = () => {
   }
 
   const onRefresh = (tokenFromIndex: number | null, tokenToIndex: number | null) => {
-    // dispatch(walletActions.getBalance())
+    dispatch(walletActions.getBalance())
 
     if (tokenFromIndex === null || tokenToIndex == null) {
       return
     }
 
-    // dispatch(
-    //   poolsActions.getAllPoolsForPairData({
-    //     first: tokensList[tokenFromIndex].address,
-    //     second: tokensList[tokenToIndex].address
-    //   })
-    // )
+    dispatch(
+      poolsActions.getAllPoolsForPairData({
+        first: tokensList[tokenFromIndex].address,
+        second: tokensList[tokenToIndex].address
+      })
+    )
 
     if (tokenTo === null || tokenFrom === null) {
       return
@@ -228,6 +234,15 @@ export const WrappedSwap = () => {
     }
   }
 
+  useEffect(() => {
+    const load = async () => {
+      const api = await initPolkadotApi(network, rpc)
+      setApi(api)
+    }
+
+    load()
+  }, [rpc, network])
+
   return (
     <Swap
       isFetchingNewPool={isFetchingNewPool}
@@ -243,18 +258,18 @@ export const WrappedSwap = () => {
         byAmountIn
       ) => {
         setProgress('progress')
-        // dispatch(
-        //   actions.swap({
-        //     slippage,
-        //     estimatedPriceAfterSwap,
-        //     poolIndex,
-        //     tokenFrom,
-        //     tokenTo,
-        //     amountIn,
-        //     amountOut,
-        //     byAmountIn
-        //   })
-        // )
+        dispatch(
+          actions.swap({
+            slippage,
+            estimatedPriceAfterSwap,
+            poolIndex,
+            tokenFrom,
+            tokenTo,
+            amountIn,
+            amountOut,
+            byAmountIn
+          })
+        )
       }}
       onSetPair={(tokenFrom, tokenTo) => {
         setTokenFrom(tokenFrom)
@@ -268,17 +283,17 @@ export const WrappedSwap = () => {
           localStorage.setItem(`INVARIANT_LAST_TOKEN_TO_${networkType}`, tokenTo.toString())
         }
         if (tokenFrom !== null && tokenTo !== null && tokenFrom !== tokenTo) {
-          // dispatch(
-          //   poolsActions.getAllPoolsForPairData({
-          //     first: tokenFrom,
-          //     second: tokenTo
-          //   })
-          // )
+          dispatch(
+            poolsActions.getAllPoolsForPairData({
+              first: tokenFrom,
+              second: tokenTo
+            })
+          )
         }
       }}
       onConnectWallet={openWalletSelectorModal}
       onDisconnectWallet={() => {
-        // dispatch(walletActions.disconnect())
+        dispatch(walletActions.disconnect())
       }}
       walletStatus={walletStatus}
       tokens={tokensList}
@@ -288,11 +303,9 @@ export const WrappedSwap = () => {
       poolTicks={{}} //TODO add real data
       isWaitingForNewPool={isFetchingNewPool}
       tickmap={tickmap}
-      // initialTokenFromIndex={initialTokenFromIndex === -1 ? null : initialTokenFromIndex}
-      // initialTokenToIndex={initialTokenToIndex === -1 ? null : initialTokenToIndex}
+      initialTokenFromIndex={initialTokenFromIndex === -1 ? null : initialTokenFromIndex}
+      initialTokenToIndex={initialTokenToIndex === -1 ? null : initialTokenToIndex}
       // handleAddToken={addTokenHandler}
-      initialTokenFromIndex={1}
-      initialTokenToIndex={2}
       handleAddToken={() => {}}
       commonTokens={commonTokensForNetworks[network]}
       initialHideUnknownTokensValue={initialHideUnknownTokensValue}
@@ -304,6 +317,8 @@ export const WrappedSwap = () => {
       onSlippageChange={onSlippageChange}
       initialSlippage={initialSlippage}
       isBalanceLoading={isBalanceLoading}
+      api={api}
+      network={network}
     />
   )
 }

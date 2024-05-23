@@ -175,18 +175,18 @@ const poolsSlice = createSlice({
     //   }
     //   return state
     // },
-    // addPools(state, action: PayloadAction<PoolWithAddress[]>) {
-    //   const newData = action.payload.reduce(
-    //     (acc, pool) => ({
-    //       ...acc,
-    //       [pool.address.toString()]: pool
-    //     }),
-    //     {}
-    //   )
-    //   state.pools = R.merge(state.pools, newData)
-    //   state.isLoadingLatestPoolsForTransaction = false
-    //   return state
-    // },
+    addPools(state, action: PayloadAction<PoolWithPoolKey[]>) {
+      const newData = action.payload.reduce(
+        (acc, pool) => ({
+          ...acc,
+          [poolKeyToString(pool.poolKey)]: pool
+        }),
+        {}
+      )
+      state.pools = R.merge(state.pools, newData)
+      state.isLoadingLatestPoolsForTransaction = false
+      return state
+    },
     addPoolsForList(state, action: PayloadAction<ListPoolsResponse>) {
       const newData = action.payload.data.reduce(
         (acc, pool) => ({
@@ -208,6 +208,14 @@ const poolsSlice = createSlice({
     //   state.isLoadingLatestPoolsForTransaction = true
     //   return state
     // },
+    // getPoolData(state, _action: PayloadAction<Pair>) {
+    //   state.isLoadingLatestPoolsForTransaction = true
+    //   return state
+    // },
+    getAllPoolsForPairData(state, action: PayloadAction<PairTokens>) {
+      state.isLoadingLatestPoolsForTransaction = true
+      return state
+    },
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     getPoolsDataForList(_state, _action: PayloadAction<ListPoolsRequest>) {}
     // deleteTick(state, action: PayloadAction<DeleteTick>) {
