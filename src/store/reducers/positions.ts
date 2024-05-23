@@ -1,13 +1,4 @@
-import {
-  Liquidity,
-  Percentage,
-  PoolKey,
-  Position,
-  SqrtPrice,
-  Tick,
-  TokenAmount
-} from '@invariant-labs/a0-sdk'
-import { AddressOrPair } from '@polkadot/api/types'
+import { PoolKey, Position, SqrtPrice, Tick, TokenAmount } from '@invariant-labs/a0-sdk'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/consts/types'
 
@@ -49,9 +40,9 @@ export interface InitPositionData {
   poolKeyData: PoolKey
   lowerTick: bigint
   upperTick: bigint
-  liquidityDelta: Liquidity
+  liquidityDelta: bigint
   spotSqrtPrice: SqrtPrice
-  slippageTolerance: Percentage
+  slippageTolerance: bigint
   tokenXAmount: TokenAmount
   tokenYAmount: TokenAmount
   initPool?: boolean

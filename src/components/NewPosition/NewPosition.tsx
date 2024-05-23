@@ -24,6 +24,7 @@ import {
   trimLeadingZeros
 } from '@store/consts/utils'
 import { AddressOrPair } from '@polkadot/api/types'
+import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
 
 export interface INewPosition {
   initialTokenFrom: string
@@ -538,7 +539,7 @@ export const NewPosition: React.FC<INewPosition> = ({
                 isXtoY
                   ? convertBalanceToBigint(tokenBDeposit, tokenBDecimals)
                   : convertBalanceToBigint(tokenADeposit, tokenADecimals),
-                BigInt(+slippTolerance * 1000)
+                (BigInt(slippTolerance) * PERCENTAGE_DENOMINATOR) / 100n //TODO check if this is correct
               )
             }
           }}

@@ -21,6 +21,7 @@ import { Signer } from '@polkadot/api/types'
 import { fetchAllPoolKeys } from './pools'
 import { tokens } from '@store/selectors/pools'
 import { DEFAULT_CONTRACT_OPTIONS } from '@store/consts/static'
+import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
 
 function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator {
   const loaderCreatePosition = createLoaderKey()
@@ -37,12 +38,13 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     tokenXAmount,
     tokenYAmount,
     liquidityDelta,
-    initPool
+    initPool,
+    slippageTolerance
   } = action.payload
 
-  const slippageTolerance = 0n //TODO delete when sdk will be fixed
-
   const { tokenX, tokenY } = poolKeyData
+
+  const percentageSlippageMultiplier = 100n + (slippageTolerance * 100n) / PERCENTAGE_DENOMINATOR
 
   try {
     yield put(
@@ -75,7 +77,11 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     )
 
     yield* call([psp22, psp22.setContractAddress], tokenX)
-    const XTokenTx = yield* call([psp22, psp22.approveTx], TESTNET_INVARIANT_ADDRESS, tokenXAmount)
+    const XTokenTx = yield* call(
+      [psp22, psp22.approveTx],
+      TESTNET_INVARIANT_ADDRESS,
+      (tokenXAmount * percentageSlippageMultiplier) / 100n
+    )
 
     const signedXTokenTx = yield* call([XTokenTx, XTokenTx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
@@ -104,7 +110,11 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     )
 
     yield* call([psp22, psp22.setContractAddress], tokenY)
-    const YTokenTx = yield* call([psp22, psp22.approveTx], TESTNET_INVARIANT_ADDRESS, tokenYAmount)
+    const YTokenTx = yield* call(
+      [psp22, psp22.approveTx],
+      TESTNET_INVARIANT_ADDRESS,
+      (tokenYAmount * percentageSlippageMultiplier) / 100n
+    )
 
     const signedYTokenTx = yield* call([YTokenTx, YTokenTx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
