@@ -78,59 +78,77 @@ export function* handleGetCurrentPositionTicks(action: PayloadAction<bigint>) {
 }
 
 export function* handleClaimFee(action: PayloadAction<bigint>) {
-  const walletAddress = yield* select(address)
-  const connection = yield* getConnection()
-  const network = yield* select(networkType)
-  const invariant = yield* call(
-    Invariant.load,
-    connection,
-    network,
-    TESTNET_INVARIANT_ADDRESS,
-    DEFAULT_CONTRACT_OPTIONS
-  )
-  const adapter = yield* call(getAlephZeroWallet)
-
   const loaderSigningTx = createLoaderKey()
-  yield put(
-    snackbarsActions.add({
-      message: 'Signing transaction...',
-      variant: 'pending',
-      persist: true,
-      key: loaderSigningTx
-    })
-  )
-
-  const tx = yield* call([invariant, invariant.claimFeeTx], action.payload)
-  const signedTx = yield* call([tx, tx.signAsync], walletAddress, {
-    signer: adapter.signer as Signer
-  })
-
-  closeSnackbar(loaderSigningTx)
-  yield put(snackbarsActions.remove(loaderSigningTx))
   const loaderKey = createLoaderKey()
-  yield put(
-    snackbarsActions.add({
-      message: 'Claiming fee...',
-      variant: 'pending',
-      persist: true,
-      key: loaderKey
+
+  try {
+    const walletAddress = yield* select(address)
+    const connection = yield* getConnection()
+    const network = yield* select(networkType)
+    const invariant = yield* call(
+      Invariant.load,
+      connection,
+      network,
+      TESTNET_INVARIANT_ADDRESS,
+      DEFAULT_CONTRACT_OPTIONS
+    )
+    const adapter = yield* call(getAlephZeroWallet)
+
+    yield put(
+      snackbarsActions.add({
+        message: 'Signing transaction...',
+        variant: 'pending',
+        persist: true,
+        key: loaderSigningTx
+      })
+    )
+
+    const tx = yield* call([invariant, invariant.claimFeeTx], action.payload)
+    const signedTx = yield* call([tx, tx.signAsync], walletAddress, {
+      signer: adapter.signer as Signer
     })
-  )
 
-  const txResult = yield* call(sendTx, signedTx)
+    closeSnackbar(loaderSigningTx)
+    yield put(snackbarsActions.remove(loaderSigningTx))
+    yield put(
+      snackbarsActions.add({
+        message: 'Claiming fee...',
+        variant: 'pending',
+        persist: true,
+        key: loaderKey
+      })
+    )
 
-  closeSnackbar(loaderKey)
-  yield put(snackbarsActions.remove(loaderKey))
-  yield put(
-    snackbarsActions.add({
-      message: 'Fee successfully created',
-      variant: 'success',
-      persist: false,
-      txid: txResult.hash
-    })
-  )
+    const txResult = yield* call(sendTx, signedTx)
 
-  yield put(actions.getSinglePosition(action.payload))
+    closeSnackbar(loaderKey)
+    yield put(snackbarsActions.remove(loaderKey))
+    yield put(
+      snackbarsActions.add({
+        message: 'Fee successfully created',
+        variant: 'success',
+        persist: false,
+        txid: txResult.hash
+      })
+    )
+
+    yield put(actions.getSinglePosition(action.payload))
+  } catch (e) {
+    closeSnackbar(loaderSigningTx)
+    yield put(snackbarsActions.remove(loaderSigningTx))
+    closeSnackbar(loaderKey)
+    yield put(snackbarsActions.remove(loaderKey))
+
+    yield put(
+      snackbarsActions.add({
+        message: 'Failed to claim fee. Please try again.',
+        variant: 'error',
+        persist: false
+      })
+    )
+
+    console.log(e)
+  }
 }
 
 export function* handleGetSinglePosition(action: PayloadAction<bigint>) {
@@ -157,60 +175,79 @@ export function* handleGetSinglePosition(action: PayloadAction<bigint>) {
 }
 
 export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
-  const walletAddress = yield* select(address)
-  const connection = yield* getConnection()
-  const network = yield* select(networkType)
-  const invariant = yield* call(
-    Invariant.load,
-    connection,
-    network,
-    TESTNET_INVARIANT_ADDRESS,
-    DEFAULT_CONTRACT_OPTIONS
-  )
-  const adapter = yield* call(getAlephZeroWallet)
-
   const loaderSigningTx = createLoaderKey()
-  yield put(
-    snackbarsActions.add({
-      message: 'Signing transaction...',
-      variant: 'pending',
-      persist: true,
-      key: loaderSigningTx
-    })
-  )
-
-  const tx = yield* call([invariant, invariant.removePositionTx], action.payload.positionIndex)
-  const signedTx = yield* call([tx, tx.signAsync], walletAddress, {
-    signer: adapter.signer as Signer
-  })
-
-  closeSnackbar(loaderSigningTx)
-  yield put(snackbarsActions.remove(loaderSigningTx))
   const loaderKey = createLoaderKey()
-  yield put(
-    snackbarsActions.add({
-      message: 'Removing position...',
-      variant: 'pending',
-      persist: true,
-      key: loaderKey
+
+  try {
+    const walletAddress = yield* select(address)
+    const connection = yield* getConnection()
+    const network = yield* select(networkType)
+    const invariant = yield* call(
+      Invariant.load,
+      connection,
+      network,
+      TESTNET_INVARIANT_ADDRESS,
+      DEFAULT_CONTRACT_OPTIONS
+    )
+    const adapter = yield* call(getAlephZeroWallet)
+
+    yield put(
+      snackbarsActions.add({
+        message: 'Signing transaction...',
+        variant: 'pending',
+        persist: true,
+        key: loaderSigningTx
+      })
+    )
+
+    const tx = yield* call([invariant, invariant.removePositionTx], action.payload.positionIndex)
+    const signedTx = yield* call([tx, tx.signAsync], walletAddress, {
+      signer: adapter.signer as Signer
     })
-  )
 
-  const txResult = yield* call(sendTx, signedTx)
+    closeSnackbar(loaderSigningTx)
+    yield put(snackbarsActions.remove(loaderSigningTx))
+    const loaderKey = createLoaderKey()
+    yield put(
+      snackbarsActions.add({
+        message: 'Removing position...',
+        variant: 'pending',
+        persist: true,
+        key: loaderKey
+      })
+    )
 
-  closeSnackbar(loaderKey)
-  yield put(snackbarsActions.remove(loaderKey))
-  yield put(
-    snackbarsActions.add({
-      message: 'Position successfully removed',
-      variant: 'success',
-      persist: false,
-      txid: txResult.hash
-    })
-  )
+    const txResult = yield* call(sendTx, signedTx)
 
-  yield* put(actions.getPositionsList())
-  action.payload.onSuccess()
+    closeSnackbar(loaderKey)
+    yield put(snackbarsActions.remove(loaderKey))
+    yield put(
+      snackbarsActions.add({
+        message: 'Position successfully removed',
+        variant: 'success',
+        persist: false,
+        txid: txResult.hash
+      })
+    )
+
+    yield* put(actions.getPositionsList())
+    action.payload.onSuccess()
+  } catch (e) {
+    closeSnackbar(loaderSigningTx)
+    yield put(snackbarsActions.remove(loaderSigningTx))
+    closeSnackbar(loaderKey)
+    yield put(snackbarsActions.remove(loaderKey))
+
+    yield put(
+      snackbarsActions.add({
+        message: 'Failed to close position. Please try again.',
+        variant: 'error',
+        persist: false
+      })
+    )
+
+    console.log(e)
+  }
 }
 
 export function* getPositionsListHandler(): Generator {
