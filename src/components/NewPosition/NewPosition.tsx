@@ -18,8 +18,10 @@ import PoolInit from './PoolInit/PoolInit'
 import RangeSelector from './RangeSelector/RangeSelector'
 import useStyles from './style'
 import {
+  PositionTokenBlock,
   calcPrice,
   convertBalanceToBigint,
+  determinePositionTokenBlock,
   printBigint,
   trimLeadingZeros
 } from '@store/consts/utils'
@@ -65,7 +67,7 @@ export interface INewPosition {
   yDecimal: bigint
   tickSpacing: bigint
   isWaitingForNewPool: boolean
-  poolIndex: bigint | null
+  poolIndex: number | null
   currentPairReversed: boolean | null
   bestTiers: BestTier[]
   initialIsDiscreteValue: boolean
@@ -560,16 +562,16 @@ export const NewPosition: React.FC<INewPosition> = ({
               )
             },
             blocked:
-              // tokenAIndex !== null &&
-              // tokenBIndex !== null &&
-              // !isWaitingForNewPool &&
-              // determinePositionTokenBlock(
-              //   currentPriceSqrt,
-              //   BigInt(Math.min(Number(leftRange), Number(rightRange))),
-              //   BigInt(Math.max(Number(leftRange), Number(rightRange))),
-              //   isXtoY
-              // ) === PositionTokenBlock.A,
-              false, //TODO correct determinePositionTokenBlock function
+              tokenAIndex !== null &&
+              tokenBIndex !== null &&
+              !isWaitingForNewPool &&
+              determinePositionTokenBlock(
+                currentPriceSqrt,
+                BigInt(Math.min(Number(leftRange), Number(rightRange))),
+                BigInt(Math.max(Number(leftRange), Number(rightRange))),
+                isXtoY
+              ) === PositionTokenBlock.A,
+
             blockerInfo: 'Range only for single-asset deposit.',
             decimalsLimit: tokenAIndex !== null ? Number(tokens[tokenAIndex].decimals) : 0
           }}
@@ -590,16 +592,15 @@ export const NewPosition: React.FC<INewPosition> = ({
               )
             },
             blocked:
-              // tokenAIndex !== null &&
-              // tokenBIndex !== null &&
-              // !isWaitingForNewPool &&
-              // determinePositionTokenBlock(
-              //   currentPriceSqrt,
-              //   BigInt(Math.min(Number(leftRange), Number(rightRange))),
-              //   BigInt(Math.max(Number(leftRange), Number(rightRange))),
-              //   isXtoY
-              // ) === PositionTokenBlock.B,
-              false,
+              tokenAIndex !== null &&
+              tokenBIndex !== null &&
+              !isWaitingForNewPool &&
+              determinePositionTokenBlock(
+                currentPriceSqrt,
+                BigInt(Math.min(Number(leftRange), Number(rightRange))),
+                BigInt(Math.max(Number(leftRange), Number(rightRange))),
+                isXtoY
+              ) === PositionTokenBlock.B,
             blockerInfo: 'Range only for single-asset deposit.',
             decimalsLimit: tokenBIndex !== null ? Number(tokens[tokenBIndex].decimals) : 0
           }}

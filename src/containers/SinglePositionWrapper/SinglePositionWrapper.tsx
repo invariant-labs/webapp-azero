@@ -6,7 +6,7 @@ import loader from '@static/gif/loader.gif'
 import { TokenPriceData } from '@store/consts/static'
 import {
   calcPrice,
-  calcYPerXPrice,
+  calcYPerXPriceByTickIndex,
   getCoingeckoTokenPrice,
   getMockedTokenPrice,
   poolKeyToString,
@@ -81,7 +81,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
     if (position?.poolData) {
       return {
         index: position.poolData.currentTickIndex,
-        x: calcYPerXPrice(
+        x: calcYPerXPriceByTickIndex(
           position.poolData.currentTickIndex,
           position.tokenX.decimals,
           position.tokenY.decimals
@@ -136,7 +136,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   const min = useMemo(
     () =>
       position
-        ? calcYPerXPrice(
+        ? calcYPerXPriceByTickIndex(
             position.lowerTickIndex,
             position.tokenX.decimals,
             position.tokenY.decimals
@@ -147,7 +147,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   const max = useMemo(
     () =>
       position
-        ? calcYPerXPrice(
+        ? calcYPerXPriceByTickIndex(
             position.upperTickIndex,
             position.tokenX.decimals,
             position.tokenY.decimals
@@ -158,7 +158,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   const current = useMemo(
     () =>
       position?.poolData
-        ? calcYPerXPrice(
+        ? calcYPerXPriceByTickIndex(
             position.poolData.currentTickIndex,
             position.tokenX.decimals,
             position.tokenY.decimals
