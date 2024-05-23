@@ -2,7 +2,7 @@ import { PositionsList } from '@components/PositionsList/PositionsList'
 import { getLiquidityByX, getLiquidityByY } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/src/consts'
 import { POSITIONS_PER_PAGE } from '@store/consts/static'
-import { calcYPerXPrice, printBigint } from '@store/consts/utils'
+import { calcYPerXPriceByTickIndex, printBigint } from '@store/consts/utils'
 import { actions } from '@store/reducers/positions'
 import { Status } from '@store/reducers/wallet'
 import {
@@ -53,10 +53,18 @@ export const WrappedPositionsList: React.FC = () => {
   const data = list
     .map((position, index) => {
       const lowerPrice = Number(
-        calcYPerXPrice(position.lowerTickIndex, position.tokenX.decimals, position.tokenY.decimals)
+        calcYPerXPriceByTickIndex(
+          position.lowerTickIndex,
+          position.tokenX.decimals,
+          position.tokenY.decimals
+        )
       )
       const upperPrice = Number(
-        calcYPerXPrice(position.upperTickIndex, position.tokenX.decimals, position.tokenY.decimals)
+        calcYPerXPriceByTickIndex(
+          position.upperTickIndex,
+          position.tokenX.decimals,
+          position.tokenY.decimals
+        )
       )
 
       const min = Math.min(lowerPrice, upperPrice)
@@ -94,7 +102,7 @@ export const WrappedPositionsList: React.FC = () => {
         tokenYLiq = 0
       }
 
-      const currentPrice = calcYPerXPrice(
+      const currentPrice = calcYPerXPriceByTickIndex(
         position.poolData?.currentTickIndex ?? 0n,
         position.tokenX.decimals,
         position.tokenY.decimals

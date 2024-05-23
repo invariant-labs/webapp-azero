@@ -17,7 +17,7 @@ import {
 } from '@store/consts/static'
 import {
   calcPrice,
-  calcYPerXSqrtPrice,
+  calcYPerXPriceBySqrtPrice,
   createPlaceholderLiquidityPlot,
   getCoingeckoTokenPrice,
   getMockedTokenPrice,
@@ -239,7 +239,9 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     if (poolsData[poolKey]) {
       setMidPrice({
         index: poolsData[poolKey].currentTickIndex,
-        x: calcYPerXSqrtPrice(poolsData[poolKey].sqrtPrice, xDecimal, yDecimal) ** (isXtoY ? 1 : -1)
+        x:
+          calcYPerXPriceBySqrtPrice(poolsData[poolKey].sqrtPrice, xDecimal, yDecimal) **
+          (isXtoY ? 1 : -1)
       })
     }
   }, [poolKey, isXtoY, xDecimal, yDecimal, poolsData])
