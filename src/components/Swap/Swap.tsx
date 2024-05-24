@@ -17,8 +17,6 @@ import { blurContent, unblurContent } from '@utils/uiUtils'
 import classNames from 'classnames'
 import React, { useEffect, useRef, useState } from 'react'
 import ExchangeRate from './ExchangeRate/ExchangeRate'
-import SendTestTransactionButton from './SendTestTransactionButton/SendTestTransactionButton'
-import TestTransaction from './TestTransaction/TestTransaction'
 import TransactionDetailsBox from './TransactionDetailsBox/TransactionDetailsBox'
 import useStyles from './style'
 import { PoolWithPoolKey } from '@store/reducers/pools'
@@ -718,8 +716,6 @@ export const Swap: React.FC<ISwap> = ({
           />
         )}
       </Grid>
-      <TestTransaction />
-      <SendTestTransactionButton />
     </Grid>
   )
 }
