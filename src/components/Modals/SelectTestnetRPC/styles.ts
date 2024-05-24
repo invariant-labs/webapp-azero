@@ -27,10 +27,10 @@ const useStyles = makeStyles()(() => {
         background: colors.invariant.light,
         color: colors.white.main
       },
-      '&:first-child': {
+      '&first-of-type': {
         marginBottom: '4px'
       },
-      '&:not(:first-child)': {
+      '&:not(:first-of-type)': {
         margin: '4px 0'
       },
       '&:last-child': {
