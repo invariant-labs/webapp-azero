@@ -203,6 +203,22 @@ export function* handleAirdrop(): Generator {
 //   return balance
 // }
 
+export function* fetchSelectedTokensBalances(action: PayloadAction<string[]>): Generator {
+  const api = yield* getConnection()
+  const network = yield* select(networkType)
+  const walletAddress = yield* select(address)
+
+  const tokens = action.payload
+  const balances = yield* call(getTokenBalances, tokens, api, network, walletAddress)
+
+  const convertedBalances: ITokenBalance[] = balances.map(balance => ({
+    address: balance[0],
+    balance: balance[1]
+  }))
+
+  yield* put(actions.addTokenBalances(convertedBalances))
+}
+
 export function* fetchTokensBalances(): Generator {
   const api = yield* getConnection()
   const network = yield* select(networkType)
@@ -297,6 +313,23 @@ export function* initSaga(): Generator {
 //   yield takeLeading(actions.getBalance, handleBalance)
 // }
 
+export function* handleFetchTokensBalances(): Generator {
+  yield takeLeading(actions.getTokens, fetchTokensBalances)
+}
+
+export function* handleFetchSelectedTokensBalances(): Generator {
+  yield takeLeading(actions.getSelectedTokens, fetchSelectedTokensBalances)
+}
+
 export function* walletSaga(): Generator {
-  yield all([initSaga, airdropSaga, connectHandler, disconnectHandler].map(spawn))
+  yield all(
+    [
+      initSaga,
+      airdropSaga,
+      connectHandler,
+      disconnectHandler,
+      handleFetchTokensBalances,
+      handleFetchSelectedTokensBalances
+    ].map(spawn)
+  )
 }

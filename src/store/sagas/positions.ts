@@ -16,6 +16,7 @@ import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { networkType } from '@store/selectors/connection'
 import { tokens } from '@store/selectors/pools'
 import { address } from '@store/selectors/wallet'
+import { actions as walletActions } from '@store/reducers/wallet'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
@@ -210,6 +211,8 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
         txid: txResult.hash
       })
     )
+
+    yield put(walletActions.getSelectedTokens([tokenX, tokenY]))
 
     closeSnackbar(loaderCreatePosition)
     yield put(snackbarsActions.remove(loaderCreatePosition))
