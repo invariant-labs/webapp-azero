@@ -2,7 +2,8 @@ import {
   FEE_TIERS,
   TESTNET_BTC_ADDRESS,
   TESTNET_ETH_ADDRESS,
-  TESTNET_USDC_ADDRESS
+  TESTNET_USDC_ADDRESS,
+  TESTNET_WAZERO_ADDRESS
 } from '@invariant-labs/a0-sdk'
 
 import { Network } from '@invariant-labs/a0-sdk/src'
@@ -177,6 +178,15 @@ export const USDC: Token = {
   logoURI:
     'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
   coingeckoId: 'usdc'
+}
+
+export const AZERO: Token = {
+  symbol: 'AZERO',
+  address: TESTNET_WAZERO_ADDRESS,
+  decimals: 12n,
+  name: 'Aleph Zero',
+  logoURI: 'https://assets.coingecko.com/coins/images/17212/standard/azero-logo_coingecko.png',
+  coingeckoId: 'aleph-zero'
 }
 
 export const DEFAULT_CONTRACT_OPTIONS = {
