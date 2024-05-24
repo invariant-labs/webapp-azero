@@ -53,7 +53,7 @@ export const useSingleTabStyles = makeStyles()(theme => {
     },
     selected: {
       ...typography.caption1,
-      color: colors.invariant.black,
+      color: colors.invariant.black + ' !important',
 
       '&:hover': {
         color: colors.invariant.black
