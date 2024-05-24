@@ -64,7 +64,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     const tokenXName = tokensList[tokenX]?.symbol ?? 'first'
     const tokenYName = tokensList[tokenY]?.symbol ?? 'second'
 
-    const psp22 = yield* call(PSP22.load, api, network, walletAddress, DEFAULT_CONTRACT_OPTIONS)
+    const psp22 = yield* call(PSP22.load, api, network, DEFAULT_CONTRACT_OPTIONS)
 
     yield put(
       snackbarsActions.add({
@@ -75,8 +75,12 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       })
     )
 
-    yield* call([psp22, psp22.setContractAddress], tokenX)
-    const XTokenTx = yield* call([psp22, psp22.approveTx], TESTNET_INVARIANT_ADDRESS, tokenXAmount)
+    const XTokenTx = yield* call(
+      [psp22, psp22.approveTx],
+      TESTNET_INVARIANT_ADDRESS,
+      tokenXAmount,
+      tokenX
+    )
 
     const signedXTokenTx = yield* call([XTokenTx, XTokenTx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
@@ -104,8 +108,12 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       })
     )
 
-    yield* call([psp22, psp22.setContractAddress], tokenY)
-    const YTokenTx = yield* call([psp22, psp22.approveTx], TESTNET_INVARIANT_ADDRESS, tokenYAmount)
+    const YTokenTx = yield* call(
+      [psp22, psp22.approveTx],
+      TESTNET_INVARIANT_ADDRESS,
+      tokenYAmount,
+      tokenY
+    )
 
     const signedYTokenTx = yield* call([YTokenTx, YTokenTx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
