@@ -12,8 +12,9 @@ import { PayloadAction } from '@reduxjs/toolkit'
 import { DEFAULT_CONTRACT_OPTIONS } from '@store/consts/static'
 import { createLoaderKey, poolKeyToString } from '@store/consts/utils'
 import { ListType, actions as poolsActions } from '@store/reducers/pools'
-import { InitPositionData, actions } from '@store/reducers/positions'
+import { ClosePositionData, InitPositionData, actions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
+import { actions as walletActions } from '@store/reducers/wallet'
 import { networkType } from '@store/selectors/connection'
 import { address } from '@store/selectors/wallet'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
@@ -255,6 +256,8 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
       })
     )
 
+    yield put(walletActions.getSelectedTokens([tokenX, tokenY]))
+
     closeSnackbar(loaderCreatePosition)
     yield put(snackbarsActions.remove(loaderCreatePosition))
   } catch (error) {
@@ -313,7 +316,7 @@ export function* handleGetPositionsList() {
   }
 }
 
-export function* handleGetCurrentPositionTicks(action: PayloadAction<number>) {
+export function* handleGetCurrentPositionTicks(action: PayloadAction<bigint>) {
   const walletAddress = yield* select(address)
   const connection = yield* getConnection()
   const network = yield* select(networkType)
@@ -323,7 +326,7 @@ export function* handleGetCurrentPositionTicks(action: PayloadAction<number>) {
     proofSize: 10000000000
   })
 
-  const position = yield* call([invariant, invariant.getPosition], walletAddress, 0n)
+  const position = yield* call([invariant, invariant.getPosition], walletAddress, action.payload)
 
   const [lowerTick, upperTick] = yield* all([
     call([invariant, invariant.getTick], position.poolKey, position.lowerTickIndex),
@@ -338,6 +341,179 @@ export function* handleGetCurrentPositionTicks(action: PayloadAction<number>) {
   )
 }
 
+export function* handleClaimFee(action: PayloadAction<bigint>) {
+  const loaderSigningTx = createLoaderKey()
+  const loaderKey = createLoaderKey()
+
+  try {
+    const walletAddress = yield* select(address)
+    const connection = yield* getConnection()
+    const network = yield* select(networkType)
+    const invariant = yield* call(
+      Invariant.load,
+      connection,
+      network,
+      TESTNET_INVARIANT_ADDRESS,
+      DEFAULT_CONTRACT_OPTIONS
+    )
+    const adapter = yield* call(getAlephZeroWallet)
+
+    yield put(
+      snackbarsActions.add({
+        message: 'Signing transaction...',
+        variant: 'pending',
+        persist: true,
+        key: loaderSigningTx
+      })
+    )
+
+    const tx = yield* call([invariant, invariant.claimFeeTx], action.payload)
+    const signedTx = yield* call([tx, tx.signAsync], walletAddress, {
+      signer: adapter.signer as Signer
+    })
+
+    closeSnackbar(loaderSigningTx)
+    yield put(snackbarsActions.remove(loaderSigningTx))
+    yield put(
+      snackbarsActions.add({
+        message: 'Claiming fee...',
+        variant: 'pending',
+        persist: true,
+        key: loaderKey
+      })
+    )
+
+    const txResult = yield* call(sendTx, signedTx)
+
+    closeSnackbar(loaderKey)
+    yield put(snackbarsActions.remove(loaderKey))
+    yield put(
+      snackbarsActions.add({
+        message: 'Fee successfully created',
+        variant: 'success',
+        persist: false,
+        txid: txResult.hash
+      })
+    )
+
+    yield put(actions.getSinglePosition(action.payload))
+  } catch (e) {
+    closeSnackbar(loaderSigningTx)
+    yield put(snackbarsActions.remove(loaderSigningTx))
+    closeSnackbar(loaderKey)
+    yield put(snackbarsActions.remove(loaderKey))
+
+    yield put(
+      snackbarsActions.add({
+        message: 'Failed to claim fee. Please try again.',
+        variant: 'error',
+        persist: false
+      })
+    )
+
+    console.log(e)
+  }
+}
+
+export function* handleGetSinglePosition(action: PayloadAction<bigint>) {
+  const walletAddress = yield* select(address)
+  const connection = yield* getConnection()
+  const network = yield* select(networkType)
+  const invariant = yield* call(
+    Invariant.load,
+    connection,
+    network,
+    TESTNET_INVARIANT_ADDRESS,
+    DEFAULT_CONTRACT_OPTIONS
+  )
+
+  const position = yield* call([invariant, invariant.getPosition], walletAddress, action.payload)
+  yield put(
+    actions.setSinglePosition({
+      index: action.payload,
+      position
+    })
+  )
+
+  yield put(actions.getCurrentPositionTicks(action.payload))
+}
+
+export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
+  const loaderSigningTx = createLoaderKey()
+  const loaderKey = createLoaderKey()
+
+  try {
+    const walletAddress = yield* select(address)
+    const connection = yield* getConnection()
+    const network = yield* select(networkType)
+    const invariant = yield* call(
+      Invariant.load,
+      connection,
+      network,
+      TESTNET_INVARIANT_ADDRESS,
+      DEFAULT_CONTRACT_OPTIONS
+    )
+    const adapter = yield* call(getAlephZeroWallet)
+
+    yield put(
+      snackbarsActions.add({
+        message: 'Signing transaction...',
+        variant: 'pending',
+        persist: true,
+        key: loaderSigningTx
+      })
+    )
+
+    const tx = yield* call([invariant, invariant.removePositionTx], action.payload.positionIndex)
+    const signedTx = yield* call([tx, tx.signAsync], walletAddress, {
+      signer: adapter.signer as Signer
+    })
+
+    closeSnackbar(loaderSigningTx)
+    yield put(snackbarsActions.remove(loaderSigningTx))
+    const loaderKey = createLoaderKey()
+    yield put(
+      snackbarsActions.add({
+        message: 'Removing position...',
+        variant: 'pending',
+        persist: true,
+        key: loaderKey
+      })
+    )
+
+    const txResult = yield* call(sendTx, signedTx)
+
+    closeSnackbar(loaderKey)
+    yield put(snackbarsActions.remove(loaderKey))
+    yield put(
+      snackbarsActions.add({
+        message: 'Position successfully removed',
+        variant: 'success',
+        persist: false,
+        txid: txResult.hash
+      })
+    )
+
+    yield* put(actions.getPositionsList())
+    action.payload.onSuccess()
+  } catch (e) {
+    closeSnackbar(loaderSigningTx)
+    yield put(snackbarsActions.remove(loaderSigningTx))
+    closeSnackbar(loaderKey)
+    yield put(snackbarsActions.remove(loaderKey))
+
+    yield put(
+      snackbarsActions.add({
+        message: 'Failed to close position. Please try again.',
+        variant: 'error',
+        persist: false
+      })
+    )
+
+    console.log(e)
+  }
+}
+
 export function* initPositionHandler(): Generator {
   yield* takeEvery(actions.initPosition, handleInitPosition)
 }
@@ -350,8 +526,26 @@ export function* getCurrentPositionTicksHandler(): Generator {
   yield* takeEvery(actions.getCurrentPositionTicks, handleGetCurrentPositionTicks)
 }
 
+export function* claimFeeHandler(): Generator {
+  yield* takeEvery(actions.claimFee, handleClaimFee)
+}
+
+export function* getSinglePositionHandler(): Generator {
+  yield* takeEvery(actions.getSinglePosition, handleGetSinglePosition)
+}
+
+export function* closePositionHandler(): Generator {
+  yield* takeEvery(actions.closePosition, handleClosePosition)
+}
+
 export function* positionsSaga(): Generator {
   yield all(
-    [initPositionHandler, getPositionsListHandler, getCurrentPositionTicksHandler].map(spawn)
+    [
+      getPositionsListHandler,
+      getCurrentPositionTicksHandler,
+      claimFeeHandler,
+      getSinglePositionHandler,
+      closePositionHandler
+    ].map(spawn)
   )
 }

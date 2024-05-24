@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import SelectMainnetRPC from './SelectMainnetRPC'
+import SelectTestnetRPC from './SelectTestnetRPC'
 import { Network } from '@invariant-labs/a0-sdk'
 
 const meta = {
   title: 'Modals/SelectRPC',
-  component: SelectMainnetRPC,
+  component: SelectTestnetRPC,
   args: {
     activeRPC: 'https://testnet-mock.com',
     anchorEl: null,
@@ -19,7 +19,7 @@ const meta = {
     onSelect: () => {},
     open: true
   }
-} satisfies Meta<typeof SelectMainnetRPC>
+} satisfies Meta<typeof SelectTestnetRPC>
 
 export default meta
 type Story = StoryObj<typeof meta>

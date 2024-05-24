@@ -11,7 +11,7 @@ const SinglePositionPage: React.FC = () => {
   return (
     <Grid container className={classes.container} justifyContent='center'>
       <Grid item>
-        <SinglePositionWrapper address={address ?? ''} id={id ? +id : -1} />
+        <SinglePositionWrapper address={address ?? ''} id={id ? BigInt(id) : -1n} />
       </Grid>
     </Grid>
   )

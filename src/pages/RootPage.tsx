@@ -8,7 +8,7 @@ import { status as connectionStatus } from '@store/selectors/connection'
 import { address, status } from '@store/selectors/wallet'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 
 const RootPage: React.FC = () => {
   const dispatch = useDispatch()
@@ -16,8 +16,11 @@ const RootPage: React.FC = () => {
   const walletStatus = useSelector(status)
   const walletAddress = useSelector(address)
 
+  const navigate = useNavigate()
+
   useEffect(() => {
     // dispatch(providerActions.initProvider())
+    navigate('/swap')
     dispatch(alephZeroConnectionActions.initAlephZeroConnection())
   }, [dispatch])
 

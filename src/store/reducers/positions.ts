@@ -1,13 +1,4 @@
-import {
-  Liquidity,
-  Percentage,
-  PoolKey,
-  Position,
-  SqrtPrice,
-  Tick,
-  TokenAmount
-} from '@invariant-labs/a0-sdk'
-import { AddressOrPair } from '@polkadot/api/types'
+import { PoolKey, Position, SqrtPrice, Tick, TokenAmount } from '@invariant-labs/a0-sdk'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/consts/types'
 
@@ -49,9 +40,9 @@ export interface InitPositionData {
   poolKeyData: PoolKey
   lowerTick: bigint
   upperTick: bigint
-  liquidityDelta: Liquidity
+  liquidityDelta: bigint
   spotSqrtPrice: SqrtPrice
-  slippageTolerance: Percentage
+  slippageTolerance: bigint
   tokenXAmount: TokenAmount
   tokenYAmount: TokenAmount
   initPool?: boolean
@@ -63,13 +54,13 @@ export interface GetCurrentTicksData {
 }
 
 export interface ClosePositionData {
-  positionIndex: number
+  positionIndex: bigint
   claimFarmRewards?: boolean
   onSuccess: () => void
 }
 
 export interface SetPositionData {
-  index: number
+  index: bigint
   position: Position
 }
 
@@ -137,14 +128,14 @@ const positionsSlice = createSlice({
       state.positionsList.loading = true
       return state
     },
-    getSinglePosition(state, _action: PayloadAction<number>) {
+    getSinglePosition(state, _action: PayloadAction<bigint>) {
       return state
     },
     setSinglePosition(state, action: PayloadAction<SetPositionData>) {
-      state.positionsList.list[action.payload.index] = action.payload.position
+      state.positionsList.list[Number(action.payload.index)] = action.payload.position
       return state
     },
-    getCurrentPositionTicks(state, _action: PayloadAction<number>) {
+    getCurrentPositionTicks(state, _action: PayloadAction<bigint>) {
       state.currentPositionTicks.loading = true
       return state
     },
@@ -154,17 +145,17 @@ const positionsSlice = createSlice({
         loading: false
       }
       return state
+    },
+    claimFee(state, _action: PayloadAction<bigint>) {
+      return state
+    },
+    closePosition(state, _action: PayloadAction<ClosePositionData>) {
+      return state
+    },
+    resetState(state) {
+      state = defaultState
+      return state
     }
-    // claimFee(state, _action: PayloadAction<number>) {
-    //   return state
-    // },
-    // closePosition(state, _action: PayloadAction<ClosePositionData>) {
-    //   return state
-    // },
-    // resetState(state) {
-    //   state = defaultState
-    //   return state
-    // }
   }
 })
 

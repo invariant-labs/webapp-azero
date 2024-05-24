@@ -129,15 +129,21 @@ export function* handleAirdrop(): Generator {
   const faucetDeployer = getFaucetDeployer()
   const data = connection.createType('Vec<u8>', [])
 
-  const psp22 = yield* call(PSP22.load, connection, Network.Testnet, '', DEFAULT_CONTRACT_OPTIONS)
+  const psp22 = yield* call(PSP22.load, connection, Network.Testnet, DEFAULT_CONTRACT_OPTIONS)
 
   for (const ticker in TokenList) {
     const address = TokenList[ticker as keyof typeof TokenList]
     const airdropAmount = TokenAirdropAmount[ticker as keyof typeof TokenList]
 
-    yield* call([psp22, psp22.setContractAddress], address)
-    yield* call([psp22, psp22.mint], faucetDeployer, airdropAmount)
-    yield* call([psp22, psp22.transfer], faucetDeployer, walletAddress, airdropAmount, data)
+    yield* call([psp22, psp22.mint], faucetDeployer, airdropAmount, address)
+    yield* call(
+      [psp22, psp22.transfer],
+      faucetDeployer,
+      walletAddress,
+      airdropAmount,
+      data,
+      address
+    )
 
     yield* put(
       snackbarsActions.add({
@@ -203,69 +209,20 @@ export function* handleAirdrop(): Generator {
 //   return balance
 // }
 
-export function* testTransaction(
-  action: PayloadAction<{ receiverAddress: AddressOrPair; amount: number }>
-): Generator {
-  const loaderKey = createLoaderKey()
+export function* fetchSelectedTokensBalances(action: PayloadAction<string[]>): Generator {
+  const api = yield* getConnection()
+  const network = yield* select(networkType)
+  const walletAddress = yield* select(address)
 
-  try {
-    const { amount, receiverAddress } = action.payload
-    const walletAddress = yield* select(address)
-    console.log(walletAddress)
-    if (!walletAddress) {
-      yield put(
-        snackbarsActions.add({
-          message: 'Please connect your wallet first.',
-          variant: 'error',
-          persist: false
-        })
-      )
-      return
-    }
-    yield put(
-      snackbarsActions.add({
-        message: 'Processing transaction...',
-        variant: 'pending',
-        persist: true,
-        key: loaderKey
-      })
-    )
+  const tokens = action.payload
+  const balances = yield* call(getTokenBalances, tokens, api, network, walletAddress)
 
-    const walletAdapter = yield* call(getWallet)
-    const connection = yield* call(getConnection)
+  const convertedBalances: ITokenBalance[] = balances.map(balance => ({
+    address: balance[0],
+    balance: balance[1]
+  }))
 
-    const tx = connection.tx.balances.transferAllowDeath(receiverAddress, amount)
-    const signedTx = yield* call(signAndSend, walletAdapter, tx, walletAddress)
-
-    closeSnackbar(loaderKey)
-    yield put(snackbarsActions.remove(loaderKey))
-
-    yield put(
-      snackbarsActions.add({
-        message: 'Successful send transaction',
-        variant: 'success',
-        persist: false,
-        txid: signedTx
-      })
-    )
-  } catch (error) {
-    console.log(error)
-    closeSnackbar(loaderKey)
-    yield put(snackbarsActions.remove(loaderKey))
-  }
-}
-
-export function* signAndSend(
-  walletAdapter: NightlyConnectAdapter,
-  tx: SubmittableExtrinsic<'promise', any>,
-  address: AddressOrPair
-): SagaGenerator<string> {
-  const signedTx = yield* call([tx, tx.signAsync], address, {
-    signer: walletAdapter.signer
-  } as SignerOptions)
-
-  const txId = yield* call([signedTx, signedTx.send])
-  return txId.toString()
+  yield* put(actions.addTokenBalances(convertedBalances))
 }
 
 export function* fetchTokensBalances(): Generator {
@@ -361,11 +318,24 @@ export function* initSaga(): Generator {
 // export function* handleBalanceSaga(): Generator {
 //   yield takeLeading(actions.getBalance, handleBalance)
 // }
-export function* handleTestTransaction(): Generator {
-  yield takeLeading(actions.initTestTransaction, testTransaction)
+
+export function* handleFetchTokensBalances(): Generator {
+  yield takeLeading(actions.getTokens, fetchTokensBalances)
 }
+
+export function* handleFetchSelectedTokensBalances(): Generator {
+  yield takeLeading(actions.getSelectedTokens, fetchSelectedTokensBalances)
+}
+
 export function* walletSaga(): Generator {
   yield all(
-    [initSaga, airdropSaga, connectHandler, disconnectHandler, handleTestTransaction].map(spawn)
+    [
+      initSaga,
+      airdropSaga,
+      connectHandler,
+      disconnectHandler,
+      handleFetchTokensBalances,
+      handleFetchSelectedTokensBalances
+    ].map(spawn)
   )
 }

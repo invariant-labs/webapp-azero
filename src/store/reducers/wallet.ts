@@ -74,13 +74,6 @@ const walletSlice = createSlice({
       action.payload ? (state.balanceLoading = true) : (state.balanceLoading = false)
       return state
     },
-    initTestTransaction(
-      state,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      _action: PayloadAction<{ receiverAddress: AddressOrPair; amount: number }>
-    ) {
-      return state
-    },
     addTokenBalance(state, action: PayloadAction<ITokenBalance>) {
       state.tokensBalances[action.payload.address] = action.payload
       return state
@@ -93,6 +86,12 @@ const walletSlice = createSlice({
     },
     setTokenBalance(state, action: PayloadAction<ITokenBalance>) {
       state.tokensBalances[action.payload.address.toString()] = action.payload
+      return state
+    },
+    getTokens(state) {
+      return state
+    },
+    getSelectedTokens(state, _action: PayloadAction<string[]>) {
       return state
     },
     // Triggers rescan for tokens that we control
