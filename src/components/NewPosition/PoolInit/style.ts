@@ -40,7 +40,7 @@ const useStyles = makeStyles()(theme => {
       gap: 12,
 
       [theme.breakpoints.down('sm')]: {
-        '&:first-child': {
+        '&:first-of-type': {
           marginRight: 0,
           marginBottom: 8
         }
@@ -58,7 +58,7 @@ const useStyles = makeStyles()(theme => {
       borderRadius: 11,
 
       [theme.breakpoints.down('sm')]: {
-        '&:first-child': {
+        '&:first-of-type': {
           marginRight: 0,
           marginBottom: 8
         }
