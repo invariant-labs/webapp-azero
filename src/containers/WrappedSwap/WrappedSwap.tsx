@@ -1,7 +1,6 @@
 import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import { Swap } from '@components/Swap/Swap'
 import { initPolkadotApi } from '@invariant-labs/a0-sdk'
-import { ApiPromise } from '@polkadot/api'
 import { AddressOrPair } from '@polkadot/api/types'
 import { TokenPriceData, commonTokensForNetworks } from '@store/consts/static'
 import { getCoingeckoTokenPrice, getMockedTokenPrice } from '@store/consts/utils'
@@ -14,17 +13,14 @@ import {
   poolsArraySortedByFees,
   tickMaps
 } from '@store/selectors/pools'
-import { swap as swapPool } from '@store/selectors/swap'
+import { simulateResult, swap as swapPool } from '@store/selectors/swap'
 import { balanceLoading, status, swapTokens, swapTokensDict } from '@store/selectors/wallet'
-import { getCurrentAlephZeroConnection } from '@utils/web3/connection'
 import { openWalletSelectorModal } from '@utils/web3/selector'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 export const WrappedSwap = () => {
   const dispatch = useDispatch()
-
-  const connection = getCurrentAlephZeroConnection()
 
   const walletStatus = useSelector(status)
   const swap = useSelector(swapPool)
@@ -38,11 +34,11 @@ export const WrappedSwap = () => {
   const isFetchingNewPool = useSelector(isLoadingLatestPoolsForTransaction)
   const network = useSelector(networkType)
   const rpc = useSelector(rpcAddress)
+  const swapSimulateResult = useSelector(simulateResult)
 
   const [progress, setProgress] = useState<ProgressState>('none')
   const [tokenFrom, setTokenFrom] = useState<AddressOrPair | null>(null)
   const [tokenTo, setTokenTo] = useState<AddressOrPair | null>(null)
-  const [api, setApi] = useState<ApiPromise | null>(null)
 
   useEffect(() => {
     let timeoutId1: NodeJS.Timeout
@@ -317,8 +313,7 @@ export const WrappedSwap = () => {
       onSlippageChange={onSlippageChange}
       initialSlippage={initialSlippage}
       isBalanceLoading={isBalanceLoading}
-      api={api}
-      network={network}
+      simulateResult={swapSimulateResult}
     />
   )
 }

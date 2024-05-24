@@ -2,9 +2,8 @@ import AnimatedButton, { ProgressState } from '@components/AnimatedButton/Animat
 import ChangeWalletButton from '@components/Header/HeaderButton/ChangeWalletButton'
 import ExchangeAmountInput from '@components/Inputs/ExchangeAmountInput/ExchangeAmountInput'
 import Slippage from '@components/Modals/Slippage/Slippage'
-import { Network, Price, Tick, TokenAmount } from '@invariant-labs/a0-sdk'
+import { Price, Tick, TokenAmount } from '@invariant-labs/a0-sdk'
 import { Box, Button, CardMedia, Grid, Typography } from '@mui/material'
-import { ApiPromise } from '@polkadot/api'
 import { AddressOrPair } from '@polkadot/api/types'
 import infoIcon from '@static/svg/info.svg'
 import refreshIcon from '@static/svg/refresh.svg'
@@ -14,17 +13,17 @@ import { TokenPriceData } from '@store/consts/static'
 import {
   SimulateResult,
   convertBalanceToBigint,
-  handleSimulate,
   printBigint,
   trimLeadingZeros
 } from '@store/consts/utils'
 import { PoolWithPoolKey } from '@store/reducers/pools'
-import { Swap as SwapData } from '@store/reducers/swap'
+import { Swap as SwapData, actions } from '@store/reducers/swap'
 import { Status } from '@store/reducers/wallet'
 import { SwapToken } from '@store/selectors/wallet'
 import { blurContent, unblurContent } from '@utils/uiUtils'
 import classNames from 'classnames'
 import React, { useEffect, useRef, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import ExchangeRate from './ExchangeRate/ExchangeRate'
 import SendTestTransactionButton from './SendTestTransactionButton/SendTestTransactionButton'
 import TestTransaction from './TestTransaction/TestTransaction'
@@ -88,8 +87,7 @@ export interface ISwap {
   onSlippageChange: (slippage: string) => void
   initialSlippage: string
   isBalanceLoading: boolean
-  api: ApiPromise | null
-  network: Network
+  simulateResult: SimulateResult
 }
 
 export const Swap: React.FC<ISwap> = ({
@@ -120,8 +118,7 @@ export const Swap: React.FC<ISwap> = ({
   initialSlippage,
   isBalanceLoading,
   swapData,
-  api,
-  network
+  simulateResult
 }) => {
   const { classes } = useStyles()
   enum inputTarget {
@@ -142,13 +139,9 @@ export const Swap: React.FC<ISwap> = ({
   const [detailsOpen, setDetailsOpen] = React.useState<boolean>(false)
   const [inputRef, setInputRef] = React.useState<string>(inputTarget.FROM)
   const [rateReversed, setRateReversed] = React.useState<boolean>(false)
-  const [simulateResult, setSimulateResult] = React.useState<SimulateResult>({
-    amountOut: 0n,
-    fee: 0n,
-    priceImpact: 0
-  })
 
   const timeoutRef = useRef<number>(0)
+  const dispatch = useDispatch()
 
   useEffect(() => {
     if (!!tokens.length && tokenFromIndex === null && tokenToIndex === null) {
@@ -214,7 +207,7 @@ export const Swap: React.FC<ISwap> = ({
       setSimulateAmount().finally(() => {
         setThrottle(false)
       })
-    }, 100)
+    }, 500)
     timeoutRef.current = timeout as unknown as number
   }
 
@@ -252,32 +245,24 @@ export const Swap: React.FC<ISwap> = ({
   }
 
   const setSimulateAmount = async () => {
-    if (tokenFromIndex !== null && tokenToIndex !== null && api && swapData) {
+    if (tokenFromIndex !== null && tokenToIndex !== null && swapData) {
       if (inputRef === inputTarget.FROM) {
-        setSimulateResult(
-          await handleSimulate(
-            api,
-            network,
-            pools,
-            tokens,
-            tokens[tokenFromIndex].assetAddress,
-            tokens[tokenToIndex].assetAddress,
-            convertBalanceToBigint(amountFrom, Number(tokens[tokenFromIndex].decimals)),
-            true
-          )
+        dispatch(
+          actions.getSimulateResult({
+            fromToken: tokens[tokenFromIndex].assetAddress,
+            toToken: tokens[tokenToIndex].assetAddress,
+            amount: convertBalanceToBigint(amountFrom, Number(tokens[tokenFromIndex].decimals)),
+            byAmountIn: true
+          })
         )
       } else {
-        setSimulateResult(
-          await handleSimulate(
-            api,
-            network,
-            pools,
-            tokens,
-            tokens[tokenFromIndex].assetAddress,
-            tokens[tokenToIndex].assetAddress,
-            convertBalanceToBigint(amountTo, Number(tokens[tokenToIndex].decimals)),
-            false
-          )
+        dispatch(
+          actions.getSimulateResult({
+            fromToken: tokens[tokenFromIndex].assetAddress,
+            toToken: tokens[tokenToIndex].assetAddress,
+            amount: convertBalanceToBigint(amountTo, Number(tokens[tokenToIndex].decimals)),
+            byAmountIn: false
+          })
         )
       }
     }
@@ -538,10 +523,10 @@ export const Swap: React.FC<ISwap> = ({
             }}
             placeholder={`0.${'0'.repeat(6)}`}
             onMaxClick={() => {
-              if (tokenFromIndex !== null) {
+              if (tokenToIndex !== null) {
                 setInputRef(inputTarget.FROM)
                 setAmountTo(
-                  printBigint(tokens[tokenFromIndex].balance, tokens[tokenFromIndex].decimals)
+                  printBigint(tokens[tokenToIndex].balance, tokens[tokenToIndex].decimals)
                 )
               }
             }}

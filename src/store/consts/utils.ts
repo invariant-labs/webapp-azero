@@ -3,7 +3,6 @@ import {
   Network,
   PSP22,
   PoolKey,
-  QuoteResult,
   TESTNET_INVARIANT_ADDRESS,
   TokenAmount,
   calculateSqrtPrice,
@@ -12,10 +11,8 @@ import {
 } from '@invariant-labs/a0-sdk'
 import { PRICE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { ApiPromise } from '@polkadot/api'
-import { AddressOrPair } from '@polkadot/api/types'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
-import { SwapToken } from '@store/selectors/wallet'
 import axios from 'axios'
 import {
   BTC,
@@ -545,83 +542,6 @@ export type SimulateResult = {
   amountOut: bigint
   fee: bigint
   priceImpact: number
-}
-
-export const handleSimulate = async (
-  api: ApiPromise,
-  network: Network,
-  pools: PoolWithPoolKey[],
-  tokens: SwapToken[],
-  fromToken: AddressOrPair,
-  toToken: AddressOrPair,
-  amount: bigint,
-  byAmountIn: boolean
-): Promise<SimulateResult> => {
-  if (amount === 0n) {
-    return {
-      amountOut: 0n,
-      fee: 0n,
-      priceImpact: 0
-    }
-  }
-
-  const filteredPools = findPairs(fromToken.toString(), toToken.toString(), pools)
-  if (!filteredPools) {
-    return {
-      amountOut: 0n,
-      fee: 0n,
-      priceImpact: 0
-    }
-  }
-
-  const invariant = await Invariant.load(
-    api,
-    network,
-    TESTNET_INVARIANT_ADDRESS,
-    DEFAULT_CONTRACT_OPTIONS
-  )
-  let amountOut = 0n
-  let fee = 0n
-  let priceImpact = 0
-
-  const quotePromises: Promise<QuoteResult>[] = []
-  for (const pool of filteredPools) {
-    quotePromises.push(
-      invariant.quote(pool.poolKey, pool.poolKey.tokenX === fromToken, amount, byAmountIn)
-    )
-  }
-
-  const quoteResults = await Promise.allSettled(quotePromises)
-  filteredPools.forEach((pool, index) => {
-    const quoteResult = quoteResults[index]
-    if (quoteResult.status === 'rejected') {
-      return
-    }
-
-    const tokenX = tokens.find(token => token.assetAddress === pool.poolKey.tokenX)
-    const tokenY = tokens.find(token => token.assetAddress === pool.poolKey.tokenY)
-    if (!tokenX || !tokenY) {
-      return
-    }
-
-    if (quoteResult.value.amountOut > amountOut) {
-      amountOut = quoteResult.value.amountOut
-      fee = pool.poolKey.feeTier.fee
-
-      const parsedPoolSqrtPrice = Number(pool.sqrtPrice)
-      const parsedTargetSqrtPrice = Number(quoteResult.value.targetSqrtPrice)
-      priceImpact =
-        parsedPoolSqrtPrice > parsedTargetSqrtPrice
-          ? 1 - parsedTargetSqrtPrice / parsedPoolSqrtPrice
-          : 1 - parsedPoolSqrtPrice / parsedTargetSqrtPrice
-    }
-  })
-
-  return {
-    amountOut,
-    fee,
-    priceImpact
-  }
 }
 
 export const getPools = async (
