@@ -34,7 +34,6 @@ export const SelectTestnetRPC: React.FC<ISelectTestnetRPC> = ({
 
     return urlRegex.test(address)
   }
-  console.log(networks)
 
   return (
     <Popover
