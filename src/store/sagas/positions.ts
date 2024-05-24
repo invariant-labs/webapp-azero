@@ -541,6 +541,7 @@ export function* closePositionHandler(): Generator {
 export function* positionsSaga(): Generator {
   yield all(
     [
+      initPositionHandler,
       getPositionsListHandler,
       getCurrentPositionTicksHandler,
       claimFeeHandler,
