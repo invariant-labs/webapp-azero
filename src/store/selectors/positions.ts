@@ -56,9 +56,9 @@ export const positionsWithPoolsData = createSelector(
   }
 )
 
-export const singlePositionData = (id: number) =>
+export const singlePositionData = (id: bigint) =>
   createSelector(positionsWithPoolsData, positions =>
-    positions.find(position => id === position.positionIndex)
+    positions.find(position => id === BigInt(position.positionIndex))
   )
 
 export const positionsSelectors = {

@@ -26,7 +26,8 @@ const configureAppStore = (initialState = {}) => {
       getDefaultMiddleware({
         serializableCheck: {
           isSerializable,
-          getEntries
+          getEntries,
+          ignoredActions: ['positions/closePosition']
         }
       }).concat(middleware),
     preloadedState: initialState,
