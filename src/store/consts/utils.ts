@@ -310,11 +310,15 @@ export const getTokenDataByAddresses = async (
   network: Network,
   address: string
 ): Promise<Record<string, Token>> => {
-  const psp22 = await PSP22.load(api, network, '', DEFAULT_CONTRACT_OPTIONS)
+  const psp22 = await PSP22.load(api, network, DEFAULT_CONTRACT_OPTIONS)
 
   const promises = tokens.flatMap(token => {
-    psp22.setContractAddress(token)
-    return [psp22.tokenSymbol(), psp22.tokenName(), psp22.tokenDecimals(), psp22.balanceOf(address)]
+    return [
+      psp22.tokenSymbol(token),
+      psp22.tokenName(token),
+      psp22.tokenDecimals(token),
+      psp22.balanceOf(address, token)
+    ]
   })
   const results = await Promise.all(promises)
 
@@ -339,12 +343,11 @@ export const getTokenBalances = async (
   network: Network,
   address: string
 ): Promise<[string, bigint][]> => {
-  const psp22 = await PSP22.load(api, network, '')
+  const psp22 = await PSP22.load(api, network, DEFAULT_CONTRACT_OPTIONS)
 
   const promises: Promise<any>[] = []
   tokens.map(token => {
-    psp22.setContractAddress(token)
-    promises.push(psp22.balanceOf(address))
+    promises.push(psp22.balanceOf(address, token))
   })
   const results = await Promise.all(promises)
 
