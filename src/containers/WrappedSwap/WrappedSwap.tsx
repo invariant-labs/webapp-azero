@@ -1,13 +1,12 @@
 import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import { Swap } from '@components/Swap/Swap'
-import { initPolkadotApi } from '@invariant-labs/a0-sdk'
 import { AddressOrPair } from '@polkadot/api/types'
 import { TokenPriceData, commonTokensForNetworks } from '@store/consts/static'
 import { getCoingeckoTokenPrice, getMockedTokenPrice } from '@store/consts/utils'
 import { actions as poolsActions } from '@store/reducers/pools'
 import { actions } from '@store/reducers/swap'
 import { actions as walletActions } from '@store/reducers/wallet'
-import { networkType, rpcAddress } from '@store/selectors/connection'
+import { networkType } from '@store/selectors/connection'
 import {
   isLoadingLatestPoolsForTransaction,
   poolsArraySortedByFees,
@@ -33,7 +32,6 @@ export const WrappedSwap = () => {
   const { success, inProgress } = useSelector(swapPool)
   const isFetchingNewPool = useSelector(isLoadingLatestPoolsForTransaction)
   const network = useSelector(networkType)
-  const rpc = useSelector(rpcAddress)
   const swapSimulateResult = useSelector(simulateResult)
 
   const [progress, setProgress] = useState<ProgressState>('none')
@@ -229,15 +227,6 @@ export const WrappedSwap = () => {
       setTokenFromPriceData(undefined)
     }
   }
-
-  useEffect(() => {
-    const load = async () => {
-      const api = await initPolkadotApi(network, rpc)
-      setApi(api)
-    }
-
-    load()
-  }, [rpc, network])
 
   return (
     <Swap
