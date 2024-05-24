@@ -189,10 +189,22 @@ export const AZERO: Token = {
   coingeckoId: 'aleph-zero'
 }
 
-export const DEFAULT_CONTRACT_OPTIONS = {
+export const DEFAULT_INVARIANT_OPTIONS = {
   storageDepositLimit: 100000000000,
   refTime: 100000000000,
   proofSize: 100000000000
+}
+
+export const DEFAULT_PSP22_OPTIONS = {
+  storageDepositLimit: 10000000000,
+  refTime: 10000000000,
+  proofSize: 10000000000
+}
+
+export const DEFAULT_WAZERO_OPTIONS = {
+  storageDepositLimit: 10000000000,
+  refTime: 10000000000,
+  proofSize: 10000000000
 }
 
 export const ALL_FEE_TIERS_DATA = FEE_TIERS.map((tier, index) => ({

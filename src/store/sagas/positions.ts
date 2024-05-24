@@ -9,7 +9,11 @@ import {
 } from '@invariant-labs/a0-sdk'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { DEFAULT_CONTRACT_OPTIONS } from '@store/consts/static'
+import {
+  DEFAULT_INVARIANT_OPTIONS,
+  DEFAULT_PSP22_OPTIONS,
+  DEFAULT_WAZERO_OPTIONS
+} from '@store/consts/static'
 import { createLoaderKey, poolKeyToString } from '@store/consts/utils'
 import { ListType, actions as poolsActions } from '@store/reducers/pools'
 import { ClosePositionData, InitPositionData, actions } from '@store/reducers/positions'
@@ -65,18 +69,22 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
 
     const txs = []
 
-    const psp22 = yield* call(PSP22.load, api, network, walletAddress, {
-      storageDepositLimit: 10000000000,
-      refTime: 10000000000,
-      proofSize: 10000000000
-    })
+    const psp22 = yield* call(PSP22.load, api, network, DEFAULT_PSP22_OPTIONS)
 
-    yield* call([psp22, psp22.setContractAddress], tokenX)
-    const XTokenTx = yield* call([psp22, psp22.approveTx], TESTNET_INVARIANT_ADDRESS, tokenXAmount)
+    const XTokenTx = yield* call(
+      [psp22, psp22.approveTx],
+      TESTNET_INVARIANT_ADDRESS,
+      tokenXAmount,
+      tokenX
+    )
     txs.push(XTokenTx)
 
-    yield* call([psp22, psp22.setContractAddress], tokenY)
-    const YTokenTx = yield* call([psp22, psp22.approveTx], TESTNET_INVARIANT_ADDRESS, tokenYAmount)
+    const YTokenTx = yield* call(
+      [psp22, psp22.approveTx],
+      TESTNET_INVARIANT_ADDRESS,
+      tokenYAmount,
+      tokenY
+    )
     txs.push(YTokenTx)
 
     const invariant = yield* call(
@@ -84,7 +92,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       api,
       network,
       TESTNET_INVARIANT_ADDRESS,
-      DEFAULT_CONTRACT_OPTIONS
+      DEFAULT_INVARIANT_OPTIONS
     )
 
     if (initPool) {
@@ -180,11 +188,13 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
 
     const txs = []
 
-    const wazero = yield* call(WrappedAZERO.load, api, network, TESTNET_WAZERO_ADDRESS, {
-      storageDepositLimit: 10000000000,
-      refTime: 10000000000,
-      proofSize: 10000000000
-    })
+    const wazero = yield* call(
+      WrappedAZERO.load,
+      api,
+      network,
+      TESTNET_WAZERO_ADDRESS,
+      DEFAULT_WAZERO_OPTIONS
+    )
 
     const depositTx = yield* call(
       [wazero, wazero.depositTx],
@@ -192,18 +202,22 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     )
     txs.push(depositTx)
 
-    const psp22 = yield* call(PSP22.load, api, network, walletAddress, {
-      storageDepositLimit: 10000000000,
-      refTime: 10000000000,
-      proofSize: 10000000000
-    })
+    const psp22 = yield* call(PSP22.load, api, network, DEFAULT_PSP22_OPTIONS)
 
-    yield* call([psp22, psp22.setContractAddress], tokenX)
-    const XTokenTx = yield* call([psp22, psp22.approveTx], TESTNET_INVARIANT_ADDRESS, tokenXAmount)
+    const XTokenTx = yield* call(
+      [psp22, psp22.approveTx],
+      TESTNET_INVARIANT_ADDRESS,
+      tokenXAmount,
+      tokenX
+    )
     txs.push(XTokenTx)
 
-    yield* call([psp22, psp22.setContractAddress], tokenY)
-    const YTokenTx = yield* call([psp22, psp22.approveTx], TESTNET_INVARIANT_ADDRESS, tokenYAmount)
+    const YTokenTx = yield* call(
+      [psp22, psp22.approveTx],
+      TESTNET_INVARIANT_ADDRESS,
+      tokenYAmount,
+      tokenY
+    )
     txs.push(YTokenTx)
 
     const invariant = yield* call(
@@ -211,7 +225,7 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
       api,
       network,
       TESTNET_INVARIANT_ADDRESS,
-      DEFAULT_CONTRACT_OPTIONS
+      DEFAULT_INVARIANT_OPTIONS
     )
 
     if (initPool) {
@@ -286,7 +300,7 @@ export function* handleGetPositionsList() {
       connection,
       network,
       TESTNET_INVARIANT_ADDRESS,
-      DEFAULT_CONTRACT_OPTIONS
+      DEFAULT_INVARIANT_OPTIONS
     )
     const walletAddress = yield* select(address)
 
@@ -320,11 +334,13 @@ export function* handleGetCurrentPositionTicks(action: PayloadAction<bigint>) {
   const walletAddress = yield* select(address)
   const connection = yield* getConnection()
   const network = yield* select(networkType)
-  const invariant = yield* call(Invariant.load, connection, network, TESTNET_INVARIANT_ADDRESS, {
-    storageDepositLimit: 10000000000,
-    refTime: 10000000000,
-    proofSize: 10000000000
-  })
+  const invariant = yield* call(
+    Invariant.load,
+    connection,
+    network,
+    TESTNET_INVARIANT_ADDRESS,
+    DEFAULT_INVARIANT_OPTIONS
+  )
 
   const position = yield* call([invariant, invariant.getPosition], walletAddress, action.payload)
 
@@ -354,7 +370,7 @@ export function* handleClaimFee(action: PayloadAction<bigint>) {
       connection,
       network,
       TESTNET_INVARIANT_ADDRESS,
-      DEFAULT_CONTRACT_OPTIONS
+      DEFAULT_INVARIANT_OPTIONS
     )
     const adapter = yield* call(getAlephZeroWallet)
 
@@ -424,7 +440,7 @@ export function* handleGetSinglePosition(action: PayloadAction<bigint>) {
     connection,
     network,
     TESTNET_INVARIANT_ADDRESS,
-    DEFAULT_CONTRACT_OPTIONS
+    DEFAULT_INVARIANT_OPTIONS
   )
 
   const position = yield* call([invariant, invariant.getPosition], walletAddress, action.payload)
@@ -451,7 +467,7 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
       connection,
       network,
       TESTNET_INVARIANT_ADDRESS,
-      DEFAULT_CONTRACT_OPTIONS
+      DEFAULT_INVARIANT_OPTIONS
     )
     const adapter = yield* call(getAlephZeroWallet)
 

@@ -9,20 +9,21 @@ import {
   getMaxTick,
   getMinTick
 } from '@invariant-labs/a0-sdk'
+import { PRICE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { ApiPromise } from '@polkadot/api'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
 import axios from 'axios'
 import {
   BTC,
-  DEFAULT_CONTRACT_OPTIONS,
+  DEFAULT_INVARIANT_OPTIONS,
+  DEFAULT_PSP22_OPTIONS,
   ETH,
   Token,
   TokenPriceData,
   USDC,
   tokensPrices
 } from './static'
-import { PRICE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -310,11 +311,15 @@ export const getTokenDataByAddresses = async (
   network: Network,
   address: string
 ): Promise<Record<string, Token>> => {
-  const psp22 = await PSP22.load(api, network, '', DEFAULT_CONTRACT_OPTIONS)
+  const psp22 = await PSP22.load(api, network, DEFAULT_PSP22_OPTIONS)
 
   const promises = tokens.flatMap(token => {
-    psp22.setContractAddress(token)
-    return [psp22.tokenSymbol(), psp22.tokenName(), psp22.tokenDecimals(), psp22.balanceOf(address)]
+    return [
+      psp22.tokenSymbol(token),
+      psp22.tokenName(token),
+      psp22.tokenDecimals(token),
+      psp22.balanceOf(address, token)
+    ]
   })
   const results = await Promise.all(promises)
 
@@ -339,12 +344,11 @@ export const getTokenBalances = async (
   network: Network,
   address: string
 ): Promise<[string, bigint][]> => {
-  const psp22 = await PSP22.load(api, network, '')
+  const psp22 = await PSP22.load(api, network, DEFAULT_PSP22_OPTIONS)
 
   const promises: Promise<any>[] = []
   tokens.map(token => {
-    psp22.setContractAddress(token)
-    promises.push(psp22.balanceOf(address))
+    promises.push(psp22.balanceOf(address, token))
   })
   const results = await Promise.all(promises)
 
@@ -364,7 +368,7 @@ export const getPoolsByPoolKeys = async (
     api,
     network,
     TESTNET_INVARIANT_ADDRESS,
-    DEFAULT_CONTRACT_OPTIONS
+    DEFAULT_INVARIANT_OPTIONS
   )
 
   const promises = poolKeys.map(({ tokenX, tokenY, feeTier }) =>

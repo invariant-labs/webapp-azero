@@ -4,11 +4,11 @@ import {
   TESTNET_INVARIANT_ADDRESS,
   newPoolKey,
   sendTx,
-  toPrice,
   toSqrtPrice
 } from '@invariant-labs/a0-sdk'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
+import { DEFAULT_INVARIANT_OPTIONS } from '@store/consts/static'
 import {
   createLoaderKey,
   getPoolsByPoolKeys,
@@ -24,7 +24,6 @@ import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
 import { getConnection } from './connection'
-import { DEFAULT_CONTRACT_OPTIONS, TokenList } from '@store/consts/static'
 
 export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) {
   const walletAddress = yield* select(address)
@@ -92,7 +91,7 @@ export function* handleInitPool(action: PayloadAction<PoolKey>): Generator {
       api,
       network,
       TESTNET_INVARIANT_ADDRESS,
-      DEFAULT_CONTRACT_OPTIONS
+      DEFAULT_INVARIANT_OPTIONS
     )
 
     const poolKey = newPoolKey(tokenX, tokenY, feeTier)
@@ -154,7 +153,7 @@ export function* fetchPoolData(action: PayloadAction<PoolKey>): Generator {
       api,
       network,
       TESTNET_INVARIANT_ADDRESS,
-      DEFAULT_CONTRACT_OPTIONS
+      DEFAULT_INVARIANT_OPTIONS
     )
     const pool = yield* call([invariant, invariant.getPool], tokenX, tokenY, feeTier)
 
@@ -184,7 +183,7 @@ export function* fetchAllPoolKeys(): Generator {
       api,
       network,
       TESTNET_INVARIANT_ADDRESS,
-      DEFAULT_CONTRACT_OPTIONS
+      DEFAULT_INVARIANT_OPTIONS
     )
 
     //TODO: in the future handle more than 100 pools

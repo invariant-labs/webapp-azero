@@ -576,9 +576,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   }
 
   useEffect(() => {
-    console.log(1)
     if (openPosition && tokenAIndex !== null && tokenBIndex !== null) {
-      console.log(2)
       dispatch(
         positionsActions.initPosition({
           poolKeyData: newPoolKey(
