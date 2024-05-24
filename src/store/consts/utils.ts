@@ -121,8 +121,24 @@ export const trimZeros = (numStr: string): string => {
   return numStr
 }
 
-export const calcYPerXPrice = (tickIndex: bigint, xDecimal: bigint, yDecimal: bigint): number => {
+export const calcYPerXPriceByTickIndex = (
+  tickIndex: bigint,
+  xDecimal: bigint,
+  yDecimal: bigint
+): number => {
   const sqrt = +printBigint(calculateSqrtPrice(tickIndex), PRICE_SCALE)
+
+  const proportion = sqrt * sqrt
+
+  return proportion / 10 ** Number(yDecimal - xDecimal)
+}
+export const calcYPerXPriceBySqrtPrice = (
+  sqrtPrice: bigint,
+  xDecimal: bigint,
+  yDecimal: bigint
+): number => {
+  const sqrt = +printBigint(sqrtPrice, PRICE_SCALE)
+
   const proportion = sqrt * sqrt
 
   return proportion / 10 ** Number(yDecimal - xDecimal)
@@ -176,12 +192,12 @@ export const toMaxNumericPlaces = (num: number, places: number): string => {
 }
 
 export const calcPrice = (
-  amount: bigint,
+  amountTickIndex: bigint,
   isXtoY: boolean,
   xDecimal: bigint,
   yDecimal: bigint
 ): number => {
-  const price = calcYPerXPrice(amount, xDecimal, yDecimal)
+  const price = calcYPerXPriceByTickIndex(amountTickIndex, xDecimal, yDecimal)
 
   return isXtoY ? price : 1 / price
 }
