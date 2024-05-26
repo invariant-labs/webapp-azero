@@ -28,15 +28,13 @@ const useStyles = makeStyles()(() => {
         color: colors.white.main,
         background: colors.invariant.light
       },
-      '&:first-child': {
+      '&:first-of-type': {
         marginBottom: '4px'
       },
-      '&:not(:first-child)': {
+      '&:not(:first-of-type)': {
         margin: '4px 0'
       },
-      '&:last-child': {
-        marginTop: '4px'
-      }
+      '&:last-of-type': {}
     },
     title: {
       ...typography.body1,
