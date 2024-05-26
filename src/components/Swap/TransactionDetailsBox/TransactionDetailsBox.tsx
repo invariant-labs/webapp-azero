@@ -1,17 +1,18 @@
 import React from 'react'
 
-import loadingAnimation from '@static/gif/loading.gif'
-import { useStyles } from './styles'
-import { Percentage } from '@invariant-labs/a0-sdk'
+import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { Grid, Typography } from '@mui/material'
+import loadingAnimation from '@static/gif/loading.gif'
+import { printBigint } from '@store/consts/utils'
+import { useStyles } from './styles'
 
 interface IProps {
   open: boolean
-  fee: { v: bigint }
+  fee: bigint
   exchangeRate: { val: number; symbol: string; decimal: number }
   slippage: number
   // minimumReceived: { val: BN; symbol: string; decimal: number }
-  priceImpact: Percentage
+  priceImpact: number
   isLoadingRate?: boolean
 }
 
@@ -36,8 +37,8 @@ const TransactionDetailsBox: React.FC<IProps> = ({
 }) => {
   const { classes } = useStyles({ open })
 
-  // const feePercent = percentValueDisplay(fee)
-  // const impact = +printBigint(priceImpact, DECIMAL - 2)
+  const feePercent = Number(printBigint(fee, PERCENTAGE_SCALE - 2n))
+  const impact = priceImpact * 100
 
   return (
     <Grid container className={classes.wrapper}>
@@ -57,17 +58,13 @@ const TransactionDetailsBox: React.FC<IProps> = ({
 
         <Grid container justifyContent='space-between' className={classes.row}>
           <Typography className={classes.label}>Fee:</Typography>
-          <Typography className={classes.value}>
-            {/* {printBigint(feePercent.value, feePercent.decimal)}% */}
-            {'0.3%'}
-          </Typography>
+          <Typography className={classes.value}>{`${feePercent}%`}</Typography>
         </Grid>
 
         <Grid container justifyContent='space-between' className={classes.row}>
           <Typography className={classes.label}>Price impact:</Typography>
           <Typography className={classes.value}>
-            {/* {impact < 0.01 ? '<0.01%' : `${impact.toFixed(2)}%`} */}
-            {'<0.01%'}
+            {impact < 0.01 ? '<0.01%' : `${impact.toFixed(2)}%`}
           </Typography>
         </Grid>
 

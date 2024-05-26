@@ -2,6 +2,7 @@ import { Percentage, TESTNET_WAZERO_ADDRESS, TokenAmount } from '@invariant-labs
 import { AddressOrPair } from '@polkadot/api/types'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/consts/types'
+import { SimulateResult } from '@store/consts/utils'
 
 export interface Swap {
   slippage: Percentage
@@ -18,17 +19,15 @@ export interface Swap {
 }
 
 export interface Simulate {
-  simulatePrice: TokenAmount
   fromToken: AddressOrPair
   toToken: AddressOrPair
-  amount: TokenAmount
-  success: boolean
-  txid?: string
-  inProgress?: boolean
+  amount: bigint
+  byAmountIn: boolean
 }
 
 export interface ISwapStore {
   swap: Swap
+  simulateResult: SimulateResult
 }
 
 export const defaultState: ISwapStore = {
@@ -42,6 +41,11 @@ export const defaultState: ISwapStore = {
     amountIn: BigInt(0),
     byAmountIn: false,
     amountOut: BigInt(0)
+  },
+  simulateResult: {
+    amountOut: 0n,
+    fee: 0n,
+    priceImpact: 0
   }
 }
 
@@ -69,6 +73,13 @@ const swapSlice = createSlice({
     setPair(state, action: PayloadAction<{ tokenFrom: AddressOrPair; tokenTo: AddressOrPair }>) {
       state.swap.tokenFrom = action.payload.tokenFrom
       state.swap.tokenTo = action.payload.tokenTo
+      return state
+    },
+    getSimulateResult(state, action: PayloadAction<Simulate>) {
+      return state
+    },
+    setSimulateResult(state, action: PayloadAction<SimulateResult>) {
+      state.simulateResult = action.payload
       return state
     }
   }

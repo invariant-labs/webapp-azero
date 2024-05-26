@@ -9,6 +9,7 @@ import {
   getMaxTick,
   getMinTick
 } from '@invariant-labs/a0-sdk'
+import { PRICE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { ApiPromise } from '@polkadot/api'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
@@ -22,7 +23,6 @@ import {
   USDC,
   tokensPrices
 } from './static'
-import { PRICE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -539,4 +539,40 @@ export const determinePositionTokenBlock = (
   }
 
   return PositionTokenBlock.None
+}
+
+export const findPairs = (tokenFrom: string, tokenTo: string, pairs: PoolWithPoolKey[]) => {
+  return pairs.filter(
+    pool =>
+      (tokenFrom === pool.poolKey.tokenX && tokenTo === pool.poolKey.tokenY) ||
+      (tokenFrom === pool.poolKey.tokenY && tokenTo === pool.poolKey.tokenX)
+  )
+}
+
+export const findPairsByPoolKeys = (tokenFrom: string, tokenTo: string, poolKeys: PoolKey[]) => {
+  return poolKeys.filter(
+    poolKey =>
+      (tokenFrom === poolKey.tokenX && tokenTo === poolKey.tokenY) ||
+      (tokenFrom === poolKey.tokenY && tokenTo === poolKey.tokenX)
+  )
+}
+
+export type SimulateResult = {
+  amountOut: bigint
+  fee: bigint
+  priceImpact: number
+}
+
+export const getPools = async (
+  invariant: Invariant,
+  poolKeys: PoolKey[]
+): Promise<PoolWithPoolKey[]> => {
+  const promises = poolKeys.map(poolKey =>
+    invariant.getPool(poolKey.tokenX, poolKey.tokenY, poolKey.feeTier)
+  )
+
+  const pools = await Promise.all(promises)
+  return pools.map((pool, index) => {
+    return { ...pool, poolKey: poolKeys[index] }
+  })
 }

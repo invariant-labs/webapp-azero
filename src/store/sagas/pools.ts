@@ -4,18 +4,20 @@ import {
   TESTNET_INVARIANT_ADDRESS,
   newPoolKey,
   sendTx,
-  toPrice,
   toSqrtPrice
 } from '@invariant-labs/a0-sdk'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
+import { DEFAULT_CONTRACT_OPTIONS } from '@store/consts/static'
 import {
   createLoaderKey,
+  findPairsByPoolKeys,
+  getPools,
   getPoolsByPoolKeys,
   getTokenBalances,
   getTokenDataByAddresses
 } from '@store/consts/utils'
-import { ListPoolsRequest, actions } from '@store/reducers/pools'
+import { ListPoolsRequest, PairTokens, actions } from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { networkType } from '@store/selectors/connection'
 import { tokens } from '@store/selectors/pools'
@@ -24,7 +26,6 @@ import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
 import { getConnection } from './connection'
-import { DEFAULT_CONTRACT_OPTIONS, TokenList } from '@store/consts/static'
 
 export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) {
   const walletAddress = yield* select(address)
@@ -139,10 +140,6 @@ export function* handleInitPool(action: PayloadAction<PoolKey>): Generator {
   }
 }
 
-export function* getPoolsDataForListHandler(): Generator {
-  yield* takeEvery(actions.getPoolsDataForList, fetchPoolsDataForList)
-}
-
 export function* fetchPoolData(action: PayloadAction<PoolKey>): Generator {
   const api = yield* getConnection()
   const network = yield* select(networkType)
@@ -197,6 +194,31 @@ export function* fetchAllPoolKeys(): Generator {
   }
 }
 
+export function* fetchAllPoolsForPairData(action: PayloadAction<PairTokens>) {
+  const connection = yield* call(getConnection)
+  const network = yield* select(networkType)
+  const invariant = yield* call(
+    Invariant.load,
+    connection,
+    network,
+    TESTNET_INVARIANT_ADDRESS,
+    DEFAULT_CONTRACT_OPTIONS
+  )
+  const poolKeys = yield* call([invariant, invariant.getPoolKeys], 100n, 0n)
+  const filteredPoolKeys = findPairsByPoolKeys(
+    action.payload.first.toString(),
+    action.payload.second.toString(),
+    poolKeys
+  )
+  const pools = yield* call(getPools, invariant, filteredPoolKeys)
+
+  yield* put(actions.addPools(pools))
+}
+
+export function* getPoolsDataForListHandler(): Generator {
+  yield* takeEvery(actions.getPoolsDataForList, fetchPoolsDataForList)
+}
+
 export function* initPoolHandler(): Generator {
   yield* takeLatest(actions.initPool, handleInitPool)
 }
@@ -209,8 +231,18 @@ export function* getPoolKeysHandler(): Generator {
   yield* takeLatest(actions.getPoolKeys, fetchAllPoolKeys)
 }
 
+export function* getAllPoolsForPairDataHandler(): Generator {
+  yield* takeLatest(actions.getAllPoolsForPairData, fetchAllPoolsForPairData)
+}
+
 export function* poolsSaga(): Generator {
   yield all(
-    [initPoolHandler, getPoolDataHandler, getPoolKeysHandler, getPoolsDataForListHandler].map(spawn)
+    [
+      initPoolHandler,
+      getPoolDataHandler,
+      getPoolKeysHandler,
+      getPoolsDataForListHandler,
+      getAllPoolsForPairDataHandler
+    ].map(spawn)
   )
 }
