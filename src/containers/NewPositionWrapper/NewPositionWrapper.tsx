@@ -1,5 +1,5 @@
-import NewPosition from '@components/NewPosition/NewPosition'
 import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
+import NewPosition from '@components/NewPosition/NewPosition'
 import {
   TokenAmount,
   calculateSqrtPrice,
@@ -24,23 +24,23 @@ import {
   poolKeyToString,
   printBigint
 } from '@store/consts/utils'
-import { actions as positionsActions, TickPlotPositionData } from '@store/reducers/positions'
-import { Status } from '@store/reducers/wallet'
 import { actions as poolsActions } from '@store/reducers/pools'
+import { TickPlotPositionData, actions as positionsActions } from '@store/reducers/positions'
+import { Status } from '@store/reducers/wallet'
 import { networkType } from '@store/selectors/connection'
 import {
   isLoadingLatestPoolsForTransaction,
-  poolsArraySortedByFees,
-  volumeRanges,
   poolKeys,
-  pools
+  pools,
+  poolsArraySortedByFees,
+  volumeRanges
 } from '@store/selectors/pools'
 import { initPosition, plotTicks } from '@store/selectors/positions'
 import { canCreateNewPool, canCreateNewPosition, status, swapTokens } from '@store/selectors/wallet'
 import { getCurrentAlephZeroConnection } from '@utils/web3/connection'
+import { openWalletSelectorModal } from '@utils/web3/selector'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { openWalletSelectorModal } from '@utils/web3/selector'
 
 export interface IProps {
   initialTokenFrom: string

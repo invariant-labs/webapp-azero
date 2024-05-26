@@ -1,21 +1,20 @@
 import { Network, PSP22 } from '@invariant-labs/a0-sdk'
 import { NightlyConnectAdapter } from '@nightlylabs/wallet-selector-polkadot'
-import { AddressOrPair, SubmittableExtrinsic } from '@polkadot/api/types'
-import { SignerOptions } from '@polkadot/api/types/submittable'
+import { AddressOrPair } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
 import {
-  DEFAULT_CONTRACT_OPTIONS,
+  DEFAULT_PSP22_OPTIONS,
   TokenAirdropAmount,
   TokenList,
   getFaucetDeployer
 } from '@store/consts/static'
-import { createLoaderKey, getTokenBalances } from '@store/consts/utils'
+import { getTokenBalances } from '@store/consts/utils'
 import { actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { ITokenBalance, Status, actions } from '@store/reducers/wallet'
+import { networkType } from '@store/selectors/connection'
 import { address, status } from '@store/selectors/wallet'
 import { disconnectWallet, getAlephZeroWallet } from '@utils/web3/wallet'
-import { closeSnackbar } from 'notistack'
 import {
   SagaGenerator,
   all,
@@ -27,7 +26,6 @@ import {
   takeLeading
 } from 'typed-redux-saga'
 import { getConnection } from './connection'
-import { networkType } from '@store/selectors/connection'
 
 export function* getWallet(): SagaGenerator<NightlyConnectAdapter> {
   const wallet = yield* call(getAlephZeroWallet)
@@ -129,7 +127,7 @@ export function* handleAirdrop(): Generator {
   const faucetDeployer = getFaucetDeployer()
   const data = connection.createType('Vec<u8>', [])
 
-  const psp22 = yield* call(PSP22.load, connection, Network.Testnet, DEFAULT_CONTRACT_OPTIONS)
+  const psp22 = yield* call(PSP22.load, connection, Network.Testnet, DEFAULT_PSP22_OPTIONS)
 
   for (const ticker in TokenList) {
     const address = TokenList[ticker as keyof typeof TokenList]

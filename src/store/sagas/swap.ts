@@ -1,6 +1,6 @@
 import { Invariant, QuoteResult, TESTNET_INVARIANT_ADDRESS } from '@invariant-labs/a0-sdk'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { DEFAULT_CONTRACT_OPTIONS } from '@store/consts/static'
+import { DEFAULT_INVARIANT_OPTIONS } from '@store/consts/static'
 import { findPairs } from '@store/consts/utils'
 import { Simulate, actions } from '@store/reducers/swap'
 import { networkType } from '@store/selectors/connection'
@@ -38,7 +38,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
     connection,
     network,
     TESTNET_INVARIANT_ADDRESS,
-    DEFAULT_CONTRACT_OPTIONS
+    DEFAULT_INVARIANT_OPTIONS
   )
   let amountOut = 0n
   let fee = 0n

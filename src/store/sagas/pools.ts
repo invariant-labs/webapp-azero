@@ -8,7 +8,7 @@ import {
 } from '@invariant-labs/a0-sdk'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { DEFAULT_CONTRACT_OPTIONS } from '@store/consts/static'
+import { DEFAULT_INVARIANT_OPTIONS } from '@store/consts/static'
 import {
   createLoaderKey,
   findPairsByPoolKeys,
@@ -93,7 +93,7 @@ export function* handleInitPool(action: PayloadAction<PoolKey>): Generator {
       api,
       network,
       TESTNET_INVARIANT_ADDRESS,
-      DEFAULT_CONTRACT_OPTIONS
+      DEFAULT_INVARIANT_OPTIONS
     )
 
     const poolKey = newPoolKey(tokenX, tokenY, feeTier)
@@ -151,7 +151,7 @@ export function* fetchPoolData(action: PayloadAction<PoolKey>): Generator {
       api,
       network,
       TESTNET_INVARIANT_ADDRESS,
-      DEFAULT_CONTRACT_OPTIONS
+      DEFAULT_INVARIANT_OPTIONS
     )
     const pool = yield* call([invariant, invariant.getPool], tokenX, tokenY, feeTier)
 
@@ -181,7 +181,7 @@ export function* fetchAllPoolKeys(): Generator {
       api,
       network,
       TESTNET_INVARIANT_ADDRESS,
-      DEFAULT_CONTRACT_OPTIONS
+      DEFAULT_INVARIANT_OPTIONS
     )
 
     //TODO: in the future handle more than 100 pools
@@ -202,7 +202,7 @@ export function* fetchAllPoolsForPairData(action: PayloadAction<PairTokens>) {
     connection,
     network,
     TESTNET_INVARIANT_ADDRESS,
-    DEFAULT_CONTRACT_OPTIONS
+    DEFAULT_INVARIANT_OPTIONS
   )
   const poolKeys = yield* call([invariant, invariant.getPoolKeys], 100n, 0n)
   const filteredPoolKeys = findPairsByPoolKeys(

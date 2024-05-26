@@ -2,7 +2,8 @@ import {
   FEE_TIERS,
   TESTNET_BTC_ADDRESS,
   TESTNET_ETH_ADDRESS,
-  TESTNET_USDC_ADDRESS
+  TESTNET_USDC_ADDRESS,
+  TESTNET_WAZERO_ADDRESS
 } from '@invariant-labs/a0-sdk'
 
 import { Network } from '@invariant-labs/a0-sdk/src'
@@ -179,10 +180,31 @@ export const USDC: Token = {
   coingeckoId: 'usdc'
 }
 
-export const DEFAULT_CONTRACT_OPTIONS = {
+export const AZERO: Token = {
+  symbol: 'AZERO',
+  address: TESTNET_WAZERO_ADDRESS,
+  decimals: 12n,
+  name: 'Aleph Zero',
+  logoURI: 'https://assets.coingecko.com/coins/images/17212/standard/azero-logo_coingecko.png',
+  coingeckoId: 'aleph-zero'
+}
+
+export const DEFAULT_INVARIANT_OPTIONS = {
   storageDepositLimit: 100000000000,
   refTime: 100000000000,
   proofSize: 100000000000
+}
+
+export const DEFAULT_PSP22_OPTIONS = {
+  storageDepositLimit: 10000000000,
+  refTime: 10000000000,
+  proofSize: 10000000000
+}
+
+export const DEFAULT_WAZERO_OPTIONS = {
+  storageDepositLimit: 10000000000,
+  refTime: 10000000000,
+  proofSize: 10000000000
 }
 
 export const ALL_FEE_TIERS_DATA = FEE_TIERS.map((tier, index) => ({

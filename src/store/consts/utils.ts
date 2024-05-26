@@ -16,7 +16,8 @@ import { PlotTickData } from '@store/reducers/positions'
 import axios from 'axios'
 import {
   BTC,
-  DEFAULT_CONTRACT_OPTIONS,
+  DEFAULT_INVARIANT_OPTIONS,
+  DEFAULT_PSP22_OPTIONS,
   ETH,
   Token,
   TokenPriceData,
@@ -310,7 +311,7 @@ export const getTokenDataByAddresses = async (
   network: Network,
   address: string
 ): Promise<Record<string, Token>> => {
-  const psp22 = await PSP22.load(api, network, DEFAULT_CONTRACT_OPTIONS)
+  const psp22 = await PSP22.load(api, network, DEFAULT_PSP22_OPTIONS)
 
   const promises = tokens.flatMap(token => {
     return [
@@ -343,7 +344,7 @@ export const getTokenBalances = async (
   network: Network,
   address: string
 ): Promise<[string, bigint][]> => {
-  const psp22 = await PSP22.load(api, network, DEFAULT_CONTRACT_OPTIONS)
+  const psp22 = await PSP22.load(api, network, DEFAULT_PSP22_OPTIONS)
 
   const promises: Promise<any>[] = []
   tokens.map(token => {
@@ -367,7 +368,7 @@ export const getPoolsByPoolKeys = async (
     api,
     network,
     TESTNET_INVARIANT_ADDRESS,
-    DEFAULT_CONTRACT_OPTIONS
+    DEFAULT_INVARIANT_OPTIONS
   )
 
   const promises = poolKeys.map(({ tokenX, tokenY, feeTier }) =>
