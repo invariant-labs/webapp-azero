@@ -1,12 +1,133 @@
-import { Invariant, QuoteResult, TESTNET_INVARIANT_ADDRESS } from '@invariant-labs/a0-sdk'
+import {
+  Invariant,
+  PSP22,
+  QuoteResult,
+  TESTNET_INVARIANT_ADDRESS,
+  calculateSqrtPriceAfterSlippage,
+  sendTx
+} from '@invariant-labs/a0-sdk'
+import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { DEFAULT_INVARIANT_OPTIONS } from '@store/consts/static'
-import { findPairs } from '@store/consts/utils'
+import { DEFAULT_INVARIANT_OPTIONS, DEFAULT_PSP22_OPTIONS } from '@store/consts/static'
+import { createLoaderKey, findPairs, poolKeyToString } from '@store/consts/utils'
+import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Simulate, actions } from '@store/reducers/swap'
 import { networkType } from '@store/selectors/connection'
-import { poolsArraySortedByFees, tokens } from '@store/selectors/pools'
+import { pools, poolsArraySortedByFees, tokens } from '@store/selectors/pools'
+import { swap } from '@store/selectors/swap'
+import { address } from '@store/selectors/wallet'
+import { getAlephZeroWallet } from '@utils/web3/wallet'
+import { closeSnackbar } from 'notistack'
 import { all, call, put, select, spawn, takeEvery } from 'typed-redux-saga'
 import { getConnection } from './connection'
+
+export function* handleSwap(): Generator {
+  const loaderSwappingTokens = createLoaderKey()
+
+  try {
+    const allTokens = yield* select(tokens)
+    const allPools = yield* select(pools)
+    const { poolKey, tokenFrom, slippage, amountIn, byAmountIn } = yield* select(swap)
+
+    if (!poolKey) {
+      return
+    }
+
+    const api = yield* getConnection()
+    const network = yield* select(networkType)
+    const walletAddress = yield* select(address)
+    const adapter = yield* call(getAlephZeroWallet)
+
+    const pool = allPools[poolKeyToString(poolKey)]
+    const tokenX = allTokens[poolKey.tokenX]
+    const tokenY = allTokens[poolKey.tokenY]
+    const xToY = tokenFrom.toString() === poolKey.tokenX
+
+    yield put(
+      snackbarsActions.add({
+        message: 'Swapping tokens',
+        variant: 'pending',
+        persist: true,
+        key: loaderSwappingTokens
+      })
+    )
+
+    const txs = []
+
+    const psp22 = yield* call(PSP22.load, api, network, DEFAULT_PSP22_OPTIONS)
+    const invariant = yield* call(
+      Invariant.load,
+      api,
+      network,
+      TESTNET_INVARIANT_ADDRESS,
+      DEFAULT_INVARIANT_OPTIONS
+    )
+
+    if (xToY) {
+      const approveTx = yield* call(
+        [psp22, psp22.approveTx],
+        TESTNET_INVARIANT_ADDRESS,
+        amountIn,
+        tokenX.address.toString()
+      )
+      txs.push(approveTx)
+    } else {
+      const approveTx = yield* call(
+        [psp22, psp22.approveTx],
+        TESTNET_INVARIANT_ADDRESS,
+        amountIn,
+        tokenY.address.toString()
+      )
+      txs.push(approveTx)
+    }
+
+    const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(pool.sqrtPrice, slippage, !xToY)
+    const swapTx = yield* call(
+      [invariant, invariant.swapTx],
+      poolKey,
+      xToY,
+      amountIn,
+      byAmountIn,
+      sqrtPriceLimit
+    )
+    txs.push(swapTx)
+
+    const batchedTx = api.tx.utility.batchAll(txs)
+    const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
+      signer: adapter.signer as Signer
+    })
+    const txResult = yield* call(sendTx, signedBatchedTx)
+
+    closeSnackbar(loaderSwappingTokens)
+    yield put(snackbarsActions.remove(loaderSwappingTokens))
+
+    yield put(
+      snackbarsActions.add({
+        message: 'Tokens swapped successfully.',
+        variant: 'success',
+        persist: false,
+        txid: txResult.hash
+      })
+    )
+
+    yield put(actions.setSwapSuccess(true))
+  } catch (error) {
+    console.log(error)
+
+    yield put(actions.setSwapSuccess(false))
+
+    closeSnackbar(loaderSwappingTokens)
+    yield put(snackbarsActions.remove(loaderSwappingTokens))
+
+    yield put(
+      snackbarsActions.add({
+        message: 'Tokens swapping failed. Please try again.',
+        variant: 'error',
+        persist: false
+      })
+    )
+  }
+}
 
 export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
   const connection = yield* getConnection()
@@ -40,9 +161,11 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
     TESTNET_INVARIANT_ADDRESS,
     DEFAULT_INVARIANT_OPTIONS
   )
+  let poolKey = null
   let amountOut = 0n
   let fee = 0n
   let priceImpact = 0
+  let targetSqrtPrice = 0n
 
   const quotePromises: Promise<QuoteResult>[] = []
   for (const pool of filteredPools) {
@@ -66,6 +189,8 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
     }
 
     if (quoteResult.value.amountOut > amountOut) {
+      poolKey = pool.poolKey
+
       amountOut = quoteResult.value.amountOut
       fee = pool.poolKey.feeTier.fee
 
@@ -75,16 +200,24 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
         parsedPoolSqrtPrice > parsedTargetSqrtPrice
           ? 1 - parsedTargetSqrtPrice / parsedPoolSqrtPrice
           : 1 - parsedPoolSqrtPrice / parsedTargetSqrtPrice
+
+      targetSqrtPrice = quoteResult.value.targetSqrtPrice
     }
   })
 
   yield put(
     actions.setSimulateResult({
+      poolKey,
       amountOut,
       fee,
-      priceImpact
+      priceImpact,
+      targetSqrtPrice
     })
   )
+}
+
+export function* swapHandler(): Generator {
+  yield* takeEvery(actions.swap, handleSwap)
 }
 
 export function* getSimulateResultHandler(): Generator {
@@ -92,5 +225,5 @@ export function* getSimulateResultHandler(): Generator {
 }
 
 export function* swapSaga(): Generator {
-  yield all([getSimulateResultHandler].map(spawn))
+  yield all([swapHandler, getSimulateResultHandler].map(spawn))
 }

@@ -2,7 +2,8 @@ import AnimatedButton, { ProgressState } from '@components/AnimatedButton/Animat
 import ChangeWalletButton from '@components/Header/HeaderButton/ChangeWalletButton'
 import ExchangeAmountInput from '@components/Inputs/ExchangeAmountInput/ExchangeAmountInput'
 import Slippage from '@components/Modals/Slippage/Slippage'
-import { Price, Tick, TokenAmount } from '@invariant-labs/a0-sdk'
+import { PoolKey, Price, Tick, TokenAmount } from '@invariant-labs/a0-sdk'
+import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
 import { Box, Button, CardMedia, Grid, Typography } from '@mui/material'
 import { AddressOrPair } from '@polkadot/api/types'
 import infoIcon from '@static/svg/info.svg'
@@ -57,11 +58,11 @@ export interface ISwap {
   pools: PoolWithPoolKey[]
   tickmap: { [x: string]: bigint[] } //TODO check if this is correct
   onSwap: (
+    poolKey: PoolKey,
     slippage: bigint,
     knownPrice: Price,
     tokenFrom: AddressOrPair,
     tokenTo: AddressOrPair,
-    poolIndex: number,
     amountIn: TokenAmount,
     amountOut: TokenAmount,
     byAmountIn: boolean
@@ -624,20 +625,23 @@ export const Swap: React.FC<ISwap> = ({
             }
             disabled={getStateMessage() !== 'Swap tokens' || progress !== 'none'}
             onClick={() => {
-              if (tokenFromIndex === null || tokenToIndex === null) return
+              if (
+                simulateResult.poolKey === null ||
+                tokenFromIndex === null ||
+                tokenToIndex === null
+              )
+                return
 
-              // onSwap(
-              //   { v: fromFee(new BN(Number(+slippTolerance * 1000))) },
-              //   {
-              //     v: simulateResult.estimatedPriceAfterSwap
-              //   },
-              //   tokens[tokenFromIndex].address,
-              //   tokens[tokenToIndex].address,
-              //   simulateResult.poolIndex,
-              //   convertBalanceToBigint(amountFrom, tokens[tokenFromIndex].decimals),
-              //   convertBalanceToBigint(amountTo, tokens[tokenToIndex].decimals),
-              //   inputRef === inputTarget.FROM
-              // )
+              onSwap(
+                simulateResult.poolKey,
+                BigInt(+slippTolerance * Number(PERCENTAGE_DENOMINATOR)),
+                simulateResult.targetSqrtPrice,
+                tokens[tokenFromIndex].assetAddress,
+                tokens[tokenToIndex].assetAddress,
+                convertBalanceToBigint(amountFrom, tokens[tokenFromIndex].decimals),
+                convertBalanceToBigint(amountTo, tokens[tokenToIndex].decimals),
+                inputRef === inputTarget.FROM
+              )
             }}
             progress={progress}
           />
