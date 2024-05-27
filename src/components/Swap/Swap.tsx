@@ -634,7 +634,7 @@ export const Swap: React.FC<ISwap> = ({
 
               onSwap(
                 simulateResult.poolKey,
-                BigInt(+slippTolerance * Number(PERCENTAGE_DENOMINATOR)),
+                BigInt((+slippTolerance * Number(PERCENTAGE_DENOMINATOR)) / 100),
                 simulateResult.targetSqrtPrice,
                 tokens[tokenFromIndex].assetAddress,
                 tokens[tokenToIndex].assetAddress,

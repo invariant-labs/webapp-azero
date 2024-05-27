@@ -81,7 +81,9 @@ export function* handleSwap(): Generator {
       txs.push(approveTx)
     }
 
+    console.log(pool.sqrtPrice, slippage)
     const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(pool.sqrtPrice, slippage, !xToY)
+    console.log(pool.sqrtPrice, slippage, sqrtPriceLimit)
     const swapTx = yield* call(
       [invariant, invariant.swapTx],
       poolKey,
