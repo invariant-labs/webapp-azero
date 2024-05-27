@@ -71,7 +71,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
 
     const psp22 = yield* call(PSP22.load, api, network, DEFAULT_PSP22_OPTIONS)
 
-    const [xAmountAfterSlippage, yAmountAfterSlippage] = calculateTokenAmountsWithSlippage(
+    const [xAmountWithSlippage, yAmountWithSlippage] = calculateTokenAmountsWithSlippage(
       feeTier.tickSpacing,
       spotSqrtPrice,
       liquidityDelta,
@@ -84,7 +84,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     const XTokenTx = yield* call(
       [psp22, psp22.approveTx],
       TESTNET_INVARIANT_ADDRESS,
-      xAmountAfterSlippage,
+      xAmountWithSlippage,
       tokenX
     )
     txs.push(XTokenTx)
@@ -92,7 +92,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     const YTokenTx = yield* call(
       [psp22, psp22.approveTx],
       TESTNET_INVARIANT_ADDRESS,
-      yAmountAfterSlippage,
+      yAmountWithSlippage,
       tokenY
     )
     txs.push(YTokenTx)
@@ -213,7 +213,7 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
 
     const psp22 = yield* call(PSP22.load, api, network, DEFAULT_PSP22_OPTIONS)
 
-    const [xAmountAfterSlippage, yAmountAfterSlippage] = calculateTokenAmountsWithSlippage(
+    const [xAmountWithSlippage, yAmountWithSlippage] = calculateTokenAmountsWithSlippage(
       feeTier.tickSpacing,
       spotSqrtPrice,
       liquidityDelta,
@@ -226,7 +226,7 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     const XTokenTx = yield* call(
       [psp22, psp22.approveTx],
       TESTNET_INVARIANT_ADDRESS,
-      xAmountAfterSlippage,
+      xAmountWithSlippage,
       tokenX
     )
     txs.push(XTokenTx)
@@ -234,7 +234,7 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     const YTokenTx = yield* call(
       [psp22, psp22.approveTx],
       TESTNET_INVARIANT_ADDRESS,
-      yAmountAfterSlippage,
+      yAmountWithSlippage,
       tokenY
     )
     txs.push(YTokenTx)
