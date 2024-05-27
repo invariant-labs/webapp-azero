@@ -1,21 +1,21 @@
-import {  TESTNET_WAZERO_ADDRESS, TokenAmount } from '@invariant-labs/a0-sdk'
+import { PoolKey } from '@invariant-labs/a0-sdk'
 import { AddressOrPair } from '@polkadot/api/types'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/consts/types'
 import { SimulateResult } from '@store/consts/utils'
 
 export interface Swap {
+  poolKey: PoolKey | null
   slippage: bigint
   estimatedPriceAfterSwap: bigint
-  poolIndex: number
   tokenFrom: AddressOrPair
   tokenTo: AddressOrPair
-  amountIn: TokenAmount
+  amountIn: bigint
   byAmountIn: boolean
   txid?: string
   inProgress?: boolean
   success?: boolean
-  amountOut: TokenAmount
+  amountOut: bigint
 }
 
 export interface Simulate {
@@ -32,20 +32,21 @@ export interface ISwapStore {
 
 export const defaultState: ISwapStore = {
   swap: {
-    // slippage: fromFee(BigInt(1000)),
-    slippage: BigInt(0),
-    estimatedPriceAfterSwap: BigInt(0),
-    poolIndex: 0,
-    tokenFrom: TESTNET_WAZERO_ADDRESS,
-    tokenTo: TESTNET_WAZERO_ADDRESS,
-    amountIn: BigInt(0),
+    poolKey: null,
+    slippage: 0n,
+    estimatedPriceAfterSwap: 0n,
+    tokenFrom: '',
+    tokenTo: '',
+    amountIn: 0n,
     byAmountIn: false,
-    amountOut: BigInt(0)
+    amountOut: 0n
   },
   simulateResult: {
+    poolKey: null,
     amountOut: 0n,
     fee: 0n,
-    priceImpact: 0
+    priceImpact: 0,
+    targetSqrtPrice: 0n
   }
 }
 
@@ -64,10 +65,6 @@ const swapSlice = createSlice({
     setSwapSuccess(state, action: PayloadAction<boolean>) {
       state.swap.inProgress = false
       state.swap.success = action.payload
-      return state
-    },
-    setPoolIndex(state, action: PayloadAction<number>) {
-      state.swap.poolIndex = action.payload
       return state
     },
     setPair(state, action: PayloadAction<{ tokenFrom: AddressOrPair; tokenTo: AddressOrPair }>) {

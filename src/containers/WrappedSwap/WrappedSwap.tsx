@@ -233,11 +233,11 @@ export const WrappedSwap = () => {
       isFetchingNewPool={isFetchingNewPool}
       onRefresh={onRefresh}
       onSwap={(
+        poolKey,
         slippage,
         estimatedPriceAfterSwap,
         tokenFrom,
         tokenTo,
-        poolIndex,
         amountIn,
         amountOut,
         byAmountIn
@@ -245,9 +245,9 @@ export const WrappedSwap = () => {
         setProgress('progress')
         dispatch(
           actions.swap({
+            poolKey,
             slippage,
             estimatedPriceAfterSwap,
-            poolIndex,
             tokenFrom,
             tokenTo,
             amountIn,
