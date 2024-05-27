@@ -6,7 +6,7 @@ import loader from '@static/gif/loader.gif'
 import { TokenPriceData } from '@store/consts/static'
 import {
   calcPrice,
-  calcYPerXPrice,
+  calcYPerXPriceByTickIndex,
   getCoingeckoTokenPrice,
   getMockedTokenPrice,
   poolKeyToString,
@@ -27,18 +27,19 @@ import { status } from '@store/selectors/wallet'
 import { VariantType } from 'notistack'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import useStyles from './style'
 
 export interface IProps {
   address: string
-  id: number
+  id: bigint
 }
 
 export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   const { classes } = useStyles()
 
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const currentNetwork = useSelector(networkType)
   const position = useSelector(singlePositionData(id))
@@ -81,7 +82,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
     if (position?.poolData) {
       return {
         index: position.poolData.currentTickIndex,
-        x: calcYPerXPrice(
+        x: calcYPerXPriceByTickIndex(
           position.poolData.currentTickIndex,
           position.tokenX.decimals,
           position.tokenY.decimals
@@ -136,7 +137,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   const min = useMemo(
     () =>
       position
-        ? calcYPerXPrice(
+        ? calcYPerXPriceByTickIndex(
             position.lowerTickIndex,
             position.tokenX.decimals,
             position.tokenY.decimals
@@ -147,7 +148,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   const max = useMemo(
     () =>
       position
-        ? calcYPerXPrice(
+        ? calcYPerXPriceByTickIndex(
             position.upperTickIndex,
             position.tokenX.decimals,
             position.tokenY.decimals
@@ -158,7 +159,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   const current = useMemo(
     () =>
       position?.poolData
-        ? calcYPerXPrice(
+        ? calcYPerXPriceByTickIndex(
             position.poolData.currentTickIndex,
             position.tokenX.decimals,
             position.tokenY.decimals
@@ -362,8 +363,17 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
         leftRange={leftRange}
         rightRange={rightRange}
         currentPrice={current}
-        onClickClaimFee={() => {}} // add real data
-        closePosition={() => {}} // add real data
+        onClickClaimFee={() => dispatch(actions.claimFee(id))}
+        closePosition={() =>
+          dispatch(
+            actions.closePosition({
+              positionIndex: id,
+              onSuccess: () => {
+                navigate('/pool')
+              }
+            })
+          )
+        }
         ticksLoading={ticksLoading}
         tickSpacing={Number(position.poolKey.feeTier.tickSpacing)}
         tokenX={{
@@ -394,7 +404,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
                 +printBigint(position.tokenY.balance ?? 0n, position.tokenY.decimals)
         }}
         tokenYPriceData={tokenYPriceData}
-        fee={Number(position.poolKey.feeTier.fee)}
+        fee={position.poolKey.feeTier.fee}
         min={min}
         max={max}
         initialIsDiscreteValue={initialIsDiscreteValue}

@@ -64,10 +64,7 @@ export const swapTokens = createSelector(
     return Object.values(tokens).map(token => ({
       ...token,
       assetAddress: token.address,
-      balance:
-        token.address.toString() === TESTNET_WAZERO_ADDRESS
-          ? a0Balance
-          : allAccounts[token.address.toString()]?.balance ?? 0n
+      balance: token.balance ?? 0n
     }))
   }
 )

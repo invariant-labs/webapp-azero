@@ -179,7 +179,7 @@ const useStyles = makeStyles()((theme: Theme) => {
     },
 
     hideScroll: {
-      '& > *:first-child': {
+      '& > *:first-of-type': {
         paddingRight: '30px'
       }
     },

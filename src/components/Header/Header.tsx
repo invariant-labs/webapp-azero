@@ -15,7 +15,7 @@ import { AddressOrPair } from '@polkadot/api-base/types'
 import SelectRPCButton from './HeaderButton/SelectRPCButton'
 import useButtonStyles from './HeaderButton/style'
 import { theme } from '@static/theme'
-import SelectMainnetRPC from '@components/Modals/SelectMainnetRPC/SelectMainnetRPC'
+import SelectTestnetRPC from '@components/Modals/SelectTestnetRPC/SelectTestnetRPC'
 import { Network } from '@invariant-labs/a0-sdk/src'
 
 export interface IHeader {
@@ -198,7 +198,7 @@ export const Header: React.FC<IHeader> = ({
             }
           />
           {typeOfNetwork === Network.Testnet ? (
-            <SelectMainnetRPC
+            <SelectTestnetRPC
               networks={testnetRPCs}
               open={testnetRpcsOpen}
               anchorEl={routesModalAnchor}

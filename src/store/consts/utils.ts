@@ -9,20 +9,21 @@ import {
   getMaxTick,
   getMinTick
 } from '@invariant-labs/a0-sdk'
+import { PRICE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { ApiPromise } from '@polkadot/api'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
 import axios from 'axios'
 import {
   BTC,
-  DEFAULT_CONTRACT_OPTIONS,
+  DEFAULT_INVARIANT_OPTIONS,
+  DEFAULT_PSP22_OPTIONS,
   ETH,
   Token,
   TokenPriceData,
   USDC,
   tokensPrices
 } from './static'
-import { PRICE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -121,8 +122,24 @@ export const trimZeros = (numStr: string): string => {
   return numStr
 }
 
-export const calcYPerXPrice = (tickIndex: bigint, xDecimal: bigint, yDecimal: bigint): number => {
+export const calcYPerXPriceByTickIndex = (
+  tickIndex: bigint,
+  xDecimal: bigint,
+  yDecimal: bigint
+): number => {
   const sqrt = +printBigint(calculateSqrtPrice(tickIndex), PRICE_SCALE)
+
+  const proportion = sqrt * sqrt
+
+  return proportion / 10 ** Number(yDecimal - xDecimal)
+}
+export const calcYPerXPriceBySqrtPrice = (
+  sqrtPrice: bigint,
+  xDecimal: bigint,
+  yDecimal: bigint
+): number => {
+  const sqrt = +printBigint(sqrtPrice, PRICE_SCALE)
+
   const proportion = sqrt * sqrt
 
   return proportion / 10 ** Number(yDecimal - xDecimal)
@@ -176,12 +193,12 @@ export const toMaxNumericPlaces = (num: number, places: number): string => {
 }
 
 export const calcPrice = (
-  amount: bigint,
+  amountTickIndex: bigint,
   isXtoY: boolean,
   xDecimal: bigint,
   yDecimal: bigint
 ): number => {
-  const price = calcYPerXPrice(amount, xDecimal, yDecimal)
+  const price = calcYPerXPriceByTickIndex(amountTickIndex, xDecimal, yDecimal)
 
   return isXtoY ? price : 1 / price
 }
@@ -294,11 +311,15 @@ export const getTokenDataByAddresses = async (
   network: Network,
   address: string
 ): Promise<Record<string, Token>> => {
-  const psp22 = await PSP22.load(api, network, '', DEFAULT_CONTRACT_OPTIONS)
+  const psp22 = await PSP22.load(api, network, DEFAULT_PSP22_OPTIONS)
 
   const promises = tokens.flatMap(token => {
-    psp22.setContractAddress(token)
-    return [psp22.tokenSymbol(), psp22.tokenName(), psp22.tokenDecimals(), psp22.balanceOf(address)]
+    return [
+      psp22.tokenSymbol(token),
+      psp22.tokenName(token),
+      psp22.tokenDecimals(token),
+      psp22.balanceOf(address, token)
+    ]
   })
   const results = await Promise.all(promises)
 
@@ -323,12 +344,11 @@ export const getTokenBalances = async (
   network: Network,
   address: string
 ): Promise<[string, bigint][]> => {
-  const psp22 = await PSP22.load(api, network, '')
+  const psp22 = await PSP22.load(api, network, DEFAULT_PSP22_OPTIONS)
 
   const promises: Promise<any>[] = []
   tokens.map(token => {
-    psp22.setContractAddress(token)
-    promises.push(psp22.balanceOf(address))
+    promises.push(psp22.balanceOf(address, token))
   })
   const results = await Promise.all(promises)
 
@@ -348,7 +368,7 @@ export const getPoolsByPoolKeys = async (
     api,
     network,
     TESTNET_INVARIANT_ADDRESS,
-    DEFAULT_CONTRACT_OPTIONS
+    DEFAULT_INVARIANT_OPTIONS
   )
 
   const promises = poolKeys.map(({ tokenX, tokenY, feeTier }) =>
@@ -520,4 +540,40 @@ export const determinePositionTokenBlock = (
   }
 
   return PositionTokenBlock.None
+}
+
+export const findPairs = (tokenFrom: string, tokenTo: string, pairs: PoolWithPoolKey[]) => {
+  return pairs.filter(
+    pool =>
+      (tokenFrom === pool.poolKey.tokenX && tokenTo === pool.poolKey.tokenY) ||
+      (tokenFrom === pool.poolKey.tokenY && tokenTo === pool.poolKey.tokenX)
+  )
+}
+
+export const findPairsByPoolKeys = (tokenFrom: string, tokenTo: string, poolKeys: PoolKey[]) => {
+  return poolKeys.filter(
+    poolKey =>
+      (tokenFrom === poolKey.tokenX && tokenTo === poolKey.tokenY) ||
+      (tokenFrom === poolKey.tokenY && tokenTo === poolKey.tokenX)
+  )
+}
+
+export type SimulateResult = {
+  amountOut: bigint
+  fee: bigint
+  priceImpact: number
+}
+
+export const getPools = async (
+  invariant: Invariant,
+  poolKeys: PoolKey[]
+): Promise<PoolWithPoolKey[]> => {
+  const promises = poolKeys.map(poolKey =>
+    invariant.getPool(poolKey.tokenX, poolKey.tokenY, poolKey.feeTier)
+  )
+
+  const pools = await Promise.all(promises)
+  return pools.map((pool, index) => {
+    return { ...pool, poolKey: poolKeys[index] }
+  })
 }

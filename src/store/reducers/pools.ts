@@ -5,11 +5,12 @@ import {
   TESTNET_BTC_ADDRESS,
   TESTNET_ETH_ADDRESS,
   TESTNET_USDC_ADDRESS,
+  TESTNET_WAZERO_ADDRESS,
   Tick
 } from '@invariant-labs/a0-sdk'
 import { AddressOrPair } from '@polkadot/api/types'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
-import { BTC, ETH, Token, USDC } from '@store/consts/static'
+import { AZERO, BTC, ETH, Token, USDC } from '@store/consts/static'
 import { PayloadType } from '@store/consts/types'
 import { poolKeyToString } from '@store/consts/utils'
 
@@ -69,7 +70,12 @@ export interface FetchTicksAndTickMaps {
 }
 
 export const defaultState: IPoolsStore = {
-  tokens: { [TESTNET_BTC_ADDRESS]: BTC, [TESTNET_ETH_ADDRESS]: ETH, [TESTNET_USDC_ADDRESS]: USDC },
+  tokens: {
+    [TESTNET_BTC_ADDRESS]: BTC,
+    [TESTNET_ETH_ADDRESS]: ETH,
+    [TESTNET_USDC_ADDRESS]: USDC,
+    [TESTNET_WAZERO_ADDRESS]: AZERO
+  },
   pools: {},
   poolKeys: {},
   poolTicks: {},
@@ -175,18 +181,18 @@ const poolsSlice = createSlice({
     //   }
     //   return state
     // },
-    // addPools(state, action: PayloadAction<PoolWithAddress[]>) {
-    //   const newData = action.payload.reduce(
-    //     (acc, pool) => ({
-    //       ...acc,
-    //       [pool.address.toString()]: pool
-    //     }),
-    //     {}
-    //   )
-    //   state.pools = R.merge(state.pools, newData)
-    //   state.isLoadingLatestPoolsForTransaction = false
-    //   return state
-    // },
+    addPools(state, action: PayloadAction<PoolWithPoolKey[]>) {
+      const newData = action.payload.reduce(
+        (acc, pool) => ({
+          ...acc,
+          [poolKeyToString(pool.poolKey)]: pool
+        }),
+        {}
+      )
+      state.pools = R.merge(state.pools, newData)
+      state.isLoadingLatestPoolsForTransaction = false
+      return state
+    },
     addPoolsForList(state, action: PayloadAction<ListPoolsResponse>) {
       const newData = action.payload.data.reduce(
         (acc, pool) => ({
@@ -208,6 +214,14 @@ const poolsSlice = createSlice({
     //   state.isLoadingLatestPoolsForTransaction = true
     //   return state
     // },
+    // getPoolData(state, _action: PayloadAction<Pair>) {
+    //   state.isLoadingLatestPoolsForTransaction = true
+    //   return state
+    // },
+    getAllPoolsForPairData(state, action: PayloadAction<PairTokens>) {
+      state.isLoadingLatestPoolsForTransaction = true
+      return state
+    },
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     getPoolsDataForList(_state, _action: PayloadAction<ListPoolsRequest>) {}
     // deleteTick(state, action: PayloadAction<DeleteTick>) {

@@ -1,10 +1,10 @@
-import React from 'react'
-import successGif from '@static/gif/successAnimation.gif'
+import { Button } from '@mui/material'
 import errorGif from '@static/gif/errorAnimation.gif'
 import loadingAnimation from '@static/gif/loading.gif'
+import successGif from '@static/gif/successAnimation.gif'
 import classNames from 'classnames'
+import React from 'react'
 import useStyles from './style'
-import { Button } from '@mui/material'
 
 export type ProgressState =
   | 'progress'
@@ -84,7 +84,7 @@ const AnimatedButton: React.FC<Props> = ({
       progress === 'approvedWithSuccess' ||
       progress === 'approvedWithFail' ||
       content === 'Loading' ? (
-        <img src={loadingAnimation} style={{ height: '100%', width: 25, zIndex: 10 }}></img>
+        <img src={loadingAnimation} style={{ height: 25, width: 25, zIndex: 10 }}></img>
       ) : (
         getMessage()
       )}

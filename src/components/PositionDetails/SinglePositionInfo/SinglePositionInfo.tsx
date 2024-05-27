@@ -1,5 +1,4 @@
 import ClosePositionWarning from '@components/Modals/ClosePositionWarning/ClosePositionWarning'
-import { Percentage } from '@invariant-labs/a0-sdk/src'
 import { Button, Grid, Typography } from '@mui/material'
 import icons from '@static/icons'
 import { TokenPriceData } from '@store/consts/static'
@@ -11,7 +10,7 @@ import { ILiquidityToken } from './consts'
 import useStyles from './style'
 
 interface IProp {
-  fee: Percentage
+  fee: number
   onClickClaimFee: () => void
   closePosition: (claimFarmRewards?: boolean) => void
   tokenX: ILiquidityToken

@@ -22,8 +22,8 @@ export const ConcentrationTypeSwitch: React.FC<IProps> = ({
 
   const [current, setCurrent] = useState(initialValue)
 
-  const tabsClasses = useTabsStyles({ value: current })
-  const singleTabClasses = useSingleTabStyles()
+  const { classes: tabsClasses } = useTabsStyles({ value: current })
+  const { classes: singleTabClasses } = useSingleTabStyles()
 
   const handleChange = (_: React.ChangeEvent<{}>, newValue: number) => {
     setCurrent(newValue)
@@ -38,7 +38,6 @@ export const ConcentrationTypeSwitch: React.FC<IProps> = ({
       onChange={!disabled ? handleChange : undefined}
       variant='scrollable'
       scrollButtons={false}
-      TabIndicatorProps={{ children: <span /> }}
       classes={tabsClasses}>
       <Tab
         disableRipple
