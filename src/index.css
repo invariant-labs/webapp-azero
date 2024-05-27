@@ -16,7 +16,3 @@ body {
   letter-spacing: -0.03em;
   min-height: 100vh;
 }
-
-.MuiPaper-root.MuiPopover-paper {
-  background-color: transparent;
-}

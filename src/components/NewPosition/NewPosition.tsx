@@ -541,7 +541,7 @@ export const NewPosition: React.FC<INewPosition> = ({
                 isXtoY
                   ? convertBalanceToBigint(tokenBDeposit, tokenBDecimals)
                   : convertBalanceToBigint(tokenADeposit, tokenADecimals),
-                (BigInt(slippTolerance) * PERCENTAGE_DENOMINATOR) / 100n //TODO check if this is correct
+                BigInt(+slippTolerance * Number(PERCENTAGE_DENOMINATOR)) / 100n
               )
             }
           }}

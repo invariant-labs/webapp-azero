@@ -26,6 +26,7 @@ import { closeSnackbar } from 'notistack'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
 import { getConnection } from './connection'
 import { fetchAllPoolKeys } from './pools'
+import { calculateTokenAmountsWithSlippage } from '@invariant-labs/a0-sdk/src/utils'
 
 function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator {
   const loaderCreatePosition = createLoaderKey()
@@ -38,12 +39,11 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     tokenXAmount,
     tokenYAmount,
     liquidityDelta,
-    initPool
+    initPool,
+    slippageTolerance
   } = action.payload
 
-  const slippageTolerance = 0n //TODO delete when sdk will be fixed
-
-  const { tokenX, tokenY } = poolKeyData
+  const { tokenX, tokenY, feeTier } = poolKeyData
 
   if (
     (tokenX === TESTNET_WAZERO_ADDRESS && tokenXAmount !== 0n) ||
@@ -71,10 +71,20 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
 
     const psp22 = yield* call(PSP22.load, api, network, DEFAULT_PSP22_OPTIONS)
 
+    const [xAmountAfterSlippage, yAmountAfterSlippage] = calculateTokenAmountsWithSlippage(
+      feeTier.tickSpacing,
+      spotSqrtPrice,
+      liquidityDelta,
+      lowerTick,
+      upperTick,
+      slippageTolerance,
+      true
+    )
+
     const XTokenTx = yield* call(
       [psp22, psp22.approveTx],
       TESTNET_INVARIANT_ADDRESS,
-      tokenXAmount,
+      xAmountAfterSlippage,
       tokenX
     )
     txs.push(XTokenTx)
@@ -82,7 +92,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     const YTokenTx = yield* call(
       [psp22, psp22.approveTx],
       TESTNET_INVARIANT_ADDRESS,
-      tokenYAmount,
+      yAmountAfterSlippage,
       tokenY
     )
     txs.push(YTokenTx)
@@ -164,12 +174,11 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     tokenXAmount,
     tokenYAmount,
     liquidityDelta,
-    initPool
+    initPool,
+    slippageTolerance
   } = action.payload
 
-  const slippageTolerance = 0n //TODO delete when sdk will be fixed
-
-  const { tokenX, tokenY } = poolKeyData
+  const { tokenX, tokenY, feeTier } = poolKeyData
 
   try {
     yield put(
@@ -204,10 +213,20 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
 
     const psp22 = yield* call(PSP22.load, api, network, DEFAULT_PSP22_OPTIONS)
 
+    const [xAmountAfterSlippage, yAmountAfterSlippage] = calculateTokenAmountsWithSlippage(
+      feeTier.tickSpacing,
+      spotSqrtPrice,
+      liquidityDelta,
+      lowerTick,
+      upperTick,
+      slippageTolerance,
+      true
+    )
+
     const XTokenTx = yield* call(
       [psp22, psp22.approveTx],
       TESTNET_INVARIANT_ADDRESS,
-      tokenXAmount,
+      xAmountAfterSlippage,
       tokenX
     )
     txs.push(XTokenTx)
@@ -215,7 +234,7 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     const YTokenTx = yield* call(
       [psp22, psp22.approveTx],
       TESTNET_INVARIANT_ADDRESS,
-      tokenYAmount,
+      yAmountAfterSlippage,
       tokenY
     )
     txs.push(YTokenTx)

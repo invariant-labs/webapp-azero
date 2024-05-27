@@ -705,6 +705,9 @@ export const NewPositionWrapper: React.FC<IProps> = ({
           setProgress('progress')
         }
 
+        const lowerTickIndex = leftTickIndex < rightTickIndex ? leftTickIndex : rightTickIndex
+        const upperTickIndex = rightTickIndex > leftTickIndex ? rightTickIndex : leftTickIndex
+
         dispatch(
           positionsActions.initPosition({
             poolKeyData: newPoolKey(
@@ -712,8 +715,8 @@ export const NewPositionWrapper: React.FC<IProps> = ({
               tokens[tokenBIndex].assetAddress.toString(),
               ALL_FEE_TIERS_DATA[feeIndex].tier
             ),
-            lowerTick: leftTickIndex,
-            upperTick: rightTickIndex,
+            lowerTick: lowerTickIndex,
+            upperTick: upperTickIndex,
             liquidityDelta: liquidityRef.current,
             spotSqrtPrice: poolsData[poolKey]
               ? poolsData[poolKey].sqrtPrice
