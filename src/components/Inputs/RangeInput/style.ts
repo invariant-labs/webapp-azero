@@ -46,9 +46,11 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     }
   },
   controls: {
-    // marginTop: 5,
     backgroundColor: colors.invariant.componentBcg,
-    borderRadius: 10
+    borderRadius: 10,
+    '& input.Mui-disabled': {
+      '-webkit-text-fill-color': colors.white.main + '!important'
+    }
   },
   button: {
     minWidth: 36,

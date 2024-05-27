@@ -1,6 +1,6 @@
-import React, { ChangeEvent, useCallback } from 'react'
+import React, { useCallback } from 'react'
 import { useSliderStyles, useThumbStyles } from './style'
-import { Grid, Slider, Typography } from '@mui/material'
+import { Grid, Slider, SliderThumb } from '@mui/material'
 
 export interface IProps {
   values: number[]
@@ -10,32 +10,18 @@ export interface IProps {
   minimumSliderIndex: number
 }
 
-interface ThumbProps extends React.HTMLAttributes<HTMLSpanElement> {
-  concentrationValues: number[]
-}
+interface ThumbComponentProps extends React.HTMLAttributes<unknown> {}
 
-const Thumb: React.FC<ThumbProps> = ({ concentrationValues, ...props }) => {
+function ThumbComponent(props: ThumbComponentProps) {
   const { classes } = useThumbStyles()
-
+  const { children, ...other } = props
   return (
-    <Grid
-      {...props}
-      className={classes.root}
-      style={props.style}
-      container
-      item
-      alignItems='center'
-      direction='column'>
-      <Grid className={classes.labelWrapper}>
-        <Typography className={classes.label}>
-          {concentrationValues[props['aria-valuenow'] ?? 0].toFixed(0)}x
-        </Typography>
-      </Grid>
-
+    <SliderThumb {...other}>
+      {children}
       <Grid className={classes.outerCircle}>
         <Grid className={classes.innerCircle} />
       </Grid>
-    </Grid>
+    </SliderThumb>
   )
 }
 
@@ -53,7 +39,7 @@ export const ConcentrationSlider: React.FC<IProps> = ({
     disabledRange: disabledPercentageRange
   })
 
-  const onChangeCommited = useCallback(
+  const onChangeCommitted = useCallback(
     (_e: Event | React.SyntheticEvent, value: number | number[]) => {
       valueChangeHandler(value as number)
     },
@@ -75,16 +61,16 @@ export const ConcentrationSlider: React.FC<IProps> = ({
   return (
     <Slider
       classes={classes}
-      onChangeCommitted={onChangeCommited}
       onChange={onChange}
+      onChangeCommitted={onChangeCommitted}
       marks={marks}
       min={0}
       max={values.length - 1}
-      value={12}
-      slotProps={{
-        thumb: <Thumb concentrationValues={values} />
-      }}
+      value={valueIndex}
+      valueLabelDisplay='on'
       track={false}
+      slots={{ thumb: ThumbComponent }}
+      valueLabelFormat={value => `${values[value].toFixed(0)}x`}
     />
   )
 }

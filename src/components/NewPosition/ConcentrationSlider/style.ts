@@ -3,25 +3,6 @@ import { makeStyles } from 'tss-react/mui'
 
 export const useThumbStyles = makeStyles()(() => {
   return {
-    root: {
-      width: 60,
-      position: 'absolute',
-      top: -26,
-      transform: 'translateX(-30px)',
-      outline: 'none'
-    },
-    labelWrapper: {
-      width: 60,
-      height: 20,
-      borderRadius: 7,
-      background: colors.invariant.light,
-      marginBottom: 8
-    },
-    label: {
-      color: colors.invariant.text,
-      ...typography.caption1,
-      textAlign: 'center'
-    },
     outerCircle: {
       background: colors.invariant.pinkLinearGradient,
       width: 28,
@@ -44,6 +25,11 @@ export const useSliderStyles = makeStyles<{ valuesLength: number; disabledRange:
     root: {
       width: '100%',
       paddingBlock: 13
+    },
+    thumb: {
+      width: 'auto',
+      height: 'auto',
+      boxShadow: 'none !important'
     },
     rail: {
       background:
@@ -83,7 +69,7 @@ export const useSliderStyles = makeStyles<{ valuesLength: number; disabledRange:
         width: 14,
         height: 14,
         borderRadius: '100%',
-        transform: 'translate(-6px, -4px)'
+        transform: 'translate(-6px, -6px)'
       },
 
       '&[data-index="0"]': {
@@ -93,6 +79,42 @@ export const useSliderStyles = makeStyles<{ valuesLength: number; disabledRange:
       [`&[data-index="${valuesLength - 1}"]`]: {
         background: colors.invariant.green
       }
+    },
+
+    valueLabel: {
+      // padding: '2px 30px',
+      padding: '2px 15px',
+      width: 300,
+      height: 17,
+      position: 'absolute',
+      margin: 0,
+      top: -8,
+      borderRadius: 7,
+      background: colors.invariant.light,
+
+      '& span': {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        color: colors.invariant.text,
+        ...typography.caption1,
+        minWidth: 28
+      },
+      '&::before': {
+        display: 'none'
+      }
+    },
+    valueLabelLabel: {
+      width: 300,
+      background: colors.invariant.pink
+    },
+    valueLabelCircle: {
+      width: 120,
+      background: colors.invariant.pink
+    },
+    valueLabelOpen: {
+      width: 200,
+      background: colors.invariant.pink
     }
   })
 )

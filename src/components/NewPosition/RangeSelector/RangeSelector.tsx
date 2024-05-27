@@ -8,7 +8,13 @@ import { Button, Grid, Tooltip, Typography } from '@mui/material'
 import PlotTypeSwitch from '@components/PlotTypeSwitch/PlotTypeSwitch'
 import RangeInput from '@components/Inputs/RangeInput/RangeInput'
 import { getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
-import { calcPrice, nearestTickIndex, toMaxNumericPlaces } from '@store/consts/utils'
+import {
+  calcPrice,
+  calcTicksAmountInRange,
+  calculateConcentrationRange,
+  nearestTickIndex,
+  toMaxNumericPlaces
+} from '@store/consts/utils'
 import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
 
 export interface IRangeSelector {
@@ -102,30 +108,30 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   }, [])
 
   const zoomMinus = () => {
-    //   const diff = plotMax - plotMin
-    //   const newMin = plotMin - diff / 4
-    //   const newMax = plotMax + diff / 4
-    //   setPlotMin(newMin)
-    //   setPlotMax(newMax)
+    const diff = plotMax - plotMin
+    const newMin = plotMin - diff / 4
+    const newMax = plotMax + diff / 4
+    setPlotMin(newMin)
+    setPlotMax(newMax)
   }
 
   const zoomPlus = () => {
-    //   const diff = plotMax - plotMin
-    //   const newMin = plotMin + diff / 6
-    //   const newMax = plotMax - diff / 6
-    //   if (
-    //     calcTicksAmountInRange(
-    //       Math.max(newMin, 0),
-    //       newMax,
-    //       tickSpacing,
-    //       isXtoY,
-    //       xDecimal,
-    //       yDecimal
-    //     ) >= 4
-    //   ) {
-    //     setPlotMin(newMin)
-    //     setPlotMax(newMax)
-    //   }
+    const diff = plotMax - plotMin
+    const newMin = plotMin + diff / 6
+    const newMax = plotMax - diff / 6
+    if (
+      calcTicksAmountInRange(
+        Math.max(newMin, 0),
+        newMax,
+        Number(tickSpacing),
+        isXtoY,
+        Number(xDecimal),
+        Number(yDecimal)
+      ) >= 4
+    ) {
+      setPlotMin(newMin)
+      setPlotMax(newMax)
+    }
   }
 
   const setLeftInputValues = (val: string) => {
@@ -152,17 +158,14 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
     let leftRange: bigint
     let rightRange: bigint
 
-    // if (positionOpeningMethod === 'range') {
-    //   const { leftInRange, rightInRange } = getTicksInsideRange(left, right, isXtoY)
-    //   leftRange = leftInRange
-    //   rightRange = rightInRange
-    // } else {
-    //   leftRange = left
-    //   rightRange = right
-    // }
-
-    leftRange = left
-    rightRange = right
+    if (positionOpeningMethod === 'range') {
+      const { leftInRange, rightInRange } = getTicksInsideRange(left, right, isXtoY)
+      leftRange = leftInRange
+      rightRange = rightInRange
+    } else {
+      leftRange = left
+      rightRange = right
+    }
 
     setLeftRange(leftRange)
     setRightRange(rightRange)
@@ -174,19 +177,67 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   }
 
   const resetPlot = () => {
-    const higherTick = BigInt(
-      Math.max(Number(getMinTick(tickSpacing)), Number(midPrice.index) - Number(tickSpacing) * 10)
-    )
+    if (positionOpeningMethod === 'range') {
+      const initSideDist = Math.abs(
+        midPrice.x -
+          calcPrice(
+            BigInt(
+              Math.max(Number(getMinTick(tickSpacing)), Number(midPrice.index - tickSpacing * 15n))
+            ),
+            isXtoY,
+            xDecimal,
+            yDecimal
+          )
+      )
 
-    const lowerTick = BigInt(
-      Math.min(Number(getMaxTick(tickSpacing)), Number(midPrice.index) + Number(tickSpacing) * 10)
-    )
+      const higherTick = BigInt(
+        Math.max(Number(getMinTick(tickSpacing)), Number(midPrice.index) - Number(tickSpacing) * 10)
+      )
 
-    changeRangeHandler(isXtoY ? higherTick : lowerTick, isXtoY ? lowerTick : higherTick)
+      const lowerTick = BigInt(
+        Math.min(Number(getMaxTick(tickSpacing)), Number(midPrice.index) + Number(tickSpacing) * 10)
+      )
+
+      changeRangeHandler(isXtoY ? higherTick : lowerTick, isXtoY ? lowerTick : higherTick)
+
+      setPlotMin(midPrice.x - initSideDist)
+      setPlotMax(midPrice.x + initSideDist)
+    } else {
+      setConcentrationIndex(0)
+      const { leftRange, rightRange } = calculateConcentrationRange(
+        tickSpacing,
+        concentrationArray[0],
+        2,
+        midPrice.index,
+        isXtoY
+      )
+      changeRangeHandler(leftRange, rightRange)
+      autoZoomHandler(leftRange, rightRange, true)
+    }
   }
 
   const reversePlot = () => {
     changeRangeHandler(rightRange, leftRange)
+    if (plotMin > 0) {
+      const pom = 1 / plotMin
+      setPlotMin(1 / plotMax)
+      setPlotMax(pom)
+    } else {
+      const initSideDist = Math.abs(
+        midPrice.x -
+          calcPrice(
+            BigInt(
+              Math.max(Number(getMinTick(tickSpacing)), Number(midPrice.index - tickSpacing * 15n))
+            ),
+            isXtoY,
+            xDecimal,
+            yDecimal
+          )
+      )
+
+      setPlotMin(midPrice.x - initSideDist)
+      setPlotMax(midPrice.x + initSideDist)
+    }
   }
 
   useEffect(() => {
@@ -201,79 +252,83 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
     }
   }, [ticksLoading, midPrice])
 
-  const autoZoomHandler = (left: number, right: number, canZoomCloser: boolean = false) => {
-    // const leftX = calcPrice(left, isXtoY, xDecimal, yDecimal)
-    // const rightX = calcPrice(right, isXtoY, xDecimal, yDecimal)
-    // if (leftX < plotMin || rightX > plotMax || canZoomCloser) {
-    //   const leftDist = Math.abs(
-    //     leftX -
-    //       calcPrice(
-    //         isXtoY
-    //           ? Math.max(getMinTick(tickSpacing), left - tickSpacing * 15)
-    //           : Math.min(getMaxTick(tickSpacing), left + tickSpacing * 15),
-    //         isXtoY,
-    //         xDecimal,
-    //         yDecimal
-    //       )
-    //   )
-    //   const rightDist = Math.abs(
-    //     rightX -
-    //       calcPrice(
-    //         isXtoY
-    //           ? Math.min(getMaxTick(tickSpacing), right + tickSpacing * 15)
-    //           : Math.max(getMinTick(tickSpacing), right - tickSpacing * 15),
-    //         isXtoY,
-    //         xDecimal,
-    //         yDecimal
-    //       )
-    //   )
-    //   let dist
-    //   if (leftX < plotMin && rightX > plotMax) {
-    //     dist = Math.max(leftDist, rightDist)
-    //   } else if (leftX < plotMin) {
-    //     dist = leftDist
-    //   } else {
-    //     dist = rightDist
-    //   }
-    //   setPlotMin(leftX - dist)
-    //   setPlotMax(rightX + dist)
-    // }
+  const autoZoomHandler = (left: bigint, right: bigint, canZoomCloser: boolean = false) => {
+    const leftX = calcPrice(left, isXtoY, xDecimal, yDecimal)
+    const rightX = calcPrice(right, isXtoY, xDecimal, yDecimal)
+
+    const higherLeftIndex = BigInt(
+      Math.max(Number(getMinTick(tickSpacing)), Number(left - tickSpacing * 15n))
+    )
+
+    const lowerLeftIndex = BigInt(
+      Math.min(Number(getMaxTick(tickSpacing)), Number(left + tickSpacing * 15n))
+    )
+
+    const lowerRightIndex = BigInt(
+      Math.min(Number(getMaxTick(tickSpacing)), Number(right + tickSpacing * 15n))
+    )
+
+    const higherRightIndex = BigInt(
+      Math.max(Number(getMinTick(tickSpacing)), Number(right - tickSpacing * 15n))
+    )
+
+    if (leftX < plotMin || rightX > plotMax || canZoomCloser) {
+      const leftDist = Math.abs(
+        leftX - calcPrice(isXtoY ? higherLeftIndex : lowerLeftIndex, isXtoY, xDecimal, yDecimal)
+      )
+      const rightDist = Math.abs(
+        rightX - calcPrice(isXtoY ? lowerRightIndex : higherRightIndex, isXtoY, xDecimal, yDecimal)
+      )
+
+      let dist
+
+      if (leftX < plotMin && rightX > plotMax) {
+        dist = Math.max(leftDist, rightDist)
+      } else if (leftX < plotMin) {
+        dist = leftDist
+      } else {
+        dist = rightDist
+      }
+
+      setPlotMin(leftX - dist)
+      setPlotMax(rightX + dist)
+    }
   }
 
   useEffect(() => {
     if (positionOpeningMethod === 'concentration' && isMountedRef.current) {
       setConcentrationIndex(0)
-      // const { leftRange, rightRange } = calculateConcentrationRange(
-      //   tickSpacing,
-      //   concentrationArray[0],
-      //   2,
-      //   midPrice.index,
-      //   isXtoY
-      // )
+      const { leftRange, rightRange } = calculateConcentrationRange(
+        tickSpacing,
+        concentrationArray[0],
+        2,
+        midPrice.index,
+        isXtoY
+      )
       changeRangeHandler(leftRange, rightRange)
-      // autoZoomHandler(leftRange, rightRange, true)
+      autoZoomHandler(leftRange, rightRange, true)
     } else {
       changeRangeHandler(leftRange, rightRange)
     }
   }, [positionOpeningMethod])
 
   useEffect(() => {
-    // if (positionOpeningMethod === 'concentration' && !ticksLoading && isMountedRef.current) {
-    //   const index =
-    //     concentrationIndex > concentrationArray.length - 1
-    //       ? concentrationArray.length - 1
-    //       : concentrationIndex
-    //   setConcentrationIndex(index)
-    //   const { leftRange, rightRange } = calculateConcentrationRange(
-    //     tickSpacing,
-    //     concentrationArray[index],
-    //     2,
-    //     midPrice.index,
-    //     isXtoY
-    //   )
-    //   changeRangeHandler(leftRange, rightRange)
-    //   autoZoomHandler(leftRange, rightRange, true)
-    // }
+    if (positionOpeningMethod === 'concentration' && !ticksLoading && isMountedRef.current) {
+      const index =
+        concentrationIndex > concentrationArray.length - 1
+          ? concentrationArray.length - 1
+          : concentrationIndex
+      setConcentrationIndex(index)
+      const { leftRange, rightRange } = calculateConcentrationRange(
+        tickSpacing,
+        concentrationArray[index],
+        2,
+        midPrice.index,
+        isXtoY
+      )
+      changeRangeHandler(leftRange, rightRange)
+      autoZoomHandler(leftRange, rightRange, true)
+    }
   }, [midPrice.index, concentrationArray])
 
   return (
@@ -383,14 +438,14 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
                 ? Math.max(Number(getMinTick(tickSpacing)), Number(leftRange - tickSpacing))
                 : Math.min(Number(getMaxTick(tickSpacing)), Number(leftRange + tickSpacing))
               changeRangeHandler(BigInt(newLeft), rightRange)
-              // autoZoomHandler(newLeft, rightRange)
+              autoZoomHandler(BigInt(newLeft), rightRange)
             }}
             increaseValue={() => {
               const newLeft = isXtoY
                 ? Math.min(Number(rightRange - tickSpacing), Number(leftRange + tickSpacing))
                 : Math.max(Number(rightRange + tickSpacing), Number(leftRange - tickSpacing))
               changeRangeHandler(BigInt(newLeft), rightRange)
-              // autoZoomHandler(newLeft, rightRange)
+              autoZoomHandler(BigInt(newLeft), rightRange)
             }}
             onBlur={() => {
               const newLeft = isXtoY
@@ -404,7 +459,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
                   )
 
               changeRangeHandler(BigInt(newLeft), rightRange)
-              // autoZoomHandler(newLeft, rightRange)
+              autoZoomHandler(BigInt(newLeft), rightRange)
             }}
             diffLabel='Min - Current price'
             percentDiff={((+leftInput - midPrice.x) / midPrice.x) * 100}
@@ -422,14 +477,14 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
                 ? Math.max(Number(rightRange - tickSpacing), Number(leftRange + tickSpacing))
                 : Math.min(Number(rightRange + tickSpacing), Number(leftRange - tickSpacing))
               changeRangeHandler(leftRange, BigInt(newRight))
-              // autoZoomHandler(leftRange, newRight)
+              autoZoomHandler(leftRange, BigInt(newRight))
             }}
             increaseValue={() => {
               const newRight = isXtoY
                 ? Math.min(Number(getMaxTick(tickSpacing)), Number(rightRange + tickSpacing))
                 : Math.max(Number(getMinTick(tickSpacing)), Number(rightRange - tickSpacing))
               changeRangeHandler(leftRange, BigInt(newRight))
-              // autoZoomHandler(leftRange, newRight)
+              autoZoomHandler(leftRange, BigInt(newRight))
             }}
             onBlur={() => {
               const newRight = isXtoY
@@ -443,7 +498,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
                   )
 
               changeRangeHandler(leftRange, BigInt(newRight))
-              // autoZoomHandler(leftRange, newRight)
+              autoZoomHandler(leftRange, BigInt(newRight))
             }}
             diffLabel='Max - Current price'
             percentDiff={((+rightInput - midPrice.x) / midPrice.x) * 100}
@@ -452,17 +507,25 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
         {positionOpeningMethod === 'concentration' ? (
           <Grid container className={classes.sliderWrapper}>
             <ConcentrationSlider
-              key={poolIndex ?? -1}
               valueIndex={concentrationIndex}
               values={concentrationArray}
-              valueChangeHandler={() => {}}
+              valueChangeHandler={value => {
+                setConcentrationIndex(value)
+                const { leftRange, rightRange } = calculateConcentrationRange(
+                  tickSpacing,
+                  concentrationArray[value],
+                  2,
+                  midPrice.index,
+                  isXtoY
+                )
+                changeRangeHandler(leftRange, rightRange)
+                autoZoomHandler(leftRange, rightRange, true)
+              }}
               dragHandler={value => {
                 setConcentrationIndex(value)
               }}
               minimumSliderIndex={minimumSliderIndex}
             />
-
-            <span>Slider</span>
           </Grid>
         ) : (
           <Grid container className={classes.buttons}>
@@ -475,7 +538,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
                 const left = isXtoY ? getMinTick(tickSpacing) : getMaxTick(tickSpacing)
                 const right = isXtoY ? getMaxTick(tickSpacing) : getMinTick(tickSpacing)
                 changeRangeHandler(left, right)
-                // autoZoomHandler(left, right)
+                autoZoomHandler(left, right)
               }}>
               Set full range
             </Button>

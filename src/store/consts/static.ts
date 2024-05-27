@@ -147,7 +147,8 @@ export const TokenAirdropAmount = {
 export const TokenList = {
   BTC: TESTNET_BTC_ADDRESS,
   ETH: TESTNET_ETH_ADDRESS,
-  USDC: TESTNET_USDC_ADDRESS
+  USDC: TESTNET_USDC_ADDRESS,
+  AZERO: TESTNET_WAZERO_ADDRESS
 }
 
 export const BTC: Token = {

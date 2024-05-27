@@ -6,6 +6,7 @@ import {
   TESTNET_INVARIANT_ADDRESS,
   TokenAmount,
   calculateSqrtPrice,
+  calculateTickDelta,
   getMaxTick,
   getMinTick
 } from '@invariant-labs/a0-sdk'
@@ -576,4 +577,39 @@ export const getPools = async (
   return pools.map((pool, index) => {
     return { ...pool, poolKey: poolKeys[index] }
   })
+}
+
+export const calculateConcentrationRange = (
+  tickSpacing: bigint,
+  concentration: number,
+  minimumRange: number,
+  currentTick: bigint,
+  isXToY: boolean
+) => {
+  const parsedTickSpacing = Number(tickSpacing)
+  const parsedCurrentTick = Number(currentTick)
+  const tickDelta = calculateTickDelta(parsedTickSpacing, minimumRange, concentration)
+  const lowerTick = parsedCurrentTick - (minimumRange / 2 + tickDelta) * parsedTickSpacing
+  const upperTick = parsedCurrentTick + (minimumRange / 2 + tickDelta) * parsedTickSpacing
+
+  return {
+    leftRange: BigInt(isXToY ? lowerTick : upperTick),
+    rightRange: BigInt(isXToY ? upperTick : lowerTick)
+  }
+}
+
+export const calcTicksAmountInRange = (
+  min: number,
+  max: number,
+  tickSpacing: number,
+  isXtoY: boolean,
+  xDecimal: number,
+  yDecimal: number
+): number => {
+  const primaryUnitsMin = getPrimaryUnitsPrice(min, isXtoY, xDecimal, yDecimal)
+  const primaryUnitsMax = getPrimaryUnitsPrice(max, isXtoY, xDecimal, yDecimal)
+  const minIndex = logBase(primaryUnitsMin, 1.0001)
+  const maxIndex = logBase(primaryUnitsMax, 1.0001)
+
+  return Math.ceil(Math.abs(maxIndex - minIndex) / tickSpacing)
 }
