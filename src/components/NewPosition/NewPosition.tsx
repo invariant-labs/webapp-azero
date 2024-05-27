@@ -6,11 +6,10 @@ import { Button, Grid, Typography } from '@mui/material'
 import backIcon from '@static/svg/back-arrow.svg'
 import settingIcon from '@static/svg/settings.svg'
 import { BestTier, PositionOpeningMethod, TokenPriceData } from '@store/consts/static'
-import { addressToTicker } from '@store/consts/uiUtiils'
 import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
 import { SwapToken } from '@store/selectors/wallet'
 import { blurContent, unblurContent } from '@utils/uiUtils'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import ConcentrationTypeSwitch from './ConcentrationTypeSwitch/ConcentrationTypeSwitch'
 import DepositSelector from './DepositSelector/DepositSelector'
@@ -20,6 +19,7 @@ import useStyles from './style'
 import {
   PositionTokenBlock,
   calcPrice,
+  calculateConcentrationRange,
   convertBalanceToBigint,
   determinePositionTokenBlock,
   printBigint,
@@ -27,6 +27,7 @@ import {
 } from '@store/consts/utils'
 import { AddressOrPair } from '@polkadot/api/types'
 import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
+import { getConcentrationArray } from '@invariant-labs/a0-sdk/src/utils'
 
 export interface INewPosition {
   initialTokenFrom: string
@@ -148,49 +149,6 @@ export const NewPosition: React.FC<INewPosition> = ({
   poolKey,
   currentPriceSqrt
 }) => {
-  const concentrationArray = [
-    2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
-    28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
-    52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75,
-    76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99,
-    100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118,
-    119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137,
-    138, 139, 140, 141, 141.35054708823986, 142, 142.34947883030156, 143.36268108534173,
-    144.39046185004142, 145.4331380485262, 146.49103585817588, 147.56449104982505,
-    148.6538493430759, 149.75946677751372, 150.88171010068865, 152.0209571737027, 153.1775973954089,
-    154.35203214616604, 155.5446752522247, 156.75595347191637, 157.98630700477432,
-    159.23619002491995, 160.50607124005197, 161.79643447746648, 163.10777929868044,
-    164.4406216442826, 165.79549451074587, 167.17294866108585, 168.57355337137307,
-    169.99789721516217, 171.44658888818702, 172.92025807568274, 174.41955636498605,
-    175.94515820614367, 177.4977619235366, 179.07809078171604, 180.68689410880648,
-    182.32494848123096, 183.99305897363345, 185.69206047823712, 187.42281909818539,
-    189.1862336197627, 190.98323706872694, 192.8147983564498, 194.68192402192497,
-    196.58566007625885, 198.52709395674438, 200.50735659816596, 202.5276246296469,
-    204.58912270597978, 206.69312598319462, 208.84096274881784, 211.0340172182762,
-    213.2737325097704, 215.56161381111102, 217.89923175305648, 220.2882260050746,
-    222.73030911083112, 225.22727058225726, 227.78098127272426, 230.39339805185554,
-    233.06656880646017, 235.80263779450277, 238.6038513814639, 241.47256419139453,
-    244.41124570806153, 247.42248736505374, 250.50901016763237, 253.67367289346942,
-    256.9194809242411, 260.24959576532467, 263.66734531713206, 267.17623496809654,
-    270.77995958709107, 274.4824165015807, 278.2877195572063, 282.2002143655592, 286.2244948589016,
-    290.36542128441835, 294.6281397861683, 299.0181037406905, 303.54109703222264, 308.2032594762985,
-    313.0111146269428, 317.9716002321081, 323.0921016363551, 328.3804884691442, 333.84515500191145,
-    339.4950646092151, 345.33979882941395, 351.3896115894971, 357.65548923979424,
-    364.14921713798856, 370.8834536311619, 377.8718124133744, 385.1289543859215, 392.6706903246919,
-    400.5140958676793, 408.6776405824729, 417.18133316731127, 426.046885188367, 435.29789617410853,
-    444.96006338884666, 455.06142021178204, 465.63260777843453, 476.70718542761057,
-    488.32198657997344, 500.5175279982779, 513.3384820106897, 526.8342232956461, 541.0594643347168,
-    556.0749967741243, 571.9485598766967, 588.7558622304064, 606.5817892216905, 625.5218369103276,
-    645.6838234283235, 667.1899426585674, 690.179242812771, 714.8106361327322, 741.2665774146387,
-    769.7575914233175, 800.5278868860325, 833.8623739844425, 870.0955124972457, 909.622573071739,
-    952.9141160025962, 1000.5348136431164, 1053.1682167369727, 1111.6497761931, 1177.0115196048926,
-    1250.5434814639223, 1333.8797054596678, 1429.12110490717, 1539.0150279873687,
-    1667.2246056090069, 1818.7450162827427, 2000.5695099245224, 2222.799447524173,
-    2500.586870564581, 2857.742129950144, 3333.949143853263, 4000.6389649839957, 5000.6736987617005,
-    6667.3982578387395, 10000.847380154431, 20001.194755458677
-  ]
-  ///////////
-
   const { classes } = useStyles()
   const navigate = useNavigate()
 
@@ -215,10 +173,11 @@ export const NewPosition: React.FC<INewPosition> = ({
 
   const [minimumSliderIndex, setMinimumSliderIndex] = useState<number>(0)
 
-  // const concentrationArray = useMemo(
-  //   () => getConcentrationArray(tickSpacing, 2, midPrice.index).sort((a, b) => a - b),
-  //   [tickSpacing]
-  // )
+  const concentrationArray = useMemo(
+    () =>
+      getConcentrationArray(Number(tickSpacing), 2, Number(midPrice.index)).sort((a, b) => a - b),
+    [tickSpacing]
+  )
 
   const setRangeBlockerInfo = () => {
     if (tokenAIndex === null || tokenBIndex === null) {
@@ -339,6 +298,7 @@ export const NewPosition: React.FC<INewPosition> = ({
       }
     }
   }
+
   const onChangeMidPrice = (mid: bigint) => {
     setMidPrice({
       index: mid,
@@ -388,25 +348,29 @@ export const NewPosition: React.FC<INewPosition> = ({
   const getMinSliderIndex = () => {
     let minimumSliderIndex = 0
 
-    // for (let index = 0; index < concentrationArray.length; index++) {
-    //   const value = concentrationArray[index]
+    for (let index = 0; index < concentrationArray.length; index++) {
+      const value = concentrationArray[index]
 
-    //   const { leftRange, rightRange } = calculateConcentrationRange(
-    //     tickSpacing,
-    //     value,
-    //     2,
-    //     midPrice.index,
-    //     isXtoY
-    //   )
+      const { leftRange, rightRange } = calculateConcentrationRange(
+        tickSpacing,
+        value,
+        2,
+        midPrice.index,
+        isXtoY
+      )
 
-    //   const { leftInRange, rightInRange } = getTicksInsideRange(leftRange, rightRange, isXtoY)
+      const { leftInRange, rightInRange } = getTicksInsideRange(
+        BigInt(leftRange),
+        BigInt(rightRange),
+        isXtoY
+      )
 
-    //   if (leftInRange !== leftRange || rightInRange !== rightRange) {
-    //     minimumSliderIndex = index + 1
-    //   } else {
-    //     break
-    //   }
-    // }
+      if (leftInRange !== leftRange || rightInRange !== rightRange) {
+        minimumSliderIndex = index + 1
+      } else {
+        break
+      }
+    }
 
     return minimumSliderIndex
   }
@@ -445,15 +409,15 @@ export const NewPosition: React.FC<INewPosition> = ({
     const parsedFee = feeTiers[fee].feeValue
 
     if (index1 != null && index2 != null) {
-      const address1 = addressToTicker(tokens[index1].assetAddress.toString())
-      const address2 = addressToTicker(tokens[index2].assetAddress.toString())
-      navigate(`/newPosition/${address1}/${address2}/${parsedFee}`, { replace: true })
+      const token1Symbol = tokens[index1].symbol
+      const token2Symbol = tokens[index2].symbol
+      navigate(`/newPosition/${token1Symbol}/${token2Symbol}/${parsedFee}`, { replace: true })
     } else if (index1 != null) {
-      const address = addressToTicker(tokens[index1].assetAddress.toString())
-      navigate(`/newPosition/${address}/${parsedFee}`, { replace: true })
+      const tokenSymbol = tokens[index1].symbol
+      navigate(`/newPosition/${tokenSymbol}/${parsedFee}`, { replace: true })
     } else if (index2 != null) {
-      const address = addressToTicker(tokens[index2].assetAddress.toString())
-      navigate(`/newPosition/${address}/${parsedFee}`, { replace: true })
+      const tokenSymbol = tokens[index2].symbol
+      navigate(`/newPosition/${tokenSymbol}/${parsedFee}`, { replace: true })
     } else if (fee != null) {
       navigate(`/newPosition/${parsedFee}`, { replace: true })
     }
