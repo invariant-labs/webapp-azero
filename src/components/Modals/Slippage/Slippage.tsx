@@ -1,5 +1,4 @@
 import React from 'react'
-
 import useStyles from './style'
 import { Box, Button, Grid, Input, Popover, Typography } from '@mui/material'
 
@@ -82,7 +81,7 @@ const Slippage: React.FC<Props> = ({
     <Popover
       open={open}
       onClose={handleClose}
-      classes={{ root: classes.root }}
+      classes={{ paper: classes.paper }}
       anchorEl={anchorEl}
       anchorOrigin={{
         vertical: 'bottom',

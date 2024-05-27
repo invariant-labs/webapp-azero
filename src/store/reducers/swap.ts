@@ -1,12 +1,12 @@
-import { Percentage, TESTNET_WAZERO_ADDRESS, TokenAmount } from '@invariant-labs/a0-sdk'
+import {  TESTNET_WAZERO_ADDRESS, TokenAmount } from '@invariant-labs/a0-sdk'
 import { AddressOrPair } from '@polkadot/api/types'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/consts/types'
 import { SimulateResult } from '@store/consts/utils'
 
 export interface Swap {
-  slippage: Percentage
-  estimatedPriceAfterSwap: Percentage
+  slippage: bigint
+  estimatedPriceAfterSwap: bigint
   poolIndex: number
   tokenFrom: AddressOrPair
   tokenTo: AddressOrPair

@@ -79,16 +79,9 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const [tokenAIndex, setTokenAIndex] = useState<number | null>(null)
   const [tokenBIndex, setTokenBIndex] = useState<number | null>(null)
 
-  const [tokenAAmount, setTokenAAmount] = useState(0n)
-  const [tokenBAmount, setTokenBAmount] = useState(0n)
-
   const [currentPairReversed, setCurrentPairReversed] = useState<boolean | null>(null)
 
   const isMountedRef = useRef(false)
-  const [openPosition, setOpenPosition] = useState(false)
-
-  const [leftTick, setLeftTick] = useState(0n)
-  const [rightTick, setRightTick] = useState(0n)
 
   useEffect(() => {
     dispatch(poolsActions.getPoolKeys())
@@ -522,9 +515,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     const lowerTick = BigInt(Math.min(left, right))
     const upperTick = BigInt(Math.max(left, right))
 
-    setLeftTick(lowerTick)
-    setRightTick(upperTick)
-
     try {
       if (byX) {
         const { amount: tokenYAmount, l: positionLiquidity } = getLiquidityByX(
@@ -539,8 +529,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         if (isMountedRef.current) {
           liquidityRef.current = positionLiquidity
         }
-        setTokenAAmount(amount)
-        setTokenBAmount(tokenYAmount)
+
         return tokenYAmount
       }
 
@@ -556,8 +545,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       if (isMountedRef.current) {
         liquidityRef.current = positionLiquidity
       }
-      setTokenAAmount(tokenXAmount)
-      setTokenBAmount(amount)
+
       return tokenXAmount
     } catch (error) {
       const result = (byX ? getLiquidityByY : getLiquidityByX)(
@@ -574,32 +562,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
 
     return BigInt(0)
   }
-
-  useEffect(() => {
-    if (openPosition && tokenAIndex !== null && tokenBIndex !== null) {
-      dispatch(
-        positionsActions.initPosition({
-          poolKeyData: newPoolKey(
-            tokens[tokenAIndex].assetAddress.toString(),
-            tokens[tokenBIndex].assetAddress.toString(),
-            ALL_FEE_TIERS_DATA[feeIndex].tier
-          ),
-          lowerTick: leftTick,
-          upperTick: rightTick,
-          liquidityDelta: liquidityRef.current,
-          spotSqrtPrice: poolsData[poolKey]
-            ? poolsData[poolKey].sqrtPrice
-            : calculateSqrtPrice(midPrice.index),
-          // spotSqrtPrice: toSqrtPrice(1n, 0n),
-          slippageTolerance: 0n,
-          tokenXAmount: tokenAAmount,
-          tokenYAmount: tokenBAmount,
-          initPool: poolKey === ''
-        })
-      )
-    }
-    setOpenPosition(false)
-  }, [openPosition])
 
   return (
     <NewPosition
@@ -743,7 +705,28 @@ export const NewPositionWrapper: React.FC<IProps> = ({
           setProgress('progress')
         }
 
-        setOpenPosition(true)
+        const lowerTickIndex = leftTickIndex < rightTickIndex ? leftTickIndex : rightTickIndex
+        const upperTickIndex = rightTickIndex > leftTickIndex ? rightTickIndex : leftTickIndex
+
+        dispatch(
+          positionsActions.initPosition({
+            poolKeyData: newPoolKey(
+              tokens[tokenAIndex].assetAddress.toString(),
+              tokens[tokenBIndex].assetAddress.toString(),
+              ALL_FEE_TIERS_DATA[feeIndex].tier
+            ),
+            lowerTick: lowerTickIndex,
+            upperTick: upperTickIndex,
+            liquidityDelta: liquidityRef.current,
+            spotSqrtPrice: poolsData[poolKey]
+              ? poolsData[poolKey].sqrtPrice
+              : calculateSqrtPrice(midPrice.index),
+            slippageTolerance: slippage,
+            tokenXAmount: xAmount,
+            tokenYAmount: yAmount,
+            initPool: poolKey === ''
+          })
+        )
       }}
       showNoConnected={walletStatus !== Status.Initialized}
       noConnectedBlockerProps={{

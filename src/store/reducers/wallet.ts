@@ -1,5 +1,4 @@
 import { TokenAmount } from '@invariant-labs/a0-sdk'
-import { AddressOrPair } from '@polkadot/api-base/types'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/consts/types'
 
