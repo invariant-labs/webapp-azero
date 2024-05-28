@@ -2,12 +2,7 @@ import { Network, PSP22, sendTx } from '@invariant-labs/a0-sdk'
 import { NightlyConnectAdapter } from '@nightlylabs/wallet-selector-polkadot'
 import { AddressOrPair, Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
-import {
-  DEFAULT_PSP22_OPTIONS,
-  TokenAirdropAmount,
-  TokenList,
-  getFaucetDeployer
-} from '@store/consts/static'
+import { DEFAULT_PSP22_OPTIONS, TokenAirdropAmount, FaucetTokenList } from '@store/consts/static'
 import { createLoaderKey, getTokenBalances } from '@store/consts/utils'
 import { actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
@@ -143,28 +138,19 @@ export function* handleAirdrop(): Generator {
     const psp22 = yield* call(PSP22.load, connection, Network.Testnet, DEFAULT_PSP22_OPTIONS)
 
     const txs = []
-    let tokenNames: string[] = []
 
-    for (const ticker in TokenList) {
-      const address = TokenList[ticker as keyof typeof TokenList]
-      const airdropAmount = TokenAirdropAmount[ticker as keyof typeof TokenList]
+    for (const ticker in FaucetTokenList) {
+      const address = FaucetTokenList[ticker as keyof typeof FaucetTokenList]
+      const airdropAmount = TokenAirdropAmount[ticker as keyof typeof FaucetTokenList]
 
-      const mintIx = yield* call([psp22, psp22.mintTx], airdropAmount, address)
-      txs.push(mintIx)
+      const mintTx = psp22.mintTx(airdropAmount, address)
 
-      const transferTx = yield* call(
-        [psp22, psp22.transferTx],
-        walletAddress,
-        airdropAmount,
-        data,
-        address
-      )
+      txs.push(mintTx)
+
+      const transferTx = psp22.transferTx(walletAddress, airdropAmount, data, address)
       txs.push(transferTx)
-
-      tokenNames.push(ticker)
     }
 
-    const sentTokens = tokenNames.join(', ')
     const batchedTx = connection.tx.utility.batchAll(txs)
 
     const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
@@ -176,9 +162,11 @@ export function* handleAirdrop(): Generator {
     closeSnackbar(loaderAirdrop)
     yield put(snackbarsActions.remove(loaderAirdrop))
 
+    const tokenNames = Object.keys(FaucetTokenList).join(', ')
+
     yield* put(
       snackbarsActions.add({
-        message: `Airdropped ${sentTokens} tokens`,
+        message: `Airdropped ${tokenNames} tokens`,
         variant: 'success',
         persist: false,
         txid: txResult.hash
@@ -267,7 +255,7 @@ export function* fetchTokensBalances(): Generator {
   const network = yield* select(networkType)
   const walletAddress = yield* select(address)
 
-  const tokens = Object.values(TokenList)
+  const tokens = Object.values(FaucetTokenList)
   const balances = yield* call(getTokenBalances, tokens, api, network, walletAddress)
 
   const convertedBalances: ITokenBalance[] = balances.map(balance => ({

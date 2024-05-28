@@ -144,7 +144,7 @@ export const TokenAirdropAmount = {
   USDC: 50000000n
 }
 
-export const TokenList = {
+export const FaucetTokenList = {
   BTC: TESTNET_BTC_ADDRESS,
   ETH: TESTNET_ETH_ADDRESS,
   USDC: TESTNET_USDC_ADDRESS
