@@ -1,14 +1,9 @@
-import { Network, PSP22 } from '@invariant-labs/a0-sdk'
+import { Network, PSP22, sendTx } from '@invariant-labs/a0-sdk'
 import { NightlyConnectAdapter } from '@nightlylabs/wallet-selector-polkadot'
-import { AddressOrPair } from '@polkadot/api/types'
+import { AddressOrPair, Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
-import {
-  DEFAULT_PSP22_OPTIONS,
-  TokenAirdropAmount,
-  TokenList,
-  getFaucetDeployer
-} from '@store/consts/static'
-import { getTokenBalances } from '@store/consts/utils'
+import { DEFAULT_PSP22_OPTIONS, TokenAirdropAmount, FaucetTokenList } from '@store/consts/static'
+import { createLoaderKey, getTokenBalances } from '@store/consts/utils'
 import { actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { ITokenBalance, Status, actions } from '@store/reducers/wallet'
@@ -26,6 +21,7 @@ import {
   takeLeading
 } from 'typed-redux-saga'
 import { getConnection } from './connection'
+import { closeSnackbar } from 'notistack'
 
 export function* getWallet(): SagaGenerator<NightlyConnectAdapter> {
   const wallet = yield* call(getAlephZeroWallet)
@@ -123,33 +119,64 @@ export function* handleAirdrop(): Generator {
     )
   }
 
-  const connection = yield* getConnection()
-  const faucetDeployer = getFaucetDeployer()
-  const data = connection.createType('Vec<u8>', [])
+  const loaderAirdrop = createLoaderKey()
 
-  const psp22 = yield* call(PSP22.load, connection, Network.Testnet, DEFAULT_PSP22_OPTIONS)
-
-  for (const ticker in TokenList) {
-    const address = TokenList[ticker as keyof typeof TokenList]
-    const airdropAmount = TokenAirdropAmount[ticker as keyof typeof TokenList]
-
-    yield* call([psp22, psp22.mint], faucetDeployer, airdropAmount, address)
-    yield* call(
-      [psp22, psp22.transfer],
-      faucetDeployer,
-      walletAddress,
-      airdropAmount,
-      data,
-      address
+  try {
+    yield put(
+      snackbarsActions.add({
+        message: 'Airdrop in progress...',
+        variant: 'pending',
+        persist: true,
+        key: loaderAirdrop
+      })
     )
+
+    const connection = yield* getConnection()
+    const adapter = yield* call(getAlephZeroWallet)
+    const data = connection.createType('Vec<u8>', [])
+
+    const psp22 = yield* call(PSP22.load, connection, Network.Testnet, DEFAULT_PSP22_OPTIONS)
+
+    const txs = []
+
+    for (const ticker in FaucetTokenList) {
+      const address = FaucetTokenList[ticker as keyof typeof FaucetTokenList]
+      const airdropAmount = TokenAirdropAmount[ticker as keyof typeof FaucetTokenList]
+
+      const mintTx = psp22.mintTx(airdropAmount, address)
+
+      txs.push(mintTx)
+
+      const transferTx = psp22.transferTx(walletAddress, airdropAmount, data, address)
+      txs.push(transferTx)
+    }
+
+    const batchedTx = connection.tx.utility.batchAll(txs)
+
+    const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
+      signer: adapter.signer as Signer
+    })
+
+    const txResult = yield* call(sendTx, signedBatchedTx)
+
+    closeSnackbar(loaderAirdrop)
+    yield put(snackbarsActions.remove(loaderAirdrop))
+
+    const tokenNames = Object.keys(FaucetTokenList).join(', ')
 
     yield* put(
       snackbarsActions.add({
-        message: `Airdropped ${ticker} tokens`,
+        message: `Airdropped ${tokenNames} tokens`,
         variant: 'success',
-        persist: false
+        persist: false,
+        txid: txResult.hash
       })
     )
+  } catch (error) {
+    console.log(error)
+
+    closeSnackbar(loaderAirdrop)
+    yield put(snackbarsActions.remove(loaderAirdrop))
   }
 }
 
@@ -228,7 +255,7 @@ export function* fetchTokensBalances(): Generator {
   const network = yield* select(networkType)
   const walletAddress = yield* select(address)
 
-  const tokens = Object.values(TokenList)
+  const tokens = Object.values(FaucetTokenList)
   const balances = yield* call(getTokenBalances, tokens, api, network, walletAddress)
 
   const convertedBalances: ITokenBalance[] = balances.map(balance => ({
