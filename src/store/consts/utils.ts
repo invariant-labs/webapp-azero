@@ -4,13 +4,16 @@ import {
   PSP22,
   PoolKey,
   TESTNET_INVARIANT_ADDRESS,
+  Tick,
+  Tickmap,
   TokenAmount,
   calculateSqrtPrice,
   calculateTickDelta,
   getMaxTick,
-  getMinTick
+  getMinTick,
+  positionToTick
 } from '@invariant-labs/a0-sdk'
-import { PRICE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
+import { CHUNK_SIZE, PRICE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { ApiPromise } from '@polkadot/api'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
@@ -614,4 +617,44 @@ export const calcTicksAmountInRange = (
   const maxIndex = logBase(primaryUnitsMax, 1.0001)
 
   return Math.ceil(Math.abs(maxIndex - minIndex) / tickSpacing)
+}
+
+export const getAllTicks = (
+  invariant: Invariant,
+  poolKey: PoolKey,
+  ticks: bigint[]
+): Promise<Tick[]> => {
+  const promises: Promise<Tick>[] = []
+
+  for (const tick of ticks) {
+    promises.push(invariant.getTick(poolKey, tick))
+  }
+
+  return Promise.all(promises)
+}
+
+export const tickmapToArray = (tickmap: Tickmap, tickSpacing: bigint): bigint[] => {
+  const ticks = []
+
+  for (const [chunkIndex, chunk] of tickmap.bitmap.entries()) {
+    for (let bit = 0n; bit < CHUNK_SIZE; bit++) {
+      const checkedBit = chunk & (1n << bit)
+      if (checkedBit) {
+        ticks.push(positionToTick(chunkIndex, bit, tickSpacing))
+      }
+    }
+  }
+
+  return ticks
+}
+
+export const rebuildTickmap = (serializedTickmap: string): Tickmap => {
+  const deserializedMap: Map<string, string> = new Map(JSON.parse(serializedTickmap))
+
+  const parsedMap = new Map()
+  for (const [key, value] of deserializedMap) {
+    parsedMap.set(BigInt(key), BigInt(value))
+  }
+
+  return { bitmap: parsedMap }
 }

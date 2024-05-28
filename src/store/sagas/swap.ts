@@ -1,19 +1,20 @@
 import {
   Invariant,
   PSP22,
-  QuoteResult,
   TESTNET_INVARIANT_ADDRESS,
   calculateSqrtPriceAfterSlippage,
-  sendTx
+  sendTx,
+  simulateInvariantSwap
 } from '@invariant-labs/a0-sdk'
+import { MAX_SQRT_PRICE } from '@invariant-labs/a0-sdk/target/consts'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { DEFAULT_INVARIANT_OPTIONS, DEFAULT_PSP22_OPTIONS } from '@store/consts/static'
-import { createLoaderKey, findPairs, poolKeyToString } from '@store/consts/utils'
+import { createLoaderKey, findPairs, poolKeyToString, rebuildTickmap } from '@store/consts/utils'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Simulate, actions } from '@store/reducers/swap'
 import { networkType } from '@store/selectors/connection'
-import { pools, poolsArraySortedByFees, tokens } from '@store/selectors/pools'
+import { poolTicks, pools, tickMaps, tokens } from '@store/selectors/pools'
 import { swap } from '@store/selectors/swap'
 import { address } from '@store/selectors/wallet'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
@@ -132,90 +133,91 @@ export function* handleSwap(): Generator {
 }
 
 export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
-  const connection = yield* getConnection()
-  const network = yield* select(networkType)
-  const allPools = yield* select(poolsArraySortedByFees)
-  const allTokens = yield* select(tokens)
+  try {
+    const connection = yield* getConnection()
+    const network = yield* select(networkType)
+    const allPools = yield* select(pools)
+    const allTickmaps = yield* select(tickMaps)
+    const allTicks = yield* select(poolTicks)
 
-  const { fromToken, toToken, amount, byAmountIn } = action.payload
+    const { fromToken, toToken, amount, byAmountIn } = action.payload
 
-  if (amount === 0n) {
-    return {
-      amountOut: 0n,
-      fee: 0n,
-      priceImpact: 0
+    if (amount === 0n) {
+      return {
+        amountOut: 0n,
+        fee: 0n,
+        priceImpact: 0
+      }
     }
-  }
 
-  const filteredPools = findPairs(fromToken.toString(), toToken.toString(), allPools)
-  if (!filteredPools) {
-    return {
-      amountOut: 0n,
-      fee: 0n,
-      priceImpact: 0
-    }
-  }
-
-  const invariant = yield* call(
-    Invariant.load,
-    connection,
-    network,
-    TESTNET_INVARIANT_ADDRESS,
-    DEFAULT_INVARIANT_OPTIONS
-  )
-  let poolKey = null
-  let amountOut = 0n
-  let fee = 0n
-  let priceImpact = 0
-  let targetSqrtPrice = 0n
-
-  const quotePromises: Promise<QuoteResult>[] = []
-  for (const pool of filteredPools) {
-    quotePromises.push(
-      invariant.quote(pool.poolKey, pool.poolKey.tokenX === fromToken, amount, byAmountIn)
+    const filteredPools = findPairs(
+      fromToken.toString(),
+      toToken.toString(),
+      Object.values(allPools)
     )
+    if (!filteredPools) {
+      return {
+        amountOut: 0n,
+        fee: 0n,
+        priceImpact: 0
+      }
+    }
+
+    const invariant = yield* call(
+      Invariant.load,
+      connection,
+      network,
+      TESTNET_INVARIANT_ADDRESS,
+      DEFAULT_INVARIANT_OPTIONS
+    )
+    let poolKey = null
+    let amountOut = 0n
+    let fee = 0n
+    let priceImpact = 0
+    let targetSqrtPrice = 0n
+
+    const protocolFee = yield* call([invariant, invariant.getProtocolFee])
+    for (const pool of filteredPools) {
+      const xToY = fromToken.toString() === pool.poolKey.tokenX
+      const result = simulateInvariantSwap(
+        rebuildTickmap(allTickmaps[poolKeyToString(pool.poolKey)]),
+        protocolFee,
+        pool.poolKey.feeTier,
+        allPools[poolKeyToString(pool.poolKey)],
+        allTicks[poolKeyToString(pool.poolKey)],
+        xToY,
+        amount,
+        byAmountIn,
+        xToY ? 0n : MAX_SQRT_PRICE
+      )
+
+      if (result.amountOut > amountOut) {
+        amountOut = result.amountOut
+        poolKey = pool.poolKey
+        fee = pool.poolKey.feeTier.fee
+
+        const parsedPoolSqrtPrice = Number(pool.sqrtPrice)
+        const parsedTargetSqrtPrice = Number(result.targetSqrtPrice)
+        priceImpact =
+          pool.sqrtPrice > parsedTargetSqrtPrice
+            ? 1 - parsedTargetSqrtPrice / parsedPoolSqrtPrice
+            : 1 - parsedPoolSqrtPrice / parsedTargetSqrtPrice
+        targetSqrtPrice = result.targetSqrtPrice
+      }
+    }
+
+    yield put(
+      actions.setSimulateResult({
+        poolKey,
+        amountOut,
+        fee,
+        priceImpact,
+        targetSqrtPrice
+      })
+    )
+  } catch (error) {
+    console.log(error)
   }
-
-  const quoteResults = yield* call(() => Promise.allSettled(quotePromises))
-
-  filteredPools.forEach((pool, index) => {
-    const quoteResult = quoteResults[index]
-    if (quoteResult.status === 'rejected') {
-      return
-    }
-
-    const tokenX = allTokens[pool.poolKey.tokenX]
-    const tokenY = allTokens[pool.poolKey.tokenY]
-    if (!tokenX || !tokenY) {
-      return
-    }
-
-    if (quoteResult.value.amountOut > amountOut) {
-      poolKey = pool.poolKey
-
-      amountOut = quoteResult.value.amountOut
-      fee = pool.poolKey.feeTier.fee
-
-      const parsedPoolSqrtPrice = Number(pool.sqrtPrice)
-      const parsedTargetSqrtPrice = Number(quoteResult.value.targetSqrtPrice)
-      priceImpact =
-        parsedPoolSqrtPrice > parsedTargetSqrtPrice
-          ? 1 - parsedTargetSqrtPrice / parsedPoolSqrtPrice
-          : 1 - parsedPoolSqrtPrice / parsedTargetSqrtPrice
-
-      targetSqrtPrice = quoteResult.value.targetSqrtPrice
-    }
-  })
-
-  yield put(
-    actions.setSimulateResult({
-      poolKey,
-      amountOut,
-      fee,
-      priceImpact,
-      targetSqrtPrice
-    })
-  )
 }
 
 export function* swapHandler(): Generator {

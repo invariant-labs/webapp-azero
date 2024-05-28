@@ -1,5 +1,7 @@
-import { Status } from '@store/reducers/connection'
+import { actions } from '@store/reducers/pools'
 import { networkType, status } from '@store/selectors/connection'
+import { poolsArraySortedByFees } from '@store/selectors/pools'
+import { swap } from '@store/selectors/swap'
 import { getCurrentAlephZeroConnection } from '@utils/web3/connection'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -8,6 +10,8 @@ const MarketEvents = () => {
   const dispatch = useDispatch()
   const network = useSelector(networkType)
   const networkStatus = useSelector(status)
+  const { tokenFrom, tokenTo } = useSelector(swap)
+  const allPools = useSelector(poolsArraySortedByFees)
 
   useEffect(() => {
     const connection = getCurrentAlephZeroConnection()
@@ -201,12 +205,12 @@ const MarketEvents = () => {
   //     connectEvents()
   //   }, [networkStatus, marketProgram, Object.values(tickmaps).length])
 
-  //   useEffect(() => {
-  //     if (tokenFrom && tokenTo) {
-  //       dispatch(actions.getNearestTicksForPair({ tokenFrom, tokenTo, allPools }))
-  //       dispatch(actions.getTicksAndTickMaps({ tokenFrom, tokenTo, allPools }))
-  //     }
-  //   }, [tokenFrom, tokenTo])
+  useEffect(() => {
+    if (tokenFrom && tokenTo) {
+      // dispatch(actions.getNearestTicksForPair({ tokenFrom, tokenTo, allPools }))
+      dispatch(actions.getTicksAndTickMaps({ tokenFrom, tokenTo, allPools }))
+    }
+  }, [tokenFrom, tokenTo])
 
   return null
 }

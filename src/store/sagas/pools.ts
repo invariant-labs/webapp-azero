@@ -2,6 +2,7 @@ import {
   Invariant,
   PoolKey,
   TESTNET_INVARIANT_ADDRESS,
+  Tickmap,
   newPoolKey,
   sendTx,
   toSqrtPrice
@@ -11,13 +12,16 @@ import { PayloadAction } from '@reduxjs/toolkit'
 import { DEFAULT_INVARIANT_OPTIONS } from '@store/consts/static'
 import {
   createLoaderKey,
+  findPairs,
   findPairsByPoolKeys,
+  getAllTicks,
   getPools,
   getPoolsByPoolKeys,
   getTokenBalances,
-  getTokenDataByAddresses
+  getTokenDataByAddresses,
+  tickmapToArray
 } from '@store/consts/utils'
-import { ListPoolsRequest, PairTokens, actions } from '@store/reducers/pools'
+import { FetchTicksAndTickMaps, ListPoolsRequest, PairTokens, actions } from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { networkType } from '@store/selectors/connection'
 import { tokens } from '@store/selectors/pools'
@@ -215,6 +219,48 @@ export function* fetchAllPoolsForPairData(action: PayloadAction<PairTokens>) {
   yield* put(actions.addPools(pools))
 }
 
+export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMaps>) {
+  const { tokenFrom, tokenTo, allPools } = action.payload
+
+  try {
+    const connection = yield* call(getConnection)
+    const network = yield* select(networkType)
+    const invariant = yield* call(
+      Invariant.load,
+      connection,
+      network,
+      TESTNET_INVARIANT_ADDRESS,
+      DEFAULT_INVARIANT_OPTIONS
+    )
+
+    const pools = findPairs(tokenFrom.toString(), tokenTo.toString(), allPools)
+
+    const promises: Promise<Tickmap>[] = []
+    for (const pool of action.payload.allPools) {
+      promises.push(invariant.getFullTickmap(pool.poolKey))
+    }
+
+    const allTickMaps = yield* call(() => Promise.all(promises))
+
+    for (let i = 0; i < pools.length; i++) {
+      yield* put(
+        actions.setTickMaps({
+          poolKey: pools[i].poolKey,
+          tickMapStructure: allTickMaps[i]
+        })
+      )
+    }
+
+    for (const [index, pool] of pools.entries()) {
+      const tickIndexes = tickmapToArray(allTickMaps[index], pool.poolKey.feeTier.tickSpacing)
+      const ticks = yield* call(getAllTicks, invariant, pool.poolKey, tickIndexes)
+      yield* put(actions.setTicks({ poolKey: pool.poolKey, tickStructure: ticks }))
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 export function* getPoolsDataForListHandler(): Generator {
   yield* takeEvery(actions.getPoolsDataForList, fetchPoolsDataForList)
 }
@@ -235,6 +281,10 @@ export function* getAllPoolsForPairDataHandler(): Generator {
   yield* takeLatest(actions.getAllPoolsForPairData, fetchAllPoolsForPairData)
 }
 
+export function* getTicksAndTickMapsHandler(): Generator {
+  yield* takeEvery(actions.getTicksAndTickMaps, fetchTicksAndTickMaps)
+}
+
 export function* poolsSaga(): Generator {
   yield all(
     [
@@ -242,7 +292,8 @@ export function* poolsSaga(): Generator {
       getPoolDataHandler,
       getPoolKeysHandler,
       getPoolsDataForListHandler,
-      getAllPoolsForPairDataHandler
+      getAllPoolsForPairDataHandler,
+      getTicksAndTickMapsHandler
     ].map(spawn)
   )
 }

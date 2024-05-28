@@ -27,7 +27,7 @@ const configureAppStore = (initialState = {}) => {
         serializableCheck: {
           isSerializable,
           getEntries,
-          ignoredActions: ['positions/closePosition']
+          ignoredActions: ['positions/closePosition', 'pools/setTickMaps']
         }
       }).concat(middleware),
     preloadedState: initialState,
