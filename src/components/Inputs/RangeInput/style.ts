@@ -49,7 +49,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     backgroundColor: colors.invariant.componentBcg,
     borderRadius: 10,
     '& input.Mui-disabled': {
-      '-webkit-text-fill-color': colors.white.main + '!important'
+      WebkitTextFillColor: colors.white.main + '!important'
     }
   },
   button: {

@@ -1,6 +1,6 @@
 import { EmptyPlaceholder } from '@components/EmptyPlaceholder/EmptyPlaceholder'
 import PositionDetails from '@components/PositionDetails/PositionDetails'
-import { calculateFee, getLiquidityByX, getLiquidityByY } from '@invariant-labs/a0-sdk'
+import { calculateFee, calculateTokenAmounts } from '@invariant-labs/a0-sdk'
 import { Grid } from '@mui/material'
 import loader from '@static/gif/loader.gif'
 import { TokenPriceData } from '@store/consts/static'
@@ -168,46 +168,14 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
     [position]
   )
 
-  const tokenXLiquidity = useMemo(() => {
+  const [tokenXLiquidity, tokenYLiquidity] = useMemo(() => {
     if (position) {
-      try {
-        return +printBigint(
-          getLiquidityByX(
-            position.liquidity,
-            position.lowerTickIndex,
-            position.upperTickIndex,
-            position.poolData.sqrtPrice,
-            true
-          ).amount,
-          position.tokenX.decimals
-        )
-      } catch (error) {
-        return 0
-      }
+      const [x, y] = calculateTokenAmounts(position.poolData, position)
+
+      return [+printBigint(x, position.tokenX.decimals), +printBigint(y, position.tokenY.decimals)]
     }
 
-    return 0
-  }, [position])
-
-  const tokenYLiquidity = useMemo(() => {
-    if (position) {
-      try {
-        return +printBigint(
-          getLiquidityByY(
-            position.liquidity,
-            position.lowerTickIndex,
-            position.upperTickIndex,
-            position.poolData.sqrtPrice,
-            true
-          ).amount,
-          position.tokenY.decimals
-        )
-      } catch (error) {
-        return 0
-      }
-    }
-
-    return 0
+    return [0, 0]
   }, [position])
 
   const [tokenXClaim, tokenYClaim] = useMemo(() => {
