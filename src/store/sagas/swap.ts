@@ -28,7 +28,8 @@ export function* handleSwap(): Generator {
   try {
     const allTokens = yield* select(tokens)
     const allPools = yield* select(pools)
-    const { poolKey, tokenFrom, slippage, amountIn, byAmountIn } = yield* select(swap)
+    const { poolKey, tokenFrom, slippage, amountIn, byAmountIn, estimatedPriceAfterSwap } =
+      yield* select(swap)
 
     if (!poolKey) {
       return
@@ -82,9 +83,8 @@ export function* handleSwap(): Generator {
       txs.push(approveTx)
     }
 
-    console.log(pool.sqrtPrice, slippage)
-    const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(pool.sqrtPrice, slippage, !xToY)
-    console.log(pool.sqrtPrice, slippage, sqrtPriceLimit)
+    console.log(estimatedPriceAfterSwap)
+    const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(estimatedPriceAfterSwap, slippage, !xToY)
     const swapTx = yield* call(
       [invariant, invariant.swapTx],
       poolKey,
