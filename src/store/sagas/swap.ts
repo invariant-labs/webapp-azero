@@ -74,16 +74,14 @@ export function* handleSwap(): Generator {
     )
 
     if (xToY) {
-      const approveTx = yield* call(
-        [psp22, psp22.approveTx],
+      const approveTx = psp22.approveTx(
         TESTNET_INVARIANT_ADDRESS,
         amountIn,
         tokenX.address.toString()
       )
       txs.push(approveTx)
     } else {
-      const approveTx = yield* call(
-        [psp22, psp22.approveTx],
+      const approveTx = psp22.approveTx(
         TESTNET_INVARIANT_ADDRESS,
         amountIn,
         tokenY.address.toString()
@@ -92,14 +90,7 @@ export function* handleSwap(): Generator {
     }
 
     const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(pool.sqrtPrice, slippage, !xToY)
-    const swapTx = yield* call(
-      [invariant, invariant.swapTx],
-      poolKey,
-      xToY,
-      amountIn,
-      byAmountIn,
-      sqrtPriceLimit
-    )
+    const swapTx = invariant.swapTx(poolKey, xToY, amountIn, byAmountIn, sqrtPriceLimit)
     txs.push(swapTx)
 
     const batchedTx = api.tx.utility.batchAll(txs)
@@ -173,6 +164,13 @@ export function* handleSwapWithAZERO(): Generator {
 
     const txs = []
 
+    const wazero = yield* call(
+      WrappedAZERO.load,
+      api,
+      network,
+      TESTNET_WAZERO_ADDRESS,
+      DEFAULT_WAZERO_OPTIONS
+    )
     const psp22 = yield* call(PSP22.load, api, network, DEFAULT_PSP22_OPTIONS)
     const invariant = yield* call(
       Invariant.load,
@@ -180,13 +178,6 @@ export function* handleSwapWithAZERO(): Generator {
       network,
       TESTNET_INVARIANT_ADDRESS,
       DEFAULT_INVARIANT_OPTIONS
-    )
-    const wazero = yield* call(
-      WrappedAZERO.load,
-      api,
-      network,
-      TESTNET_WAZERO_ADDRESS,
-      DEFAULT_WAZERO_OPTIONS
     )
 
     if (
@@ -225,7 +216,6 @@ export function* handleSwapWithAZERO(): Generator {
       txs.push(withdrawTx)
     }
 
-    console.log(txs)
     const batchedTx = api.tx.utility.batchAll(txs)
     const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
