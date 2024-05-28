@@ -170,8 +170,12 @@ const poolsSlice = createSlice({
     // },
     setTickMaps(state, action: PayloadAction<updateTickMaps>) {
       state.tickMaps[poolKeyToString(action.payload.poolKey)] = JSON.stringify(
-        Array.from(action.payload.tickMapStructure.bitmap.entries())
+        Array.from(action.payload.tickMapStructure.bitmap.entries()).map(([key, value]) => [
+          key.toString(),
+          value.toString()
+        ])
       )
+      return state
     },
     setTicks(state, action: PayloadAction<UpdateTick>) {
       state.poolTicks[poolKeyToString(action.payload.poolKey)] = action.payload.tickStructure
