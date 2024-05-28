@@ -2,8 +2,6 @@ import {
   Invariant,
   PoolKey,
   TESTNET_INVARIANT_ADDRESS,
-  Tick,
-  Tickmap,
   newPoolKey,
   sendTx,
   toSqrtPrice
@@ -236,24 +234,25 @@ export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMa
 
     const pools = findPairs(tokenFrom.toString(), tokenTo.toString(), allPools)
 
-    const tickmapPromises: Promise<Tickmap>[] = []
-    for (const pool of pools) {
-      tickmapPromises.push(invariant.getFullTickmap(pool.poolKey))
-    }
-    const allTickMaps = yield* call(() => Promise.all(tickmapPromises))
+    const tickmapCalls = pools.map(pool =>
+      call([invariant, invariant.getFullTickmap], pool.poolKey)
+    )
+    const allTickMaps = yield* all(tickmapCalls)
 
-    const ticksPromises: Promise<Tick[]>[] = []
     for (const [index, pool] of pools.entries()) {
       yield* put(
         actions.setTickMaps({
-          poolKey: pools[index].poolKey,
+          poolKey: pool.poolKey,
           tickMapStructure: allTickMaps[index]
         })
       )
-      const tickIndexes = tickmapToArray(allTickMaps[index], pool.poolKey.feeTier.tickSpacing)
-      ticksPromises.push(getAllTicks(invariant, pool.poolKey, tickIndexes))
     }
-    const allTicks = yield* call(() => Promise.all(ticksPromises))
+
+    const allTicksCalls = pools.map((pool, index) => {
+      const tickIndexes = tickmapToArray(allTickMaps[index], pool.poolKey.feeTier.tickSpacing)
+      return call(getAllTicks, invariant, pool.poolKey, tickIndexes)
+    })
+    const allTicks = yield* all(allTicksCalls)
 
     for (const [index, pool] of pools.entries()) {
       yield* put(actions.setTicks({ poolKey: pool.poolKey, tickStructure: allTicks[index] }))
