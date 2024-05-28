@@ -1,6 +1,5 @@
 import {
   Invariant,
-  PSP22,
   PoolKey,
   TESTNET_INVARIANT_ADDRESS,
   TESTNET_WAZERO_ADDRESS,
@@ -9,11 +8,7 @@ import {
 } from '@invariant-labs/a0-sdk'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
-import {
-  DEFAULT_INVARIANT_OPTIONS,
-  DEFAULT_PSP22_OPTIONS,
-  DEFAULT_WAZERO_OPTIONS
-} from '@store/consts/static'
+import { DEFAULT_INVARIANT_OPTIONS, DEFAULT_WAZERO_OPTIONS } from '@store/consts/static'
 import { createLoaderKey, poolKeyToString } from '@store/consts/utils'
 import { ListType, actions as poolsActions } from '@store/reducers/pools'
 import { ClosePositionData, InitPositionData, actions } from '@store/reducers/positions'
@@ -27,6 +22,8 @@ import { all, call, put, select, spawn, takeEvery, takeLatest } from 'typed-redu
 import { getConnection } from './connection'
 import { fetchAllPoolKeys } from './pools'
 import { calculateTokenAmountsWithSlippage } from '@invariant-labs/a0-sdk/src/utils'
+import invariantSingleton from '@store/services/invariantSingleton'
+import psp22Singleton from '@store/services/psp22Singleton'
 
 function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator {
   const loaderCreatePosition = createLoaderKey()
@@ -69,7 +66,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
 
     const txs = []
 
-    const psp22 = yield* call(PSP22.load, api, network, DEFAULT_PSP22_OPTIONS)
+    const psp22 = yield* call([psp22Singleton, psp22Singleton.loadInstance], api, network)
 
     const [xAmountWithSlippage, yAmountWithSlippage] = calculateTokenAmountsWithSlippage(
       feeTier.tickSpacing,
@@ -98,11 +95,9 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     txs.push(YTokenTx)
 
     const invariant = yield* call(
-      [Invariant, Invariant.load],
+      [invariantSingleton, invariantSingleton.loadInstance],
       api,
-      network,
-      TESTNET_INVARIANT_ADDRESS,
-      DEFAULT_INVARIANT_OPTIONS
+      network
     )
 
     if (initPool) {
@@ -211,7 +206,7 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     )
     txs.push(depositTx)
 
-    const psp22 = yield* call(PSP22.load, api, network, DEFAULT_PSP22_OPTIONS)
+    const psp22 = yield* call([psp22Singleton, psp22Singleton.loadInstance], api, network)
 
     const [xAmountWithSlippage, yAmountWithSlippage] = calculateTokenAmountsWithSlippage(
       feeTier.tickSpacing,
@@ -240,11 +235,9 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     txs.push(YTokenTx)
 
     const invariant = yield* call(
-      [Invariant, Invariant.load],
+      [invariantSingleton, invariantSingleton.loadInstance],
       api,
-      network,
-      TESTNET_INVARIANT_ADDRESS,
-      DEFAULT_INVARIANT_OPTIONS
+      network
     )
 
     if (initPool) {
