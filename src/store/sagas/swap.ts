@@ -318,7 +318,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
       )
 
       if (result.amountOut > amountOut && !result.globalInsufficientLiquidity) {
-        amountOut = result.amountOut
+        amountOut = byAmountIn ? result.amountOut - result.fee : result.amountOut + result.fee
         poolKey = pool.poolKey
         fee = pool.poolKey.feeTier.fee
 
