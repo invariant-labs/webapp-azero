@@ -20,6 +20,7 @@ import {
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { Swap as SwapData, actions } from '@store/reducers/swap'
 import { Status } from '@store/reducers/wallet'
+import { SwapError } from '@store/sagas/swap'
 import { SwapToken } from '@store/selectors/wallet'
 import { blurContent, unblurContent } from '@utils/uiUtils'
 import classNames from 'classnames'
@@ -283,10 +284,15 @@ export const Swap: React.FC<ISwap> = ({
     }
   }
 
+  const isError = (error: SwapError): boolean => {
+    return simulateResult.errors.some(err => err === error)
+  }
+
   const getStateMessage = () => {
     if ((tokenFromIndex !== null && tokenToIndex !== null && throttle) || isWaitingForNewPool) {
       return 'Loading'
     }
+
     if (walletStatus !== Status.Initialized) {
       return 'Connect a wallet'
     }
@@ -304,18 +310,24 @@ export const Swap: React.FC<ISwap> = ({
     }
 
     if (
+      simulateResult.poolKey === null &&
+      (isError(SwapError.InsufficientLiquidity) || isError(SwapError.MaxTicksCrossed))
+    ) {
+      return 'Insufficient liquidity'
+    }
+
+    if (
       convertBalanceToBigint(amountFrom, Number(tokens[tokenFromIndex].decimals)) >
       tokens[tokenFromIndex].balance
     ) {
       return 'Insufficient balance'
     }
 
-    if (convertBalanceToBigint(amountFrom, Number(tokens[tokenFromIndex].decimals)) === 0n) {
+    if (
+      convertBalanceToBigint(amountFrom, Number(tokens[tokenFromIndex].decimals)) === 0n ||
+      (simulateResult.poolKey === null && isError(SwapError.AmountIsZero))
+    ) {
       return 'Insufficient volume'
-    }
-
-    if (simulateResult.amountOut === 0n) {
-      return 'Insufficient liquidity'
     }
 
     return 'Swap tokens'

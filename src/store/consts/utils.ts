@@ -17,6 +17,7 @@ import { CHUNK_SIZE, PRICE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { ApiPromise } from '@polkadot/api'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
+import { SwapError } from '@store/sagas/swap'
 import axios from 'axios'
 import {
   BTC,
@@ -567,6 +568,7 @@ export type SimulateResult = {
   amountOut: bigint
   priceImpact: number
   targetSqrtPrice: bigint
+  errors: SwapError[]
 }
 
 export const getPools = async (

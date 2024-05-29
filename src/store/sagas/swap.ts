@@ -264,6 +264,14 @@ export function* handleSwapWithAZERO(): Generator {
   }
 }
 
+export enum SwapError {
+  InsufficientLiquidity,
+  AmountIsZero,
+  NoRouteFound,
+  MaxTicksCrossed,
+  StateOutdated
+}
+
 export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
   try {
     const connection = yield* getConnection()
@@ -280,7 +288,8 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
           poolKey: null,
           amountOut: 0n,
           priceImpact: 0,
-          targetSqrtPrice: 0n
+          targetSqrtPrice: 0n,
+          errors: [SwapError.AmountIsZero]
         })
       )
       return
@@ -297,7 +306,8 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
           poolKey: null,
           amountOut: 0n,
           priceImpact: 0,
-          targetSqrtPrice: 0n
+          targetSqrtPrice: 0n,
+          errors: [SwapError.NoRouteFound]
         })
       )
       return
@@ -310,43 +320,78 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
       TESTNET_INVARIANT_ADDRESS,
       DEFAULT_INVARIANT_OPTIONS
     )
+
     let poolKey = null
     let amountOut = 0n
     let priceImpact = 0
     let targetSqrtPrice = 0n
+    const errors = []
 
     const protocolFee = yield* call([invariant, invariant.getProtocolFee])
     for (const pool of filteredPools) {
       const xToY = fromToken.toString() === pool.poolKey.tokenX
-      const result = simulateInvariantSwap(
-        deserializeTickmap(allTickmaps[poolKeyToString(pool.poolKey)]),
-        protocolFee,
-        pool.poolKey.feeTier,
-        allPools[poolKeyToString(pool.poolKey)],
-        allTicks[poolKeyToString(pool.poolKey)],
-        xToY,
-        byAmountIn ? (amount * pool.poolKey.feeTier.fee) / PERCENTAGE_DENOMINATOR : amount,
-        byAmountIn,
-        xToY ? MIN_SQRT_PRICE : MAX_SQRT_PRICE
-      )
 
-      if (result.amountOut > amountOut && !result.globalInsufficientLiquidity) {
-        amountOut = byAmountIn ? result.amountOut : result.amountOut + result.fee
-        poolKey = pool.poolKey
-        priceImpact = +printBigint(
-          calculatePriceImpact(pool.sqrtPrice, result.targetSqrtPrice),
-          PERCENTAGE_SCALE
+      try {
+        const result = simulateInvariantSwap(
+          deserializeTickmap(allTickmaps[poolKeyToString(pool.poolKey)]),
+          protocolFee,
+          pool.poolKey.feeTier,
+          allPools[poolKeyToString(pool.poolKey)],
+          allTicks[poolKeyToString(pool.poolKey)],
+          xToY,
+          byAmountIn
+            ? amount - (amount * pool.poolKey.feeTier.fee) / PERCENTAGE_DENOMINATOR
+            : amount,
+          byAmountIn,
+          xToY ? MIN_SQRT_PRICE : MAX_SQRT_PRICE
         )
-        targetSqrtPrice = result.targetSqrtPrice
+
+        console.log(result)
+
+        if (result.globalInsufficientLiquidity) {
+          errors.push(SwapError.InsufficientLiquidity)
+          continue
+        }
+
+        if (result.maxTicksCrossed) {
+          errors.push(SwapError.MaxTicksCrossed)
+          continue
+        }
+
+        if (result.stateOutdated) {
+          errors.push(SwapError.StateOutdated)
+          continue
+        }
+
+        const calculatedAmountOut = byAmountIn ? result.amountOut : result.amountOut + result.fee
+
+        if (calculatedAmountOut === 0n) {
+          errors.push(SwapError.AmountIsZero)
+          continue
+        }
+
+        if (calculatedAmountOut > amountOut) {
+          amountOut = calculatedAmountOut
+          poolKey = pool.poolKey
+          priceImpact = +printBigint(
+            calculatePriceImpact(pool.sqrtPrice, result.targetSqrtPrice),
+            PERCENTAGE_SCALE
+          )
+          targetSqrtPrice = result.targetSqrtPrice
+        }
+      } catch (e) {
+        console.log(e)
       }
     }
 
+    console.log(amountOut, errors)
     yield put(
       actions.setSimulateResult({
         poolKey,
         amountOut,
         priceImpact,
-        targetSqrtPrice
+        targetSqrtPrice,
+        errors
       })
     )
   } catch (error) {
