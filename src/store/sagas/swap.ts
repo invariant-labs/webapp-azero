@@ -10,7 +10,11 @@ import {
   simulateInvariantSwap
 } from '@invariant-labs/a0-sdk'
 import { MIN_SQRT_PRICE } from '@invariant-labs/a0-sdk/src/consts'
-import { MAX_SQRT_PRICE, PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
+import {
+  MAX_SQRT_PRICE,
+  PERCENTAGE_DENOMINATOR,
+  PERCENTAGE_SCALE
+} from '@invariant-labs/a0-sdk/target/consts'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
 import {
@@ -321,13 +325,13 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
         allPools[poolKeyToString(pool.poolKey)],
         allTicks[poolKeyToString(pool.poolKey)],
         xToY,
-        amount,
+        byAmountIn ? (amount * pool.poolKey.feeTier.fee) / PERCENTAGE_DENOMINATOR : amount,
         byAmountIn,
         xToY ? MIN_SQRT_PRICE : MAX_SQRT_PRICE
       )
 
       if (result.amountOut > amountOut && !result.globalInsufficientLiquidity) {
-        amountOut = result.amountOut + result.fee
+        amountOut = byAmountIn ? result.amountOut : result.amountOut + result.fee
         poolKey = pool.poolKey
         priceImpact = +printBigint(
           calculatePriceImpact(pool.sqrtPrice, result.targetSqrtPrice),
