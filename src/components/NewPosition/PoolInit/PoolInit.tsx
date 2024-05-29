@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react'
 import useStyles from './style'
 import {
   calcPrice,
+  calculateTickFromBalance,
   formatNumbers,
   nearestTickIndex,
   showPrefix,
@@ -58,10 +59,15 @@ export const PoolInit: React.FC<IPoolInit> = ({
   )
 
   useEffect(() => {
-    const TickIndex = nearestTickIndex(+leftInput, tickSpacing, isXtoY, xDecimal, yDecimal)
-    if (TickIndex) {
-      onChangeMidPrice(TickIndex!)
-    }
+    const tickIndex = calculateTickFromBalance(
+      +midPriceInput,
+      tickSpacing,
+      isXtoY,
+      xDecimal,
+      yDecimal
+    )
+
+    onChangeMidPrice(BigInt(tickIndex))
   }, [midPriceInput])
 
   const setLeftInputValues = (val: string) => {

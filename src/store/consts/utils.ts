@@ -461,6 +461,34 @@ export const nearestSpacingMultiplicity = (centerTick: number, spacing: number) 
   )
 }
 
+export const calculateTickFromBalance = (
+  price: number,
+  spacing: bigint,
+  isXtoY: boolean,
+  xDecimal: bigint,
+  yDecimal: bigint
+) => {
+  const minTick = getMinTick(spacing)
+  const maxTick = getMaxTick(spacing)
+
+  const basePrice = Math.max(
+    price,
+    Number(calcPrice(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
+  )
+  const primaryUnitsPrice = getPrimaryUnitsPrice(
+    basePrice,
+    isXtoY,
+    Number(xDecimal),
+    Number(yDecimal)
+  )
+  const tick = Math.round(logBase(primaryUnitsPrice, 1.0001))
+
+  return Math.max(
+    Math.min(tick, Number(getMaxTick(BigInt(spacing)))),
+    Number(getMinTick(BigInt(spacing)))
+  )
+}
+
 export const nearestTickIndex = (
   price: number,
   spacing: bigint,
@@ -469,20 +497,7 @@ export const nearestTickIndex = (
   yDecimal: bigint
 ) => {
   try {
-    const minTick = getMinTick(spacing)
-    const maxTick = getMaxTick(spacing)
-
-    const basePrice = Math.max(
-      price,
-      Number(calcPrice(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
-    )
-    const primaryUnitsPrice = getPrimaryUnitsPrice(
-      basePrice,
-      isXtoY,
-      Number(xDecimal),
-      Number(yDecimal)
-    )
-    const tick = Math.round(logBase(primaryUnitsPrice, 1.0001))
+    const tick = calculateTickFromBalance(price, spacing, isXtoY, xDecimal, yDecimal)
 
     return BigInt(nearestSpacingMultiplicity(tick, Number(spacing)))
   } catch (error) {
@@ -502,17 +517,6 @@ export const convertBalanceToBigint = (amount: string, decimals: bigint | number
     )
   }
   return 0n
-}
-export const convertBalanceToBigint2 = (amount: string, decimals: bigint | number): bigint => {
-  const [integerPart, fractionalPart = ''] = amount.split('.')
-  const decimalsNumber = Number(decimals)
-
-  if (fractionalPart.length > decimalsNumber) {
-    return 0n
-  }
-  const paddedFractionalPart = fractionalPart.padEnd(decimalsNumber, '0')
-
-  return BigInt(integerPart + paddedFractionalPart)
 }
 
 export enum PositionTokenBlock {
