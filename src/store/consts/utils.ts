@@ -8,7 +8,8 @@ import {
   calculateSqrtPrice,
   calculateTickDelta,
   getMaxTick,
-  getMinTick
+  getMinTick,
+  sqrtPriceToPrice
 } from '@invariant-labs/a0-sdk'
 import { PRICE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { ApiPromise } from '@polkadot/api'
@@ -614,4 +615,15 @@ export const calcTicksAmountInRange = (
   const maxIndex = logBase(primaryUnitsMax, 1.0001)
 
   return Math.ceil(Math.abs(maxIndex - minIndex) / tickSpacing)
+}
+
+export const calculateAmountIn = (
+  amountOut: bigint,
+  sqrtPriceLimit: bigint,
+  xToY: boolean
+): bigint => {
+  const price = +printBigint(sqrtPriceToPrice(sqrtPriceLimit), PRICE_SCALE)
+  const amountIn = xToY ? Number(amountOut) * price : Number(amountOut) / price
+
+  return BigInt(Math.ceil(amountIn))
 }

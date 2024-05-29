@@ -15,14 +15,14 @@ import {
   DEFAULT_PSP22_OPTIONS,
   DEFAULT_WAZERO_OPTIONS
 } from '@store/consts/static'
-import { createLoaderKey, findPairs, poolKeyToString } from '@store/consts/utils'
+import { calculateAmountIn, createLoaderKey, findPairs, poolKeyToString } from '@store/consts/utils'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Simulate, actions } from '@store/reducers/swap'
 import { actions as walletActions } from '@store/reducers/wallet'
 import { networkType } from '@store/selectors/connection'
 import { pools, poolsArraySortedByFees, tokens } from '@store/selectors/pools'
 import { simulateResult, swap } from '@store/selectors/swap'
-import { address } from '@store/selectors/wallet'
+import { address, balance } from '@store/selectors/wallet'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
 import { all, call, put, select, spawn, takeEvery } from 'typed-redux-saga'
@@ -74,23 +74,25 @@ export function* handleSwap(): Generator {
       DEFAULT_INVARIANT_OPTIONS
     )
 
+    const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(pool.sqrtPrice, slippage, !xToY)
+    const amountInWithSlippage = calculateAmountIn(amountIn, sqrtPriceLimit, !xToY)
+
     if (xToY) {
       const approveTx = psp22.approveTx(
         TESTNET_INVARIANT_ADDRESS,
-        amountIn,
+        byAmountIn ? amountIn : amountInWithSlippage,
         tokenX.address.toString()
       )
       txs.push(approveTx)
     } else {
       const approveTx = psp22.approveTx(
         TESTNET_INVARIANT_ADDRESS,
-        amountIn,
+        byAmountIn ? amountIn : amountInWithSlippage,
         tokenY.address.toString()
       )
       txs.push(approveTx)
     }
 
-    const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(pool.sqrtPrice, slippage, !xToY)
     const swapTx = invariant.swapTx(poolKey, xToY, amountIn, byAmountIn, sqrtPriceLimit)
     txs.push(swapTx)
 
@@ -198,31 +200,36 @@ export function* handleSwapWithAZERO(): Generator {
       DEFAULT_INVARIANT_OPTIONS
     )
 
+    const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(pool.sqrtPrice, slippage, !xToY)
+    const amountInWithSlippage = calculateAmountIn(amountIn, sqrtPriceLimit, !xToY)
+
     if (
       (xToY && poolKey.tokenX === TESTNET_WAZERO_ADDRESS) ||
       (!xToY && poolKey.tokenY === TESTNET_WAZERO_ADDRESS)
     ) {
-      const depositTx = wazero.depositTx(amountIn)
+      const azeroBalance = yield* select(balance)
+      const azeroAmountInWithSlippage =
+        azeroBalance > amountInWithSlippage ? amountInWithSlippage : azeroBalance
+      const depositTx = wazero.depositTx(byAmountIn ? amountIn : azeroAmountInWithSlippage)
       txs.push(depositTx)
     }
 
     if (xToY) {
       const approveTx = psp22.approveTx(
         TESTNET_INVARIANT_ADDRESS,
-        amountIn,
+        byAmountIn ? amountIn : amountInWithSlippage,
         tokenX.address.toString()
       )
       txs.push(approveTx)
     } else {
       const approveTx = psp22.approveTx(
         TESTNET_INVARIANT_ADDRESS,
-        amountIn,
+        byAmountIn ? amountIn : amountInWithSlippage,
         tokenY.address.toString()
       )
       txs.push(approveTx)
     }
 
-    const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(pool.sqrtPrice, slippage, !xToY)
     const swapTx = invariant.swapTx(poolKey, xToY, amountIn, byAmountIn, sqrtPriceLimit)
     txs.push(swapTx)
 
