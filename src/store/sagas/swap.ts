@@ -327,14 +327,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
       )
 
       if (result.amountOut > amountOut && !result.globalInsufficientLiquidity) {
-        const calculatedAmountOut = byAmountIn
-          ? result.amountOut - result.fee
-          : result.amountOut + result.fee
-        if (calculatedAmountOut <= 0n) {
-          continue
-        }
-
-        amountOut = calculatedAmountOut
+        amountOut = result.amountOut + result.fee
         poolKey = pool.poolKey
         priceImpact = +printBigint(
           calculatePriceImpact(pool.sqrtPrice, result.targetSqrtPrice),
