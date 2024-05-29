@@ -8,6 +8,7 @@ import {
   sendTx,
   simulateInvariantSwap
 } from '@invariant-labs/a0-sdk'
+import { MIN_SQRT_PRICE } from '@invariant-labs/a0-sdk/src/consts'
 import { MAX_SQRT_PRICE } from '@invariant-labs/a0-sdk/target/consts'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
@@ -16,7 +17,12 @@ import {
   DEFAULT_PSP22_OPTIONS,
   DEFAULT_WAZERO_OPTIONS
 } from '@store/consts/static'
-import { createLoaderKey, findPairs, poolKeyToString, rebuildTickmap } from '@store/consts/utils'
+import {
+  createLoaderKey,
+  deserializeTickmap,
+  findPairs,
+  poolKeyToString
+} from '@store/consts/utils'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Simulate, actions } from '@store/reducers/swap'
 import { networkType } from '@store/selectors/connection'
@@ -300,7 +306,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
     for (const pool of filteredPools) {
       const xToY = fromToken.toString() === pool.poolKey.tokenX
       const result = simulateInvariantSwap(
-        rebuildTickmap(allTickmaps[poolKeyToString(pool.poolKey)]),
+        deserializeTickmap(allTickmaps[poolKeyToString(pool.poolKey)]),
         protocolFee,
         pool.poolKey.feeTier,
         allPools[poolKeyToString(pool.poolKey)],
@@ -308,10 +314,10 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
         xToY,
         amount,
         byAmountIn,
-        xToY ? 0n : MAX_SQRT_PRICE
+        xToY ? MIN_SQRT_PRICE : MAX_SQRT_PRICE
       )
 
-      if (result.amountOut > amountOut) {
+      if (result.amountOut > amountOut && !result.globalInsufficientLiquidity) {
         amountOut = result.amountOut
         poolKey = pool.poolKey
         fee = pool.poolKey.feeTier.fee

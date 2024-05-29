@@ -648,7 +648,7 @@ export const tickmapToArray = (tickmap: Tickmap, tickSpacing: bigint): bigint[] 
   return ticks
 }
 
-export const rebuildTickmap = (serializedTickmap: string): Tickmap => {
+export const deserializeTickmap = (serializedTickmap: string): Tickmap => {
   const deserializedMap: Map<string, string> = new Map(JSON.parse(serializedTickmap))
 
   const parsedMap = new Map()
