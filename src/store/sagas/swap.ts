@@ -18,6 +18,7 @@ import {
 import { createLoaderKey, findPairs, poolKeyToString } from '@store/consts/utils'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Simulate, actions } from '@store/reducers/swap'
+import { actions as walletActions } from '@store/reducers/wallet'
 import { networkType } from '@store/selectors/connection'
 import { pools, poolsArraySortedByFees, tokens } from '@store/selectors/pools'
 import { simulateResult, swap } from '@store/selectors/swap'
@@ -109,6 +110,23 @@ export function* handleSwap(): Generator {
         persist: false,
         txid: txResult.hash
       })
+    )
+
+    const tokenXBalance = yield* call(
+      [psp22, psp22.balanceOf],
+      walletAddress,
+      tokenX.address.toString()
+    )
+    const tokenYBalance = yield* call(
+      [psp22, psp22.balanceOf],
+      walletAddress,
+      tokenY.address.toString()
+    )
+    yield* put(
+      walletActions.addTokenBalances([
+        { address: tokenX.address.toString(), balance: tokenXBalance },
+        { address: tokenY.address.toString(), balance: tokenYBalance }
+      ])
     )
 
     yield put(actions.setSwapSuccess(true))
@@ -232,6 +250,23 @@ export function* handleSwapWithAZERO(): Generator {
         persist: false,
         txid: txResult.hash
       })
+    )
+
+    const tokenXBalance = yield* call(
+      [psp22, psp22.balanceOf],
+      walletAddress,
+      tokenX.address.toString()
+    )
+    const tokenYBalance = yield* call(
+      [psp22, psp22.balanceOf],
+      walletAddress,
+      tokenY.address.toString()
+    )
+    yield* put(
+      walletActions.addTokenBalances([
+        { address: tokenX.address.toString(), balance: tokenXBalance },
+        { address: tokenY.address.toString(), balance: tokenYBalance }
+      ])
     )
 
     yield put(actions.setSwapSuccess(true))
