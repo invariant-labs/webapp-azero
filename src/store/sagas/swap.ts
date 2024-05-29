@@ -4,12 +4,13 @@ import {
   TESTNET_INVARIANT_ADDRESS,
   TESTNET_WAZERO_ADDRESS,
   WrappedAZERO,
+  calculatePriceImpact,
   calculateSqrtPriceAfterSlippage,
   sendTx,
   simulateInvariantSwap
 } from '@invariant-labs/a0-sdk'
 import { MIN_SQRT_PRICE } from '@invariant-labs/a0-sdk/src/consts'
-import { MAX_SQRT_PRICE } from '@invariant-labs/a0-sdk/target/consts'
+import { MAX_SQRT_PRICE, PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
 import {
@@ -21,7 +22,8 @@ import {
   createLoaderKey,
   deserializeTickmap,
   findPairs,
-  poolKeyToString
+  poolKeyToString,
+  printBigint
 } from '@store/consts/utils'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Simulate, actions } from '@store/reducers/swap'
@@ -269,11 +271,15 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
     const { fromToken, toToken, amount, byAmountIn } = action.payload
 
     if (amount === 0n) {
-      return {
-        amountOut: 0n,
-        fee: 0n,
-        priceImpact: 0
-      }
+      yield put(
+        actions.setSimulateResult({
+          poolKey: null,
+          amountOut: 0n,
+          priceImpact: 0,
+          targetSqrtPrice: 0n
+        })
+      )
+      return
     }
 
     const filteredPools = findPairs(
@@ -282,11 +288,15 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
       Object.values(allPools)
     )
     if (!filteredPools) {
-      return {
-        amountOut: 0n,
-        fee: 0n,
-        priceImpact: 0
-      }
+      yield put(
+        actions.setSimulateResult({
+          poolKey: null,
+          amountOut: 0n,
+          priceImpact: 0,
+          targetSqrtPrice: 0n
+        })
+      )
+      return
     }
 
     const invariant = yield* call(
@@ -298,7 +308,6 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
     )
     let poolKey = null
     let amountOut = 0n
-    let fee = 0n
     let priceImpact = 0
     let targetSqrtPrice = 0n
 
@@ -318,16 +327,19 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
       )
 
       if (result.amountOut > amountOut && !result.globalInsufficientLiquidity) {
-        amountOut = byAmountIn ? result.amountOut - result.fee : result.amountOut + result.fee
-        poolKey = pool.poolKey
-        fee = pool.poolKey.feeTier.fee
+        const calculatedAmountOut = byAmountIn
+          ? result.amountOut - result.fee
+          : result.amountOut + result.fee
+        if (calculatedAmountOut <= 0n) {
+          continue
+        }
 
-        const parsedPoolSqrtPrice = Number(pool.sqrtPrice)
-        const parsedTargetSqrtPrice = Number(result.targetSqrtPrice)
-        priceImpact =
-          pool.sqrtPrice > parsedTargetSqrtPrice
-            ? 1 - parsedTargetSqrtPrice / parsedPoolSqrtPrice
-            : 1 - parsedPoolSqrtPrice / parsedTargetSqrtPrice
+        amountOut = calculatedAmountOut
+        poolKey = pool.poolKey
+        priceImpact = +printBigint(
+          calculatePriceImpact(pool.sqrtPrice, result.targetSqrtPrice),
+          PERCENTAGE_SCALE
+        )
         targetSqrtPrice = result.targetSqrtPrice
       }
     }
@@ -336,7 +348,6 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
       actions.setSimulateResult({
         poolKey,
         amountOut,
-        fee,
         priceImpact,
         targetSqrtPrice
       })

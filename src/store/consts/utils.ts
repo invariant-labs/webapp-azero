@@ -565,7 +565,6 @@ export const findPairsByPoolKeys = (tokenFrom: string, tokenTo: string, poolKeys
 export type SimulateResult = {
   poolKey: PoolKey | null
   amountOut: bigint
-  fee: bigint
   priceImpact: number
   targetSqrtPrice: bigint
 }

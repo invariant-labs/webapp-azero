@@ -314,11 +314,7 @@ export const Swap: React.FC<ISwap> = ({
       return 'Insufficient volume'
     }
 
-    if (
-      simulateResult.amountOut === 0n &&
-      simulateResult.fee === 0n &&
-      simulateResult.priceImpact === 0
-    ) {
+    if (simulateResult.amountOut === 0n) {
       return 'Insufficient liquidity'
     }
 
@@ -586,7 +582,7 @@ export const Swap: React.FC<ISwap> = ({
         </Box>
         <TransactionDetailsBox
           open={getStateMessage() !== 'Loading' ? detailsOpen && canShowDetails : prevOpenState}
-          fee={simulateResult.fee}
+          fee={simulateResult.poolKey?.feeTier.fee ?? 0n}
           exchangeRate={{
             val: rateReversed ? 1 / swapRate : swapRate,
             symbol: canShowDetails
