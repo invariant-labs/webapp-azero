@@ -617,7 +617,7 @@ export const calcTicksAmountInRange = (
   return Math.ceil(Math.abs(maxIndex - minIndex) / tickSpacing)
 }
 
-export const calculateAmountIn = (
+export const calculateAmountInWithSlippage = (
   amountOut: bigint,
   sqrtPriceLimit: bigint,
   xToY: boolean

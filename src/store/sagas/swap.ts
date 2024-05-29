@@ -15,7 +15,12 @@ import {
   DEFAULT_PSP22_OPTIONS,
   DEFAULT_WAZERO_OPTIONS
 } from '@store/consts/static'
-import { calculateAmountIn, createLoaderKey, findPairs, poolKeyToString } from '@store/consts/utils'
+import {
+  calculateAmountInWithSlippage,
+  createLoaderKey,
+  findPairs,
+  poolKeyToString
+} from '@store/consts/utils'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Simulate, actions } from '@store/reducers/swap'
 import { actions as walletActions } from '@store/reducers/wallet'
@@ -75,19 +80,23 @@ export function* handleSwap(): Generator {
     )
 
     const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(pool.sqrtPrice, slippage, !xToY)
-    const amountInWithSlippage = calculateAmountIn(amountIn, sqrtPriceLimit, !xToY)
+
+    let calculatedAmountIn = amountIn
+    if (byAmountIn) {
+      calculatedAmountIn = calculateAmountInWithSlippage(amountIn, sqrtPriceLimit, !xToY)
+    }
 
     if (xToY) {
       const approveTx = psp22.approveTx(
         TESTNET_INVARIANT_ADDRESS,
-        byAmountIn ? amountIn : amountInWithSlippage,
+        calculatedAmountIn,
         tokenX.address.toString()
       )
       txs.push(approveTx)
     } else {
       const approveTx = psp22.approveTx(
         TESTNET_INVARIANT_ADDRESS,
-        byAmountIn ? amountIn : amountInWithSlippage,
+        calculatedAmountIn,
         tokenY.address.toString()
       )
       txs.push(approveTx)
@@ -201,7 +210,10 @@ export function* handleSwapWithAZERO(): Generator {
     )
 
     const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(pool.sqrtPrice, slippage, !xToY)
-    const amountInWithSlippage = calculateAmountIn(amountIn, sqrtPriceLimit, !xToY)
+    let calculatedAmountIn = amountIn
+    if (byAmountIn) {
+      calculatedAmountIn = calculateAmountInWithSlippage(amountIn, sqrtPriceLimit, !xToY)
+    }
 
     if (
       (xToY && poolKey.tokenX === TESTNET_WAZERO_ADDRESS) ||
@@ -209,7 +221,7 @@ export function* handleSwapWithAZERO(): Generator {
     ) {
       const azeroBalance = yield* select(balance)
       const azeroAmountInWithSlippage =
-        azeroBalance > amountInWithSlippage ? amountInWithSlippage : azeroBalance
+        azeroBalance > calculatedAmountIn ? calculatedAmountIn : azeroBalance
       const depositTx = wazero.depositTx(byAmountIn ? amountIn : azeroAmountInWithSlippage)
       txs.push(depositTx)
     }
@@ -217,14 +229,14 @@ export function* handleSwapWithAZERO(): Generator {
     if (xToY) {
       const approveTx = psp22.approveTx(
         TESTNET_INVARIANT_ADDRESS,
-        byAmountIn ? amountIn : amountInWithSlippage,
+        calculatedAmountIn,
         tokenX.address.toString()
       )
       txs.push(approveTx)
     } else {
       const approveTx = psp22.approveTx(
         TESTNET_INVARIANT_ADDRESS,
-        byAmountIn ? amountIn : amountInWithSlippage,
+        calculatedAmountIn,
         tokenY.address.toString()
       )
       txs.push(approveTx)
