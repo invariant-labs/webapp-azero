@@ -11,7 +11,8 @@ import {
   calculateTickDelta,
   getMaxTick,
   getMinTick,
-  positionToTick
+  positionToTick,
+  sqrtPriceToPrice
 } from '@invariant-labs/a0-sdk'
 import { CHUNK_SIZE, PRICE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { ApiPromise } from '@polkadot/api'
@@ -658,4 +659,15 @@ export const deserializeTickmap = (serializedTickmap: string): Tickmap => {
   }
 
   return { bitmap: parsedMap }
+}
+
+export const calculateAmountInWithSlippage = (
+  amountOut: bigint,
+  sqrtPriceLimit: bigint,
+  xToY: boolean
+): bigint => {
+  const price = +printBigint(sqrtPriceToPrice(sqrtPriceLimit), PRICE_SCALE)
+  const amountIn = xToY ? Number(amountOut) * price : Number(amountOut) / price
+
+  return BigInt(Math.ceil(amountIn))
 }

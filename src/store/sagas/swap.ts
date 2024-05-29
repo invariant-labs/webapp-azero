@@ -23,6 +23,7 @@ import {
   DEFAULT_WAZERO_OPTIONS
 } from '@store/consts/static'
 import {
+  calculateAmountInWithSlippage,
   createLoaderKey,
   deserializeTickmap,
   findPairs,
@@ -31,10 +32,11 @@ import {
 } from '@store/consts/utils'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Simulate, actions } from '@store/reducers/swap'
+import { actions as walletActions } from '@store/reducers/wallet'
 import { networkType } from '@store/selectors/connection'
 import { poolTicks, pools, tickMaps, tokens } from '@store/selectors/pools'
 import { simulateResult, swap } from '@store/selectors/swap'
-import { address } from '@store/selectors/wallet'
+import { address, balance } from '@store/selectors/wallet'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
 import { all, call, put, select, spawn, takeEvery } from 'typed-redux-saga'
@@ -85,23 +87,29 @@ export function* handleSwap(): Generator {
       DEFAULT_INVARIANT_OPTIONS
     )
 
+    const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(estimatedPriceAfterSwap, slippage, !xToY)
+
+    let calculatedAmountIn = amountIn
+    if (byAmountIn) {
+      calculatedAmountIn = calculateAmountInWithSlippage(amountIn, sqrtPriceLimit, !xToY)
+    }
+
     if (xToY) {
       const approveTx = psp22.approveTx(
         TESTNET_INVARIANT_ADDRESS,
-        amountIn,
+        calculatedAmountIn,
         tokenX.address.toString()
       )
       txs.push(approveTx)
     } else {
       const approveTx = psp22.approveTx(
         TESTNET_INVARIANT_ADDRESS,
-        amountIn,
+        calculatedAmountIn,
         tokenY.address.toString()
       )
       txs.push(approveTx)
     }
 
-    const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(estimatedPriceAfterSwap, slippage, !xToY)
     const swapTx = invariant.swapTx(poolKey, xToY, amountIn, byAmountIn, sqrtPriceLimit)
     txs.push(swapTx)
 
@@ -121,6 +129,23 @@ export function* handleSwap(): Generator {
         persist: false,
         txid: txResult.hash
       })
+    )
+
+    const tokenXBalance = yield* call(
+      [psp22, psp22.balanceOf],
+      walletAddress,
+      tokenX.address.toString()
+    )
+    const tokenYBalance = yield* call(
+      [psp22, psp22.balanceOf],
+      walletAddress,
+      tokenY.address.toString()
+    )
+    yield* put(
+      walletActions.addTokenBalances([
+        { address: tokenX.address.toString(), balance: tokenXBalance },
+        { address: tokenY.address.toString(), balance: tokenYBalance }
+      ])
     )
 
     yield put(actions.setSwapSuccess(true))
@@ -191,31 +216,39 @@ export function* handleSwapWithAZERO(): Generator {
       DEFAULT_INVARIANT_OPTIONS
     )
 
+    const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(estimatedPriceAfterSwap, slippage, !xToY)
+    let calculatedAmountIn = amountIn
+    if (byAmountIn) {
+      calculatedAmountIn = calculateAmountInWithSlippage(amountIn, sqrtPriceLimit, !xToY)
+    }
+
     if (
       (xToY && poolKey.tokenX === TESTNET_WAZERO_ADDRESS) ||
       (!xToY && poolKey.tokenY === TESTNET_WAZERO_ADDRESS)
     ) {
-      const depositTx = wazero.depositTx(amountIn)
+      const azeroBalance = yield* select(balance)
+      const azeroAmountInWithSlippage =
+        azeroBalance > calculatedAmountIn ? calculatedAmountIn : azeroBalance
+      const depositTx = wazero.depositTx(byAmountIn ? amountIn : azeroAmountInWithSlippage)
       txs.push(depositTx)
     }
 
     if (xToY) {
       const approveTx = psp22.approveTx(
         TESTNET_INVARIANT_ADDRESS,
-        amountIn,
+        calculatedAmountIn,
         tokenX.address.toString()
       )
       txs.push(approveTx)
     } else {
       const approveTx = psp22.approveTx(
         TESTNET_INVARIANT_ADDRESS,
-        amountIn,
+        calculatedAmountIn,
         tokenY.address.toString()
       )
       txs.push(approveTx)
     }
 
-    const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(estimatedPriceAfterSwap, slippage, !xToY)
     const swapTx = invariant.swapTx(poolKey, xToY, amountIn, byAmountIn, sqrtPriceLimit)
     txs.push(swapTx)
 
@@ -243,6 +276,23 @@ export function* handleSwapWithAZERO(): Generator {
         persist: false,
         txid: txResult.hash
       })
+    )
+
+    const tokenXBalance = yield* call(
+      [psp22, psp22.balanceOf],
+      walletAddress,
+      tokenX.address.toString()
+    )
+    const tokenYBalance = yield* call(
+      [psp22, psp22.balanceOf],
+      walletAddress,
+      tokenY.address.toString()
+    )
+    yield* put(
+      walletActions.addTokenBalances([
+        { address: tokenX.address.toString(), balance: tokenXBalance },
+        { address: tokenY.address.toString(), balance: tokenYBalance }
+      ])
     )
 
     yield put(actions.setSwapSuccess(true))
