@@ -1,5 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react'
-import useStyles from './style'
+import AnimatedNumber from '@components/AnimatedNumber'
+import RangeInput from '@components/Inputs/RangeInput/RangeInput'
+import SimpleInput from '@components/Inputs/SimpleInput/SimpleInput'
+import { Price, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk/src'
+import { Button, Grid, Typography } from '@mui/material'
 import {
   calcPrice,
   formatNumbers,
@@ -7,11 +10,8 @@ import {
   showPrefix,
   toMaxNumericPlaces
 } from '@store/consts/utils'
-import { Button, Grid, Typography } from '@mui/material'
-import SimpleInput from '@components/Inputs/SimpleInput/SimpleInput'
-import RangeInput from '@components/Inputs/RangeInput/RangeInput'
-import AnimatedNumber from '@components/AnimatedNumber'
-import { Price, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk/src'
+import React, { useEffect, useMemo, useState } from 'react'
+import useStyles from './style'
 
 export interface IPoolInit {
   tokenASymbol: string
@@ -145,7 +145,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
           <Grid className={classes.infoWrapper}>
             <Typography className={classes.info}>
               This pool does not exist yet. To create it, select the fee tier, initial price, and
-              enter the amount of tokens. The estimated cost of creating a pool is 0.1 SOL.
+              enter the amount of tokens.
             </Typography>
           </Grid>
 
