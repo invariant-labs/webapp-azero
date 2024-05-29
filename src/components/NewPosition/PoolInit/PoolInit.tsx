@@ -162,7 +162,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
             className={classes.midPrice}
             placeholder='0.0'
             onBlur={e => {
-              setMidPriceInput(validateMidPriceInput(e.target.value))
+              setMidPriceInput(validateMidPriceInput(e.target.value ? e.target.value : '0'))
             }}
           />
 
