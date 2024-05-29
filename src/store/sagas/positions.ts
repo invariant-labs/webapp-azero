@@ -3,12 +3,11 @@ import {
   PoolKey,
   TESTNET_INVARIANT_ADDRESS,
   TESTNET_WAZERO_ADDRESS,
-  WrappedAZERO,
   sendTx
 } from '@invariant-labs/a0-sdk'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { DEFAULT_INVARIANT_OPTIONS, DEFAULT_WAZERO_OPTIONS } from '@store/consts/static'
+import { DEFAULT_INVARIANT_OPTIONS } from '@store/consts/static'
 import { createLoaderKey, poolKeyToString } from '@store/consts/utils'
 import { ListType, actions as poolsActions } from '@store/reducers/pools'
 import { ClosePositionData, InitPositionData, actions } from '@store/reducers/positions'
@@ -24,6 +23,7 @@ import { fetchAllPoolKeys } from './pools'
 import { calculateTokenAmountsWithSlippage } from '@invariant-labs/a0-sdk/src/utils'
 import invariantSingleton from '@store/services/invariantSingleton'
 import psp22Singleton from '@store/services/psp22Singleton'
+import wrappedAZEROSingleton from '@store/services/wrappedAZEROSingleton'
 
 function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator {
   const loaderCreatePosition = createLoaderKey()
@@ -193,11 +193,9 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     const txs = []
 
     const wazero = yield* call(
-      WrappedAZERO.load,
+      [wrappedAZEROSingleton, wrappedAZEROSingleton.loadInstance],
       api,
-      network,
-      TESTNET_WAZERO_ADDRESS,
-      DEFAULT_WAZERO_OPTIONS
+      network
     )
 
     const depositTx = yield* call(

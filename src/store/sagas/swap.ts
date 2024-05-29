@@ -3,13 +3,12 @@ import {
   QuoteResult,
   TESTNET_INVARIANT_ADDRESS,
   TESTNET_WAZERO_ADDRESS,
-  WrappedAZERO,
   calculateSqrtPriceAfterSlippage,
   sendTx
 } from '@invariant-labs/a0-sdk'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { DEFAULT_INVARIANT_OPTIONS, DEFAULT_WAZERO_OPTIONS } from '@store/consts/static'
+import { DEFAULT_INVARIANT_OPTIONS } from '@store/consts/static'
 import { createLoaderKey, findPairs, poolKeyToString } from '@store/consts/utils'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Simulate, actions } from '@store/reducers/swap'
@@ -22,6 +21,7 @@ import { closeSnackbar } from 'notistack'
 import { all, call, put, select, spawn, takeEvery } from 'typed-redux-saga'
 import { getConnection } from './connection'
 import psp22Singleton from '@store/services/psp22Singleton'
+import wrappedAZEROSingleton from '@store/services/wrappedAZEROSingleton'
 
 export function* handleSwap(): Generator {
   const loaderSwappingTokens = createLoaderKey()
@@ -161,11 +161,9 @@ export function* handleSwapWithAZERO(): Generator {
     const txs = []
 
     const wazero = yield* call(
-      WrappedAZERO.load,
+      [wrappedAZEROSingleton, wrappedAZEROSingleton.loadInstance],
       api,
-      network,
-      TESTNET_WAZERO_ADDRESS,
-      DEFAULT_WAZERO_OPTIONS
+      network
     )
     const psp22 = yield* call([psp22Singleton, psp22Singleton.loadInstance], api, network)
     const invariant = yield* call(
