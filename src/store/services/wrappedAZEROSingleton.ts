@@ -6,6 +6,8 @@ import { DEFAULT_WAZERO_OPTIONS } from '@store/consts/static'
 class SingletonWrappedAZERO {
   private static instance: SingletonWrappedAZERO
   private wrappedAZERO: WrappedAZERO | null = null
+  private currentApi: ApiPromise | null = null
+  private currentNetwork: Network | null = null
 
   private constructor() {}
 
@@ -17,13 +19,15 @@ class SingletonWrappedAZERO {
   }
 
   public async loadInstance(api: ApiPromise, network: Network): Promise<WrappedAZERO> {
-    if (!this.wrappedAZERO) {
+    if (!this.wrappedAZERO || this.currentApi !== api || this.currentNetwork !== network) {
       this.wrappedAZERO = await WrappedAZERO.load(
         api,
         network,
         TESTNET_WAZERO_ADDRESS,
         DEFAULT_WAZERO_OPTIONS
       )
+      this.currentApi = api
+      this.currentNetwork = network
     }
     return this.wrappedAZERO
   }

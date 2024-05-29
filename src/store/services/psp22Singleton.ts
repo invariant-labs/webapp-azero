@@ -6,6 +6,8 @@ import { DEFAULT_PSP22_OPTIONS } from '@store/consts/static'
 class SingletonPSP22 {
   private static instance: SingletonPSP22
   private psp22: PSP22 | null = null
+  private currentApi: ApiPromise | null = null
+  private currentNetwork: Network | null = null
 
   private constructor() {}
 
@@ -17,8 +19,10 @@ class SingletonPSP22 {
   }
 
   public async loadInstance(api: ApiPromise, network: Network): Promise<PSP22> {
-    if (!this.psp22) {
+    if (!this.psp22 || this.currentApi !== api || this.currentNetwork !== network) {
       this.psp22 = await PSP22.load(api, network, DEFAULT_PSP22_OPTIONS)
+      this.currentApi = api
+      this.currentNetwork = network
     }
     return this.psp22
   }

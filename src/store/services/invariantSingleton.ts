@@ -6,6 +6,8 @@ import { DEFAULT_INVARIANT_OPTIONS } from '@store/consts/static'
 class SingletonInvariant {
   private static instance: SingletonInvariant
   private invariant: Invariant | null = null
+  private currentApi: ApiPromise | null = null
+  private currentNetwork: Network | null = null
 
   private constructor() {}
 
@@ -17,13 +19,15 @@ class SingletonInvariant {
   }
 
   public async loadInstance(api: ApiPromise, network: Network): Promise<Invariant> {
-    if (!this.invariant) {
+    if (!this.invariant || this.currentApi !== api || this.currentNetwork !== network) {
       this.invariant = await Invariant.load(
         api,
         network,
         TESTNET_INVARIANT_ADDRESS,
         DEFAULT_INVARIANT_OPTIONS
       )
+      this.currentApi = api
+      this.currentNetwork = network
     }
     return this.invariant
   }
