@@ -3,7 +3,6 @@ import {
   Network,
   PSP22,
   PoolKey,
-  TESTNET_INVARIANT_ADDRESS,
   Tick,
   Tickmap,
   TokenAmount,
@@ -366,16 +365,12 @@ export const getTokenBalances = async (
 }
 
 export const getPoolsByPoolKeys = async (
+  invariantAddress: string,
   poolKeys: PoolKey[],
   api: ApiPromise,
   network: Network
 ): Promise<PoolWithPoolKey[]> => {
-  const invariant = await Invariant.load(
-    api,
-    network,
-    TESTNET_INVARIANT_ADDRESS,
-    DEFAULT_INVARIANT_OPTIONS
-  )
+  const invariant = await Invariant.load(api, network, invariantAddress, DEFAULT_INVARIANT_OPTIONS)
 
   const promises = poolKeys.map(({ tokenX, tokenY, feeTier }) =>
     invariant.getPool(tokenX, tokenY, feeTier)

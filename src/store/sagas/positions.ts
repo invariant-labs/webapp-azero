@@ -2,7 +2,6 @@ import {
   Invariant,
   PSP22,
   PoolKey,
-  TESTNET_INVARIANT_ADDRESS,
   TESTNET_WAZERO_ADDRESS,
   WrappedAZERO,
   sendTx
@@ -21,7 +20,7 @@ import { ListType, actions as poolsActions } from '@store/reducers/pools'
 import { ClosePositionData, InitPositionData, actions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { actions as walletActions } from '@store/reducers/wallet'
-import { networkType } from '@store/selectors/connection'
+import { invariantAddress, networkType } from '@store/selectors/connection'
 import { address } from '@store/selectors/wallet'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
@@ -67,6 +66,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     const network = yield* select(networkType)
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
+    const invAddress = yield* select(invariantAddress)
 
     const txs = []
 
@@ -82,27 +82,17 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       true
     )
 
-    const XTokenTx = yield* call(
-      [psp22, psp22.approveTx],
-      TESTNET_INVARIANT_ADDRESS,
-      xAmountWithSlippage,
-      tokenX
-    )
+    const XTokenTx = yield* call([psp22, psp22.approveTx], invAddress, xAmountWithSlippage, tokenX)
     txs.push(XTokenTx)
 
-    const YTokenTx = yield* call(
-      [psp22, psp22.approveTx],
-      TESTNET_INVARIANT_ADDRESS,
-      yAmountWithSlippage,
-      tokenY
-    )
+    const YTokenTx = yield* call([psp22, psp22.approveTx], invAddress, yAmountWithSlippage, tokenY)
     txs.push(YTokenTx)
 
     const invariant = yield* call(
       [Invariant, Invariant.load],
       api,
       network,
-      TESTNET_INVARIANT_ADDRESS,
+      invAddress,
       DEFAULT_INVARIANT_OPTIONS
     )
 
@@ -197,6 +187,7 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     const network = yield* select(networkType)
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
+    const invAddress = yield* select(invariantAddress)
 
     const txs = []
 
@@ -225,17 +216,17 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
       true
     )
 
-    const XTokenTx = psp22.approveTx(TESTNET_INVARIANT_ADDRESS, xAmountWithSlippage, tokenX)
+    const XTokenTx = psp22.approveTx(invAddress, xAmountWithSlippage, tokenX)
     txs.push(XTokenTx)
 
-    const YTokenTx = psp22.approveTx(TESTNET_INVARIANT_ADDRESS, yAmountWithSlippage, tokenY)
+    const YTokenTx = psp22.approveTx(invAddress, yAmountWithSlippage, tokenY)
     txs.push(YTokenTx)
 
     const invariant = yield* call(
       [Invariant, Invariant.load],
       api,
       network,
-      TESTNET_INVARIANT_ADDRESS,
+      invAddress,
       DEFAULT_INVARIANT_OPTIONS
     )
 
@@ -256,13 +247,13 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     )
     txs.push(tx)
 
-    const approveTx = psp22.approveTx(TESTNET_INVARIANT_ADDRESS, U128MAX, TESTNET_WAZERO_ADDRESS)
+    const approveTx = psp22.approveTx(invAddress, U128MAX, TESTNET_WAZERO_ADDRESS)
     txs.push(approveTx)
 
     const unwrapTx = invariant.withdrawAllWAZEROTx(TESTNET_WAZERO_ADDRESS)
     txs.push(unwrapTx)
 
-    const resetApproveTx = psp22.approveTx(TESTNET_INVARIANT_ADDRESS, 0n, TESTNET_WAZERO_ADDRESS)
+    const resetApproveTx = psp22.approveTx(invAddress, 0n, TESTNET_WAZERO_ADDRESS)
     txs.push(resetApproveTx)
 
     const batchedTx = api.tx.utility.batchAll(txs)
@@ -312,11 +303,12 @@ export function* handleGetPositionsList() {
   try {
     const connection = yield* getConnection()
     const network = yield* select(networkType)
+    const invAddress = yield* select(invariantAddress)
     const invariant = yield* call(
       Invariant.load,
       connection,
       network,
-      TESTNET_INVARIANT_ADDRESS,
+      invAddress,
       DEFAULT_INVARIANT_OPTIONS
     )
     const walletAddress = yield* select(address)
@@ -351,11 +343,12 @@ export function* handleGetCurrentPositionTicks(action: PayloadAction<bigint>) {
   const walletAddress = yield* select(address)
   const connection = yield* getConnection()
   const network = yield* select(networkType)
+  const invAddress = yield* select(invariantAddress)
   const invariant = yield* call(
     Invariant.load,
     connection,
     network,
-    TESTNET_INVARIANT_ADDRESS,
+    invAddress,
     DEFAULT_INVARIANT_OPTIONS
   )
 
@@ -382,11 +375,12 @@ export function* handleClaimFee(action: PayloadAction<bigint>) {
     const walletAddress = yield* select(address)
     const connection = yield* getConnection()
     const network = yield* select(networkType)
+    const invAddress = yield* select(invariantAddress)
     const invariant = yield* call(
       Invariant.load,
       connection,
       network,
-      TESTNET_INVARIANT_ADDRESS,
+      invAddress,
       DEFAULT_INVARIANT_OPTIONS
     )
 
@@ -466,11 +460,12 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<bigint>) {
     const walletAddress = yield* select(address)
     const connection = yield* getConnection()
     const network = yield* select(networkType)
+    const invAddress = yield* select(invariantAddress)
     const invariant = yield* call(
       Invariant.load,
       connection,
       network,
-      TESTNET_INVARIANT_ADDRESS,
+      invAddress,
       DEFAULT_INVARIANT_OPTIONS
     )
     const psp22 = yield* call(PSP22.load, connection, network, DEFAULT_PSP22_OPTIONS)
@@ -489,13 +484,13 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<bigint>) {
     const claimTx = invariant.claimFeeTx(action.payload)
     txs.push(claimTx)
 
-    const approveTx = psp22.approveTx(TESTNET_INVARIANT_ADDRESS, U128MAX, TESTNET_WAZERO_ADDRESS)
+    const approveTx = psp22.approveTx(invAddress, U128MAX, TESTNET_WAZERO_ADDRESS)
     txs.push(approveTx)
 
     const unwrapTx = invariant.withdrawAllWAZEROTx(TESTNET_WAZERO_ADDRESS)
     txs.push(unwrapTx)
 
-    const resetApproveTx = psp22.approveTx(TESTNET_INVARIANT_ADDRESS, 0n, TESTNET_WAZERO_ADDRESS)
+    const resetApproveTx = psp22.approveTx(invAddress, 0n, TESTNET_WAZERO_ADDRESS)
     txs.push(resetApproveTx)
 
     const batchedTx = connection.tx.utility.batchAll(txs)
@@ -550,11 +545,12 @@ export function* handleGetSinglePosition(action: PayloadAction<bigint>) {
   const walletAddress = yield* select(address)
   const connection = yield* getConnection()
   const network = yield* select(networkType)
+  const invAddress = yield* select(invariantAddress)
   const invariant = yield* call(
     Invariant.load,
     connection,
     network,
-    TESTNET_INVARIANT_ADDRESS,
+    invAddress,
     DEFAULT_INVARIANT_OPTIONS
   )
 
@@ -577,11 +573,12 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
     const walletAddress = yield* select(address)
     const connection = yield* getConnection()
     const network = yield* select(networkType)
+    const invAddress = yield* select(invariantAddress)
     const invariant = yield* call(
       Invariant.load,
       connection,
       network,
-      TESTNET_INVARIANT_ADDRESS,
+      invAddress,
       DEFAULT_INVARIANT_OPTIONS
     )
     const adapter = yield* call(getAlephZeroWallet)

@@ -1,11 +1,4 @@
-import {
-  Invariant,
-  PoolKey,
-  TESTNET_INVARIANT_ADDRESS,
-  newPoolKey,
-  sendTx,
-  toSqrtPrice
-} from '@invariant-labs/a0-sdk'
+import { Invariant, PoolKey, newPoolKey, sendTx, toSqrtPrice } from '@invariant-labs/a0-sdk'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { DEFAULT_INVARIANT_OPTIONS } from '@store/consts/static'
@@ -22,7 +15,7 @@ import {
 } from '@store/consts/utils'
 import { FetchTicksAndTickMaps, ListPoolsRequest, PairTokens, actions } from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import { networkType } from '@store/selectors/connection'
+import { invariantAddress, networkType } from '@store/selectors/connection'
 import { tokens } from '@store/selectors/pools'
 import { address } from '@store/selectors/wallet'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
@@ -34,7 +27,14 @@ export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) 
   const walletAddress = yield* select(address)
   const connection = yield* call(getConnection)
   const network = yield* select(networkType)
-  const pools = yield* call(getPoolsByPoolKeys, action.payload.poolKeys, connection, network)
+  const invAddress = yield* select(invariantAddress)
+  const pools = yield* call(
+    getPoolsByPoolKeys,
+    invAddress,
+    action.payload.poolKeys,
+    connection,
+    network
+  )
 
   const allTokens = yield* select(tokens)
   const unknownTokens = new Set(
@@ -90,12 +90,13 @@ export function* handleInitPool(action: PayloadAction<PoolKey>): Generator {
     const network = yield* select(networkType)
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
+    const invAddress = yield* select(invariantAddress)
 
     const invariant = yield* call(
       [Invariant, Invariant.load],
       api,
       network,
-      TESTNET_INVARIANT_ADDRESS,
+      invAddress,
       DEFAULT_INVARIANT_OPTIONS
     )
 
@@ -146,6 +147,7 @@ export function* handleInitPool(action: PayloadAction<PoolKey>): Generator {
 export function* fetchPoolData(action: PayloadAction<PoolKey>): Generator {
   const api = yield* getConnection()
   const network = yield* select(networkType)
+  const invAddress = yield* select(invariantAddress)
   const { feeTier, tokenX, tokenY } = action.payload
 
   try {
@@ -153,7 +155,7 @@ export function* fetchPoolData(action: PayloadAction<PoolKey>): Generator {
       [Invariant, Invariant.load],
       api,
       network,
-      TESTNET_INVARIANT_ADDRESS,
+      invAddress,
       DEFAULT_INVARIANT_OPTIONS
     )
     const pool = yield* call([invariant, invariant.getPool], tokenX, tokenY, feeTier)
@@ -177,13 +179,14 @@ export function* fetchPoolData(action: PayloadAction<PoolKey>): Generator {
 export function* fetchAllPoolKeys(): Generator {
   const api = yield* getConnection()
   const network = yield* select(networkType)
+  const invAddress = yield* select(invariantAddress)
 
   try {
     const invariant = yield* call(
       [Invariant, Invariant.load],
       api,
       network,
-      TESTNET_INVARIANT_ADDRESS,
+      invAddress,
       DEFAULT_INVARIANT_OPTIONS
     )
 
@@ -200,11 +203,12 @@ export function* fetchAllPoolKeys(): Generator {
 export function* fetchAllPoolsForPairData(action: PayloadAction<PairTokens>) {
   const connection = yield* call(getConnection)
   const network = yield* select(networkType)
+  const invAddress = yield* select(invariantAddress)
   const invariant = yield* call(
     Invariant.load,
     connection,
     network,
-    TESTNET_INVARIANT_ADDRESS,
+    invAddress,
     DEFAULT_INVARIANT_OPTIONS
   )
   const poolKeys = yield* call([invariant, invariant.getPoolKeys], 100n, 0n)
@@ -224,11 +228,12 @@ export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMa
   try {
     const connection = yield* call(getConnection)
     const network = yield* select(networkType)
+    const invAddress = yield* select(invariantAddress)
     const invariant = yield* call(
       Invariant.load,
       connection,
       network,
-      TESTNET_INVARIANT_ADDRESS,
+      invAddress,
       DEFAULT_INVARIANT_OPTIONS
     )
 

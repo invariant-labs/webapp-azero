@@ -1,7 +1,6 @@
 import {
   Invariant,
   PSP22,
-  TESTNET_INVARIANT_ADDRESS,
   TESTNET_WAZERO_ADDRESS,
   WrappedAZERO,
   calculatePriceImpact,
@@ -33,7 +32,7 @@ import {
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Simulate, actions } from '@store/reducers/swap'
 import { actions as walletActions } from '@store/reducers/wallet'
-import { networkType } from '@store/selectors/connection'
+import { invariantAddress, networkType } from '@store/selectors/connection'
 import { poolTicks, pools, tickMaps, tokens } from '@store/selectors/pools'
 import { simulateResult, swap } from '@store/selectors/swap'
 import { address, balance } from '@store/selectors/wallet'
@@ -62,6 +61,7 @@ export function* handleSwap(): Generator {
     const network = yield* select(networkType)
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
+    const invAddress = yield* select(invariantAddress)
 
     const tokenX = allTokens[poolKey.tokenX]
     const tokenY = allTokens[poolKey.tokenY]
@@ -83,7 +83,7 @@ export function* handleSwap(): Generator {
       Invariant.load,
       api,
       network,
-      TESTNET_INVARIANT_ADDRESS,
+      invAddress,
       DEFAULT_INVARIANT_OPTIONS
     )
 
@@ -95,18 +95,10 @@ export function* handleSwap(): Generator {
     }
 
     if (xToY) {
-      const approveTx = psp22.approveTx(
-        TESTNET_INVARIANT_ADDRESS,
-        calculatedAmountIn,
-        tokenX.address.toString()
-      )
+      const approveTx = psp22.approveTx(invAddress, calculatedAmountIn, tokenX.address.toString())
       txs.push(approveTx)
     } else {
-      const approveTx = psp22.approveTx(
-        TESTNET_INVARIANT_ADDRESS,
-        calculatedAmountIn,
-        tokenY.address.toString()
-      )
+      const approveTx = psp22.approveTx(invAddress, calculatedAmountIn, tokenY.address.toString())
       txs.push(approveTx)
     }
 
@@ -184,6 +176,7 @@ export function* handleSwapWithAZERO(): Generator {
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
     const swapSimulateResult = yield* select(simulateResult)
+    const invAddress = yield* select(invariantAddress)
 
     const tokenX = allTokens[poolKey.tokenX]
     const tokenY = allTokens[poolKey.tokenY]
@@ -212,7 +205,7 @@ export function* handleSwapWithAZERO(): Generator {
       Invariant.load,
       api,
       network,
-      TESTNET_INVARIANT_ADDRESS,
+      invAddress,
       DEFAULT_INVARIANT_OPTIONS
     )
 
@@ -234,18 +227,10 @@ export function* handleSwapWithAZERO(): Generator {
     }
 
     if (xToY) {
-      const approveTx = psp22.approveTx(
-        TESTNET_INVARIANT_ADDRESS,
-        calculatedAmountIn,
-        tokenX.address.toString()
-      )
+      const approveTx = psp22.approveTx(invAddress, calculatedAmountIn, tokenX.address.toString())
       txs.push(approveTx)
     } else {
-      const approveTx = psp22.approveTx(
-        TESTNET_INVARIANT_ADDRESS,
-        calculatedAmountIn,
-        tokenY.address.toString()
-      )
+      const approveTx = psp22.approveTx(invAddress, calculatedAmountIn, tokenY.address.toString())
       txs.push(approveTx)
     }
 
@@ -324,8 +309,6 @@ export enum SwapError {
 
 export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
   try {
-    const connection = yield* getConnection()
-    const network = yield* select(networkType)
     const allPools = yield* select(pools)
     const allTickmaps = yield* select(tickMaps)
     const allTicks = yield* select(poolTicks)
@@ -362,14 +345,6 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
       )
       return
     }
-
-    const invariant = yield* call(
-      Invariant.load,
-      connection,
-      network,
-      TESTNET_INVARIANT_ADDRESS,
-      DEFAULT_INVARIANT_OPTIONS
-    )
 
     let poolKey = null
     let amountOut = 0n
