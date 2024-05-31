@@ -1,14 +1,6 @@
-import {
-  Invariant,
-  PoolKey,
-  TESTNET_INVARIANT_ADDRESS,
-  newPoolKey,
-  sendTx,
-  toSqrtPrice
-} from '@invariant-labs/a0-sdk'
+import { PoolKey, newPoolKey, sendTx, toSqrtPrice } from '@invariant-labs/a0-sdk'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { DEFAULT_INVARIANT_OPTIONS } from '@store/consts/static'
 import {
   createLoaderKey,
   findPairsByPoolKeys,
@@ -190,15 +182,9 @@ export function* fetchAllPoolKeys(): Generator {
 }
 
 export function* fetchAllPoolsForPairData(action: PayloadAction<PairTokens>) {
-  const connection = yield* call(getConnection)
+  const api = yield* call(getConnection)
   const network = yield* select(networkType)
-  const invariant = yield* call(
-    Invariant.load,
-    connection,
-    network,
-    TESTNET_INVARIANT_ADDRESS,
-    DEFAULT_INVARIANT_OPTIONS
-  )
+  const invariant = yield* call([invariantSingleton, invariantSingleton.loadInstance], api, network)
   const poolKeys = yield* call([invariant, invariant.getPoolKeys], 100n, 0n)
   const filteredPoolKeys = findPairsByPoolKeys(
     action.payload.first.toString(),

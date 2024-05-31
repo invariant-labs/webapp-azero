@@ -1,5 +1,4 @@
 import {
-  Invariant,
   QuoteResult,
   TESTNET_INVARIANT_ADDRESS,
   TESTNET_WAZERO_ADDRESS,
@@ -8,7 +7,6 @@ import {
 } from '@invariant-labs/a0-sdk'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { DEFAULT_INVARIANT_OPTIONS } from '@store/consts/static'
 import { createLoaderKey, findPairs, poolKeyToString } from '@store/consts/utils'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Simulate, actions } from '@store/reducers/swap'
@@ -22,6 +20,7 @@ import { all, call, put, select, spawn, takeEvery } from 'typed-redux-saga'
 import { getConnection } from './connection'
 import psp22Singleton from '@store/services/psp22Singleton'
 import wrappedAZEROSingleton from '@store/services/wrappedAZEROSingleton'
+import invariantSingleton from '@store/services/invariantSingleton'
 
 export function* handleSwap(): Generator {
   const loaderSwappingTokens = createLoaderKey()
@@ -62,11 +61,9 @@ export function* handleSwap(): Generator {
 
     const psp22 = yield* call([psp22Singleton, psp22Singleton.loadInstance], api, network)
     const invariant = yield* call(
-      Invariant.load,
+      [invariantSingleton, invariantSingleton.loadInstance],
       api,
-      network,
-      TESTNET_INVARIANT_ADDRESS,
-      DEFAULT_INVARIANT_OPTIONS
+      network
     )
 
     if (xToY) {
@@ -167,13 +164,10 @@ export function* handleSwapWithAZERO(): Generator {
     )
     const psp22 = yield* call([psp22Singleton, psp22Singleton.loadInstance], api, network)
     const invariant = yield* call(
-      Invariant.load,
+      [invariantSingleton, invariantSingleton.loadInstance],
       api,
-      network,
-      TESTNET_INVARIANT_ADDRESS,
-      DEFAULT_INVARIANT_OPTIONS
+      network
     )
-
     if (
       (xToY && poolKey.tokenX === TESTNET_WAZERO_ADDRESS) ||
       (!xToY && poolKey.tokenY === TESTNET_WAZERO_ADDRESS)
@@ -248,7 +242,7 @@ export function* handleSwapWithAZERO(): Generator {
 }
 
 export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
-  const connection = yield* getConnection()
+  const api = yield* getConnection()
   const network = yield* select(networkType)
   const allPools = yield* select(poolsArraySortedByFees)
   const allTokens = yield* select(tokens)
@@ -272,13 +266,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
     }
   }
 
-  const invariant = yield* call(
-    Invariant.load,
-    connection,
-    network,
-    TESTNET_INVARIANT_ADDRESS,
-    DEFAULT_INVARIANT_OPTIONS
-  )
+  const invariant = yield* call([invariantSingleton, invariantSingleton.loadInstance], api, network)
   let poolKey = null
   let amountOut = 0n
   let fee = 0n

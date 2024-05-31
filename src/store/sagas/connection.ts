@@ -4,21 +4,19 @@ import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { rpcAddress, networkType } from '@store/selectors/connection'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { ApiPromise } from '@polkadot/api'
-import { initPolkadotApi } from '@invariant-labs/a0-sdk/src'
+import apiSingleton from '@store/services/apiSingleton'
 
 export function* getConnection(): SagaGenerator<ApiPromise> {
   const rpc = yield* select(rpcAddress)
   const network = yield* select(networkType)
-  const connection = yield* call(initPolkadotApi, network, rpc)
+  const api = yield* call([apiSingleton, apiSingleton.loadInstance], network, rpc)
 
-  return connection
+  return api
 }
 
 export function* initConnection(): Generator {
   try {
-    const rpc = yield* select(rpcAddress)
-    const network = yield* select(networkType)
-    yield* call(initPolkadotApi, network, rpc)
+    yield* call(getConnection)
 
     yield* put(
       snackbarsActions.add({
@@ -45,7 +43,10 @@ export function* initConnection(): Generator {
 
 export function* handleNetworkChange(action: PayloadAction<PayloadTypes['setNetwork']>): Generator {
   yield* delay(1000)
-  window.location.reload()
+
+  const { networkType, rpcAddress } = action.payload
+  yield* call([apiSingleton, apiSingleton.loadInstance], networkType, rpcAddress)
+
   yield* put(
     snackbarsActions.add({
       message: `You are on network ${action.payload.networkType}${

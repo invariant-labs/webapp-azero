@@ -1,5 +1,4 @@
 import {
-  Invariant,
   PoolKey,
   TESTNET_INVARIANT_ADDRESS,
   TESTNET_WAZERO_ADDRESS,
@@ -7,7 +6,6 @@ import {
 } from '@invariant-labs/a0-sdk'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { DEFAULT_INVARIANT_OPTIONS } from '@store/consts/static'
 import { createLoaderKey, poolKeyToString } from '@store/consts/utils'
 import { ListType, actions as poolsActions } from '@store/reducers/pools'
 import { ClosePositionData, InitPositionData, actions } from '@store/reducers/positions'
@@ -303,14 +301,12 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
 
 export function* handleGetPositionsList() {
   try {
-    const connection = yield* getConnection()
+    const api = yield* getConnection()
     const network = yield* select(networkType)
     const invariant = yield* call(
-      Invariant.load,
-      connection,
-      network,
-      TESTNET_INVARIANT_ADDRESS,
-      DEFAULT_INVARIANT_OPTIONS
+      [invariantSingleton, invariantSingleton.loadInstance],
+      api,
+      network
     )
     const walletAddress = yield* select(address)
 
@@ -342,15 +338,9 @@ export function* handleGetPositionsList() {
 
 export function* handleGetCurrentPositionTicks(action: PayloadAction<bigint>) {
   const walletAddress = yield* select(address)
-  const connection = yield* getConnection()
+  const api = yield* getConnection()
   const network = yield* select(networkType)
-  const invariant = yield* call(
-    Invariant.load,
-    connection,
-    network,
-    TESTNET_INVARIANT_ADDRESS,
-    DEFAULT_INVARIANT_OPTIONS
-  )
+  const invariant = yield* call([invariantSingleton, invariantSingleton.loadInstance], api, network)
 
   const position = yield* call([invariant, invariant.getPosition], walletAddress, action.payload)
 
@@ -373,14 +363,12 @@ export function* handleClaimFee(action: PayloadAction<bigint>) {
 
   try {
     const walletAddress = yield* select(address)
-    const connection = yield* getConnection()
+    const api = yield* getConnection()
     const network = yield* select(networkType)
     const invariant = yield* call(
-      Invariant.load,
-      connection,
-      network,
-      TESTNET_INVARIANT_ADDRESS,
-      DEFAULT_INVARIANT_OPTIONS
+      [invariantSingleton, invariantSingleton.loadInstance],
+      api,
+      network
     )
     const adapter = yield* call(getAlephZeroWallet)
 
@@ -443,16 +431,9 @@ export function* handleClaimFee(action: PayloadAction<bigint>) {
 
 export function* handleGetSinglePosition(action: PayloadAction<bigint>) {
   const walletAddress = yield* select(address)
-  const connection = yield* getConnection()
+  const api = yield* getConnection()
   const network = yield* select(networkType)
-  const invariant = yield* call(
-    Invariant.load,
-    connection,
-    network,
-    TESTNET_INVARIANT_ADDRESS,
-    DEFAULT_INVARIANT_OPTIONS
-  )
-
+  const invariant = yield* call([invariantSingleton, invariantSingleton.loadInstance], api, network)
   const position = yield* call([invariant, invariant.getPosition], walletAddress, action.payload)
   yield put(
     actions.setSinglePosition({
@@ -470,14 +451,12 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
 
   try {
     const walletAddress = yield* select(address)
-    const connection = yield* getConnection()
+    const api = yield* getConnection()
     const network = yield* select(networkType)
     const invariant = yield* call(
-      Invariant.load,
-      connection,
-      network,
-      TESTNET_INVARIANT_ADDRESS,
-      DEFAULT_INVARIANT_OPTIONS
+      [invariantSingleton, invariantSingleton.loadInstance],
+      api,
+      network
     )
     const adapter = yield* call(getAlephZeroWallet)
 
