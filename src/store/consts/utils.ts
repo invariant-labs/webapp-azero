@@ -2,16 +2,21 @@ import {
   Invariant,
   Network,
   PoolKey,
+  Tick,
+  Tickmap,
   TokenAmount,
   calculateSqrtPrice,
   calculateTickDelta,
   getMaxTick,
-  getMinTick
+  getMinTick,
+  positionToTick,
+  sqrtPriceToPrice
 } from '@invariant-labs/a0-sdk'
-import { PRICE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
+import { CHUNK_SIZE, PRICE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { ApiPromise } from '@polkadot/api'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
+import { SwapError } from '@store/sagas/swap'
 import axios from 'axios'
 import { BTC, ETH, Token, TokenPriceData, USDC, tokensPrices } from './static'
 import invariantSingleton from '@store/services/invariantSingleton'
@@ -447,6 +452,34 @@ export const nearestSpacingMultiplicity = (centerTick: number, spacing: number) 
   )
 }
 
+export const calculateTickFromBalance = (
+  price: number,
+  spacing: bigint,
+  isXtoY: boolean,
+  xDecimal: bigint,
+  yDecimal: bigint
+) => {
+  const minTick = getMinTick(spacing)
+  const maxTick = getMaxTick(spacing)
+
+  const basePrice = Math.max(
+    price,
+    Number(calcPrice(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
+  )
+  const primaryUnitsPrice = getPrimaryUnitsPrice(
+    basePrice,
+    isXtoY,
+    Number(xDecimal),
+    Number(yDecimal)
+  )
+  const tick = Math.round(logBase(primaryUnitsPrice, 1.0001))
+
+  return Math.max(
+    Math.min(tick, Number(getMaxTick(BigInt(spacing)))),
+    Number(getMinTick(BigInt(spacing)))
+  )
+}
+
 export const nearestTickIndex = (
   price: number,
   spacing: bigint,
@@ -455,20 +488,7 @@ export const nearestTickIndex = (
   yDecimal: bigint
 ) => {
   try {
-    const minTick = getMinTick(spacing)
-    const maxTick = getMaxTick(spacing)
-
-    const basePrice = Math.max(
-      price,
-      Number(calcPrice(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
-    )
-    const primaryUnitsPrice = getPrimaryUnitsPrice(
-      basePrice,
-      isXtoY,
-      Number(xDecimal),
-      Number(yDecimal)
-    )
-    const tick = Math.round(logBase(primaryUnitsPrice, 1.0001))
+    const tick = calculateTickFromBalance(price, spacing, isXtoY, xDecimal, yDecimal)
 
     return BigInt(nearestSpacingMultiplicity(tick, Number(spacing)))
   } catch (error) {
@@ -488,17 +508,6 @@ export const convertBalanceToBigint = (amount: string, decimals: bigint | number
     )
   }
   return 0n
-}
-export const convertBalanceToBigint2 = (amount: string, decimals: bigint | number): bigint => {
-  const [integerPart, fractionalPart = ''] = amount.split('.')
-  const decimalsNumber = Number(decimals)
-
-  if (fractionalPart.length > decimalsNumber) {
-    return 0n
-  }
-  const paddedFractionalPart = fractionalPart.padEnd(decimalsNumber, '0')
-
-  return BigInt(integerPart + paddedFractionalPart)
 }
 
 export enum PositionTokenBlock {
@@ -548,9 +557,9 @@ export const findPairsByPoolKeys = (tokenFrom: string, tokenTo: string, poolKeys
 export type SimulateResult = {
   poolKey: PoolKey | null
   amountOut: bigint
-  fee: bigint
   priceImpact: number
   targetSqrtPrice: bigint
+  errors: SwapError[]
 }
 
 export const getPools = async (
@@ -600,4 +609,55 @@ export const calcTicksAmountInRange = (
   const maxIndex = logBase(primaryUnitsMax, 1.0001)
 
   return Math.ceil(Math.abs(maxIndex - minIndex) / tickSpacing)
+}
+
+export const getAllTicks = (
+  invariant: Invariant,
+  poolKey: PoolKey,
+  ticks: bigint[]
+): Promise<Tick[]> => {
+  const promises: Promise<Tick>[] = []
+
+  for (const tick of ticks) {
+    promises.push(invariant.getTick(poolKey, tick))
+  }
+
+  return Promise.all(promises)
+}
+
+export const tickmapToArray = (tickmap: Tickmap, tickSpacing: bigint): bigint[] => {
+  const ticks = []
+
+  for (const [chunkIndex, chunk] of tickmap.bitmap.entries()) {
+    for (let bit = 0n; bit < CHUNK_SIZE; bit++) {
+      const checkedBit = chunk & (1n << bit)
+      if (checkedBit) {
+        ticks.push(positionToTick(chunkIndex, bit, tickSpacing))
+      }
+    }
+  }
+
+  return ticks
+}
+
+export const deserializeTickmap = (serializedTickmap: string): Tickmap => {
+  const deserializedMap: Map<string, string> = new Map(JSON.parse(serializedTickmap))
+
+  const parsedMap = new Map()
+  for (const [key, value] of deserializedMap) {
+    parsedMap.set(BigInt(key), BigInt(value))
+  }
+
+  return { bitmap: parsedMap }
+}
+
+export const calculateAmountInWithSlippage = (
+  amountOut: bigint,
+  sqrtPriceLimit: bigint,
+  xToY: boolean
+): bigint => {
+  const price = +printBigint(sqrtPriceToPrice(sqrtPriceLimit), PRICE_SCALE)
+  const amountIn = xToY ? Number(amountOut) * price : Number(amountOut) / price
+
+  return BigInt(Math.ceil(amountIn))
 }

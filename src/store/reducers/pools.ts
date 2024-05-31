@@ -6,7 +6,8 @@ import {
   TESTNET_ETH_ADDRESS,
   TESTNET_USDC_ADDRESS,
   TESTNET_WAZERO_ADDRESS,
-  Tick
+  Tick,
+  Tickmap
 } from '@invariant-labs/a0-sdk'
 import { AddressOrPair } from '@polkadot/api/types'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
@@ -32,7 +33,7 @@ export interface IPoolsStore {
   poolTicks: { [key in string]: Tick[] }
   nearestPoolTicksForPair: { [key in string]: Tick[] }
   isLoadingLatestPoolsForTransaction: boolean
-  tickMaps: { [key in string]: bigint[] }
+  tickMaps: { [key in string]: string }
   volumeRanges: Record<string, Range[]>
 }
 
@@ -42,12 +43,12 @@ export interface UpdatePool {
 }
 
 export interface updateTickMaps {
-  index: string
-  tickMapStructure: bigint[]
+  poolKey: PoolKey
+  tickMapStructure: Tickmap
 }
 
 export interface UpdateTick {
-  index: string
+  poolKey: PoolKey
   tickStructure: Tick[]
 }
 export interface DeleteTick {
@@ -167,13 +168,19 @@ const poolsSlice = createSlice({
     //   state.pools = action.payload
     //   return state
     // },
-    // setTickMaps(state, action: PayloadAction<updateTickMaps>) {
-    //   state.tickMaps[action.payload.index] = action.payload.tickMapStructure
-    // },
-    // setTicks(state, action: PayloadAction<UpdateTick>) {
-    //   state.poolTicks[action.payload.index] = action.payload.tickStructure
-    //   return state
-    // },
+    setTickMaps(state, action: PayloadAction<updateTickMaps>) {
+      state.tickMaps[poolKeyToString(action.payload.poolKey)] = JSON.stringify(
+        Array.from(action.payload.tickMapStructure.bitmap.entries()).map(([key, value]) => [
+          key.toString(),
+          value.toString()
+        ])
+      )
+      return state
+    },
+    setTicks(state, action: PayloadAction<UpdateTick>) {
+      state.poolTicks[poolKeyToString(action.payload.poolKey)] = action.payload.tickStructure
+      return state
+    },
     // updatePool(state, action: PayloadAction<UpdatePool>) {
     //   state.pools[action.payload.address.toString()] = {
     //     address: state.pools[action.payload.address.toString()].address,
@@ -223,16 +230,16 @@ const poolsSlice = createSlice({
       return state
     },
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    getPoolsDataForList(_state, _action: PayloadAction<ListPoolsRequest>) {}
+    getPoolsDataForList(_state, _action: PayloadAction<ListPoolsRequest>) {},
     // deleteTick(state, action: PayloadAction<DeleteTick>) {
     //   state.poolTicks[action.payload.address].splice(action.payload.index, 1)
     // },
     // updateTickmap(state, action: PayloadAction<UpdateTickmap>) {
     //   state.tickMaps[action.payload.address].bitmap = action.payload.bitmap
     // },
-    // getTicksAndTickMaps(_state, _action: PayloadAction<FetchTicksAndTickMaps>) {
-    //   return _state
-    // },
+    getTicksAndTickMaps(_state, _action: PayloadAction<FetchTicksAndTickMaps>) {
+      return _state
+    }
     // addTicksToArray(state, action: PayloadAction<UpdateTick>) {
     //   const { index, tickStructure } = action.payload
     //   if (!state.poolTicks[index]) {

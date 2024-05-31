@@ -20,6 +20,7 @@ import {
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { Swap as SwapData, actions } from '@store/reducers/swap'
 import { Status } from '@store/reducers/wallet'
+import { SwapError } from '@store/sagas/swap'
 import { SwapToken } from '@store/selectors/wallet'
 import { blurContent, unblurContent } from '@utils/uiUtils'
 import classNames from 'classnames'
@@ -283,10 +284,17 @@ export const Swap: React.FC<ISwap> = ({
     }
   }
 
+  const isError = (error: SwapError): boolean => {
+    return simulateResult.errors.some(err => err === error)
+  }
+
   const getStateMessage = () => {
+    console.log(tokenFromIndex, tokenToIndex, throttle, isWaitingForNewPool)
+
     if ((tokenFromIndex !== null && tokenToIndex !== null && throttle) || isWaitingForNewPool) {
       return 'Loading'
     }
+
     if (walletStatus !== Status.Initialized) {
       return 'Connect a wallet'
     }
@@ -304,29 +312,31 @@ export const Swap: React.FC<ISwap> = ({
     }
 
     if (
+      simulateResult.poolKey === null &&
+      (isError(SwapError.InsufficientLiquidity) || isError(SwapError.MaxTicksCrossed))
+    ) {
+      return 'Insufficient liquidity'
+    }
+
+    if (
       convertBalanceToBigint(amountFrom, Number(tokens[tokenFromIndex].decimals)) >
       tokens[tokenFromIndex].balance
     ) {
       return 'Insufficient balance'
     }
 
-    if (convertBalanceToBigint(amountFrom, Number(tokens[tokenFromIndex].decimals)) === 0n) {
-      return 'Insufficient volume'
-    }
-
     if (
-      simulateResult.amountOut === 0n &&
-      simulateResult.fee === 0n &&
-      simulateResult.priceImpact === 0
+      convertBalanceToBigint(amountFrom, Number(tokens[tokenFromIndex].decimals)) === 0n ||
+      (simulateResult.poolKey === null && isError(SwapError.AmountIsZero))
     ) {
-      return 'Insufficient liquidity'
+      return 'Insufficient volume'
     }
 
     return 'Swap tokens'
   }
   const hasShowRateMessage = () => {
     return (
-      // getStateMessage() === 'Insufficient balance' ||
+      getStateMessage() === 'Insufficient balance' ||
       getStateMessage() === 'Swap tokens' ||
       getStateMessage() === 'Loading' ||
       getStateMessage() === 'Connect a wallet' ||
@@ -586,7 +596,7 @@ export const Swap: React.FC<ISwap> = ({
         </Box>
         <TransactionDetailsBox
           open={getStateMessage() !== 'Loading' ? detailsOpen && canShowDetails : prevOpenState}
-          fee={simulateResult.fee}
+          fee={simulateResult.poolKey?.feeTier.fee ?? 0n}
           exchangeRate={{
             val: rateReversed ? 1 / swapRate : swapRate,
             symbol: canShowDetails

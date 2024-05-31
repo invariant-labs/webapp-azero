@@ -1,17 +1,18 @@
-import React, { useState, useEffect, useMemo } from 'react'
-import useStyles from './style'
+import AnimatedNumber from '@components/AnimatedNumber'
+import RangeInput from '@components/Inputs/RangeInput/RangeInput'
+import SimpleInput from '@components/Inputs/SimpleInput/SimpleInput'
+import { Price, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk/src'
+import { Button, Grid, Typography } from '@mui/material'
 import {
   calcPrice,
+  calculateTickFromBalance,
   formatNumbers,
   nearestTickIndex,
   showPrefix,
   toMaxNumericPlaces
 } from '@store/consts/utils'
-import { Button, Grid, Typography } from '@mui/material'
-import SimpleInput from '@components/Inputs/SimpleInput/SimpleInput'
-import RangeInput from '@components/Inputs/RangeInput/RangeInput'
-import AnimatedNumber from '@components/AnimatedNumber'
-import { Price, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk/src'
+import React, { useEffect, useMemo, useState } from 'react'
+import useStyles from './style'
 
 export interface IPoolInit {
   tokenASymbol: string
@@ -58,10 +59,15 @@ export const PoolInit: React.FC<IPoolInit> = ({
   )
 
   useEffect(() => {
-    const TickIndex = nearestTickIndex(+leftInput, tickSpacing, isXtoY, xDecimal, yDecimal)
-    if (TickIndex) {
-      onChangeMidPrice(TickIndex!)
-    }
+    const tickIndex = calculateTickFromBalance(
+      +midPriceInput,
+      tickSpacing,
+      isXtoY,
+      xDecimal,
+      yDecimal
+    )
+
+    onChangeMidPrice(BigInt(tickIndex))
   }, [midPriceInput])
 
   const setLeftInputValues = (val: string) => {
@@ -145,7 +151,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
           <Grid className={classes.infoWrapper}>
             <Typography className={classes.info}>
               This pool does not exist yet. To create it, select the fee tier, initial price, and
-              enter the amount of tokens. The estimated cost of creating a pool is 0.1 SOL.
+              enter the amount of tokens. The estimated cost of creating a pool is 0.003 AZERO.
             </Typography>
           </Grid>
 
@@ -156,7 +162,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
             className={classes.midPrice}
             placeholder='0.0'
             onBlur={e => {
-              setMidPriceInput(validateMidPriceInput(e.target.value))
+              setMidPriceInput(validateMidPriceInput(e.target.value || '0'))
             }}
           />
 
