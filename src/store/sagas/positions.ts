@@ -147,6 +147,8 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
 
     closeSnackbar(loaderCreatePosition)
     yield put(snackbarsActions.remove(loaderCreatePosition))
+
+    yield put(actions.getPositionsList())
   } catch (error) {
     console.log(error)
 
@@ -287,6 +289,8 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
 
     closeSnackbar(loaderCreatePosition)
     yield put(snackbarsActions.remove(loaderCreatePosition))
+
+    yield put(actions.getPositionsList())
   } catch (error) {
     console.log(error)
 
