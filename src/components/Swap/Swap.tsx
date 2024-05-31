@@ -289,8 +289,6 @@ export const Swap: React.FC<ISwap> = ({
   }
 
   const getStateMessage = () => {
-    console.log(tokenFromIndex, tokenToIndex, throttle, isWaitingForNewPool)
-
     if ((tokenFromIndex !== null && tokenToIndex !== null && throttle) || isWaitingForNewPool) {
       return 'Loading'
     }

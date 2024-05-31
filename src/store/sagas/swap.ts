@@ -434,7 +434,6 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
       }
     }
 
-    console.log(amountOut, errors)
     yield put(
       actions.setSimulateResult({
         poolKey,
