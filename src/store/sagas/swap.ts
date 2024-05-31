@@ -377,7 +377,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
     let targetSqrtPrice = 0n
     const errors = []
 
-    const protocolFee = yield* call([invariant, invariant.getProtocolFee])
+    const protocolFee = 0n
     for (const pool of filteredPools) {
       const xToY = fromToken.toString() === pool.poolKey.tokenX
 
