@@ -203,14 +203,12 @@ export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMa
   const { tokenFrom, tokenTo, allPools } = action.payload
 
   try {
-    const connection = yield* call(getConnection)
+    const api = yield* call(getConnection)
     const network = yield* select(networkType)
     const invariant = yield* call(
-      Invariant.load,
-      connection,
-      network,
-      TESTNET_INVARIANT_ADDRESS,
-      DEFAULT_INVARIANT_OPTIONS
+      [invariantSingleton, invariantSingleton.loadInstance],
+      api,
+      network
     )
 
     const pools = findPairs(tokenFrom.toString(), tokenTo.toString(), allPools)
