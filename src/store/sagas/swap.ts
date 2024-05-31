@@ -20,7 +20,8 @@ import { PayloadAction } from '@reduxjs/toolkit'
 import {
   DEFAULT_INVARIANT_OPTIONS,
   DEFAULT_PSP22_OPTIONS,
-  DEFAULT_WAZERO_OPTIONS
+  DEFAULT_WAZERO_OPTIONS,
+  U128MAX
 } from '@store/consts/static'
 import {
   calculateAmountInWithSlippage,
@@ -259,6 +260,12 @@ export function* handleSwapWithAZERO(): Generator {
       const withdrawTx = wazero.withdrawTx(swapSimulateResult.amountOut)
       txs.push(withdrawTx)
     }
+
+    const approveTx = psp22.approveTx(TESTNET_INVARIANT_ADDRESS, U128MAX, TESTNET_WAZERO_ADDRESS)
+    txs.push(approveTx)
+
+    const unwrapTx = invariant.withdrawAllWAZEROTx(TESTNET_WAZERO_ADDRESS)
+    txs.push(unwrapTx)
 
     const batchedTx = api.tx.utility.batchAll(txs)
     const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
