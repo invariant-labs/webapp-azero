@@ -30,6 +30,7 @@ import {
   USDC,
   tokensPrices
 } from './static'
+import { calculateLiquidityBreakpoints } from '@invariant-labs/a0-sdk/target/utils'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -501,13 +502,9 @@ export const nearestTickIndex = (
   xDecimal: bigint,
   yDecimal: bigint
 ) => {
-  try {
-    const tick = calculateTickFromBalance(price, spacing, isXtoY, xDecimal, yDecimal)
+  const tick = calculateTickFromBalance(price, spacing, isXtoY, xDecimal, yDecimal)
 
-    return BigInt(nearestSpacingMultiplicity(tick, Number(spacing)))
-  } catch (error) {
-    console.log(error)
-  }
+  return BigInt(nearestSpacingMultiplicity(tick, Number(spacing)))
 }
 
 export const convertBalanceToBigint = (amount: string, decimals: bigint | number): bigint => {
@@ -674,4 +671,100 @@ export const calculateAmountInWithSlippage = (
   const amountIn = xToY ? Number(amountOut) * price : Number(amountOut) / price
 
   return BigInt(Math.ceil(amountIn))
+}
+
+//TODO export from SDK
+export interface LiquidityTick {
+  index: bigint
+  liquidityChange: bigint
+  sign: boolean
+}
+export const createLiquidityPlot = (
+  rawTicks: LiquidityTick[],
+  tickSpacing: bigint,
+  isXtoY: boolean,
+  tokenXDecimal: bigint,
+  tokenYDecimal: bigint
+) => {
+  const sortedTicks = rawTicks.sort((a, b) => Number(a.index - b.index))
+  const parsedTicks = rawTicks.length ? calculateLiquidityBreakpoints(sortedTicks) : []
+
+  const ticks = rawTicks.map((raw, index) => ({
+    ...raw,
+    liqudity: parsedTicks[index].liquidity
+  }))
+
+  const ticksData: PlotTickData[] = []
+
+  const min = getMinTick(tickSpacing)
+  const max = getMaxTick(tickSpacing)
+
+  if (!ticks.length || ticks[0].index > min) {
+    const minPrice = calcPrice(min, isXtoY, tokenXDecimal, tokenYDecimal)
+
+    ticksData.push({
+      x: minPrice,
+      y: 0,
+      index: min
+    })
+  }
+
+  ticks.forEach((tick, i) => {
+    if (i === 0 && tick.index - tickSpacing > min) {
+      const price = calcPrice(tick.index - tickSpacing, isXtoY, tokenXDecimal, tokenYDecimal)
+      ticksData.push({
+        x: price,
+        y: 0,
+        index: tick.index - tickSpacing
+      })
+    } else if (i > 0 && tick.index - tickSpacing > ticks[i - 1].index) {
+      const price = calcPrice(tick.index - tickSpacing, isXtoY, tokenXDecimal, tokenYDecimal)
+      ticksData.push({
+        x: price,
+        y: +printBigint(ticks[i - 1].liqudity, 12n), // TODO use constant
+        index: tick.index - tickSpacing
+      })
+    }
+
+    const price = calcPrice(tick.index, isXtoY, tokenXDecimal, tokenYDecimal)
+    ticksData.push({
+      x: price,
+      y: +printBigint(ticks[i].liqudity, 12n), // TODO use constant
+      index: tick.index
+    })
+  })
+
+  if (!ticks.length) {
+    const maxPrice = calcPrice(max, isXtoY, tokenXDecimal, tokenYDecimal)
+
+    ticksData.push({
+      x: maxPrice,
+      y: 0,
+      index: max
+    })
+  } else if (ticks[ticks.length - 1].index < max) {
+    if (max - ticks[ticks.length - 1].index > tickSpacing) {
+      const price = calcPrice(
+        ticks[ticks.length - 1].index + tickSpacing,
+        isXtoY,
+        tokenXDecimal,
+        tokenYDecimal
+      )
+      ticksData.push({
+        x: price,
+        y: 0,
+        index: ticks[ticks.length - 1].index + tickSpacing
+      })
+    }
+
+    const maxPrice = calcPrice(max, isXtoY, tokenXDecimal, tokenYDecimal)
+
+    ticksData.push({
+      x: maxPrice,
+      y: 0,
+      index: max
+    })
+  }
+
+  return isXtoY ? ticksData : ticksData.reverse()
 }

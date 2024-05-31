@@ -103,22 +103,21 @@ const positionsSlice = createSlice({
       state.initPosition.success = action.payload
       return state
     },
-    // setPlotTicks(state, action: PayloadAction<PlotTickData[]>) {
-    //   state.plotTicks.data = action.payload
-    //   state.plotTicks.loading = false
-    //   state.plotTicks.hasError = false
-    //   return state
-    // },
-    // setErrorPlotTicks(state, action: PayloadAction<PlotTickData[]>) {
-    //   state.plotTicks.data = action.payload
-    //   state.plotTicks.loading = false
-    //   state.plotTicks.hasError = true
-    //   return state
-    // },
-    // getCurrentPlotTicks(state, action: PayloadAction<GetCurrentTicksData>) {
-    //   state.plotTicks.loading = !action.payload.disableLoading
-    //   return state
-    // },
+    setPlotTicks(state, action: PayloadAction<PlotTickData[]>) {
+      state.plotTicks.data = action.payload
+      state.plotTicks.loading = false
+      return state
+    },
+    setErrorPlotTicks(state, action: PayloadAction<PlotTickData[]>) {
+      state.plotTicks.data = action.payload
+      state.plotTicks.loading = false
+      state.plotTicks.hasError = true
+      return state
+    },
+    getCurrentPlotTicks(state, _action: PayloadAction<{ poolKey: PoolKey; isXtoY: boolean }>) {
+      state.plotTicks.loading = true
+      return state
+    },
     setPositionsList(state, action: PayloadAction<Position[]>) {
       state.positionsList.list = action.payload
       state.positionsList.loading = false
