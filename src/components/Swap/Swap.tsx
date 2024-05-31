@@ -284,6 +284,8 @@ export const Swap: React.FC<ISwap> = ({
   }
 
   const getStateMessage = () => {
+    console.log(tokenFromIndex, tokenToIndex, throttle, isWaitingForNewPool)
+
     if ((tokenFromIndex !== null && tokenToIndex !== null && throttle) || isWaitingForNewPool) {
       return 'Loading'
     }
@@ -326,7 +328,7 @@ export const Swap: React.FC<ISwap> = ({
   }
   const hasShowRateMessage = () => {
     return (
-      // getStateMessage() === 'Insufficient balance' ||
+      getStateMessage() === 'Insufficient balance' ||
       getStateMessage() === 'Swap tokens' ||
       getStateMessage() === 'Loading' ||
       getStateMessage() === 'Connect a wallet' ||
