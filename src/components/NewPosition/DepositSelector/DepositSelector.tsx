@@ -1,15 +1,15 @@
+import AnimatedButton, { ProgressState } from '@components/AnimatedButton/AnimatedButton'
+import DepositAmountInput from '@components/Inputs/DepositAmountInput/DepositAmountInput'
+import Select from '@components/Inputs/Select/Select'
+import { Grid, Typography } from '@mui/material'
 import SwapList from '@static/svg/swap-list.svg'
+import { ALL_FEE_TIERS_DATA, PositionOpeningMethod } from '@store/consts/static'
+import { parsePathFeeToFeeString, tickerToAddress } from '@store/consts/uiUtiils'
+import { convertBalanceToBigint, getScaleFromString, printBigint } from '@store/consts/utils'
 import classNames from 'classnames'
 import React, { useCallback, useEffect, useState } from 'react'
 import FeeSwitch from '../FeeSwitch/FeeSwitch'
 import { useStyles } from './style'
-import AnimatedButton, { ProgressState } from '@components/AnimatedButton/AnimatedButton'
-import { ALL_FEE_TIERS_DATA, PositionOpeningMethod } from '@store/consts/static'
-import { Grid, Typography } from '@mui/material'
-import { getScaleFromString, printBigint, convertBalanceToBigint } from '@store/consts/utils'
-import DepositAmountInput from '@components/Inputs/DepositAmountInput/DepositAmountInput'
-import Select from '@components/Inputs/Select/Select'
-import { parsePathFeeToFeeString, tickerToAddress } from '@store/consts/uiUtiils'
 export interface InputState {
   value: string
   setValue: (value: string) => void
@@ -147,7 +147,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
       (poolIndex === null && !canCreateNewPool) ||
       (poolIndex !== null && !canCreateNewPosition)
     ) {
-      return 'Insufficient SOL'
+      return 'Insufficient AZERO'
     }
 
     if (

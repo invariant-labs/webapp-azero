@@ -1,7 +1,7 @@
+import { Box, Typography } from '@mui/material'
 import loadingAnimation from '@static/gif/loading.gif'
 import React from 'react'
 import useStyles from './style'
-import { Box, Grid, Typography } from '@mui/material'
 
 interface iProps {
   tokenFromSymbol: string
@@ -23,9 +23,9 @@ const ExchangeRate: React.FC<iProps> = ({
   const { classes } = useStyles()
   const setLoading = () => {
     return loading ? (
-      <Grid className={classes.loadingContainer}>
+      <Box className={classes.loadingContainer}>
         <img src={loadingAnimation} className={classes.loading}></img>
-      </Grid>
+      </Box>
     ) : (
       <Typography className={classes.rateText} onClick={onClick}>
         1 {tokenFromSymbol} = {isNaN(amount) ? 0 : amount.toFixed(tokenToDecimals)} {tokenToSymbol}
