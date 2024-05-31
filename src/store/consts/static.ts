@@ -211,3 +211,5 @@ export const ALL_FEE_TIERS_DATA = FEE_TIERS.map((tier, index) => ({
   tier,
   primaryIndex: index
 }))
+
+export const U128MAX = 2n ** 128n - 1n
