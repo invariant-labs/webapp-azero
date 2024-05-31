@@ -498,6 +498,9 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<bigint>) {
     const unwrapTx = invariant.withdrawAllWAZEROTx(TESTNET_WAZERO_ADDRESS)
     txs.push(unwrapTx)
 
+    const resetApproveTx = psp22.approveTx(TESTNET_INVARIANT_ADDRESS, 0n, TESTNET_WAZERO_ADDRESS)
+    txs.push(resetApproveTx)
+
     const batchedTx = connection.tx.utility.batchAll(txs)
     const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
