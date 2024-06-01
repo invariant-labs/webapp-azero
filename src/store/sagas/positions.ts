@@ -432,7 +432,7 @@ export function* handleClaimFee(action: PayloadAction<bigint>) {
     yield put(snackbarsActions.remove(loaderKey))
     yield put(
       snackbarsActions.add({
-        message: 'Fee successfully created',
+        message: 'Fee successfully claimed',
         variant: 'success',
         persist: false,
         txid: txResult.hash
@@ -559,14 +559,16 @@ export function* handleGetSinglePosition(action: PayloadAction<bigint>) {
   )
 
   const position = yield* call([invariant, invariant.getPosition], walletAddress, action.payload)
-  yield put(
+  yield* put(
     actions.setSinglePosition({
       index: action.payload,
       position
     })
   )
-
-  yield put(actions.getCurrentPositionTicks(action.payload))
+  yield* put(actions.getCurrentPositionTicks(action.payload))
+  yield* put(
+    poolsActions.getPoolsDataForList({ poolKeys: [position.poolKey], listType: ListType.POSITIONS })
+  )
 }
 
 export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
