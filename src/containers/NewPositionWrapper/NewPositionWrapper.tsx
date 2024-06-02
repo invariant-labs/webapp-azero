@@ -116,7 +116,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     if (!inProgress && progress === 'progress') {
       setProgress(success ? 'approvedWithSuccess' : 'approvedWithFail')
 
-      if (poolIndex !== null && tokenAIndex !== null && tokenBIndex !== null) {
+      if (poolKey !== '' && tokenAIndex !== null && tokenBIndex !== null) {
         dispatch(positionsActions.getCurrentPlotTicks({ poolKey: allPoolKeys[poolKey], isXtoY }))
       }
 
@@ -133,7 +133,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       clearTimeout(timeoutId1)
       clearTimeout(timeoutId2)
     }
-  }, [success, inProgress])
+  }, [success, inProgress, poolKey])
 
   const isXtoY = useMemo(() => {
     if (tokenAIndex !== null && tokenBIndex !== null) {
