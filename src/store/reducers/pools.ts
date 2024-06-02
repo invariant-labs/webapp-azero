@@ -216,15 +216,6 @@ const poolsSlice = createSlice({
     //     state.poolTicks[action.payload.address].findIndex(e => e.index === action.payload.index)
     //   ] = action.payload.tick
     // },
-
-    // getAllPoolsForPairData(state, _action: PayloadAction<PairTokens>) {
-    //   state.isLoadingLatestPoolsForTransaction = true
-    //   return state
-    // },
-    // getPoolData(state, _action: PayloadAction<Pair>) {
-    //   state.isLoadingLatestPoolsForTransaction = true
-    //   return state
-    // },
     getAllPoolsForPairData(state, action: PayloadAction<PairTokens>) {
       state.isLoadingLatestPoolsForTransaction = true
       return state

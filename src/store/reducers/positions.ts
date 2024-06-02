@@ -106,6 +106,7 @@ const positionsSlice = createSlice({
     setPlotTicks(state, action: PayloadAction<PlotTickData[]>) {
       state.plotTicks.data = action.payload
       state.plotTicks.loading = false
+      state.plotTicks.hasError = false
       return state
     },
     setErrorPlotTicks(state, action: PayloadAction<PlotTickData[]>) {

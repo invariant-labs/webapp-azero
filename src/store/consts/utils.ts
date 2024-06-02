@@ -390,7 +390,15 @@ export const getPoolsByPoolKeys = async (
 }
 
 export const poolKeyToString = (poolKey: PoolKey): string => {
-  return poolKey.tokenX + poolKey.tokenY + poolKey.feeTier.fee + poolKey.feeTier.tickSpacing
+  return (
+    poolKey.tokenX +
+    '-' +
+    poolKey.tokenY +
+    '-' +
+    poolKey.feeTier.fee +
+    '-' +
+    poolKey.feeTier.tickSpacing
+  )
 }
 
 export const getNetworkTokensList = (networkType: Network): Record<string, Token> => {

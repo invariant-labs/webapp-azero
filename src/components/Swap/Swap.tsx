@@ -285,7 +285,10 @@ export const Swap: React.FC<ISwap> = ({
   }
 
   const isError = (error: SwapError): boolean => {
-    return simulateResult.errors.some(err => err === error)
+    if (simulateResult.errors) {
+      return simulateResult.errors.some(err => err === error)
+    }
+    return false
   }
 
   const getStateMessage = () => {
