@@ -349,14 +349,12 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
     let targetSqrtPrice = 0n
     const errors = []
 
-    const protocolFee = 0n
     for (const pool of filteredPools) {
       const xToY = fromToken.toString() === pool.poolKey.tokenX
 
       try {
         const result = simulateInvariantSwap(
           deserializeTickmap(allTickmaps[poolKeyToString(pool.poolKey)]),
-          protocolFee,
           pool.poolKey.feeTier,
           allPools[poolKeyToString(pool.poolKey)],
           allTicks[poolKeyToString(pool.poolKey)],
