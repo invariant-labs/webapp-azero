@@ -23,13 +23,13 @@ import { networkType } from '@store/selectors/connection'
 import { address } from '@store/selectors/wallet'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
-import { all, call, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
+import { all, call, delay, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
 import { getConnection } from './connection'
 import { fetchAllPoolKeys } from './pools'
 import invariantSingleton from '@store/services/invariantSingleton'
 import psp22Singleton from '@store/services/psp22Singleton'
 import wrappedAZEROSingleton from '@store/services/wrappedAZEROSingleton'
-import { tickMaps, tokens } from '@store/selectors/pools'
+import { poolsArraySortedByFees, tickMaps, tokens } from '@store/selectors/pools'
 
 function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator {
   const loaderCreatePosition = createLoaderKey()
@@ -365,10 +365,11 @@ export function* handleGetCurrentPositionTicks(action: PayloadAction<bigint>) {
 export function* handleGetCurrentPlotTicks(
   action: PayloadAction<{ poolKey: PoolKey; isXtoY: boolean }>
 ): Generator {
-  const connection = yield* getConnection()
+  const api = yield* getConnection()
   const network = yield* select(networkType)
-  const allTickmaps = yield* select(tickMaps)
+  let allTickmaps = yield* select(tickMaps)
   const allTokens = yield* select(tokens)
+  const allPools = yield* select(poolsArraySortedByFees)
   const { poolKey, isXtoY } = action.payload
 
   const xDecimal = allTokens[poolKey.tokenX].decimals
@@ -376,12 +377,27 @@ export function* handleGetCurrentPlotTicks(
 
   try {
     const invariant = yield* call(
-      [Invariant, Invariant.load],
-      connection,
-      network,
-      TESTNET_INVARIANT_ADDRESS,
-      DEFAULT_INVARIANT_OPTIONS
+      [invariantSingleton, invariantSingleton.loadInstance],
+      api,
+      network
     )
+
+    if (!allTickmaps[poolKeyToString(poolKey)]) {
+      yield* put(
+        poolsActions.getTicksAndTickMaps({
+          tokenFrom: allTokens[poolKey.tokenX].address,
+          tokenTo: allTokens[poolKey.tokenY].address,
+          allPools
+        })
+      )
+    }
+
+    let i = 0
+    while (!allTickmaps[poolKeyToString(poolKey)] && i < 5) {
+      i++
+      yield* delay(300)
+      allTickmaps = yield* select(tickMaps)
+    }
 
     const rawTicks = yield* call(
       [invariant, invariant.getAllLiquidityTicks],

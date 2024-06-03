@@ -85,12 +85,11 @@ export const NewPositionWrapper: React.FC<IProps> = ({
 
   useEffect(() => {
     if (tokenAIndex !== null && tokenBIndex !== null) {
-      console.log('getTicksAndTickMaps')
       const tokenFrom = isXtoY ? tokens[tokenAIndex].assetAddress : tokens[tokenBIndex].assetAddress
       const tokenTo = isXtoY ? tokens[tokenBIndex].assetAddress : tokens[tokenAIndex].assetAddress
       dispatch(poolsActions.getTicksAndTickMaps({ tokenFrom, tokenTo, allPools }))
     }
-  }, [tokenAIndex, tokenBIndex])
+  }, [tokenAIndex, tokenBIndex, allPools])
 
   useEffect(() => {
     dispatch(poolsActions.getPoolKeys())
@@ -116,8 +115,15 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     if (!inProgress && progress === 'progress') {
       setProgress(success ? 'approvedWithSuccess' : 'approvedWithFail')
 
-      if (poolKey !== '' && tokenAIndex !== null && tokenBIndex !== null) {
-        dispatch(positionsActions.getCurrentPlotTicks({ poolKey: allPoolKeys[poolKey], isXtoY }))
+      if (poolKey !== '' && tokenAIndex !== null && tokenBIndex !== null && poolIndex !== null) {
+        dispatch(
+          positionsActions.getCurrentPlotTicks({
+            poolKey: allPoolKeys[poolKey],
+            isXtoY:
+              allPools[poolIndex].poolKey.tokenX ===
+              tokens[currentPairReversed === true ? tokenBIndex : tokenAIndex].assetAddress
+          })
+        )
       }
 
       timeoutId1 = setTimeout(() => {
@@ -219,7 +225,12 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       setPoolIndex(index !== -1 ? index : null)
 
       if (poolKey !== '') {
-        dispatch(positionsActions.getCurrentPlotTicks({ poolKey: allPoolKeys[poolKey], isXtoY }))
+        dispatch(
+          positionsActions.getCurrentPlotTicks({
+            poolKey: allPoolKeys[poolKey],
+            isXtoY
+          })
+        )
       }
     }
   }, [isWaitingForNewPool, tokenAIndex, tokenBIndex, feeIndex, poolIndex, poolKey])
@@ -249,9 +260,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       return createPlaceholderLiquidityPlot(isXtoY, 10, tickSpacing, xDecimal, yDecimal)
     }
 
-    if (currentPairReversed === true) {
-      return ticksData.map(tick => ({ ...tick, x: 1 / tick.x })).reverse()
-    }
     return ticksData
   }, [ticksData, ticksLoading, isXtoY, tickSpacing, xDecimal, yDecimal, currentPairReversed])
 
@@ -542,10 +550,12 @@ export const NewPositionWrapper: React.FC<IProps> = ({
               setCurrentPairReversed(currentPairReversed === null ? true : !currentPairReversed)
             }
           }
-
-          if (poolKey !== '' && index !== poolIndex) {
+          if (poolKey.length > 0 && index !== poolIndex && tokenAIndex !== null) {
             dispatch(
-              positionsActions.getCurrentPlotTicks({ poolKey: allPoolKeys[poolKey], isXtoY })
+              positionsActions.getCurrentPlotTicks({
+                poolKey: allPoolKeys[poolKey],
+                isXtoY: allPoolKeys[poolKey].tokenX === tokens[tokenAIndex].assetAddress.toString()
+              })
             )
           } else if (
             !(
@@ -584,7 +594,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       tickSpacing={tickSpacing}
       isWaitingForNewPool={isWaitingForNewPool}
       poolIndex={poolIndex}
-      currentPairReversed={null}
+      currentPairReversed={currentPairReversed}
       bestTiers={bestTiers[currentNetwork]}
       initialIsDiscreteValue={initialIsDiscreteValue}
       onDiscreteChange={setIsDiscreteValue}
@@ -605,8 +615,15 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       priceBLoading={priceBLoading}
       hasTicksError={hasTicksError}
       reloadHandler={() => {
-        if (poolKey !== '' && tokenAIndex !== null && tokenBIndex !== null) {
-          dispatch(positionsActions.getCurrentPlotTicks({ poolKey: allPoolKeys[poolKey], isXtoY }))
+        if (poolKey !== '' && tokenAIndex !== null && tokenBIndex !== null && poolIndex !== null) {
+          dispatch(
+            positionsActions.getCurrentPlotTicks({
+              poolKey: allPoolKeys[poolKey],
+              isXtoY:
+                allPools[poolIndex].poolKey.tokenX ===
+                tokens[currentPairReversed === true ? tokenBIndex : tokenAIndex].assetAddress
+            })
+          )
         }
       }}
       plotVolumeRange={currentVolumeRange}

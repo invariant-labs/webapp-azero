@@ -1,5 +1,6 @@
 import {
   Invariant,
+  LiquidityTick,
   Network,
   PoolKey,
   Tick,
@@ -667,12 +668,6 @@ export const calculateAmountInWithSlippage = (
   return BigInt(Math.ceil(amountIn))
 }
 
-//TODO export from SDK
-export interface LiquidityTick {
-  index: bigint
-  liquidityChange: bigint
-  sign: boolean
-}
 export const createLiquidityPlot = (
   rawTicks: LiquidityTick[],
   tickSpacing: bigint,
