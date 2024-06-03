@@ -169,7 +169,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   )
 
   const [tokenXLiquidity, tokenYLiquidity] = useMemo(() => {
-    if (position) {
+    if (position?.poolData) {
       const [x, y] = calculateTokenAmounts(position.poolData, position)
 
       return [+printBigint(x, position.tokenX.decimals), +printBigint(y, position.tokenY.decimals)]
