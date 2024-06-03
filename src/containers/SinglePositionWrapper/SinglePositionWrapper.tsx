@@ -319,6 +319,10 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
     }
   }, [walletStatus])
 
+  useEffect(() => {
+    dispatch(actions.getSinglePosition(id))
+  }, [])
+
   if (position) {
     return (
       <PositionDetails
