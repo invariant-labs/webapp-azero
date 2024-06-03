@@ -530,10 +530,10 @@ export const Swap: React.FC<ISwap> = ({
             }}
             placeholder={`0.${'0'.repeat(6)}`}
             onMaxClick={() => {
-              if (tokenToIndex !== null) {
+              if (tokenFromIndex !== null) {
                 setInputRef(inputTarget.FROM)
-                setAmountTo(
-                  printBigint(tokens[tokenToIndex].balance, tokens[tokenToIndex].decimals)
+                setAmountFrom(
+                  printBigint(tokens[tokenFromIndex].balance, tokens[tokenFromIndex].decimals)
                 )
               }
             }}
