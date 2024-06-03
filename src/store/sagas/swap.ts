@@ -84,7 +84,7 @@ export function* handleSwap(): Generator {
     const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(estimatedPriceAfterSwap, slippage, !xToY)
 
     let calculatedAmountIn = amountIn
-    if (byAmountIn) {
+    if (!byAmountIn) {
       calculatedAmountIn = calculateAmountInWithSlippage(amountIn, sqrtPriceLimit, !xToY)
     }
 
@@ -202,7 +202,7 @@ export function* handleSwapWithAZERO(): Generator {
 
     const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(estimatedPriceAfterSwap, slippage, !xToY)
     let calculatedAmountIn = amountIn
-    if (byAmountIn) {
+    if (!byAmountIn) {
       calculatedAmountIn = calculateAmountInWithSlippage(amountIn, sqrtPriceLimit, !xToY)
     }
 
@@ -365,8 +365,6 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
           byAmountIn,
           xToY ? MIN_SQRT_PRICE : MAX_SQRT_PRICE
         )
-
-        console.log(result)
 
         if (result.globalInsufficientLiquidity) {
           errors.push(SwapError.InsufficientLiquidity)
