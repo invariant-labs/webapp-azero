@@ -1,13 +1,13 @@
-import React, { CSSProperties, useRef } from 'react'
-import classNames from 'classnames'
 import Select from '@components/Inputs/Select/Select'
-import loadingAnimation from '@static/gif/loading.gif'
-import useStyles from './style'
-import { AddressOrPair } from '@polkadot/api/types'
-import { FormatNumberThreshold, formatNumbers, showPrefix } from '@store/consts/utils'
-import { Grid, Input, Tooltip, Typography } from '@mui/material'
-import { SwapToken } from '@store/selectors/wallet'
 import { OutlinedButton } from '@components/OutlinedButton/OutlinedButton'
+import { Grid, Input, Tooltip, Typography } from '@mui/material'
+import { AddressOrPair } from '@polkadot/api/types'
+import loadingAnimation from '@static/gif/loading.gif'
+import { FormatNumberThreshold, formatNumbers, showPrefix } from '@store/consts/utils'
+import { SwapToken } from '@store/selectors/wallet'
+import classNames from 'classnames'
+import React, { CSSProperties, useRef } from 'react'
+import useStyles from './style'
 
 interface IProps {
   setValue: (value: string) => void
@@ -33,6 +33,7 @@ interface IProps {
   tokenPrice?: number
   priceLoading?: boolean
   isBalanceLoading: boolean
+  showMaxButton: boolean
 }
 
 export const AmountInput: React.FC<IProps> = ({
@@ -57,7 +58,8 @@ export const AmountInput: React.FC<IProps> = ({
   onHideUnknownTokensChange,
   tokenPrice,
   priceLoading = false,
-  isBalanceLoading
+  isBalanceLoading,
+  showMaxButton = true
 }) => {
   const { classes } = useStyles({ walletDisconnected: hideBalances })
   const inputRef = useRef<HTMLInputElement>(null)
@@ -212,18 +214,20 @@ export const AmountInput: React.FC<IProps> = ({
               {showPrefix(Number(balance))} {tokenIcon.slice(0, 8)}
               {tokenIcon.length > 8 ? '...' : ''}
             </Typography>
-            <OutlinedButton
-              name='Max'
-              color='primary'
-              onClick={onMaxClick}
-              className={classes.maxButton}
-              labelClassName={classes.label}
-              disabled={
-                disabled && isNaN(Number(balance))
-                  ? disabled
-                  : isNaN(Number(balance)) || hideBalances
-              }
-            />
+            {showMaxButton && (
+              <OutlinedButton
+                name='Max'
+                color='primary'
+                onClick={onMaxClick}
+                className={classes.maxButton}
+                labelClassName={classes.label}
+                disabled={
+                  disabled && isNaN(Number(balance))
+                    ? disabled
+                    : isNaN(Number(balance)) || hideBalances
+                }
+              />
+            )}
           </Grid>
           <Grid className={classes.percentages} container alignItems='center' wrap='nowrap'>
             {current ? (

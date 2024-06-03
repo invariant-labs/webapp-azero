@@ -480,6 +480,7 @@ export const Swap: React.FC<ISwap> = ({
             tokenPrice={tokenFromPriceData?.price}
             priceLoading={priceFromLoading}
             isBalanceLoading={isBalanceLoading}
+            showMaxButton={true}
           />
         </Box>
         <Box className={classes.tokenComponentTextContainer}>
@@ -550,6 +551,7 @@ export const Swap: React.FC<ISwap> = ({
             tokenPrice={tokenToPriceData?.price}
             priceLoading={priceToLoading}
             isBalanceLoading={isBalanceLoading}
+            showMaxButton={false}
           />
         </Box>
         <Box className={classes.transactionDetails}>
