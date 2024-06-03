@@ -1,8 +1,5 @@
 import {
-  Invariant,
-  PSP22,
   TESTNET_WAZERO_ADDRESS,
-  WrappedAZERO,
   calculatePriceImpact,
   calculateSqrtPriceAfterSlippage,
   sendTx,
@@ -16,11 +13,7 @@ import {
 } from '@invariant-labs/a0-sdk/target/consts'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
-import {
-  DEFAULT_INVARIANT_OPTIONS,
-  DEFAULT_PSP22_OPTIONS,
-  DEFAULT_WAZERO_OPTIONS
-} from '@store/consts/static'
+import { U128MAX } from '@store/consts/static'
 import {
   calculateAmountInWithSlippage,
   createLoaderKey,
@@ -36,6 +29,9 @@ import { invariantAddress, networkType } from '@store/selectors/connection'
 import { poolTicks, pools, tickMaps, tokens } from '@store/selectors/pools'
 import { simulateResult, swap } from '@store/selectors/swap'
 import { address, balance } from '@store/selectors/wallet'
+import invariantSingleton from '@store/services/invariantSingleton'
+import psp22Singleton from '@store/services/psp22Singleton'
+import wrappedAZEROSingleton from '@store/services/wrappedAZEROSingleton'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
 import { all, call, put, select, spawn, takeEvery } from 'typed-redux-saga'
@@ -78,15 +74,13 @@ export function* handleSwap(): Generator {
 
     const txs = []
 
-    const psp22 = yield* call(PSP22.load, api, network, DEFAULT_PSP22_OPTIONS)
+    const psp22 = yield* call([psp22Singleton, psp22Singleton.loadInstance], api, network)
     const invariant = yield* call(
-      Invariant.load,
+      [invariantSingleton, invariantSingleton.loadInstance],
       api,
       network,
-      invAddress,
-      DEFAULT_INVARIANT_OPTIONS
+      invAddress
     )
-
     const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(estimatedPriceAfterSwap, slippage, !xToY)
 
     let calculatedAmountIn = amountIn
@@ -194,19 +188,16 @@ export function* handleSwapWithAZERO(): Generator {
     const txs = []
 
     const wazero = yield* call(
-      WrappedAZERO.load,
+      [wrappedAZEROSingleton, wrappedAZEROSingleton.loadInstance],
       api,
-      network,
-      TESTNET_WAZERO_ADDRESS,
-      DEFAULT_WAZERO_OPTIONS
+      network
     )
-    const psp22 = yield* call(PSP22.load, api, network, DEFAULT_PSP22_OPTIONS)
+    const psp22 = yield* call([psp22Singleton, psp22Singleton.loadInstance], api, network)
     const invariant = yield* call(
-      Invariant.load,
+      [invariantSingleton, invariantSingleton.loadInstance],
       api,
       network,
-      invAddress,
-      DEFAULT_INVARIANT_OPTIONS
+      invAddress
     )
 
     const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(estimatedPriceAfterSwap, slippage, !xToY)
@@ -244,6 +235,12 @@ export function* handleSwapWithAZERO(): Generator {
       const withdrawTx = wazero.withdrawTx(swapSimulateResult.amountOut)
       txs.push(withdrawTx)
     }
+
+    const approveTx = psp22.approveTx(invAddress, U128MAX, TESTNET_WAZERO_ADDRESS)
+    txs.push(approveTx)
+
+    const unwrapTx = invariant.withdrawAllWAZEROTx(TESTNET_WAZERO_ADDRESS)
+    txs.push(unwrapTx)
 
     const batchedTx = api.tx.utility.batchAll(txs)
     const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {

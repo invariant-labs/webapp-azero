@@ -1,7 +1,6 @@
-import { Invariant, PoolKey, newPoolKey, sendTx, toSqrtPrice } from '@invariant-labs/a0-sdk'
+import { PoolKey, newPoolKey, sendTx, toSqrtPrice } from '@invariant-labs/a0-sdk'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { DEFAULT_INVARIANT_OPTIONS } from '@store/consts/static'
 import {
   createLoaderKey,
   findPairs,
@@ -18,6 +17,7 @@ import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { invariantAddress, networkType } from '@store/selectors/connection'
 import { tokens } from '@store/selectors/pools'
 import { address } from '@store/selectors/wallet'
+import invariantSingleton from '@store/services/invariantSingleton'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
@@ -70,7 +70,6 @@ export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) 
   yield* put(actions.addPoolsForList({ data: pools, listType: action.payload.listType }))
 }
 
-//TODO check can it be deleted
 export function* handleInitPool(action: PayloadAction<PoolKey>): Generator {
   const loaderKey = createLoaderKey()
   const loaderSigningTx = createLoaderKey()
@@ -93,11 +92,10 @@ export function* handleInitPool(action: PayloadAction<PoolKey>): Generator {
     const invAddress = yield* select(invariantAddress)
 
     const invariant = yield* call(
-      [Invariant, Invariant.load],
+      [invariantSingleton, invariantSingleton.loadInstance],
       api,
       network,
-      invAddress,
-      DEFAULT_INVARIANT_OPTIONS
+      invAddress
     )
 
     const poolKey = newPoolKey(tokenX, tokenY, feeTier)
@@ -152,12 +150,12 @@ export function* fetchPoolData(action: PayloadAction<PoolKey>): Generator {
 
   try {
     const invariant = yield* call(
-      [Invariant, Invariant.load],
+      [invariantSingleton, invariantSingleton.loadInstance],
       api,
       network,
-      invAddress,
-      DEFAULT_INVARIANT_OPTIONS
+      invAddress
     )
+
     const pool = yield* call([invariant, invariant.getPool], tokenX, tokenY, feeTier)
 
     if (pool) {
@@ -183,11 +181,10 @@ export function* fetchAllPoolKeys(): Generator {
 
   try {
     const invariant = yield* call(
-      [Invariant, Invariant.load],
+      [invariantSingleton, invariantSingleton.loadInstance],
       api,
       network,
-      invAddress,
-      DEFAULT_INVARIANT_OPTIONS
+      invAddress
     )
 
     //TODO: in the future handle more than 100 pools
@@ -201,15 +198,14 @@ export function* fetchAllPoolKeys(): Generator {
 }
 
 export function* fetchAllPoolsForPairData(action: PayloadAction<PairTokens>) {
-  const connection = yield* call(getConnection)
+  const api = yield* call(getConnection)
   const network = yield* select(networkType)
   const invAddress = yield* select(invariantAddress)
   const invariant = yield* call(
-    Invariant.load,
-    connection,
+    [invariantSingleton, invariantSingleton.loadInstance],
+    api,
     network,
-    invAddress,
-    DEFAULT_INVARIANT_OPTIONS
+    invAddress
   )
   const poolKeys = yield* call([invariant, invariant.getPoolKeys], 100n, 0n)
   const filteredPoolKeys = findPairsByPoolKeys(
@@ -226,15 +222,14 @@ export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMa
   const { tokenFrom, tokenTo, allPools } = action.payload
 
   try {
-    const connection = yield* call(getConnection)
+    const api = yield* call(getConnection)
     const network = yield* select(networkType)
     const invAddress = yield* select(invariantAddress)
     const invariant = yield* call(
-      Invariant.load,
-      connection,
+      [invariantSingleton, invariantSingleton.loadInstance],
+      api,
       network,
-      invAddress,
-      DEFAULT_INVARIANT_OPTIONS
+      invAddress
     )
 
     const pools = findPairs(tokenFrom.toString(), tokenTo.toString(), allPools)

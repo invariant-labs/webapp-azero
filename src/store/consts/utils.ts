@@ -1,7 +1,6 @@
 import {
   Invariant,
   Network,
-  PSP22,
   PoolKey,
   Tick,
   Tickmap,
@@ -18,17 +17,10 @@ import { ApiPromise } from '@polkadot/api'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
 import { SwapError } from '@store/sagas/swap'
+import invariantSingleton from '@store/services/invariantSingleton'
+import psp22Singleton from '@store/services/psp22Singleton'
 import axios from 'axios'
-import {
-  BTC,
-  DEFAULT_INVARIANT_OPTIONS,
-  DEFAULT_PSP22_OPTIONS,
-  ETH,
-  Token,
-  TokenPriceData,
-  USDC,
-  tokensPrices
-} from './static'
+import { BTC, ETH, Token, TokenPriceData, USDC, tokensPrices } from './static'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -316,7 +308,7 @@ export const getTokenDataByAddresses = async (
   network: Network,
   address: string
 ): Promise<Record<string, Token>> => {
-  const psp22 = await PSP22.load(api, network, DEFAULT_PSP22_OPTIONS)
+  const psp22 = await psp22Singleton.loadInstance(api, network)
 
   const promises = tokens.flatMap(token => {
     return [
@@ -349,7 +341,7 @@ export const getTokenBalances = async (
   network: Network,
   address: string
 ): Promise<[string, bigint][]> => {
-  const psp22 = await PSP22.load(api, network, DEFAULT_PSP22_OPTIONS)
+  const psp22 = await psp22Singleton.loadInstance(api, network)
 
   const promises: Promise<any>[] = []
   tokens.map(token => {
@@ -370,7 +362,7 @@ export const getPoolsByPoolKeys = async (
   api: ApiPromise,
   network: Network
 ): Promise<PoolWithPoolKey[]> => {
-  const invariant = await Invariant.load(api, network, invariantAddress, DEFAULT_INVARIANT_OPTIONS)
+  const invariant = await invariantSingleton.loadInstance(api, network, invariantAddress)
 
   const promises = poolKeys.map(({ tokenX, tokenY, feeTier }) =>
     invariant.getPool(tokenX, tokenY, feeTier)
