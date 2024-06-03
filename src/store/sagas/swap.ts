@@ -14,6 +14,7 @@ import {
 } from '@invariant-labs/a0-sdk/target/consts'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
+import { U128MAX } from '@store/consts/static'
 import {
   calculateAmountInWithSlippage,
   createLoaderKey,
@@ -247,6 +248,12 @@ export function* handleSwapWithAZERO(): Generator {
       const withdrawTx = wazero.withdrawTx(swapSimulateResult.amountOut)
       txs.push(withdrawTx)
     }
+
+    const approveTx = psp22.approveTx(TESTNET_INVARIANT_ADDRESS, U128MAX, TESTNET_WAZERO_ADDRESS)
+    txs.push(approveTx)
+
+    const unwrapTx = invariant.withdrawAllWAZEROTx(TESTNET_WAZERO_ADDRESS)
+    txs.push(unwrapTx)
 
     const batchedTx = api.tx.utility.batchAll(txs)
     const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
