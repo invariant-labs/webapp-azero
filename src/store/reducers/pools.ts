@@ -1,5 +1,6 @@
 import {
   FeeTier,
+  LiquidityTick,
   Pool,
   PoolKey,
   TESTNET_BTC_ADDRESS,
@@ -30,7 +31,7 @@ export interface IPoolsStore {
   tokens: Record<string, Token>
   pools: { [key in string]: PoolWithPoolKey }
   poolKeys: { [key in string]: PoolKey }
-  poolTicks: { [key in string]: Tick[] }
+  poolTicks: { [key in string]: LiquidityTick[] }
   nearestPoolTicksForPair: { [key in string]: Tick[] }
   isLoadingLatestPoolsForTransaction: boolean
   tickMaps: { [key in string]: string }
@@ -49,7 +50,7 @@ export interface updateTickMaps {
 
 export interface UpdateTick {
   poolKey: PoolKey
-  tickStructure: Tick[]
+  tickStructure: LiquidityTick[]
 }
 export interface DeleteTick {
   address: string

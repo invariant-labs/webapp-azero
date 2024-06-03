@@ -5,12 +5,10 @@ import {
   createLoaderKey,
   findPairs,
   findPairsByPoolKeys,
-  getAllTicks,
   getPools,
   getPoolsByPoolKeys,
   getTokenBalances,
-  getTokenDataByAddresses,
-  tickmapToArray
+  getTokenDataByAddresses
 } from '@store/consts/utils'
 import { FetchTicksAndTickMaps, ListPoolsRequest, PairTokens, actions } from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
@@ -248,10 +246,9 @@ export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMa
       )
     }
 
-    const allTicksCalls = pools.map((pool, index) => {
-      const tickIndexes = tickmapToArray(allTickMaps[index], pool.poolKey.feeTier.tickSpacing)
-      return call(getAllTicks, invariant, pool.poolKey, tickIndexes)
-    })
+    const allTicksCalls = pools.map((pool, index) =>
+      call([invariant, invariant.getAllLiquidityTicks], pool.poolKey, allTickMaps[index])
+    )
     const allTicks = yield* all(allTicksCalls)
 
     for (const [index, pool] of pools.entries()) {
