@@ -20,7 +20,6 @@ const RootPage: React.FC = () => {
 
   useEffect(() => {
     // dispatch(providerActions.initProvider())
-    navigate('/swap')
     dispatch(alephZeroConnectionActions.initAlephZeroConnection())
   }, [dispatch])
 
