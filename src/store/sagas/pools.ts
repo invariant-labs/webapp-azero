@@ -5,29 +5,34 @@ import {
   createLoaderKey,
   findPairs,
   findPairsByPoolKeys,
-  getAllTicks,
   getPools,
   getPoolsByPoolKeys,
   getTokenBalances,
-  getTokenDataByAddresses,
-  tickmapToArray
+  getTokenDataByAddresses
 } from '@store/consts/utils'
 import { FetchTicksAndTickMaps, ListPoolsRequest, PairTokens, actions } from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import { networkType } from '@store/selectors/connection'
+import { invariantAddress, networkType } from '@store/selectors/connection'
 import { tokens } from '@store/selectors/pools'
 import { address } from '@store/selectors/wallet'
+import invariantSingleton from '@store/services/invariantSingleton'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
 import { getConnection } from './connection'
-import invariantSingleton from '@store/services/invariantSingleton'
 
 export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) {
   const walletAddress = yield* select(address)
   const connection = yield* call(getConnection)
   const network = yield* select(networkType)
-  const pools = yield* call(getPoolsByPoolKeys, action.payload.poolKeys, connection, network)
+  const invAddress = yield* select(invariantAddress)
+  const pools = yield* call(
+    getPoolsByPoolKeys,
+    invAddress,
+    action.payload.poolKeys,
+    connection,
+    network
+  )
 
   const allTokens = yield* select(tokens)
   const unknownTokens = new Set(
@@ -82,11 +87,13 @@ export function* handleInitPool(action: PayloadAction<PoolKey>): Generator {
     const network = yield* select(networkType)
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
+    const invAddress = yield* select(invariantAddress)
 
     const invariant = yield* call(
       [invariantSingleton, invariantSingleton.loadInstance],
       api,
-      network
+      network,
+      invAddress
     )
 
     const poolKey = newPoolKey(tokenX, tokenY, feeTier)
@@ -136,13 +143,15 @@ export function* handleInitPool(action: PayloadAction<PoolKey>): Generator {
 export function* fetchPoolData(action: PayloadAction<PoolKey>): Generator {
   const api = yield* getConnection()
   const network = yield* select(networkType)
+  const invAddress = yield* select(invariantAddress)
   const { feeTier, tokenX, tokenY } = action.payload
 
   try {
     const invariant = yield* call(
       [invariantSingleton, invariantSingleton.loadInstance],
       api,
-      network
+      network,
+      invAddress
     )
 
     const pool = yield* call([invariant, invariant.getPool], tokenX, tokenY, feeTier)
@@ -166,12 +175,14 @@ export function* fetchPoolData(action: PayloadAction<PoolKey>): Generator {
 export function* fetchAllPoolKeys(): Generator {
   const api = yield* getConnection()
   const network = yield* select(networkType)
+  const invAddress = yield* select(invariantAddress)
 
   try {
     const invariant = yield* call(
       [invariantSingleton, invariantSingleton.loadInstance],
       api,
-      network
+      network,
+      invAddress
     )
 
     //TODO: in the future handle more than 100 pools
@@ -187,7 +198,13 @@ export function* fetchAllPoolKeys(): Generator {
 export function* fetchAllPoolsForPairData(action: PayloadAction<PairTokens>) {
   const api = yield* call(getConnection)
   const network = yield* select(networkType)
-  const invariant = yield* call([invariantSingleton, invariantSingleton.loadInstance], api, network)
+  const invAddress = yield* select(invariantAddress)
+  const invariant = yield* call(
+    [invariantSingleton, invariantSingleton.loadInstance],
+    api,
+    network,
+    invAddress
+  )
   const poolKeys = yield* call([invariant, invariant.getPoolKeys], 100n, 0n)
   const filteredPoolKeys = findPairsByPoolKeys(
     action.payload.first.toString(),
@@ -205,10 +222,12 @@ export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMa
   try {
     const api = yield* call(getConnection)
     const network = yield* select(networkType)
+    const invAddress = yield* select(invariantAddress)
     const invariant = yield* call(
       [invariantSingleton, invariantSingleton.loadInstance],
       api,
-      network
+      network,
+      invAddress
     )
 
     const pools = findPairs(tokenFrom.toString(), tokenTo.toString(), allPools)
@@ -227,10 +246,9 @@ export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMa
       )
     }
 
-    const allTicksCalls = pools.map((pool, index) => {
-      const tickIndexes = tickmapToArray(allTickMaps[index], pool.poolKey.feeTier.tickSpacing)
-      return call(getAllTicks, invariant, pool.poolKey, tickIndexes)
-    })
+    const allTicksCalls = pools.map((pool, index) =>
+      call([invariant, invariant.getAllLiquidityTicks], pool.poolKey, allTickMaps[index])
+    )
     const allTicks = yield* all(allTicksCalls)
 
     for (const [index, pool] of pools.entries()) {

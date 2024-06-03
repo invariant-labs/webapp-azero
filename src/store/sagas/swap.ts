@@ -1,5 +1,4 @@
 import {
-  TESTNET_INVARIANT_ADDRESS,
   TESTNET_WAZERO_ADDRESS,
   calculatePriceImpact,
   calculateSqrtPriceAfterSlippage,
@@ -26,17 +25,17 @@ import {
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Simulate, actions } from '@store/reducers/swap'
 import { actions as walletActions } from '@store/reducers/wallet'
-import { networkType } from '@store/selectors/connection'
+import { invariantAddress, networkType } from '@store/selectors/connection'
 import { poolTicks, pools, tickMaps, tokens } from '@store/selectors/pools'
 import { simulateResult, swap } from '@store/selectors/swap'
 import { address, balance } from '@store/selectors/wallet'
+import invariantSingleton from '@store/services/invariantSingleton'
+import psp22Singleton from '@store/services/psp22Singleton'
+import wrappedAZEROSingleton from '@store/services/wrappedAZEROSingleton'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
 import { all, call, put, select, spawn, takeEvery } from 'typed-redux-saga'
 import { getConnection } from './connection'
-import invariantSingleton from '@store/services/invariantSingleton'
-import psp22Singleton from '@store/services/psp22Singleton'
-import wrappedAZEROSingleton from '@store/services/wrappedAZEROSingleton'
 
 export function* handleSwap(): Generator {
   const loaderSwappingTokens = createLoaderKey()
@@ -58,6 +57,7 @@ export function* handleSwap(): Generator {
     const network = yield* select(networkType)
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
+    const invAddress = yield* select(invariantAddress)
 
     const tokenX = allTokens[poolKey.tokenX]
     const tokenY = allTokens[poolKey.tokenY]
@@ -78,28 +78,21 @@ export function* handleSwap(): Generator {
     const invariant = yield* call(
       [invariantSingleton, invariantSingleton.loadInstance],
       api,
-      network
+      network,
+      invAddress
     )
     const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(estimatedPriceAfterSwap, slippage, !xToY)
 
     let calculatedAmountIn = amountIn
-    if (byAmountIn) {
+    if (!byAmountIn) {
       calculatedAmountIn = calculateAmountInWithSlippage(amountIn, sqrtPriceLimit, !xToY)
     }
 
     if (xToY) {
-      const approveTx = psp22.approveTx(
-        TESTNET_INVARIANT_ADDRESS,
-        calculatedAmountIn,
-        tokenX.address.toString()
-      )
+      const approveTx = psp22.approveTx(invAddress, calculatedAmountIn, tokenX.address.toString())
       txs.push(approveTx)
     } else {
-      const approveTx = psp22.approveTx(
-        TESTNET_INVARIANT_ADDRESS,
-        calculatedAmountIn,
-        tokenY.address.toString()
-      )
+      const approveTx = psp22.approveTx(invAddress, calculatedAmountIn, tokenY.address.toString())
       txs.push(approveTx)
     }
 
@@ -177,6 +170,7 @@ export function* handleSwapWithAZERO(): Generator {
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
     const swapSimulateResult = yield* select(simulateResult)
+    const invAddress = yield* select(invariantAddress)
 
     const tokenX = allTokens[poolKey.tokenX]
     const tokenY = allTokens[poolKey.tokenY]
@@ -202,12 +196,13 @@ export function* handleSwapWithAZERO(): Generator {
     const invariant = yield* call(
       [invariantSingleton, invariantSingleton.loadInstance],
       api,
-      network
+      network,
+      invAddress
     )
 
     const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(estimatedPriceAfterSwap, slippage, !xToY)
     let calculatedAmountIn = amountIn
-    if (byAmountIn) {
+    if (!byAmountIn) {
       calculatedAmountIn = calculateAmountInWithSlippage(amountIn, sqrtPriceLimit, !xToY)
     }
 
@@ -223,18 +218,10 @@ export function* handleSwapWithAZERO(): Generator {
     }
 
     if (xToY) {
-      const approveTx = psp22.approveTx(
-        TESTNET_INVARIANT_ADDRESS,
-        calculatedAmountIn,
-        tokenX.address.toString()
-      )
+      const approveTx = psp22.approveTx(invAddress, calculatedAmountIn, tokenX.address.toString())
       txs.push(approveTx)
     } else {
-      const approveTx = psp22.approveTx(
-        TESTNET_INVARIANT_ADDRESS,
-        calculatedAmountIn,
-        tokenY.address.toString()
-      )
+      const approveTx = psp22.approveTx(invAddress, calculatedAmountIn, tokenY.address.toString())
       txs.push(approveTx)
     }
 
@@ -249,7 +236,7 @@ export function* handleSwapWithAZERO(): Generator {
       txs.push(withdrawTx)
     }
 
-    const approveTx = psp22.approveTx(TESTNET_INVARIANT_ADDRESS, U128MAX, TESTNET_WAZERO_ADDRESS)
+    const approveTx = psp22.approveTx(invAddress, U128MAX, TESTNET_WAZERO_ADDRESS)
     txs.push(approveTx)
 
     const unwrapTx = invariant.withdrawAllWAZEROTx(TESTNET_WAZERO_ADDRESS)
@@ -362,14 +349,12 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
     let targetSqrtPrice = 0n
     const errors = []
 
-    const protocolFee = 0n
     for (const pool of filteredPools) {
       const xToY = fromToken.toString() === pool.poolKey.tokenX
 
       try {
         const result = simulateInvariantSwap(
           deserializeTickmap(allTickmaps[poolKeyToString(pool.poolKey)]),
-          protocolFee,
           pool.poolKey.feeTier,
           allPools[poolKeyToString(pool.poolKey)],
           allTicks[poolKeyToString(pool.poolKey)],
@@ -380,8 +365,6 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
           byAmountIn,
           xToY ? MIN_SQRT_PRICE : MAX_SQRT_PRICE
         )
-
-        console.log(result)
 
         if (result.globalInsufficientLiquidity) {
           errors.push(SwapError.InsufficientLiquidity)

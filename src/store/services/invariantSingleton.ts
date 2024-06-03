@@ -1,4 +1,4 @@
-import { Invariant, TESTNET_INVARIANT_ADDRESS } from '@invariant-labs/a0-sdk'
+import { Invariant } from '@invariant-labs/a0-sdk'
 import { Network } from '@invariant-labs/a0-sdk/src'
 import { ApiPromise } from '@polkadot/api'
 import { DEFAULT_INVARIANT_OPTIONS } from '@store/consts/static'
@@ -18,14 +18,18 @@ class SingletonInvariant {
     return SingletonInvariant.instance
   }
 
-  public async loadInstance(api: ApiPromise, network: Network): Promise<Invariant> {
-    if (!this.invariant || this.currentApi !== api || this.currentNetwork !== network) {
-      this.invariant = await Invariant.load(
-        api,
-        network,
-        TESTNET_INVARIANT_ADDRESS,
-        DEFAULT_INVARIANT_OPTIONS
-      )
+  public async loadInstance(
+    api: ApiPromise,
+    network: Network,
+    address: string
+  ): Promise<Invariant> {
+    if (
+      !this.invariant ||
+      this.currentApi !== api ||
+      this.currentNetwork !== network ||
+      address !== this.invariant.contract.address.toString()
+    ) {
+      this.invariant = await Invariant.load(api, network, address, DEFAULT_INVARIANT_OPTIONS)
       this.currentApi = api
       this.currentNetwork = network
     }
