@@ -214,4 +214,4 @@ export const ALL_FEE_TIERS_DATA = FEE_TIERS.map((tier, index) => ({
 
 export const U128MAX = 2n ** 128n - 1n
 
-export const SAFE_TRANSACETION_FEE = BigInt(Math.ceil(0.005 * 10 ** 12))
+export const SAFE_TRANSACETION_FEE = Math.ceil(0.125 * 10 ** 12)

@@ -284,7 +284,7 @@ export function* init(): Generator {
 
     const balance = yield* call(getBalance, accounts[0].address)
 
-    yield* put(actions.setBalance(BigInt(balance) - SAFE_TRANSACETION_FEE))
+    yield* put(actions.setBalance(BigInt(Math.max(+balance - SAFE_TRANSACETION_FEE, 0))))
     yield* put(actions.setStatus(Status.Initialized))
     yield* call(fetchTokensBalances)
     yield* put(actions.setIsBalanceLoading(false))
