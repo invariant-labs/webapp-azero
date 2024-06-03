@@ -17,10 +17,10 @@ import { ApiPromise } from '@polkadot/api'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
 import { SwapError } from '@store/sagas/swap'
-import axios from 'axios'
-import { BTC, ETH, Token, TokenPriceData, USDC, tokensPrices } from './static'
 import invariantSingleton from '@store/services/invariantSingleton'
 import psp22Singleton from '@store/services/psp22Singleton'
+import axios from 'axios'
+import { BTC, ETH, Token, TokenPriceData, USDC, tokensPrices } from './static'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -357,11 +357,12 @@ export const getTokenBalances = async (
 }
 
 export const getPoolsByPoolKeys = async (
+  invariantAddress: string,
   poolKeys: PoolKey[],
   api: ApiPromise,
   network: Network
 ): Promise<PoolWithPoolKey[]> => {
-  const invariant = await invariantSingleton.loadInstance(api, network)
+  const invariant = await invariantSingleton.loadInstance(api, network, invariantAddress)
 
   const promises = poolKeys.map(({ tokenX, tokenY, feeTier }) =>
     invariant.getPool(tokenX, tokenY, feeTier)
