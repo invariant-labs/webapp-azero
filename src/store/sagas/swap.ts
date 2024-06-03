@@ -84,7 +84,7 @@ export function* handleSwap(): Generator {
     const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(estimatedPriceAfterSwap, slippage, !xToY)
 
     let calculatedAmountIn = amountIn
-    if (byAmountIn) {
+    if (!byAmountIn) {
       calculatedAmountIn = calculateAmountInWithSlippage(amountIn, sqrtPriceLimit, !xToY)
     }
 
