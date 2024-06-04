@@ -2,25 +2,24 @@ import React, { useCallback, useMemo, useRef } from 'react'
 import { Layer, ResponsiveLine } from '@nivo/line'
 import { linearGradientDef } from '@nivo/core'
 import { colors, theme } from '@static/theme'
-
 import classNames from 'classnames'
 import ZoomInIcon from '@static/svg/zoom-in-icon.svg'
 import ZoomOutIcon from '@static/svg/zoom-out-icon.svg'
 import Brush from './Brush/Brush'
-
 import loader from '@static/gif/loader.gif'
 import useStyles from './style'
 import { PlotTickData } from '@store/reducers/positions'
 import { Button, Grid, Typography, useMediaQuery } from '@mui/material'
+import { nearestTickIndex } from '@store/consts/utils'
 
 export type TickPlotPositionData = Omit<PlotTickData, 'y'>
 
 export interface IPriceRangePlot {
-  parsedData: PlotTickData[]
-  parsedMidPrice?: TickPlotPositionData
-  parsedLeftRange: TickPlotPositionData
-  parsedRightRange: TickPlotPositionData
-  onChangeRange?: (left: number, right: number) => void
+  data: PlotTickData[]
+  midPrice?: TickPlotPositionData
+  leftRange: TickPlotPositionData
+  rightRange: TickPlotPositionData
+  onChangeRange?: (left: bigint, right: bigint) => void
   style?: React.CSSProperties
   className?: string
   disabled?: boolean
@@ -30,24 +29,24 @@ export interface IPriceRangePlot {
   zoomPlus: () => void
   loading?: boolean
   isXtoY: boolean
-  xDecimal: number
-  yDecimal: number
-  tickSpacing: number
+  xDecimal: bigint
+  yDecimal: bigint
+  tickSpacing: bigint
   isDiscrete?: boolean
   coverOnLoading?: boolean
   hasError?: boolean
   reloadHandler: () => void
   volumeRange?: {
-    min: number
-    max: number
+    min: bigint
+    max: bigint
   }
 }
 
 export const PriceRangePlot: React.FC<IPriceRangePlot> = ({
-  parsedData,
-  parsedLeftRange,
-  parsedRightRange,
-  parsedMidPrice,
+  data,
+  leftRange,
+  rightRange,
+  midPrice,
   onChangeRange,
   style,
   className,
@@ -67,25 +66,6 @@ export const PriceRangePlot: React.FC<IPriceRangePlot> = ({
   reloadHandler,
   volumeRange
 }) => {
-  // TODO check which types should be applied here, bigint or numbers, this fix workaround
-  const data = parsedData.map(tick => ({
-    x: Number(tick.x),
-    y: Number(tick.y),
-    index: Number(tick.index)
-  }))
-  const midPrice = {
-    x: Number(parsedMidPrice?.x),
-    index: Number(parsedMidPrice?.index)
-  }
-  const leftRange = {
-    x: Number(parsedLeftRange.x),
-    index: Number(parsedLeftRange.index)
-  }
-  const rightRange = {
-    x: Number(parsedRightRange.x),
-    index: Number(parsedRightRange.index)
-  }
-
   const { classes } = useStyles()
 
   const isSmDown = useMediaQuery(theme.breakpoints.down('sm'))
@@ -317,14 +297,16 @@ export const PriceRangePlot: React.FC<IPriceRangePlot> = ({
     if (typeof volumeRange === 'undefined') {
       return null
     }
+    const minRange = Number(volumeRange.min)
+    const maxRange = Number(volumeRange.max)
 
     const unitLen = innerWidth / (plotMax - plotMin)
     return (
       <>
         {volumeRange.min >= plotMin ? (
           <line
-            x1={(volumeRange.min - plotMin) * unitLen}
-            x2={(volumeRange.min - plotMin) * unitLen}
+            x1={(minRange - plotMin) * unitLen}
+            x2={(minRange - plotMin) * unitLen}
             y1={0}
             strokeWidth={1}
             y2={innerHeight}
@@ -334,8 +316,8 @@ export const PriceRangePlot: React.FC<IPriceRangePlot> = ({
         ) : null}
         {volumeRange.max <= plotMax ? (
           <line
-            x1={(volumeRange.max - plotMin) * unitLen}
-            x2={(volumeRange.max - plotMin) * unitLen}
+            x1={(maxRange - plotMin) * unitLen}
+            x2={(maxRange - plotMin) * unitLen}
             y1={0}
             strokeWidth={1}
             y2={innerHeight}
@@ -383,34 +365,34 @@ export const PriceRangePlot: React.FC<IPriceRangePlot> = ({
     leftRange.x,
     rightRange.x,
     position => {
-      // const nearest = nearestTickIndex(
-      //   plotMin + position * (plotMax - plotMin),
-      //   tickSpacing,
-      //   isXtoY,
-      //   xDecimal,
-      //   yDecimal
-      // )
-      // onChangeRange?.(
-      //   isXtoY
-      //     ? Math.min(rightRange.index - tickSpacing, nearest)
-      //     : Math.max(rightRange.index + tickSpacing, nearest),
-      //   rightRange.index
-      // )
+      const nearest = nearestTickIndex(
+        plotMin + position * (plotMax - plotMin),
+        tickSpacing,
+        isXtoY,
+        xDecimal,
+        yDecimal
+      )
+      onChangeRange?.(
+        isXtoY
+          ? BigInt(Math.min(Number(rightRange.index - tickSpacing), Number(nearest)))
+          : BigInt(Math.max(Number(rightRange.index + tickSpacing), Number(nearest))),
+        rightRange.index
+      )
     },
     position => {
-      // const nearest = nearestTickIndex(
-      //   plotMin + position * (plotMax - plotMin),
-      //   tickSpacing,
-      //   isXtoY,
-      //   xDecimal,
-      //   yDecimal
-      // )
-      // onChangeRange?.(
-      //   leftRange.index,
-      //   isXtoY
-      //     ? Math.max(leftRange.index + tickSpacing, nearest)
-      //     : Math.min(leftRange.index - tickSpacing, nearest)
-      // )
+      const nearest = nearestTickIndex(
+        plotMin + position * (plotMax - plotMin),
+        tickSpacing,
+        isXtoY,
+        xDecimal,
+        yDecimal
+      )
+      onChangeRange?.(
+        leftRange.index,
+        isXtoY
+          ? BigInt(Math.max(Number(leftRange.index + tickSpacing), Number(nearest)))
+          : BigInt(Math.min(Number(leftRange.index - tickSpacing), Number(nearest)))
+      )
     },
     plotMin,
     plotMax,

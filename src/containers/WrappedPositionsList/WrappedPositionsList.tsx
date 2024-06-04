@@ -1,5 +1,5 @@
 import { PositionsList } from '@components/PositionsList/PositionsList'
-import { getLiquidityByX, getLiquidityByY } from '@invariant-labs/a0-sdk'
+import { calculateTokenAmounts } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/src/consts'
 import { POSITIONS_PER_PAGE } from '@store/consts/static'
 import { calcYPerXPriceByTickIndex, printBigint } from '@store/consts/utils'
@@ -12,7 +12,6 @@ import {
 } from '@store/selectors/positions'
 import { address, status } from '@store/selectors/wallet'
 import { openWalletSelectorModal } from '@utils/web3/selector'
-
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -72,32 +71,16 @@ export const WrappedPositionsList: React.FC = () => {
 
       let tokenXLiq, tokenYLiq
 
+      const [x, y] = calculateTokenAmounts(position.poolData, position)
+
       try {
-        tokenXLiq = +printBigint(
-          getLiquidityByX(
-            position.liquidity,
-            position.lowerTickIndex,
-            position.upperTickIndex,
-            position.poolData.sqrtPrice,
-            true
-          ).amount,
-          position.tokenX.decimals
-        )
+        tokenXLiq = +printBigint(x, position.tokenX.decimals)
       } catch (error) {
         tokenXLiq = 0
       }
 
       try {
-        tokenYLiq = +printBigint(
-          getLiquidityByY(
-            position.liquidity,
-            position.lowerTickIndex,
-            position.upperTickIndex,
-            position.poolData.sqrtPrice,
-            true
-          ).amount,
-          position.tokenY.decimals
-        )
+        tokenYLiq = +printBigint(y, position.tokenY.decimals)
       } catch (error) {
         tokenYLiq = 0
       }
