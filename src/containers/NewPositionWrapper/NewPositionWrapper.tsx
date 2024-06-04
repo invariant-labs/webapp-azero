@@ -260,7 +260,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     }
 
     return ticksData
-  }, [ticksData, ticksLoading, isXtoY, tickSpacing, xDecimal, yDecimal, currentPairReversed])
+  }, [ticksData, ticksLoading, isXtoY, tickSpacing, xDecimal, yDecimal])
 
   useEffect(() => {
     if (

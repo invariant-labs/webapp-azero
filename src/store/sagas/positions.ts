@@ -402,6 +402,17 @@ export function* handleGetCurrentPlotTicks(
       poolKey,
       deserializeTickmap(allTickmaps[poolKeyToString(poolKey)])
     )
+    if (rawTicks.length === 0) {
+      const data = createPlaceholderLiquidityPlot(
+        action.payload.isXtoY,
+        0,
+        poolKey.feeTier.tickSpacing,
+        xDecimal,
+        yDecimal
+      )
+      yield* put(actions.setPlotTicks(data))
+      return
+    }
 
     const ticksData = createLiquidityPlot(
       rawTicks,
@@ -420,7 +431,7 @@ export function* handleGetCurrentPlotTicks(
       xDecimal,
       yDecimal
     )
-    yield put(actions.setErrorPlotTicks(data))
+    yield* put(actions.setErrorPlotTicks(data))
   }
 }
 
