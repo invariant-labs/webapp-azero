@@ -61,6 +61,7 @@ export interface INewPosition {
     feeValue: number
   }>
   ticksLoading: boolean
+  loadingTicksAndTickMaps: boolean
   showNoConnected?: boolean
   noConnectedBlockerProps: INoConnected
   progress: ProgressState
@@ -116,6 +117,7 @@ export const NewPosition: React.FC<INewPosition> = ({
   calcAmount,
   feeTiers,
   ticksLoading,
+  loadingTicksAndTickMaps,
   showNoConnected,
   noConnectedBlockerProps,
   isXtoY,
@@ -630,7 +632,7 @@ export const NewPosition: React.FC<INewPosition> = ({
                   tokenASymbol: tokens[tokenAIndex].symbol,
                   tokenBSymbol: tokens[tokenBIndex].symbol
                 })}
-            ticksLoading={ticksLoading}
+            ticksLoading={ticksLoading || loadingTicksAndTickMaps}
             isXtoY={isXtoY}
             tickSpacing={tickSpacing}
             xDecimal={xDecimal}

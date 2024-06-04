@@ -16,6 +16,7 @@ import {
   toMaxNumericPlaces
 } from '@store/consts/utils'
 import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
+import PriceRangePlot from '@components/PriceRangePlot/PriceRangePlot'
 
 export interface IRangeSelector {
   data: PlotTickData[]
@@ -386,43 +387,34 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
         </Grid>
       </Grid>
       <Grid container className={classes.innerWrapper}>
-        {/* TODO check how to fix price range plot */}
-        {/* <PriceRangePlot
+        <PriceRangePlot
           className={classes.plot}
           data={data}
           onChangeRange={changeRangeHandler}
-          // leftRange={{
-          //   index: leftRange,
-          //   x: calcPrice(BigInt(leftRange), isXtoY, xDecimal, yDecimal) // TODO check if this is correct
-          // }}
-          // rightRange={{
-          //   index: rightRange,
-          //   x: calcPrice(BigInt(rightRange), isXtoY, xDecimal, yDecimal) // TODO check if this is correct
-          // }}
-          parsedLeftRange={{
+          leftRange={{
             index: leftRange,
-            x: 12n
+            x: calcPrice(leftRange, isXtoY, xDecimal, yDecimal)
           }}
-          parsedRightRange={{
+          rightRange={{
             index: rightRange,
-            x: 12334n
+            x: calcPrice(rightRange, isXtoY, xDecimal, yDecimal)
           }}
-          parsedMidPrice={midPrice}
+          midPrice={midPrice}
           plotMin={plotMin}
           plotMax={plotMax}
           zoomMinus={zoomMinus}
           zoomPlus={zoomPlus}
           loading={ticksLoading}
           isXtoY={isXtoY}
-          tickSpacing={Number(tickSpacing)} // TODO check correct type
-          xDecimal={Number(xDecimal)}
-          yDecimal={Number(yDecimal)}
+          tickSpacing={tickSpacing}
+          xDecimal={xDecimal}
+          yDecimal={yDecimal}
           isDiscrete={isPlotDiscrete}
           disabled={positionOpeningMethod === 'concentration'}
           hasError={hasTicksError}
           reloadHandler={reloadHandler}
-          volumeRange={undefined} // TODO check correct type
-        /> */}
+          volumeRange={volumeRange}
+        />
         <Typography className={classes.subheader}>Set price range</Typography>
         <Grid container className={classes.inputs}>
           <RangeInput

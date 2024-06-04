@@ -3,8 +3,14 @@ import { calculateTokenAmountsWithSlippage } from '@invariant-labs/a0-sdk/src/ut
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { U128MAX } from '@store/consts/static'
-import { createLoaderKey, poolKeyToString } from '@store/consts/utils'
-import { ListType, actions as poolsActions } from '@store/reducers/pools'
+import {
+  createLiquidityPlot,
+  createLoaderKey,
+  createPlaceholderLiquidityPlot,
+  deserializeTickmap,
+  poolKeyToString
+} from '@store/consts/utils'
+import { FetchTicksAndTickMaps, ListType, actions as poolsActions } from '@store/reducers/pools'
 import { ClosePositionData, InitPositionData, actions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { actions as walletActions } from '@store/reducers/wallet'
@@ -15,9 +21,10 @@ import psp22Singleton from '@store/services/psp22Singleton'
 import wrappedAZEROSingleton from '@store/services/wrappedAZEROSingleton'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
-import { all, call, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
+import { all, call, fork, join, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
 import { getConnection } from './connection'
-import { fetchAllPoolKeys } from './pools'
+import { fetchAllPoolKeys, fetchTicksAndTickMaps } from './pools'
+import { poolsArraySortedByFees, tickMaps, tokens } from '@store/selectors/pools'
 
 function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator {
   const loaderCreatePosition = createLoaderKey()
@@ -352,6 +359,71 @@ export function* handleGetCurrentPositionTicks(action: PayloadAction<bigint>) {
   )
 }
 
+export function* handleGetCurrentPlotTicks(
+  action: PayloadAction<{ poolKey: PoolKey; isXtoY: boolean }>
+): Generator {
+  const api = yield* getConnection()
+  const network = yield* select(networkType)
+  const invAddress = yield* select(invariantAddress)
+  let allTickmaps = yield* select(tickMaps)
+  const allTokens = yield* select(tokens)
+  const allPools = yield* select(poolsArraySortedByFees)
+  const { poolKey, isXtoY } = action.payload
+
+  const xDecimal = allTokens[poolKey.tokenX].decimals
+  const yDecimal = allTokens[poolKey.tokenY].decimals
+
+  try {
+    const invariant = yield* call(
+      [invariantSingleton, invariantSingleton.loadInstance],
+      api,
+      network,
+      invAddress
+    )
+
+    if (!allTickmaps[poolKeyToString(poolKey)]) {
+      const fetchTicksAndTickMapsAction: PayloadAction<FetchTicksAndTickMaps> = {
+        type: poolsActions.getTicksAndTickMaps.type,
+        payload: {
+          tokenFrom: allTokens[poolKey.tokenX].address,
+          tokenTo: allTokens[poolKey.tokenY].address,
+          allPools
+        }
+      }
+
+      const fetchTask = yield* fork(fetchTicksAndTickMaps, fetchTicksAndTickMapsAction)
+
+      yield* join(fetchTask)
+      allTickmaps = yield* select(tickMaps)
+    }
+
+    const rawTicks = yield* call(
+      [invariant, invariant.getAllLiquidityTicks],
+      poolKey,
+      deserializeTickmap(allTickmaps[poolKeyToString(poolKey)])
+    )
+
+    const ticksData = createLiquidityPlot(
+      rawTicks,
+      poolKey.feeTier.tickSpacing,
+      isXtoY,
+      xDecimal,
+      yDecimal
+    )
+    yield put(actions.setPlotTicks(ticksData))
+  } catch (error) {
+    console.log(error)
+    const data = createPlaceholderLiquidityPlot(
+      action.payload.isXtoY,
+      10,
+      poolKey.feeTier.tickSpacing,
+      xDecimal,
+      yDecimal
+    )
+    yield put(actions.setErrorPlotTicks(data))
+  }
+}
+
 export function* handleClaimFee(action: PayloadAction<bigint>) {
   const loaderSigningTx = createLoaderKey()
   const loaderKey = createLoaderKey()
@@ -636,6 +708,9 @@ export function* getCurrentPositionTicksHandler(): Generator {
   yield* takeEvery(actions.getCurrentPositionTicks, handleGetCurrentPositionTicks)
 }
 
+export function* getCurrentPlotTicksHandler(): Generator {
+  yield* takeLatest(actions.getCurrentPlotTicks, handleGetCurrentPlotTicks)
+}
 export function* claimFeeHandler(): Generator {
   yield* takeEvery(actions.claimFee, handleClaimFee)
 }
@@ -654,6 +729,7 @@ export function* positionsSaga(): Generator {
       initPositionHandler,
       getPositionsListHandler,
       getCurrentPositionTicksHandler,
+      getCurrentPlotTicksHandler,
       claimFeeHandler,
       getSinglePositionHandler,
       closePositionHandler

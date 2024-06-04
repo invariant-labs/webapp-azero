@@ -254,6 +254,8 @@ export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMa
     for (const [index, pool] of pools.entries()) {
       yield* put(actions.setTicks({ poolKey: pool.poolKey, tickStructure: allTicks[index] }))
     }
+
+    yield* put(actions.stopIsLoadingTicksAndTickMaps())
   } catch (error) {
     console.log(error)
   }
