@@ -178,20 +178,7 @@ export function* handleAirdrop(): Generator {
       })
     )
 
-    const promises: Promise<bigint>[] = []
-
-    Object.values(FaucetTokenList).map(address =>
-      promises.push(psp22.balanceOf(walletAddress, address))
-    )
-
-    const balances = yield* call(promises => Promise.all(promises), promises)
-    const parsedBalances: ITokenBalance[] = []
-
-    Object.values(FaucetTokenList).map((address, index) => {
-      parsedBalances.push({ address, balance: balances[index] })
-    })
-
-    yield* put(actions.addTokenBalances(parsedBalances))
+    yield* call(fetchBalances, [...Object.values(FaucetTokenList)])
   } catch (error) {
     console.log(error)
 
