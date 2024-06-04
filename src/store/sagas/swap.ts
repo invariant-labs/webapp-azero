@@ -13,7 +13,14 @@ import {
 } from '@invariant-labs/a0-sdk/target/consts'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { U128MAX } from '@store/consts/static'
+import {
+  INVARIANT_SWAP_OPTIONS,
+  INVARIANT_WITHDRAW_ALL_WAZERO,
+  PSP22_APPROVE_OPTIONS,
+  U128MAX,
+  WAZERO_DEPOSIT_OPTIONS,
+  WAZERO_WITHDRAW_OPTIONS
+} from '@store/consts/static'
 import {
   calculateAmountInWithSlippage,
   createLoaderKey,
@@ -89,14 +96,31 @@ export function* handleSwap(): Generator {
     }
 
     if (xToY) {
-      const approveTx = psp22.approveTx(invAddress, calculatedAmountIn, tokenX.address.toString())
+      const approveTx = psp22.approveTx(
+        invAddress,
+        calculatedAmountIn,
+        tokenX.address.toString(),
+        PSP22_APPROVE_OPTIONS
+      )
       txs.push(approveTx)
     } else {
-      const approveTx = psp22.approveTx(invAddress, calculatedAmountIn, tokenY.address.toString())
+      const approveTx = psp22.approveTx(
+        invAddress,
+        calculatedAmountIn,
+        tokenY.address.toString(),
+        PSP22_APPROVE_OPTIONS
+      )
       txs.push(approveTx)
     }
 
-    const swapTx = invariant.swapTx(poolKey, xToY, amountIn, byAmountIn, sqrtPriceLimit)
+    const swapTx = invariant.swapTx(
+      poolKey,
+      xToY,
+      amountIn,
+      byAmountIn,
+      sqrtPriceLimit,
+      INVARIANT_SWAP_OPTIONS
+    )
     txs.push(swapTx)
 
     const batchedTx = api.tx.utility.batchAll(txs)
@@ -213,33 +237,61 @@ export function* handleSwapWithAZERO(): Generator {
       const azeroBalance = yield* select(balance)
       const azeroAmountInWithSlippage =
         azeroBalance > calculatedAmountIn ? calculatedAmountIn : azeroBalance
-      const depositTx = wazero.depositTx(byAmountIn ? amountIn : azeroAmountInWithSlippage)
+      const depositTx = wazero.depositTx(
+        byAmountIn ? amountIn : azeroAmountInWithSlippage,
+        WAZERO_DEPOSIT_OPTIONS
+      )
       txs.push(depositTx)
     }
 
     if (xToY) {
-      const approveTx = psp22.approveTx(invAddress, calculatedAmountIn, tokenX.address.toString())
+      const approveTx = psp22.approveTx(
+        invAddress,
+        calculatedAmountIn,
+        tokenX.address.toString(),
+        PSP22_APPROVE_OPTIONS
+      )
       txs.push(approveTx)
     } else {
-      const approveTx = psp22.approveTx(invAddress, calculatedAmountIn, tokenY.address.toString())
+      const approveTx = psp22.approveTx(
+        invAddress,
+        calculatedAmountIn,
+        tokenY.address.toString(),
+        PSP22_APPROVE_OPTIONS
+      )
       txs.push(approveTx)
     }
 
-    const swapTx = invariant.swapTx(poolKey, xToY, amountIn, byAmountIn, sqrtPriceLimit)
+    const swapTx = invariant.swapTx(
+      poolKey,
+      xToY,
+      amountIn,
+      byAmountIn,
+      sqrtPriceLimit,
+      INVARIANT_SWAP_OPTIONS
+    )
     txs.push(swapTx)
 
     if (
       (!xToY && poolKey.tokenX === TESTNET_WAZERO_ADDRESS) ||
       (xToY && poolKey.tokenY === TESTNET_WAZERO_ADDRESS)
     ) {
-      const withdrawTx = wazero.withdrawTx(swapSimulateResult.amountOut)
+      const withdrawTx = wazero.withdrawTx(swapSimulateResult.amountOut, WAZERO_WITHDRAW_OPTIONS)
       txs.push(withdrawTx)
     }
 
-    const approveTx = psp22.approveTx(invAddress, U128MAX, TESTNET_WAZERO_ADDRESS)
+    const approveTx = psp22.approveTx(
+      invAddress,
+      U128MAX,
+      TESTNET_WAZERO_ADDRESS,
+      PSP22_APPROVE_OPTIONS
+    )
     txs.push(approveTx)
 
-    const unwrapTx = invariant.withdrawAllWAZEROTx(TESTNET_WAZERO_ADDRESS)
+    const unwrapTx = invariant.withdrawAllWAZEROTx(
+      TESTNET_WAZERO_ADDRESS,
+      INVARIANT_WITHDRAW_ALL_WAZERO
+    )
     txs.push(unwrapTx)
 
     const batchedTx = api.tx.utility.batchAll(txs)
