@@ -30,11 +30,11 @@ import { Status } from '@store/reducers/wallet'
 import { networkType } from '@store/selectors/connection'
 import {
   isLoadingLatestPoolsForTransaction,
+  isLoadingTicksAndTickMaps,
   poolKeys,
   pools,
   poolsArraySortedByFees,
-  volumeRanges,
-  isLoadingTicksAndTickMaps
+  volumeRanges
 } from '@store/selectors/pools'
 import { initPosition, plotTicks } from '@store/selectors/positions'
 import { canCreateNewPool, canCreateNewPosition, status, swapTokens } from '@store/selectors/wallet'
