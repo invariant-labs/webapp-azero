@@ -285,7 +285,10 @@ export const Swap: React.FC<ISwap> = ({
   }
 
   const isError = (error: SwapError): boolean => {
-    return simulateResult.errors.some(err => err === error)
+    if (simulateResult.errors) {
+      return simulateResult.errors.some(err => err === error)
+    }
+    return false
   }
 
   const getStateMessage = () => {
@@ -480,6 +483,7 @@ export const Swap: React.FC<ISwap> = ({
             tokenPrice={tokenFromPriceData?.price}
             priceLoading={priceFromLoading}
             isBalanceLoading={isBalanceLoading}
+            showMaxButton={true}
           />
         </Box>
         <Box className={classes.tokenComponentTextContainer}>
@@ -530,10 +534,10 @@ export const Swap: React.FC<ISwap> = ({
             }}
             placeholder={`0.${'0'.repeat(6)}`}
             onMaxClick={() => {
-              if (tokenToIndex !== null) {
+              if (tokenFromIndex !== null) {
                 setInputRef(inputTarget.FROM)
-                setAmountTo(
-                  printBigint(tokens[tokenToIndex].balance, tokens[tokenToIndex].decimals)
+                setAmountFrom(
+                  printBigint(tokens[tokenFromIndex].balance, tokens[tokenFromIndex].decimals)
                 )
               }
             }}
@@ -550,6 +554,7 @@ export const Swap: React.FC<ISwap> = ({
             tokenPrice={tokenToPriceData?.price}
             priceLoading={priceToLoading}
             isBalanceLoading={isBalanceLoading}
+            showMaxButton={false}
           />
         </Box>
         <Box className={classes.transactionDetails}>

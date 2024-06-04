@@ -4,6 +4,7 @@ import RemoveIcon from '@mui/icons-material/Remove'
 import useStyles from './style'
 import { colors } from '@static/theme'
 import { Button, Grid, Input, Typography } from '@mui/material'
+import { FormatNumberThreshold, formatNumbers, showPrefix } from '@store/consts/utils'
 
 export interface IRangeInput {
   label: string
@@ -73,6 +74,36 @@ export const RangeInput: React.FC<IRangeInput> = ({
     }
   }
 
+  const percentageThresholds: FormatNumberThreshold[] = [
+    {
+      value: 10,
+      decimals: 2
+    },
+    {
+      value: 1000,
+      decimals: 2
+    },
+    {
+      value: 10000,
+      decimals: 2
+    },
+    {
+      value: 1000000,
+      decimals: 2,
+      divider: 1000
+    },
+    {
+      value: 1000000000,
+      decimals: 2,
+      divider: 1000000
+    },
+    {
+      value: Infinity,
+      decimals: 2,
+      divider: 1000000000
+    }
+  ]
+
   return (
     <Grid className={className} style={style} container direction='column' alignItems='center'>
       <Grid
@@ -127,7 +158,10 @@ export const RangeInput: React.FC<IRangeInput> = ({
             color: percentDiff >= 0 ? colors.invariant.green : colors.invariant.Error
           }}>
           {percentDiff >= 0 ? '+' : ''}
-          {(percentDiff ?? 0).toFixed(2)}%
+          {percentDiff
+            ? formatNumbers(percentageThresholds)(percentDiff.toString()) + showPrefix(percentDiff)
+            : 0}
+          %
         </Typography>
       </Grid>
     </Grid>
