@@ -2,14 +2,16 @@ import { Network, sendTx } from '@invariant-labs/a0-sdk'
 import { NightlyConnectAdapter } from '@nightlylabs/wallet-selector-polkadot'
 import { AddressOrPair, Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { TokenAirdropAmount, FaucetTokenList } from '@store/consts/static'
+import { FaucetTokenList, TokenAirdropAmount } from '@store/consts/static'
 import { createLoaderKey, getTokenBalances } from '@store/consts/utils'
 import { actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { ITokenBalance, Status, actions } from '@store/reducers/wallet'
 import { networkType } from '@store/selectors/connection'
 import { address, status } from '@store/selectors/wallet'
+import psp22Singleton from '@store/services/psp22Singleton'
 import { disconnectWallet, getAlephZeroWallet } from '@utils/web3/wallet'
+import { closeSnackbar } from 'notistack'
 import {
   SagaGenerator,
   all,
@@ -21,8 +23,6 @@ import {
   takeLeading
 } from 'typed-redux-saga'
 import { getConnection } from './connection'
-import { closeSnackbar } from 'notistack'
-import psp22Singleton from '@store/services/psp22Singleton'
 
 export function* getWallet(): SagaGenerator<NightlyConnectAdapter> {
   const wallet = yield* call(getAlephZeroWallet)
