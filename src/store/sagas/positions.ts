@@ -637,6 +637,20 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
     )
     const adapter = yield* call(getAlephZeroWallet)
 
+    const position = yield* call(
+      [invariant, invariant.getPosition],
+      walletAddress,
+      action.payload.positionIndex
+    )
+
+    if (
+      position.poolKey.tokenX === TESTNET_WAZERO_ADDRESS ||
+      position.poolKey.tokenY === TESTNET_WAZERO_ADDRESS
+    ) {
+      yield* call(handleClosePositionWithAZERO, action)
+      return
+    }
+
     yield put(
       snackbarsActions.add({
         message: 'Signing transaction...',
@@ -646,7 +660,7 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
       })
     )
 
-    const tx = yield* call([invariant, invariant.removePositionTx], action.payload.positionIndex)
+    const tx = invariant.removePositionTx(action.payload.positionIndex)
     const signedTx = yield* call([tx, tx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
     })
@@ -664,6 +678,97 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
     )
 
     const txResult = yield* call(sendTx, signedTx)
+
+    closeSnackbar(loaderKey)
+    yield put(snackbarsActions.remove(loaderKey))
+    yield put(
+      snackbarsActions.add({
+        message: 'Position successfully removed',
+        variant: 'success',
+        persist: false,
+        txid: txResult.hash
+      })
+    )
+
+    yield* put(actions.getPositionsList())
+    action.payload.onSuccess()
+  } catch (e) {
+    closeSnackbar(loaderSigningTx)
+    yield put(snackbarsActions.remove(loaderSigningTx))
+    closeSnackbar(loaderKey)
+    yield put(snackbarsActions.remove(loaderKey))
+
+    yield put(
+      snackbarsActions.add({
+        message: 'Failed to close position. Please try again.',
+        variant: 'error',
+        persist: false
+      })
+    )
+
+    console.log(e)
+  }
+}
+
+export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositionData>) {
+  const loaderSigningTx = createLoaderKey()
+  const loaderKey = createLoaderKey()
+
+  try {
+    const walletAddress = yield* select(address)
+    const api = yield* getConnection()
+    const network = yield* select(networkType)
+    const invAddress = yield* select(invariantAddress)
+    const invariant = yield* call(
+      [invariantSingleton, invariantSingleton.loadInstance],
+      api,
+      network,
+      invAddress
+    )
+    const psp22 = yield* call([psp22Singleton, psp22Singleton.loadInstance], api, network)
+    const adapter = yield* call(getAlephZeroWallet)
+
+    yield put(
+      snackbarsActions.add({
+        message: 'Signing transaction...',
+        variant: 'pending',
+        persist: true,
+        key: loaderSigningTx
+      })
+    )
+
+    const txs = []
+
+    const removePositionTx = invariant.removePositionTx(action.payload.positionIndex)
+    txs.push(removePositionTx)
+
+    const approveTx = psp22.approveTx(invAddress, U128MAX, TESTNET_WAZERO_ADDRESS)
+    txs.push(approveTx)
+
+    const unwrapTx = invariant.withdrawAllWAZEROTx(TESTNET_WAZERO_ADDRESS)
+    txs.push(unwrapTx)
+
+    const resetApproveTx = psp22.approveTx(invAddress, 0n, TESTNET_WAZERO_ADDRESS)
+    txs.push(resetApproveTx)
+
+    const batchedTx = api.tx.utility.batchAll(txs)
+    const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
+      signer: adapter.signer as Signer
+    })
+
+    closeSnackbar(loaderSigningTx)
+    yield put(snackbarsActions.remove(loaderSigningTx))
+    const loaderKey = createLoaderKey()
+    yield put(
+      snackbarsActions.add({
+        message: 'Removing position...',
+        variant: 'pending',
+        persist: true,
+        key: loaderKey
+      })
+    )
+
+    const txResult = yield* call(sendTx, signedBatchedTx)
 
     closeSnackbar(loaderKey)
     yield put(snackbarsActions.remove(loaderKey))
