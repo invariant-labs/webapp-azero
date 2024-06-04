@@ -5,7 +5,8 @@ import { PoolWithPoolKey } from '@store/reducers/pools'
 import { createSelector } from 'reselect'
 import { IPositionsStore, positionsSliceName } from '../reducers/positions'
 import { AnyProps, keySelectors } from './helpers'
-import { poolsArraySortedByFees, tokens } from './pools'
+import { poolsArraySortedByFees } from './pools'
+import { swapTokens } from './wallet'
 
 const store = (s: AnyProps) => s[positionsSliceName] as IPositionsStore
 
@@ -36,7 +37,7 @@ export interface PositionWithPoolData extends Position {
 export const positionsWithPoolsData = createSelector(
   poolsArraySortedByFees,
   positionsList,
-  tokens,
+  swapTokens,
   (allPools, { list }, tokens) => {
     const poolsByKey: Record<string, PoolWithPoolKeyAndIndex> = {}
     allPools.forEach((pool, index) => {
@@ -49,8 +50,8 @@ export const positionsWithPoolsData = createSelector(
     return list.map((position, index) => ({
       ...position,
       poolData: poolsByKey[poolKeyToString(position.poolKey)],
-      tokenX: tokens[position.poolKey.tokenX],
-      tokenY: tokens[position.poolKey.tokenY],
+      tokenX: tokens.find(address => address.assetAddress === position.poolKey.tokenX),
+      tokenY: tokens.find(address => address.assetAddress === position.poolKey.tokenY),
       positionIndex: index
     }))
   }
