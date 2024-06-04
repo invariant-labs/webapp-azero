@@ -10,7 +10,7 @@ import {
   deserializeTickmap,
   poolKeyToString
 } from '@store/consts/utils'
-import { ListType, actions as poolsActions } from '@store/reducers/pools'
+import { FetchTicksAndTickMaps, ListType, actions as poolsActions } from '@store/reducers/pools'
 import { ClosePositionData, InitPositionData, actions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { actions as walletActions } from '@store/reducers/wallet'
@@ -21,9 +21,9 @@ import psp22Singleton from '@store/services/psp22Singleton'
 import wrappedAZEROSingleton from '@store/services/wrappedAZEROSingleton'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
-import { all, call, delay, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
+import { all, call, fork, join, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
 import { getConnection } from './connection'
-import { fetchAllPoolKeys } from './pools'
+import { fetchAllPoolKeys, fetchTicksAndTickMaps } from './pools'
 import { poolsArraySortedByFees, tickMaps, tokens } from '@store/selectors/pools'
 
 function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator {
@@ -382,19 +382,18 @@ export function* handleGetCurrentPlotTicks(
     )
 
     if (!allTickmaps[poolKeyToString(poolKey)]) {
-      yield* put(
-        poolsActions.getTicksAndTickMaps({
+      const fetchTicksAndTickMapsAction: PayloadAction<FetchTicksAndTickMaps> = {
+        type: poolsActions.getTicksAndTickMaps.type,
+        payload: {
           tokenFrom: allTokens[poolKey.tokenX].address,
           tokenTo: allTokens[poolKey.tokenY].address,
           allPools
-        })
-      )
-    }
+        }
+      }
 
-    let i = 0
-    while (!allTickmaps[poolKeyToString(poolKey)] && i < 5) {
-      i++
-      yield* delay(300)
+      const fetchTask = yield* fork(fetchTicksAndTickMaps, fetchTicksAndTickMapsAction)
+
+      yield* join(fetchTask)
       allTickmaps = yield* select(tickMaps)
     }
 
@@ -411,7 +410,6 @@ export function* handleGetCurrentPlotTicks(
       xDecimal,
       yDecimal
     )
-
     yield put(actions.setPlotTicks(ticksData))
   } catch (error) {
     console.log(error)

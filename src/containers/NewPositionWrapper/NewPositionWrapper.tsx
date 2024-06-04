@@ -33,11 +33,11 @@ import {
   poolKeys,
   pools,
   poolsArraySortedByFees,
-  volumeRanges
+  volumeRanges,
+  isLoadingTicksAndTickMaps
 } from '@store/selectors/pools'
 import { initPosition, plotTicks } from '@store/selectors/positions'
 import { canCreateNewPool, canCreateNewPosition, status, swapTokens } from '@store/selectors/wallet'
-import { getCurrentAlephZeroConnection } from '@utils/web3/connection'
 import { openWalletSelectorModal } from '@utils/web3/selector'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -54,14 +54,13 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   initialFee
 }) => {
   const dispatch = useDispatch()
-
-  const connection = getCurrentAlephZeroConnection()
   const tokens = useSelector(swapTokens)
   const walletStatus = useSelector(status)
   const allPools = useSelector(poolsArraySortedByFees)
   const poolsVolumeRanges = useSelector(volumeRanges)
   const allPoolKeys = useSelector(poolKeys)
   const poolsData = useSelector(pools)
+  const loadingTicksAndTickMaps = useSelector(isLoadingTicksAndTickMaps)
 
   const { success, inProgress } = useSelector(initPosition)
   const { data: ticksData, loading: ticksLoading, hasError: hasTicksError } = useSelector(plotTicks)
@@ -196,7 +195,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   }, [isFetchingNewPool, poolKey])
 
   useEffect(() => {
-    if (!isWaitingForNewPool && tokenAIndex !== null && tokenBIndex !== null) {
+    if (tokenAIndex !== null && tokenBIndex !== null) {
       const tokenA = tokens[tokenAIndex].assetAddress.toString()
       const tokenB = tokens[tokenBIndex].assetAddress.toString()
 
@@ -588,6 +587,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         }
       })}
       ticksLoading={ticksLoading}
+      loadingTicksAndTickMaps={loadingTicksAndTickMaps}
       isXtoY={isXtoY}
       xDecimal={xDecimal}
       yDecimal={yDecimal}

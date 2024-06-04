@@ -675,7 +675,7 @@ export const createLiquidityPlot = (
   isXtoY: boolean,
   tokenXDecimal: bigint,
   tokenYDecimal: bigint
-) => {
+): PlotTickData[] => {
   const sortedTicks = rawTicks.sort((a, b) => Number(a.index - b.index))
   const parsedTicks = rawTicks.length ? calculateLiquidityBreakpoints(sortedTicks) : []
 
@@ -723,7 +723,7 @@ export const createLiquidityPlot = (
       index: tick.index
     })
   })
-
+  const lastTick = ticks[ticks.length - 1].index
   if (!ticks.length) {
     const maxPrice = calcPrice(max, isXtoY, tokenXDecimal, tokenYDecimal)
 
@@ -732,18 +732,13 @@ export const createLiquidityPlot = (
       y: 0,
       index: max
     })
-  } else if (ticks[ticks.length - 1].index < max) {
-    if (max - ticks[ticks.length - 1].index > tickSpacing) {
-      const price = calcPrice(
-        ticks[ticks.length - 1].index + tickSpacing,
-        isXtoY,
-        tokenXDecimal,
-        tokenYDecimal
-      )
+  } else if (lastTick < max) {
+    if (max - lastTick > tickSpacing) {
+      const price = calcPrice(lastTick + tickSpacing, isXtoY, tokenXDecimal, tokenYDecimal)
       ticksData.push({
         x: price,
         y: 0,
-        index: ticks[ticks.length - 1].index + tickSpacing
+        index: lastTick + tickSpacing
       })
     }
 
