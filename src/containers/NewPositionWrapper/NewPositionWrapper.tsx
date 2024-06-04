@@ -36,7 +36,7 @@ import {
   volumeRanges
 } from '@store/selectors/pools'
 import { initPosition, plotTicks } from '@store/selectors/positions'
-import { canCreateNewPool, canCreateNewPosition, status, swapTokens } from '@store/selectors/wallet'
+import { canCreateNewPool, canCreateNewPosition, poolTokens, status } from '@store/selectors/wallet'
 import { getCurrentAlephZeroConnection } from '@utils/web3/connection'
 import { openWalletSelectorModal } from '@utils/web3/selector'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
@@ -56,7 +56,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const dispatch = useDispatch()
 
   const connection = getCurrentAlephZeroConnection()
-  const tokens = useSelector(swapTokens)
+  const tokens = useSelector(poolTokens)
   const walletStatus = useSelector(status)
   const allPools = useSelector(poolsArraySortedByFees)
   const poolsVolumeRanges = useSelector(volumeRanges)

@@ -2,6 +2,7 @@ import { Network, TESTNET_WAZERO_ADDRESS, TokenAmount } from '@invariant-labs/a0
 import { AddressOrPair } from '@polkadot/api/types'
 import { BN } from '@polkadot/util'
 import { createSelector } from '@reduxjs/toolkit'
+import { POOL_SAFE_TRANSACTION_FEE, SWAP_SAFE_TRANSACTION_FEE } from '@store/consts/static'
 import { IAlephZeroWallet, ITokenBalance, walletSliceName } from '@store/reducers/wallet'
 import { AnyProps, keySelectors } from './helpers'
 import { tokens } from './pools'
@@ -66,7 +67,23 @@ export const swapTokens = createSelector(
       assetAddress: token.address,
       balance:
         token.address.toString() === TESTNET_WAZERO_ADDRESS
-          ? a0Balance
+          ? BigInt(Math.max(Number(a0Balance - SWAP_SAFE_TRANSACTION_FEE), 0))
+          : allAccounts[token.address.toString()]?.balance ?? 0n
+    }))
+  }
+)
+
+export const poolTokens = createSelector(
+  tokensBalances,
+  tokens,
+  balance,
+  (allAccounts, tokens, a0Balance) => {
+    return Object.values(tokens).map(token => ({
+      ...token,
+      assetAddress: token.address,
+      balance:
+        token.address.toString() === TESTNET_WAZERO_ADDRESS
+          ? BigInt(Math.max(Number(a0Balance - POOL_SAFE_TRANSACTION_FEE), 0))
           : allAccounts[token.address.toString()]?.balance ?? 0n
     }))
   }

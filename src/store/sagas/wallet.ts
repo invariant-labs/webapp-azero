@@ -2,7 +2,7 @@ import { Network, sendTx } from '@invariant-labs/a0-sdk'
 import { NightlyConnectAdapter } from '@nightlylabs/wallet-selector-polkadot'
 import { AddressOrPair, Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { FaucetTokenList, SAFE_TRANSACETION_FEE, TokenAirdropAmount } from '@store/consts/static'
+import { FaucetTokenList, TokenAirdropAmount } from '@store/consts/static'
 import { createLoaderKey, getTokenBalances } from '@store/consts/utils'
 import { actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
@@ -284,7 +284,7 @@ export function* init(): Generator {
 
     const balance = yield* call(getBalance, accounts[0].address)
 
-    yield* put(actions.setBalance(BigInt(Math.max(+balance - SAFE_TRANSACETION_FEE, 0))))
+    yield* put(actions.setBalance(BigInt(balance)))
     yield* put(actions.setStatus(Status.Initialized))
     yield* call(fetchTokensBalances)
     yield* put(actions.setIsBalanceLoading(false))
