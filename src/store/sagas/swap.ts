@@ -24,7 +24,6 @@ import {
 } from '@store/consts/utils'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Simulate, actions } from '@store/reducers/swap'
-import { actions as walletActions } from '@store/reducers/wallet'
 import { invariantAddress, networkType } from '@store/selectors/connection'
 import { poolTicks, pools, tickMaps, tokens } from '@store/selectors/pools'
 import { simulateResult, swap } from '@store/selectors/swap'
@@ -36,6 +35,7 @@ import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
 import { all, call, put, select, spawn, takeEvery } from 'typed-redux-saga'
 import { getConnection } from './connection'
+import { fetchBalances } from './wallet'
 
 export function* handleSwap(): Generator {
   const loaderSwappingTokens = createLoaderKey()
@@ -117,22 +117,7 @@ export function* handleSwap(): Generator {
       })
     )
 
-    const tokenXBalance = yield* call(
-      [psp22, psp22.balanceOf],
-      walletAddress,
-      tokenX.address.toString()
-    )
-    const tokenYBalance = yield* call(
-      [psp22, psp22.balanceOf],
-      walletAddress,
-      tokenY.address.toString()
-    )
-    yield* put(
-      walletActions.addTokenBalances([
-        { address: tokenX.address.toString(), balance: tokenXBalance },
-        { address: tokenY.address.toString(), balance: tokenYBalance }
-      ])
-    )
+    yield* call(fetchBalances, [poolKey.tokenX, poolKey.tokenY])
 
     yield put(actions.setSwapSuccess(true))
   } catch (error) {
@@ -260,22 +245,9 @@ export function* handleSwapWithAZERO(): Generator {
       })
     )
 
-    const tokenXBalance = yield* call(
-      [psp22, psp22.balanceOf],
-      walletAddress,
-      tokenX.address.toString()
-    )
-    const tokenYBalance = yield* call(
-      [psp22, psp22.balanceOf],
-      walletAddress,
-      tokenY.address.toString()
-    )
-    yield* put(
-      walletActions.addTokenBalances([
-        { address: tokenX.address.toString(), balance: tokenXBalance },
-        { address: tokenY.address.toString(), balance: tokenYBalance }
-      ])
-    )
+    yield* call(fetchBalances, [
+      poolKey.tokenX === TESTNET_WAZERO_ADDRESS ? poolKey.tokenY : poolKey.tokenX
+    ])
 
     yield put(actions.setSwapSuccess(true))
   } catch (error) {
