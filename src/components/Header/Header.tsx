@@ -50,6 +50,10 @@ export const Header: React.FC<IHeader> = ({
 
   const routes = ['swap', 'pool'] // TODO add 'stats' later
 
+  const otherRoutesToHighlight: Record<string, RegExp[]> = {
+    pool: [/^newPosition\/*/, /^position\/*/]
+  }
+
   const [activePath, setActive] = useState('swap')
 
   const [routesModalOpen, setRoutesModalOpen] = useState(false)
@@ -107,7 +111,11 @@ export const Header: React.FC<IHeader> = ({
                 onClick={() => {
                   setActive(path)
                 }}
-                active={path === activePath}
+                active={
+                  path === activePath ||
+                  (!!otherRoutesToHighlight[path] &&
+                    otherRoutesToHighlight[path].some(pathRegex => pathRegex.test(activePath)))
+                }
               />
             </Link>
           ))}
