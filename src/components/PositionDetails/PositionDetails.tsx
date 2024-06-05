@@ -33,7 +33,7 @@ interface IProps {
   onClickClaimFee: () => void
   closePosition: (claimFarmRewards?: boolean) => void
   ticksLoading: boolean
-  tickSpacing: number
+  tickSpacing: bigint
   fee: bigint
   min: number
   max: number
@@ -43,8 +43,8 @@ interface IProps {
   hasTicksError?: boolean
   reloadHandler: () => void
   plotVolumeRange?: {
-    min: number
-    max: number
+    min: bigint
+    max: bigint
   }
   userHasStakes?: boolean
 }
@@ -157,11 +157,7 @@ const PositionDetails: React.FC<IProps> = ({
                 : detailsData.map(tick => ({ ...tick, x: 1 / tick.x })).reverse()
               : Array(100)
                   .fill(1)
-                  .map((_e, index) => ({
-                    x: index,
-                    y: index,
-                    index: BigInt(index)
-                  }))
+                  .map((_e, index) => ({ x: index, y: index, index: BigInt(index) }))
           }
           leftRange={xToY ? leftRange : { ...rightRange, x: 1 / rightRange.x }}
           rightRange={xToY ? rightRange : { ...leftRange, x: 1 / leftRange.x }}
@@ -185,8 +181,8 @@ const PositionDetails: React.FC<IProps> = ({
             xToY
               ? plotVolumeRange
               : {
-                  min: 1 / (plotVolumeRange?.max ?? 1),
-                  max: 1 / (plotVolumeRange?.min ?? 1)
+                  min: 1n / (plotVolumeRange?.max ?? 1n),
+                  max: 1n / (plotVolumeRange?.min ?? 1n)
                 }
           }
         />
