@@ -612,7 +612,8 @@ export const NewPosition: React.FC<INewPosition> = ({
               tokenAIndex === null ||
               tokenBIndex === null ||
               tokenAIndex === tokenBIndex ||
-              data.length === 0
+              data.length === 0 ||
+              isWaitingForNewPool
             }
             blockerInfo={setRangeBlockerInfo()}
             {...(tokenAIndex === null ||
@@ -627,7 +628,7 @@ export const NewPosition: React.FC<INewPosition> = ({
                   tokenASymbol: tokens[tokenAIndex].symbol,
                   tokenBSymbol: tokens[tokenBIndex].symbol
                 })}
-            ticksLoading={ticksLoading || loadingTicksAndTickMaps}
+            ticksLoading={ticksLoading}
             isXtoY={isXtoY}
             tickSpacing={tickSpacing}
             xDecimal={xDecimal}

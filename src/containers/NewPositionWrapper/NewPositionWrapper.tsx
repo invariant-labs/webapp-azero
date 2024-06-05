@@ -112,17 +112,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     if (!inProgress && progress === 'progress') {
       setProgress(success ? 'approvedWithSuccess' : 'approvedWithFail')
 
-      if (poolKey !== '' && tokenAIndex !== null && tokenBIndex !== null && poolIndex !== null) {
-        dispatch(
-          positionsActions.getCurrentPlotTicks({
-            poolKey: allPoolKeys[poolKey],
-            isXtoY:
-              allPools[poolIndex].poolKey.tokenX ===
-              tokens[currentPairReversed === true ? tokenBIndex : tokenAIndex].assetAddress
-          })
-        )
-      }
-
       timeoutId1 = setTimeout(() => {
         setProgress(success ? 'success' : 'failed')
       }, 1500)
@@ -136,7 +125,28 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       clearTimeout(timeoutId1)
       clearTimeout(timeoutId2)
     }
-  }, [success, inProgress, poolKey])
+  }, [success, inProgress])
+
+  useEffect(() => {
+    if (
+      success &&
+      poolKey !== '' &&
+      tokenAIndex !== null &&
+      tokenBIndex !== null &&
+      poolIndex !== null &&
+      !loadingTicksAndTickMaps
+    ) {
+      dispatch(
+        positionsActions.getCurrentPlotTicks({
+          poolKey: allPoolKeys[poolKey],
+          isXtoY:
+            allPools[poolIndex].poolKey.tokenX ===
+            tokens[currentPairReversed === true ? tokenBIndex : tokenAIndex].assetAddress,
+          disableLoading: true
+        })
+      )
+    }
+  }, [success])
 
   const isXtoY = useMemo(() => {
     if (tokenAIndex !== null && tokenBIndex !== null) {

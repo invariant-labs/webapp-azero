@@ -50,6 +50,7 @@ export interface InitPositionData {
 export interface GetCurrentTicksData {
   poolKey: PoolKey
   isXtoY: boolean
+  disableLoading?: boolean
 }
 
 export interface ClosePositionData {
@@ -114,8 +115,8 @@ const positionsSlice = createSlice({
       state.plotTicks.hasError = true
       return state
     },
-    getCurrentPlotTicks(state, _action: PayloadAction<GetCurrentTicksData>) {
-      state.plotTicks.loading = true
+    getCurrentPlotTicks(state, action: PayloadAction<GetCurrentTicksData>) {
+      state.plotTicks.loading = !action.payload.disableLoading
       return state
     },
     setPositionsList(state, action: PayloadAction<Position[]>) {
