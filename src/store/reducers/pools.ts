@@ -36,7 +36,6 @@ export interface IPoolsStore {
   isLoadingLatestPoolsForTransaction: boolean
   isLoadingTicksAndTickMaps: boolean
   tickMaps: { [key in string]: string }
-  volumeRanges: Record<string, Range[]>
 }
 
 export interface UpdatePool {
@@ -85,8 +84,7 @@ export const defaultState: IPoolsStore = {
   nearestPoolTicksForPair: {},
   isLoadingLatestPoolsForTransaction: false,
   isLoadingTicksAndTickMaps: false,
-  tickMaps: {},
-  volumeRanges: {}
+  tickMaps: {}
 }
 
 export interface PairTokens {
@@ -163,10 +161,6 @@ const poolsSlice = createSlice({
       state.isLoadingLatestPoolsForTransaction = true
       return state
     },
-    // setVolumeRanges(state, action: PayloadAction<Record<string, Range[]>>) {
-    //   state.volumeRanges = action.payload
-    //   return state
-    // },
     // setPools(state, action: PayloadAction<{ [key in string]: PoolWithAddress }>) {
     //   state.pools = action.payload
     //   return state

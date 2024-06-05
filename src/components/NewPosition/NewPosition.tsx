@@ -91,10 +91,6 @@ export interface INewPosition {
   priceBLoading?: boolean
   hasTicksError?: boolean
   reloadHandler: () => void
-  plotVolumeRange?: {
-    min: bigint
-    max: bigint
-  }
   currentFeeIndex: number
   onSlippageChange: (slippage: string) => void
   initialSlippage: string
@@ -144,7 +140,6 @@ export const NewPosition: React.FC<INewPosition> = ({
   priceBLoading,
   hasTicksError,
   reloadHandler,
-  plotVolumeRange,
   currentFeeIndex,
   onSlippageChange,
   initialSlippage,
@@ -643,7 +638,6 @@ export const NewPosition: React.FC<INewPosition> = ({
             positionOpeningMethod={positionOpeningMethod}
             hasTicksError={hasTicksError}
             reloadHandler={reloadHandler}
-            volumeRange={plotVolumeRange}
             concentrationArray={concentrationArray}
             setConcentrationIndex={setConcentrationIndex}
             concentrationIndex={concentrationIndex}
