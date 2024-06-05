@@ -712,7 +712,7 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
       position.poolKey.tokenX === TESTNET_WAZERO_ADDRESS ||
       position.poolKey.tokenY === TESTNET_WAZERO_ADDRESS
     ) {
-      yield* call(handleClosePositionWithAZERO, action)
+      yield* call(handleClosePositionWithAZERO, action, position)
       return
     }
 
@@ -780,7 +780,10 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
   }
 }
 
-export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositionData>) {
+export function* handleClosePositionWithAZERO(
+  action: PayloadAction<ClosePositionData>,
+  position: Position
+) {
   const loaderSigningTx = createLoaderKey()
   const loaderKey = createLoaderKey()
 
@@ -853,6 +856,8 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
 
     yield* put(actions.getPositionsList())
     action.payload.onSuccess()
+
+    yield* call(fetchBalances, [position.poolKey.tokenX, position.poolKey.tokenY])
   } catch (e) {
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
