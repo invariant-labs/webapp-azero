@@ -42,7 +42,7 @@ export const FeeSwitch: React.FC<IFeeSwitch> = ({
         value={currentValue}
         onChange={handleChange}
         variant='scrollable'
-        scrollButtons='auto'
+        scrollButtons
         TabIndicatorProps={{ children: <span /> }}
         classes={tabsClasses}>
         {feeTiers.map((tier, index) => (
