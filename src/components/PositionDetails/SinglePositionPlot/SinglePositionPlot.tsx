@@ -3,9 +3,12 @@ import LiquidationRangeInfo from '@components/PositionDetails/LiquidationRangeIn
 import { Card, Grid, Tooltip, Typography } from '@mui/material'
 import activeLiquidity from '@static/svg/activeLiquidity.svg'
 import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ILiquidityToken } from '../SinglePositionInfo/consts'
 import useStyles from './style'
+import { calcPrice, calcTicksAmountInRange, spacingMultiplicityGte } from '@store/consts/utils'
+import { getMinTick } from '@invariant-labs/a0-sdk'
+import PriceRangePlot from '@components/PriceRangePlot/PriceRangePlot'
 
 export interface ISinglePositionPlot {
   data: PlotTickData[]
@@ -16,7 +19,7 @@ export interface ISinglePositionPlot {
   tokenY: Pick<ILiquidityToken, 'name' | 'decimal'>
   tokenX: Pick<ILiquidityToken, 'name' | 'decimal'>
   ticksLoading: boolean
-  tickSpacing: number
+  tickSpacing: bigint
   min: number
   max: number
   xToY: boolean
@@ -25,8 +28,8 @@ export interface ISinglePositionPlot {
   hasTicksError?: boolean
   reloadHandler: () => void
   volumeRange?: {
-    min: number
-    max: number
+    min: bigint
+    max: bigint
   }
 }
 
@@ -56,25 +59,25 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
 
   const [isPlotDiscrete, setIsPlotDiscrete] = useState(initialIsDiscreteValue)
 
-  // useEffect(() => {
-  //   const initSideDist = Math.abs(
-  //     leftRange.x -
-  //       calcPrice(
-  //         BigInt(
-  //           Math.max(
-  //             spacingMultiplicityGte(MIN_TICK, tickSpacing),
-  //             leftRange.index - tickSpacing * 15
-  //           )
-  //         ),
-  //         xToY,
-  //         tokenX.decimal,
-  //         tokenY.decimal
-  //       )
-  //   )
+  useEffect(() => {
+    const initSideDist = Math.abs(
+      leftRange.x -
+        calcPrice(
+          BigInt(
+            Math.max(
+              spacingMultiplicityGte(Number(getMinTick(tickSpacing)), Number(tickSpacing)),
+              Number(leftRange.index) - Number(tickSpacing) * 15
+            )
+          ),
+          xToY,
+          tokenX.decimal,
+          tokenY.decimal
+        )
+    )
 
-  //   setPlotMin(leftRange.x - initSideDist)
-  //   setPlotMax(rightRange.x + initSideDist)
-  // }, [ticksLoading, leftRange, rightRange])
+    setPlotMin(leftRange.x - initSideDist)
+    setPlotMax(rightRange.x + initSideDist)
+  }, [ticksLoading, leftRange, rightRange])
 
   const zoomMinus = () => {
     const diff = plotMax - plotMin
@@ -89,21 +92,21 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
     const newMin = plotMin + diff / 6
     const newMax = plotMax - diff / 6
 
-    // if (
-    //   calcTicksAmountInRange(
-    //     Math.max(newMin, 0),
-    //     newMax,
-    //     tickSpacing,
-    //     xToY,
-    //     tokenX.decimal,
-    //     tokenY.decimal
-    //   ) >= 4
-    // ) {
-    //   setPlotMin(newMin)
-    //   setPlotMax(newMax)
-    // }
+    if (
+      calcTicksAmountInRange(
+        Math.max(newMin, 0),
+        newMax,
+        Number(tickSpacing),
+        xToY,
+        Number(tokenX.decimal),
+        Number(tokenY.decimal)
+      ) >= 4
+    ) {
+      setPlotMin(newMin)
+      setPlotMax(newMax)
+    }
   }
-
+  console.log(data)
   return (
     <Grid item className={classes.root}>
       <Grid className={classes.headerContainer} container justifyContent='space-between'>
@@ -157,28 +160,28 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
         </Grid>
       </Grid>
       <Grid className={classes.plotWrapper}>
-        {/* <PriceRangePlot
-          parsedData={data}
+        <PriceRangePlot
+          data={data}
           plotMin={plotMin}
           plotMax={plotMax}
           zoomMinus={zoomMinus}
           zoomPlus={zoomPlus}
           disabled
-          parsedLeftRange={leftRange}
-          parsedRightRange={rightRange}
-          parsedMidPrice={midPrice}
+          leftRange={leftRange}
+          rightRange={rightRange}
+          midPrice={midPrice}
           className={classes.plot}
           loading={ticksLoading}
           isXtoY={xToY}
           tickSpacing={tickSpacing}
-          xDecimal={Number(tokenX.decimal)}
-          yDecimal={Number(tokenY.decimal)}
+          xDecimal={tokenX.decimal}
+          yDecimal={tokenY.decimal}
           isDiscrete={isPlotDiscrete}
           coverOnLoading
           hasError={hasTicksError}
           reloadHandler={reloadHandler}
           volumeRange={volumeRange}
-        /> */}
+        />
       </Grid>
       <Grid className={classes.minMaxInfo}>
         <LiquidationRangeInfo

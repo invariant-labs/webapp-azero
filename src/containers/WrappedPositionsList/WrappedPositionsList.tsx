@@ -71,7 +71,11 @@ export const WrappedPositionsList: React.FC = () => {
 
       let tokenXLiq, tokenYLiq
 
-      const [x, y] = calculateTokenAmounts(position.poolData, position)
+      let x = 0n
+      let y = 0n
+      if (position.poolData) {
+        ;[x, y] = calculateTokenAmounts(position.poolData, position)
+      }
 
       try {
         tokenXLiq = +printBigint(x, position.tokenX.decimals)

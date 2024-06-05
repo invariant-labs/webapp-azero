@@ -2,7 +2,16 @@ import { PoolKey, Position, TESTNET_WAZERO_ADDRESS, sendTx } from '@invariant-la
 import { calculateTokenAmountsWithSlippage } from '@invariant-labs/a0-sdk/src/utils'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { U128MAX } from '@store/consts/static'
+import {
+  INVARIANT_CLAIM_FEE_OPTIONS,
+  INVARIANT_CREATE_POOL_OPTIONS,
+  INVARIANT_CREATE_POSITION_OPTIONS,
+  INVARIANT_REMOVE_POSITION_OPTIONS,
+  INVARIANT_WITHDRAW_ALL_WAZERO,
+  PSP22_APPROVE_OPTIONS,
+  U128MAX,
+  WAZERO_DEPOSIT_OPTIONS
+} from '@store/consts/static'
 import {
   createLiquidityPlot,
   createLoaderKey,
@@ -81,10 +90,10 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       true
     )
 
-    const XTokenTx = yield* call([psp22, psp22.approveTx], invAddress, xAmountWithSlippage, tokenX)
+    const XTokenTx = psp22.approveTx(invAddress, xAmountWithSlippage, tokenX, PSP22_APPROVE_OPTIONS)
     txs.push(XTokenTx)
 
-    const YTokenTx = yield* call([psp22, psp22.approveTx], invAddress, yAmountWithSlippage, tokenY)
+    const YTokenTx = psp22.approveTx(invAddress, yAmountWithSlippage, tokenY, PSP22_APPROVE_OPTIONS)
     txs.push(YTokenTx)
 
     const invariant = yield* call(
@@ -95,24 +104,24 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     )
 
     if (initPool) {
-      const createPoolTx = yield* call(
-        [invariant, invariant.createPoolTx],
+      const createPoolTx = invariant.createPoolTx(
         poolKeyData,
-        spotSqrtPrice
+        spotSqrtPrice,
+        INVARIANT_CREATE_POOL_OPTIONS
       )
       txs.push(createPoolTx)
 
       yield* call(fetchAllPoolKeys)
     }
 
-    const tx = yield* call(
-      [invariant, invariant.createPositionTx],
+    const tx = invariant.createPositionTx(
       poolKeyData,
       lowerTick,
       upperTick,
       liquidityDelta,
       spotSqrtPrice,
-      slippageTolerance
+      slippageTolerance,
+      INVARIANT_CREATE_POSITION_OPTIONS
     )
     txs.push(tx)
 
@@ -198,7 +207,8 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     )
 
     const depositTx = wazero.depositTx(
-      tokenX === TESTNET_WAZERO_ADDRESS ? tokenXAmount : tokenYAmount
+      tokenX === TESTNET_WAZERO_ADDRESS ? tokenXAmount : tokenYAmount,
+      WAZERO_DEPOSIT_OPTIONS
     )
     txs.push(depositTx)
 
@@ -214,10 +224,10 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
       true
     )
 
-    const XTokenTx = psp22.approveTx(invAddress, xAmountWithSlippage, tokenX)
+    const XTokenTx = psp22.approveTx(invAddress, xAmountWithSlippage, tokenX, PSP22_APPROVE_OPTIONS)
     txs.push(XTokenTx)
 
-    const YTokenTx = psp22.approveTx(invAddress, yAmountWithSlippage, tokenY)
+    const YTokenTx = psp22.approveTx(invAddress, yAmountWithSlippage, tokenY, PSP22_APPROVE_OPTIONS)
     txs.push(YTokenTx)
 
     const invariant = yield* call(
@@ -228,7 +238,11 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     )
 
     if (initPool) {
-      const createPoolTx = invariant.createPoolTx(poolKeyData, spotSqrtPrice)
+      const createPoolTx = invariant.createPoolTx(
+        poolKeyData,
+        spotSqrtPrice,
+        INVARIANT_CREATE_POOL_OPTIONS
+      )
       txs.push(createPoolTx)
 
       yield* call(fetchAllPoolKeys)
@@ -240,17 +254,31 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
       upperTick,
       liquidityDelta,
       spotSqrtPrice,
-      slippageTolerance
+      slippageTolerance,
+      INVARIANT_CREATE_POSITION_OPTIONS
     )
     txs.push(tx)
 
-    const approveTx = psp22.approveTx(invAddress, U128MAX, TESTNET_WAZERO_ADDRESS)
+    const approveTx = psp22.approveTx(
+      invAddress,
+      U128MAX,
+      TESTNET_WAZERO_ADDRESS,
+      PSP22_APPROVE_OPTIONS
+    )
     txs.push(approveTx)
 
-    const unwrapTx = invariant.withdrawAllWAZEROTx(TESTNET_WAZERO_ADDRESS)
+    const unwrapTx = invariant.withdrawAllWAZEROTx(
+      TESTNET_WAZERO_ADDRESS,
+      INVARIANT_WITHDRAW_ALL_WAZERO
+    )
     txs.push(unwrapTx)
 
-    const resetApproveTx = psp22.approveTx(invAddress, 0n, TESTNET_WAZERO_ADDRESS)
+    const resetApproveTx = psp22.approveTx(
+      invAddress,
+      0n,
+      TESTNET_WAZERO_ADDRESS,
+      PSP22_APPROVE_OPTIONS
+    )
     txs.push(resetApproveTx)
 
     const batchedTx = api.tx.utility.batchAll(txs)
@@ -407,6 +435,17 @@ export function* handleGetCurrentPlotTicks(
       poolKey,
       deserializeTickmap(allTickmaps[poolKeyToString(poolKey)])
     )
+    if (rawTicks.length === 0) {
+      const data = createPlaceholderLiquidityPlot(
+        action.payload.isXtoY,
+        0,
+        poolKey.feeTier.tickSpacing,
+        xDecimal,
+        yDecimal
+      )
+      yield* put(actions.setPlotTicks(data))
+      return
+    }
 
     const ticksData = createLiquidityPlot(
       rawTicks,
@@ -425,7 +464,7 @@ export function* handleGetCurrentPlotTicks(
       xDecimal,
       yDecimal
     )
-    yield put(actions.setErrorPlotTicks(data))
+    yield* put(actions.setErrorPlotTicks(data))
   }
 }
 
@@ -465,7 +504,7 @@ export function* handleClaimFee(action: PayloadAction<bigint>) {
       })
     )
 
-    const tx = yield* call([invariant, invariant.claimFeeTx], action.payload)
+    const tx = invariant.claimFeeTx(action.payload, INVARIANT_CLAIM_FEE_OPTIONS)
     const signedTx = yield* call([tx, tx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
     })
@@ -547,16 +586,29 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<bigint>, position
     )
 
     const txs = []
-    const claimTx = invariant.claimFeeTx(action.payload)
+    const claimTx = invariant.claimFeeTx(action.payload, INVARIANT_CLAIM_FEE_OPTIONS)
     txs.push(claimTx)
 
-    const approveTx = psp22.approveTx(invAddress, U128MAX, TESTNET_WAZERO_ADDRESS)
+    const approveTx = psp22.approveTx(
+      invAddress,
+      U128MAX,
+      TESTNET_WAZERO_ADDRESS,
+      PSP22_APPROVE_OPTIONS
+    )
     txs.push(approveTx)
 
-    const unwrapTx = invariant.withdrawAllWAZEROTx(TESTNET_WAZERO_ADDRESS)
+    const unwrapTx = invariant.withdrawAllWAZEROTx(
+      TESTNET_WAZERO_ADDRESS,
+      INVARIANT_WITHDRAW_ALL_WAZERO
+    )
     txs.push(unwrapTx)
 
-    const resetApproveTx = psp22.approveTx(invAddress, 0n, TESTNET_WAZERO_ADDRESS)
+    const resetApproveTx = psp22.approveTx(
+      invAddress,
+      0n,
+      TESTNET_WAZERO_ADDRESS,
+      PSP22_APPROVE_OPTIONS
+    )
     txs.push(resetApproveTx)
 
     const batchedTx = api.tx.utility.batchAll(txs)
@@ -673,7 +725,10 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
       })
     )
 
-    const tx = invariant.removePositionTx(action.payload.positionIndex)
+    const tx = invariant.removePositionTx(
+      action.payload.positionIndex,
+      INVARIANT_REMOVE_POSITION_OPTIONS
+    )
     const signedTx = yield* call([tx, tx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
     })
