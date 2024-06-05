@@ -22,6 +22,8 @@ import { all, call, put, select, spawn, takeEvery, takeLatest } from 'typed-redu
 import { getConnection } from './connection'
 
 export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) {
+  console.log('fetchPoolsDataForList')
+
   const walletAddress = yield* select(address)
   const connection = yield* call(getConnection)
   const network = yield* select(networkType)
@@ -141,6 +143,8 @@ export function* handleInitPool(action: PayloadAction<PoolKey>): Generator {
 }
 
 export function* fetchPoolData(action: PayloadAction<PoolKey>): Generator {
+  console.log('fetchPoolData')
+
   const api = yield* getConnection()
   const network = yield* select(networkType)
   const invAddress = yield* select(invariantAddress)
@@ -173,6 +177,8 @@ export function* fetchPoolData(action: PayloadAction<PoolKey>): Generator {
 }
 
 export function* fetchAllPoolKeys(): Generator {
+  console.log('fetchAllPoolKeys')
+
   const api = yield* getConnection()
   const network = yield* select(networkType)
   const invAddress = yield* select(invariantAddress)
@@ -196,6 +202,8 @@ export function* fetchAllPoolKeys(): Generator {
 }
 
 export function* fetchAllPoolsForPairData(action: PayloadAction<PairTokens>) {
+  console.log('fetchAllPoolsForPairData')
+
   const api = yield* call(getConnection)
   const network = yield* select(networkType)
   const invAddress = yield* select(invariantAddress)
@@ -217,6 +225,8 @@ export function* fetchAllPoolsForPairData(action: PayloadAction<PairTokens>) {
 }
 
 export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMaps>) {
+  console.log('fetchTicksAndTickMaps')
+
   const { tokenFrom, tokenTo, allPools } = action.payload
 
   try {

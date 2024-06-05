@@ -242,6 +242,8 @@ export function* handleAirdrop(): Generator {
 // }
 
 export function* fetchSelectedTokensBalances(action: PayloadAction<string[]>): Generator {
+  console.log('fetchSelectedTokensBalances')
+
   const api = yield* getConnection()
   const network = yield* select(networkType)
   const walletAddress = yield* select(address)
@@ -258,6 +260,8 @@ export function* fetchSelectedTokensBalances(action: PayloadAction<string[]>): G
 }
 
 export function* fetchTokensBalances(): Generator {
+  console.log('fetchTokensBalances')
+
   const api = yield* getConnection()
   const network = yield* select(networkType)
   const walletAddress = yield* select(address)
@@ -274,6 +278,8 @@ export function* fetchTokensBalances(): Generator {
 }
 
 export function* init(): Generator {
+  console.log('init')
+
   try {
     yield* put(actions.setStatus(Status.Init))
 
@@ -300,6 +306,8 @@ export const sleep = (ms: number) => {
 }
 
 export function* handleConnect(): Generator {
+  console.log('handleConnect')
+
   const walletStatus = yield* select(status)
   if (walletStatus === Status.Initialized) {
     yield* put(
@@ -315,6 +323,8 @@ export function* handleConnect(): Generator {
 }
 
 export function* handleDisconnect(): Generator {
+  console.log('handleDisconnect')
+
   try {
     yield* call(disconnectWallet)
     yield* put(actions.resetState())
@@ -332,6 +342,8 @@ export function* handleDisconnect(): Generator {
 }
 
 export function* fetchBalances(tokens: string[]): Generator {
+  console.log('fetchBalances')
+
   const walletAddress = yield* select(address)
   const api = yield* getConnection()
   const network = yield* select(networkType)

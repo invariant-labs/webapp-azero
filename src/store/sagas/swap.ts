@@ -329,6 +329,8 @@ export enum SwapError {
 }
 
 export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
+  console.log('handleGetSimulateResult')
+
   try {
     const allPools = yield* select(pools)
     const allTickmaps = yield* select(tickMaps)

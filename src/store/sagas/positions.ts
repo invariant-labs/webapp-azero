@@ -327,6 +327,8 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
 }
 
 export function* handleGetPositionsList() {
+  console.log('handleGetPositionsList')
+
   try {
     const api = yield* getConnection()
     const network = yield* select(networkType)
@@ -366,6 +368,8 @@ export function* handleGetPositionsList() {
 }
 
 export function* handleGetCurrentPositionTicks(action: PayloadAction<bigint>) {
+  console.log('handleGetCurrentPositionTicks')
+
   const walletAddress = yield* select(address)
   const api = yield* getConnection()
   const network = yield* select(networkType)
@@ -395,6 +399,8 @@ export function* handleGetCurrentPositionTicks(action: PayloadAction<bigint>) {
 export function* handleGetCurrentPlotTicks(
   action: PayloadAction<{ poolKey: PoolKey; isXtoY: boolean }>
 ): Generator {
+  console.log('handleGetCurrentPlotTicks')
+
   const api = yield* getConnection()
   const network = yield* select(networkType)
   const invAddress = yield* select(invariantAddress)
@@ -662,6 +668,8 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<bigint>, position
 }
 
 export function* handleGetSinglePosition(action: PayloadAction<bigint>) {
+  console.log('handleGetSinglePosition')
+
   const walletAddress = yield* select(address)
   const api = yield* getConnection()
   const network = yield* select(networkType)

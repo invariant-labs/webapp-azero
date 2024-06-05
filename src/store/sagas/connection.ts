@@ -1,10 +1,10 @@
-import { all, call, put, SagaGenerator, select, takeLeading, spawn, delay } from 'typed-redux-saga'
-import { actions, Status, PayloadTypes } from '@store/reducers/connection'
-import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import { rpcAddress, networkType } from '@store/selectors/connection'
-import { PayloadAction } from '@reduxjs/toolkit'
 import { ApiPromise } from '@polkadot/api'
+import { PayloadAction } from '@reduxjs/toolkit'
+import { PayloadTypes, Status, actions } from '@store/reducers/connection'
+import { actions as snackbarsActions } from '@store/reducers/snackbars'
+import { networkType, rpcAddress } from '@store/selectors/connection'
 import apiSingleton from '@store/services/apiSingleton'
+import { SagaGenerator, all, call, delay, put, select, spawn, takeLeading } from 'typed-redux-saga'
 
 export function* getConnection(): SagaGenerator<ApiPromise> {
   const rpc = yield* select(rpcAddress)
@@ -15,6 +15,7 @@ export function* getConnection(): SagaGenerator<ApiPromise> {
 }
 
 export function* initConnection(): Generator {
+  console.log('initConnection')
   try {
     yield* call(getConnection)
 
@@ -42,6 +43,7 @@ export function* initConnection(): Generator {
 }
 
 export function* handleNetworkChange(action: PayloadAction<PayloadTypes['setNetwork']>): Generator {
+  console.log('handleNetworkChange')
   yield* delay(1000)
 
   const { networkType, rpcAddress } = action.payload
