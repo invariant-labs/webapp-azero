@@ -29,6 +29,7 @@ import {
   poolKeyToString,
   printBigint
 } from '@store/consts/utils'
+import { actions as poolActions } from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Simulate, actions } from '@store/reducers/swap'
 import { invariantAddress, networkType } from '@store/selectors/connection'
@@ -47,11 +48,11 @@ import { fetchBalances } from './wallet'
 export function* handleSwap(): Generator {
   const loaderSwappingTokens = createLoaderKey()
 
-  try {
-    const allTokens = yield* select(tokens)
-    const { poolKey, tokenFrom, slippage, amountIn, byAmountIn, estimatedPriceAfterSwap } =
-      yield* select(swap)
+  const allTokens = yield* select(tokens)
+  const { poolKey, tokenFrom, tokenTo, slippage, amountIn, byAmountIn, estimatedPriceAfterSwap } =
+    yield* select(swap)
 
+  try {
     if (!poolKey) {
       return
     }
@@ -144,6 +145,13 @@ export function* handleSwap(): Generator {
     yield* call(fetchBalances, [poolKey.tokenX, poolKey.tokenY])
 
     yield put(actions.setSwapSuccess(true))
+
+    yield put(
+      poolActions.getAllPoolsForPairData({
+        first: tokenFrom,
+        second: tokenTo
+      })
+    )
   } catch (error) {
     console.log(error)
 
@@ -159,17 +167,24 @@ export function* handleSwap(): Generator {
         persist: false
       })
     )
+
+    yield put(
+      poolActions.getAllPoolsForPairData({
+        first: tokenFrom,
+        second: tokenTo
+      })
+    )
   }
 }
 
 export function* handleSwapWithAZERO(): Generator {
   const loaderSwappingTokens = createLoaderKey()
 
-  try {
-    const allTokens = yield* select(tokens)
-    const { poolKey, tokenFrom, slippage, amountIn, byAmountIn, estimatedPriceAfterSwap } =
-      yield* select(swap)
+  const allTokens = yield* select(tokens)
+  const { poolKey, tokenFrom, tokenTo, slippage, amountIn, byAmountIn, estimatedPriceAfterSwap } =
+    yield* select(swap)
 
+  try {
     if (!poolKey) {
       return
     }
@@ -302,6 +317,13 @@ export function* handleSwapWithAZERO(): Generator {
     ])
 
     yield put(actions.setSwapSuccess(true))
+
+    yield put(
+      poolActions.getAllPoolsForPairData({
+        first: tokenFrom,
+        second: tokenTo
+      })
+    )
   } catch (error) {
     console.log(error)
 
@@ -315,6 +337,13 @@ export function* handleSwapWithAZERO(): Generator {
         message: 'Tokens swapping failed. Please try again.',
         variant: 'error',
         persist: false
+      })
+    )
+
+    yield put(
+      poolActions.getAllPoolsForPairData({
+        first: tokenFrom,
+        second: tokenTo
       })
     )
   }
