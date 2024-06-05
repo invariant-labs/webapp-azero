@@ -1,4 +1,4 @@
-import { PoolKey, TESTNET_WAZERO_ADDRESS, sendTx } from '@invariant-labs/a0-sdk'
+import { PoolKey, Position, TESTNET_WAZERO_ADDRESS, sendTx } from '@invariant-labs/a0-sdk'
 import { calculateTokenAmountsWithSlippage } from '@invariant-labs/a0-sdk/src/utils'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
@@ -34,6 +34,7 @@ import { closeSnackbar } from 'notistack'
 import { all, call, fork, join, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
 import { getConnection } from './connection'
 import { fetchAllPoolKeys, fetchTicksAndTickMaps } from './pools'
+import { fetchBalances } from './wallet'
 
 function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator {
   const loaderCreatePosition = createLoaderKey()
@@ -145,6 +146,8 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     yield put(snackbarsActions.remove(loaderCreatePosition))
 
     yield put(actions.getPositionsList())
+
+    yield* call(fetchBalances, [tokenX, tokenY])
   } catch (error) {
     console.log(error)
 
@@ -304,6 +307,8 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     yield put(snackbarsActions.remove(loaderCreatePosition))
 
     yield put(actions.getPositionsList())
+
+    yield* call(fetchBalances, [tokenX === TESTNET_WAZERO_ADDRESS ? tokenY : tokenX])
   } catch (error) {
     console.log(error)
 
@@ -484,7 +489,7 @@ export function* handleClaimFee(action: PayloadAction<bigint>) {
       position.poolKey.tokenX === TESTNET_WAZERO_ADDRESS ||
       position.poolKey.tokenY === TESTNET_WAZERO_ADDRESS
     ) {
-      yield* call(handleClaimFeeWithAZERO, action)
+      yield* call(handleClaimFeeWithAZERO, action, position)
       return
     }
 
@@ -529,6 +534,12 @@ export function* handleClaimFee(action: PayloadAction<bigint>) {
     )
 
     yield put(actions.getSinglePosition(action.payload))
+
+    yield* call(fetchBalances, [
+      position.poolKey.tokenX === TESTNET_WAZERO_ADDRESS
+        ? position.poolKey.tokenY
+        : position.poolKey.tokenX
+    ])
   } catch (e) {
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
@@ -547,7 +558,7 @@ export function* handleClaimFee(action: PayloadAction<bigint>) {
   }
 }
 
-export function* handleClaimFeeWithAZERO(action: PayloadAction<bigint>) {
+export function* handleClaimFeeWithAZERO(action: PayloadAction<bigint>, position: Position) {
   const loaderSigningTx = createLoaderKey()
   const loaderKey = createLoaderKey()
 
@@ -630,6 +641,8 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<bigint>) {
     )
 
     yield put(actions.getSinglePosition(action.payload))
+
+    yield* call(fetchBalances, [position.poolKey.tokenX, position.poolKey.tokenY])
   } catch (e) {
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
@@ -747,6 +760,8 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
 
     yield* put(actions.getPositionsList())
     action.payload.onSuccess()
+
+    yield* call(fetchBalances, [position.poolKey.tokenX, position.poolKey.tokenY])
   } catch (e) {
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
