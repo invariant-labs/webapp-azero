@@ -6,6 +6,7 @@ import { actions } from '@store/reducers/positions'
 import { Status as WalletStatus } from '@store/reducers/wallet'
 import { status as connectionStatus } from '@store/selectors/connection'
 import { address, status } from '@store/selectors/wallet'
+import { toBlur } from '@utils/uiUtils'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
@@ -40,9 +41,11 @@ const RootPage: React.FC = () => {
   return (
     <>
       {signerStatus === Status.Initialized && <EventsHandlers />}
-      <HeaderWrapper />
-      <Outlet />
-      <FooterWrapper />
+      <div id={toBlur}>
+        <HeaderWrapper />
+        <Outlet />
+        <FooterWrapper />
+      </div>
     </>
   )
 }
