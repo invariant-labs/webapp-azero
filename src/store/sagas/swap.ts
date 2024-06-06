@@ -29,6 +29,7 @@ import {
   poolKeyToString,
   printBigint
 } from '@store/consts/utils'
+import { actions as poolActions } from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Simulate, Swap, actions } from '@store/reducers/swap'
 import { invariantAddress, networkType } from '@store/selectors/connection'
@@ -45,7 +46,7 @@ import { getConnection } from './connection'
 import { fetchBalances } from './wallet'
 
 export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generator {
-  const { poolKey, tokenFrom, slippage, amountIn, byAmountIn, estimatedPriceAfterSwap } =
+  const { poolKey, tokenFrom, slippage, amountIn, byAmountIn, estimatedPriceAfterSwap, tokenTo } =
     action.payload
 
   if (!poolKey) {
@@ -160,6 +161,13 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
     yield* call(fetchBalances, [poolKey.tokenX, poolKey.tokenY])
 
     yield put(actions.setSwapSuccess(true))
+
+    yield put(
+      poolActions.getAllPoolsForPairData({
+        first: tokenFrom,
+        second: tokenTo
+      })
+    )
   } catch (error) {
     console.log(error)
 
@@ -177,11 +185,18 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
         persist: false
       })
     )
+
+    yield put(
+      poolActions.getAllPoolsForPairData({
+        first: tokenFrom,
+        second: tokenTo
+      })
+    )
   }
 }
 
 export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>): Generator {
-  const { poolKey, tokenFrom, slippage, amountIn, byAmountIn, estimatedPriceAfterSwap } =
+  const { poolKey, tokenFrom, slippage, amountIn, byAmountIn, estimatedPriceAfterSwap, tokenTo } =
     action.payload
 
   if (!poolKey) {
@@ -336,6 +351,13 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
     ])
 
     yield put(actions.setSwapSuccess(true))
+
+    yield put(
+      poolActions.getAllPoolsForPairData({
+        first: tokenFrom,
+        second: tokenTo
+      })
+    )
   } catch (error) {
     console.log(error)
 
@@ -351,6 +373,13 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
         message: 'Tokens swapping failed. Please try again.',
         variant: 'error',
         persist: false
+      })
+    )
+
+    yield put(
+      poolActions.getAllPoolsForPairData({
+        first: tokenFrom,
+        second: tokenTo
       })
     )
   }

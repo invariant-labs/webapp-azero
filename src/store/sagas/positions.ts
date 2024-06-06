@@ -831,6 +831,7 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
       })
     )
 
+    const { addressTokenX, addressTokenY, positionIndex, onSuccess } = action.payload
     const walletAddress = yield* select(address)
     const api = yield* getConnection()
     const network = yield* select(networkType)
@@ -846,7 +847,7 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
 
     const txs = []
 
-    const removePositionTx = invariant.removePositionTx(action.payload.positionIndex)
+    const removePositionTx = invariant.removePositionTx(positionIndex)
     txs.push(removePositionTx)
 
     const approveTx = psp22.approveTx(invAddress, U128MAX, TESTNET_WAZERO_ADDRESS)
@@ -890,7 +891,9 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
     )
 
     yield* put(actions.getPositionsList())
-    action.payload.onSuccess()
+    onSuccess()
+
+    yield* call(fetchBalances, [addressTokenX, addressTokenY])
   } catch (e) {
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
