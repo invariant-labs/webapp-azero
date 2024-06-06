@@ -14,6 +14,7 @@ import { TokenPriceData } from '@store/consts/static'
 import {
   SimulateResult,
   convertBalanceToBigint,
+  newPrintBigInt,
   printBigint,
   trimLeadingZeros
 } from '@store/consts/utils'
@@ -120,6 +121,15 @@ export const Swap: React.FC<ISwap> = ({
   swapData,
   simulateResult
 }) => {
+  console.log(
+    newPrintBigInt(1000n, 0n),
+    newPrintBigInt(1000n, 1n),
+    newPrintBigInt(1004n, 1n),
+    newPrintBigInt(1000n, 7n),
+    newPrintBigInt(1000n, 8n),
+    newPrintBigInt(1003n, 12n)
+  )
+
   const { classes } = useStyles()
   enum inputTarget {
     FROM = 'from',
