@@ -13,8 +13,8 @@ import {
   poolKeyToString,
   printBigint
 } from '@store/consts/utils'
-import { actions } from '@store/reducers/positions'
 import { actions as poolsActions } from '@store/reducers/pools'
+import { actions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Status } from '@store/reducers/wallet'
 import { networkType } from '@store/selectors/connection'
@@ -192,7 +192,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   const [tokenXClaim, tokenYClaim] = useMemo(() => {
     if (
       waitingForTicksData === false &&
-      position &&
+      position?.poolData &&
       typeof lowerTick !== 'undefined' &&
       typeof upperTick !== 'undefined'
     ) {

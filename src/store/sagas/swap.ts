@@ -13,7 +13,14 @@ import {
 } from '@invariant-labs/a0-sdk/target/consts'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { U128MAX } from '@store/consts/static'
+import {
+  INVARIANT_SWAP_OPTIONS,
+  INVARIANT_WITHDRAW_ALL_WAZERO,
+  PSP22_APPROVE_OPTIONS,
+  U128MAX,
+  WAZERO_DEPOSIT_OPTIONS,
+  WAZERO_WITHDRAW_OPTIONS
+} from '@store/consts/static'
 import {
   calculateAmountInWithSlippage,
   createLoaderKey,
@@ -22,9 +29,9 @@ import {
   poolKeyToString,
   printBigint
 } from '@store/consts/utils'
+import { actions as poolActions } from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Simulate, actions } from '@store/reducers/swap'
-import { actions as walletActions } from '@store/reducers/wallet'
 import { invariantAddress, networkType } from '@store/selectors/connection'
 import { poolTicks, pools, tickMaps, tokens } from '@store/selectors/pools'
 import { simulateResult, swap } from '@store/selectors/swap'
@@ -36,15 +43,16 @@ import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
 import { all, call, put, select, spawn, takeEvery } from 'typed-redux-saga'
 import { getConnection } from './connection'
+import { fetchBalances } from './wallet'
 
 export function* handleSwap(): Generator {
   const loaderSwappingTokens = createLoaderKey()
 
-  try {
-    const allTokens = yield* select(tokens)
-    const { poolKey, tokenFrom, slippage, amountIn, byAmountIn, estimatedPriceAfterSwap } =
-      yield* select(swap)
+  const allTokens = yield* select(tokens)
+  const { poolKey, tokenFrom, tokenTo, slippage, amountIn, byAmountIn, estimatedPriceAfterSwap } =
+    yield* select(swap)
 
+  try {
     if (!poolKey) {
       return
     }
@@ -89,14 +97,31 @@ export function* handleSwap(): Generator {
     }
 
     if (xToY) {
-      const approveTx = psp22.approveTx(invAddress, calculatedAmountIn, tokenX.address.toString())
+      const approveTx = psp22.approveTx(
+        invAddress,
+        calculatedAmountIn,
+        tokenX.address.toString(),
+        PSP22_APPROVE_OPTIONS
+      )
       txs.push(approveTx)
     } else {
-      const approveTx = psp22.approveTx(invAddress, calculatedAmountIn, tokenY.address.toString())
+      const approveTx = psp22.approveTx(
+        invAddress,
+        calculatedAmountIn,
+        tokenY.address.toString(),
+        PSP22_APPROVE_OPTIONS
+      )
       txs.push(approveTx)
     }
 
-    const swapTx = invariant.swapTx(poolKey, xToY, amountIn, byAmountIn, sqrtPriceLimit)
+    const swapTx = invariant.swapTx(
+      poolKey,
+      xToY,
+      amountIn,
+      byAmountIn,
+      sqrtPriceLimit,
+      INVARIANT_SWAP_OPTIONS
+    )
     txs.push(swapTx)
 
     const batchedTx = api.tx.utility.batchAll(txs)
@@ -117,24 +142,16 @@ export function* handleSwap(): Generator {
       })
     )
 
-    const tokenXBalance = yield* call(
-      [psp22, psp22.balanceOf],
-      walletAddress,
-      tokenX.address.toString()
-    )
-    const tokenYBalance = yield* call(
-      [psp22, psp22.balanceOf],
-      walletAddress,
-      tokenY.address.toString()
-    )
-    yield* put(
-      walletActions.addTokenBalances([
-        { address: tokenX.address.toString(), balance: tokenXBalance },
-        { address: tokenY.address.toString(), balance: tokenYBalance }
-      ])
-    )
+    yield* call(fetchBalances, [poolKey.tokenX, poolKey.tokenY])
 
     yield put(actions.setSwapSuccess(true))
+
+    yield put(
+      poolActions.getAllPoolsForPairData({
+        first: tokenFrom,
+        second: tokenTo
+      })
+    )
   } catch (error) {
     console.log(error)
 
@@ -150,17 +167,24 @@ export function* handleSwap(): Generator {
         persist: false
       })
     )
+
+    yield put(
+      poolActions.getAllPoolsForPairData({
+        first: tokenFrom,
+        second: tokenTo
+      })
+    )
   }
 }
 
 export function* handleSwapWithAZERO(): Generator {
   const loaderSwappingTokens = createLoaderKey()
 
-  try {
-    const allTokens = yield* select(tokens)
-    const { poolKey, tokenFrom, slippage, amountIn, byAmountIn, estimatedPriceAfterSwap } =
-      yield* select(swap)
+  const allTokens = yield* select(tokens)
+  const { poolKey, tokenFrom, tokenTo, slippage, amountIn, byAmountIn, estimatedPriceAfterSwap } =
+    yield* select(swap)
 
+  try {
     if (!poolKey) {
       return
     }
@@ -213,33 +237,61 @@ export function* handleSwapWithAZERO(): Generator {
       const azeroBalance = yield* select(balance)
       const azeroAmountInWithSlippage =
         azeroBalance > calculatedAmountIn ? calculatedAmountIn : azeroBalance
-      const depositTx = wazero.depositTx(byAmountIn ? amountIn : azeroAmountInWithSlippage)
+      const depositTx = wazero.depositTx(
+        byAmountIn ? amountIn : azeroAmountInWithSlippage,
+        WAZERO_DEPOSIT_OPTIONS
+      )
       txs.push(depositTx)
     }
 
     if (xToY) {
-      const approveTx = psp22.approveTx(invAddress, calculatedAmountIn, tokenX.address.toString())
+      const approveTx = psp22.approveTx(
+        invAddress,
+        calculatedAmountIn,
+        tokenX.address.toString(),
+        PSP22_APPROVE_OPTIONS
+      )
       txs.push(approveTx)
     } else {
-      const approveTx = psp22.approveTx(invAddress, calculatedAmountIn, tokenY.address.toString())
+      const approveTx = psp22.approveTx(
+        invAddress,
+        calculatedAmountIn,
+        tokenY.address.toString(),
+        PSP22_APPROVE_OPTIONS
+      )
       txs.push(approveTx)
     }
 
-    const swapTx = invariant.swapTx(poolKey, xToY, amountIn, byAmountIn, sqrtPriceLimit)
+    const swapTx = invariant.swapTx(
+      poolKey,
+      xToY,
+      amountIn,
+      byAmountIn,
+      sqrtPriceLimit,
+      INVARIANT_SWAP_OPTIONS
+    )
     txs.push(swapTx)
 
     if (
       (!xToY && poolKey.tokenX === TESTNET_WAZERO_ADDRESS) ||
       (xToY && poolKey.tokenY === TESTNET_WAZERO_ADDRESS)
     ) {
-      const withdrawTx = wazero.withdrawTx(swapSimulateResult.amountOut)
+      const withdrawTx = wazero.withdrawTx(swapSimulateResult.amountOut, WAZERO_WITHDRAW_OPTIONS)
       txs.push(withdrawTx)
     }
 
-    const approveTx = psp22.approveTx(invAddress, U128MAX, TESTNET_WAZERO_ADDRESS)
+    const approveTx = psp22.approveTx(
+      invAddress,
+      U128MAX,
+      TESTNET_WAZERO_ADDRESS,
+      PSP22_APPROVE_OPTIONS
+    )
     txs.push(approveTx)
 
-    const unwrapTx = invariant.withdrawAllWAZEROTx(TESTNET_WAZERO_ADDRESS)
+    const unwrapTx = invariant.withdrawAllWAZEROTx(
+      TESTNET_WAZERO_ADDRESS,
+      INVARIANT_WITHDRAW_ALL_WAZERO
+    )
     txs.push(unwrapTx)
 
     const batchedTx = api.tx.utility.batchAll(txs)
@@ -260,24 +312,18 @@ export function* handleSwapWithAZERO(): Generator {
       })
     )
 
-    const tokenXBalance = yield* call(
-      [psp22, psp22.balanceOf],
-      walletAddress,
-      tokenX.address.toString()
-    )
-    const tokenYBalance = yield* call(
-      [psp22, psp22.balanceOf],
-      walletAddress,
-      tokenY.address.toString()
-    )
-    yield* put(
-      walletActions.addTokenBalances([
-        { address: tokenX.address.toString(), balance: tokenXBalance },
-        { address: tokenY.address.toString(), balance: tokenYBalance }
-      ])
-    )
+    yield* call(fetchBalances, [
+      poolKey.tokenX === TESTNET_WAZERO_ADDRESS ? poolKey.tokenY : poolKey.tokenX
+    ])
 
     yield put(actions.setSwapSuccess(true))
+
+    yield put(
+      poolActions.getAllPoolsForPairData({
+        first: tokenFrom,
+        second: tokenTo
+      })
+    )
   } catch (error) {
     console.log(error)
 
@@ -291,6 +337,13 @@ export function* handleSwapWithAZERO(): Generator {
         message: 'Tokens swapping failed. Please try again.',
         variant: 'error',
         persist: false
+      })
+    )
+
+    yield put(
+      poolActions.getAllPoolsForPairData({
+        first: tokenFrom,
+        second: tokenTo
       })
     )
   }

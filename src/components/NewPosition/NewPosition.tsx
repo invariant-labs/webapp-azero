@@ -28,12 +28,14 @@ import {
 import { AddressOrPair } from '@polkadot/api/types'
 import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
 import { getConcentrationArray } from '@invariant-labs/a0-sdk/src/utils'
+import MarketIdLabel from './MarketIdLabel/MarketIdLabel'
+import { VariantType } from 'notistack'
 
 export interface INewPosition {
   initialTokenFrom: string
   initialTokenTo: string
   initialFee: string
-  poolAddress: string
+  copyPoolAddressHandler: (message: string, variant: VariantType) => void
   tokens: SwapToken[]
   data: PlotTickData[]
   midPrice: TickPlotPositionData
@@ -101,7 +103,7 @@ export const NewPosition: React.FC<INewPosition> = ({
   initialTokenFrom,
   initialTokenTo,
   initialFee,
-  poolAddress,
+  copyPoolAddressHandler,
   tokens,
   data,
   midPrice,
@@ -432,13 +434,13 @@ export const NewPosition: React.FC<INewPosition> = ({
       <Grid container justifyContent='space-between'>
         <Typography className={classes.title}>Add new liquidity position</Typography>
         <Grid container item alignItems='center' className={classes.options}>
-          {/* {address !== '' ? (  //TODO Make sure to delete marketId 
+          {poolKey !== '' ? (
             <MarketIdLabel
               displayLength={9}
-              marketId={address}
+              marketId={poolKey}
               copyPoolAddressHandler={copyPoolAddressHandler}
             />
-          ) : null} */}
+          ) : null}
           <ConcentrationTypeSwitch
             onSwitch={val => {
               if (val) {

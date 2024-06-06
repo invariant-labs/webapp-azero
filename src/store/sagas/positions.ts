@@ -1,8 +1,17 @@
-import { PoolKey, TESTNET_WAZERO_ADDRESS, sendTx } from '@invariant-labs/a0-sdk'
+import { PoolKey, Position, TESTNET_WAZERO_ADDRESS, sendTx } from '@invariant-labs/a0-sdk'
 import { calculateTokenAmountsWithSlippage } from '@invariant-labs/a0-sdk/src/utils'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { U128MAX } from '@store/consts/static'
+import {
+  INVARIANT_CLAIM_FEE_OPTIONS,
+  INVARIANT_CREATE_POOL_OPTIONS,
+  INVARIANT_CREATE_POSITION_OPTIONS,
+  INVARIANT_REMOVE_POSITION_OPTIONS,
+  INVARIANT_WITHDRAW_ALL_WAZERO,
+  PSP22_APPROVE_OPTIONS,
+  U128MAX,
+  WAZERO_DEPOSIT_OPTIONS
+} from '@store/consts/static'
 import {
   createLiquidityPlot,
   createLoaderKey,
@@ -15,6 +24,7 @@ import { ClosePositionData, InitPositionData, actions } from '@store/reducers/po
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { actions as walletActions } from '@store/reducers/wallet'
 import { invariantAddress, networkType } from '@store/selectors/connection'
+import { poolsArraySortedByFees, tickMaps, tokens } from '@store/selectors/pools'
 import { address } from '@store/selectors/wallet'
 import invariantSingleton from '@store/services/invariantSingleton'
 import psp22Singleton from '@store/services/psp22Singleton'
@@ -24,7 +34,7 @@ import { closeSnackbar } from 'notistack'
 import { all, call, fork, join, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
 import { getConnection } from './connection'
 import { fetchAllPoolKeys, fetchTicksAndTickMaps } from './pools'
-import { poolsArraySortedByFees, tickMaps, tokens } from '@store/selectors/pools'
+import { fetchBalances } from './wallet'
 
 function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator {
   const loaderCreatePosition = createLoaderKey()
@@ -80,10 +90,10 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       true
     )
 
-    const XTokenTx = yield* call([psp22, psp22.approveTx], invAddress, xAmountWithSlippage, tokenX)
+    const XTokenTx = psp22.approveTx(invAddress, xAmountWithSlippage, tokenX, PSP22_APPROVE_OPTIONS)
     txs.push(XTokenTx)
 
-    const YTokenTx = yield* call([psp22, psp22.approveTx], invAddress, yAmountWithSlippage, tokenY)
+    const YTokenTx = psp22.approveTx(invAddress, yAmountWithSlippage, tokenY, PSP22_APPROVE_OPTIONS)
     txs.push(YTokenTx)
 
     const invariant = yield* call(
@@ -94,24 +104,24 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     )
 
     if (initPool) {
-      const createPoolTx = yield* call(
-        [invariant, invariant.createPoolTx],
+      const createPoolTx = invariant.createPoolTx(
         poolKeyData,
-        spotSqrtPrice
+        spotSqrtPrice,
+        INVARIANT_CREATE_POOL_OPTIONS
       )
       txs.push(createPoolTx)
 
       yield* call(fetchAllPoolKeys)
     }
 
-    const tx = yield* call(
-      [invariant, invariant.createPositionTx],
+    const tx = invariant.createPositionTx(
       poolKeyData,
       lowerTick,
       upperTick,
       liquidityDelta,
       spotSqrtPrice,
-      slippageTolerance
+      slippageTolerance,
+      INVARIANT_CREATE_POSITION_OPTIONS
     )
     txs.push(tx)
 
@@ -136,6 +146,8 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     yield put(snackbarsActions.remove(loaderCreatePosition))
 
     yield put(actions.getPositionsList())
+
+    yield* call(fetchBalances, [tokenX, tokenY])
   } catch (error) {
     console.log(error)
 
@@ -195,7 +207,8 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     )
 
     const depositTx = wazero.depositTx(
-      tokenX === TESTNET_WAZERO_ADDRESS ? tokenXAmount : tokenYAmount
+      tokenX === TESTNET_WAZERO_ADDRESS ? tokenXAmount : tokenYAmount,
+      WAZERO_DEPOSIT_OPTIONS
     )
     txs.push(depositTx)
 
@@ -211,10 +224,10 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
       true
     )
 
-    const XTokenTx = psp22.approveTx(invAddress, xAmountWithSlippage, tokenX)
+    const XTokenTx = psp22.approveTx(invAddress, xAmountWithSlippage, tokenX, PSP22_APPROVE_OPTIONS)
     txs.push(XTokenTx)
 
-    const YTokenTx = psp22.approveTx(invAddress, yAmountWithSlippage, tokenY)
+    const YTokenTx = psp22.approveTx(invAddress, yAmountWithSlippage, tokenY, PSP22_APPROVE_OPTIONS)
     txs.push(YTokenTx)
 
     const invariant = yield* call(
@@ -225,7 +238,11 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     )
 
     if (initPool) {
-      const createPoolTx = invariant.createPoolTx(poolKeyData, spotSqrtPrice)
+      const createPoolTx = invariant.createPoolTx(
+        poolKeyData,
+        spotSqrtPrice,
+        INVARIANT_CREATE_POOL_OPTIONS
+      )
       txs.push(createPoolTx)
 
       yield* call(fetchAllPoolKeys)
@@ -237,17 +254,31 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
       upperTick,
       liquidityDelta,
       spotSqrtPrice,
-      slippageTolerance
+      slippageTolerance,
+      INVARIANT_CREATE_POSITION_OPTIONS
     )
     txs.push(tx)
 
-    const approveTx = psp22.approveTx(invAddress, U128MAX, TESTNET_WAZERO_ADDRESS)
+    const approveTx = psp22.approveTx(
+      invAddress,
+      U128MAX,
+      TESTNET_WAZERO_ADDRESS,
+      PSP22_APPROVE_OPTIONS
+    )
     txs.push(approveTx)
 
-    const unwrapTx = invariant.withdrawAllWAZEROTx(TESTNET_WAZERO_ADDRESS)
+    const unwrapTx = invariant.withdrawAllWAZEROTx(
+      TESTNET_WAZERO_ADDRESS,
+      INVARIANT_WITHDRAW_ALL_WAZERO
+    )
     txs.push(unwrapTx)
 
-    const resetApproveTx = psp22.approveTx(invAddress, 0n, TESTNET_WAZERO_ADDRESS)
+    const resetApproveTx = psp22.approveTx(
+      invAddress,
+      0n,
+      TESTNET_WAZERO_ADDRESS,
+      PSP22_APPROVE_OPTIONS
+    )
     txs.push(resetApproveTx)
 
     const batchedTx = api.tx.utility.batchAll(txs)
@@ -276,6 +307,8 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     yield put(snackbarsActions.remove(loaderCreatePosition))
 
     yield put(actions.getPositionsList())
+
+    yield* call(fetchBalances, [tokenX === TESTNET_WAZERO_ADDRESS ? tokenY : tokenX])
   } catch (error) {
     console.log(error)
 
@@ -456,7 +489,7 @@ export function* handleClaimFee(action: PayloadAction<bigint>) {
       position.poolKey.tokenX === TESTNET_WAZERO_ADDRESS ||
       position.poolKey.tokenY === TESTNET_WAZERO_ADDRESS
     ) {
-      yield* call(handleClaimFeeWithAZERO, action)
+      yield* call(handleClaimFeeWithAZERO, action, position)
       return
     }
 
@@ -471,7 +504,7 @@ export function* handleClaimFee(action: PayloadAction<bigint>) {
       })
     )
 
-    const tx = yield* call([invariant, invariant.claimFeeTx], action.payload)
+    const tx = invariant.claimFeeTx(action.payload, INVARIANT_CLAIM_FEE_OPTIONS)
     const signedTx = yield* call([tx, tx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
     })
@@ -501,6 +534,12 @@ export function* handleClaimFee(action: PayloadAction<bigint>) {
     )
 
     yield put(actions.getSinglePosition(action.payload))
+
+    yield* call(fetchBalances, [
+      position.poolKey.tokenX === TESTNET_WAZERO_ADDRESS
+        ? position.poolKey.tokenY
+        : position.poolKey.tokenX
+    ])
   } catch (e) {
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
@@ -519,7 +558,7 @@ export function* handleClaimFee(action: PayloadAction<bigint>) {
   }
 }
 
-export function* handleClaimFeeWithAZERO(action: PayloadAction<bigint>) {
+export function* handleClaimFeeWithAZERO(action: PayloadAction<bigint>, position: Position) {
   const loaderSigningTx = createLoaderKey()
   const loaderKey = createLoaderKey()
 
@@ -547,16 +586,29 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<bigint>) {
     )
 
     const txs = []
-    const claimTx = invariant.claimFeeTx(action.payload)
+    const claimTx = invariant.claimFeeTx(action.payload, INVARIANT_CLAIM_FEE_OPTIONS)
     txs.push(claimTx)
 
-    const approveTx = psp22.approveTx(invAddress, U128MAX, TESTNET_WAZERO_ADDRESS)
+    const approveTx = psp22.approveTx(
+      invAddress,
+      U128MAX,
+      TESTNET_WAZERO_ADDRESS,
+      PSP22_APPROVE_OPTIONS
+    )
     txs.push(approveTx)
 
-    const unwrapTx = invariant.withdrawAllWAZEROTx(TESTNET_WAZERO_ADDRESS)
+    const unwrapTx = invariant.withdrawAllWAZEROTx(
+      TESTNET_WAZERO_ADDRESS,
+      INVARIANT_WITHDRAW_ALL_WAZERO
+    )
     txs.push(unwrapTx)
 
-    const resetApproveTx = psp22.approveTx(invAddress, 0n, TESTNET_WAZERO_ADDRESS)
+    const resetApproveTx = psp22.approveTx(
+      invAddress,
+      0n,
+      TESTNET_WAZERO_ADDRESS,
+      PSP22_APPROVE_OPTIONS
+    )
     txs.push(resetApproveTx)
 
     const batchedTx = api.tx.utility.batchAll(txs)
@@ -589,6 +641,8 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<bigint>) {
     )
 
     yield put(actions.getSinglePosition(action.payload))
+
+    yield* call(fetchBalances, [position.poolKey.tokenX, position.poolKey.tokenY])
   } catch (e) {
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
@@ -658,7 +712,7 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
       position.poolKey.tokenX === TESTNET_WAZERO_ADDRESS ||
       position.poolKey.tokenY === TESTNET_WAZERO_ADDRESS
     ) {
-      yield* call(handleClosePositionWithAZERO, action)
+      yield* call(handleClosePositionWithAZERO, action, position)
       return
     }
 
@@ -671,7 +725,10 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
       })
     )
 
-    const tx = invariant.removePositionTx(action.payload.positionIndex)
+    const tx = invariant.removePositionTx(
+      action.payload.positionIndex,
+      INVARIANT_REMOVE_POSITION_OPTIONS
+    )
     const signedTx = yield* call([tx, tx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
     })
@@ -703,6 +760,8 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
 
     yield* put(actions.getPositionsList())
     action.payload.onSuccess()
+
+    yield* call(fetchBalances, [position.poolKey.tokenX, position.poolKey.tokenY])
   } catch (e) {
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
@@ -721,7 +780,10 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
   }
 }
 
-export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositionData>) {
+export function* handleClosePositionWithAZERO(
+  action: PayloadAction<ClosePositionData>,
+  position: Position
+) {
   const loaderSigningTx = createLoaderKey()
   const loaderKey = createLoaderKey()
 
@@ -794,6 +856,8 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
 
     yield* put(actions.getPositionsList())
     action.payload.onSuccess()
+
+    yield* call(fetchBalances, [position.poolKey.tokenX, position.poolKey.tokenY])
   } catch (e) {
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))

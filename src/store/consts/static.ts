@@ -190,21 +190,75 @@ export const AZERO: Token = {
 }
 
 export const DEFAULT_INVARIANT_OPTIONS = {
-  storageDepositLimit: 100000000000,
+  storageDepositLimit: null,
   refTime: 100000000000,
   proofSize: 100000000000
 }
 
 export const DEFAULT_PSP22_OPTIONS = {
-  storageDepositLimit: 5000000000,
+  storageDepositLimit: null,
   refTime: 5000000000,
   proofSize: 5000000000
 }
 
 export const DEFAULT_WAZERO_OPTIONS = {
-  storageDepositLimit: 5000000000,
+  storageDepositLimit: null,
   refTime: 5000000000,
   proofSize: 5000000000
+}
+
+export const INVARIANT_SWAP_OPTIONS = {
+  storageDepositLimit: null,
+  refTime: 250000000000,
+  proofSize: 500000
+}
+
+export const INVARIANT_WITHDRAW_ALL_WAZERO = {
+  storageDepositLimit: null,
+  refTime: 25000000000,
+  proofSize: 250000
+}
+
+export const INVARIANT_CREATE_POOL_OPTIONS = {
+  storageDepositLimit: null,
+  refTime: 10000000000,
+  proofSize: 250000
+}
+
+export const INVARIANT_CREATE_POSITION_OPTIONS = {
+  storageDepositLimit: null,
+  refTime: 25000000000,
+  proofSize: 500000
+}
+
+export const INVARIANT_CLAIM_FEE_OPTIONS = {
+  storageDepositLimit: null,
+  refTime: 25000000000,
+  proofSize: 500000
+}
+
+export const INVARIANT_REMOVE_POSITION_OPTIONS = {
+  storageDepositLimit: null,
+  refTime: 25000000000,
+  proofSize: 250000
+}
+
+export const PSP22_APPROVE_OPTIONS = {
+  storageDepositLimit: null,
+  refTime: 2500000000,
+  proofSize: 50000
+}
+
+export const WAZERO_DEPOSIT_OPTIONS = {
+  storageDepositLimit: null,
+  refTime: 2500000000,
+  proofSize: 50000
+}
+
+export const WAZERO_WITHDRAW_OPTIONS = {
+  storageDepositLimit: null,
+  refTime: 2500000000,
+  proofSize: 50000
 }
 
 export const ALL_FEE_TIERS_DATA = FEE_TIERS.map((tier, index) => ({
@@ -214,5 +268,5 @@ export const ALL_FEE_TIERS_DATA = FEE_TIERS.map((tier, index) => ({
 
 export const U128MAX = 2n ** 128n - 1n
 
-export const SWAP_SAFE_TRANSACTION_FEE = BigInt(Math.ceil(0.125 * 10 ** 12))
-export const POOL_SAFE_TRANSACTION_FEE = BigInt(Math.ceil(0.235 * 10 ** 12))
+export const SWAP_SAFE_TRANSACTION_FEE = BigInt(Math.ceil(0.05 * 10 ** 12))
+export const POOL_SAFE_TRANSACTION_FEE = BigInt(Math.ceil(0.05 * 10 ** 12))

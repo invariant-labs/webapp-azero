@@ -6,7 +6,7 @@ import { FaucetTokenList, TokenAirdropAmount } from '@store/consts/static'
 import { createLoaderKey, getTokenBalances } from '@store/consts/utils'
 import { actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import { ITokenBalance, Status, actions } from '@store/reducers/wallet'
+import { ITokenBalance, Status, actions, actions as walletActions } from '@store/reducers/wallet'
 import { networkType } from '@store/selectors/connection'
 import { address, status } from '@store/selectors/wallet'
 import psp22Singleton from '@store/services/psp22Singleton'
@@ -177,6 +177,8 @@ export function* handleAirdrop(): Generator {
         txid: txResult.hash
       })
     )
+
+    yield* call(fetchBalances, [...Object.values(FaucetTokenList)])
   } catch (error) {
     console.log(error)
 
@@ -327,6 +329,27 @@ export function* handleDisconnect(): Generator {
   } catch (error) {
     console.log(error)
   }
+}
+
+export function* fetchBalances(tokens: string[]): Generator {
+  const walletAddress = yield* select(address)
+  const api = yield* getConnection()
+  const network = yield* select(networkType)
+
+  const balance = yield* call(getBalance, walletAddress)
+  yield* put(walletActions.setBalance(BigInt(balance)))
+
+  const tokenBalances = yield* call(getTokenBalances, tokens, api, network, walletAddress)
+  yield* put(
+    walletActions.addTokenBalances(
+      tokenBalances.map(([address, balance]) => {
+        return {
+          address,
+          balance
+        }
+      })
+    )
+  )
 }
 
 export function* connectHandler(): Generator {

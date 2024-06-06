@@ -21,6 +21,9 @@ const useStyles = makeStyles()((theme: Theme) => {
       width: 500,
       [theme.breakpoints.down('xs')]: {
         width: '100vw'
+      },
+      '& .MuiCheckbox-root.Mui-checked': {
+        color: colors.green.button
       }
     },
     selectTokenHeader: {
