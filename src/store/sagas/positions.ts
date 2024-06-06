@@ -1,4 +1,4 @@
-import { PoolKey, Position, TESTNET_WAZERO_ADDRESS, sendTx } from '@invariant-labs/a0-sdk'
+import { PoolKey, TESTNET_WAZERO_ADDRESS, sendTx } from '@invariant-labs/a0-sdk'
 import { calculateTokenAmountsWithSlippage } from '@invariant-labs/a0-sdk/src/utils'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
@@ -406,7 +406,6 @@ export function* handleGetPositionsList() {
 
 export function* handleGetCurrentPositionTicks(action: PayloadAction<GetPositionTicks>) {
   const { poolKey, lowerTickIndex, upperTickIndex } = action.payload
-  const walletAddress = yield* select(address)
   const api = yield* getConnection()
   const network = yield* select(networkType)
   const invAddress = yield* select(invariantAddress)
