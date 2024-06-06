@@ -41,6 +41,9 @@ import { canCreateNewPool, canCreateNewPosition, status, swapTokens } from '@sto
 import { openWalletSelectorModal } from '@utils/web3/selector'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { actions as snackbarsActions } from '@store/reducers/snackbars'
+import { Color } from '@mui/material'
+import { VariantType } from 'notistack'
 
 export interface IProps {
   initialTokenFrom: string
@@ -326,6 +329,16 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   //   }
   // }
 
+  const copyPoolAddressHandler = (message: string, variant: VariantType) => {
+    dispatch(
+      snackbarsActions.add({
+        message,
+        variant,
+        persist: false
+      })
+    )
+  }
+
   const initialIsConcentrationOpening =
     localStorage.getItem('OPENING_METHOD') === 'concentration' ||
     localStorage.getItem('OPENING_METHOD') === null
@@ -503,7 +516,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       initialTokenFrom={initialTokenFrom}
       initialTokenTo={initialTokenTo}
       initialFee={initialFee}
-      poolAddress='' // TODO - add real data
+      copyPoolAddressHandler={copyPoolAddressHandler}
       tokens={tokens}
       data={data}
       midPrice={midPrice}
