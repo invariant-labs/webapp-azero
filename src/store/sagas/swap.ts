@@ -6,11 +6,7 @@ import {
   simulateInvariantSwap
 } from '@invariant-labs/a0-sdk'
 import { MIN_SQRT_PRICE } from '@invariant-labs/a0-sdk/src/consts'
-import {
-  MAX_SQRT_PRICE,
-  PERCENTAGE_DENOMINATOR,
-  PERCENTAGE_SCALE
-} from '@invariant-labs/a0-sdk/target/consts'
+import { MAX_SQRT_PRICE, PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
 import {
@@ -47,11 +43,11 @@ import { fetchBalances } from './wallet'
 export function* handleSwap(): Generator {
   const loaderSwappingTokens = createLoaderKey()
 
-  try {
-    const allTokens = yield* select(tokens)
-    const { poolKey, tokenFrom, slippage, amountIn, byAmountIn, estimatedPriceAfterSwap } =
-      yield* select(swap)
+  const allTokens = yield* select(tokens)
+  const { poolKey, tokenFrom, slippage, amountIn, amountOut, byAmountIn, estimatedPriceAfterSwap } =
+    yield* select(swap)
 
+  try {
     if (!poolKey) {
       return
     }
@@ -113,12 +109,13 @@ export function* handleSwap(): Generator {
       txs.push(approveTx)
     }
 
-    const swapTx = invariant.swapTx(
+    const swapTx = invariant.swapWithSlippageTx(
       poolKey,
       xToY,
-      amountIn,
+      byAmountIn ? amountIn : amountOut,
       byAmountIn,
-      sqrtPriceLimit,
+      estimatedPriceAfterSwap,
+      slippage,
       INVARIANT_SWAP_OPTIONS
     )
     txs.push(swapTx)
@@ -383,9 +380,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
           allPools[poolKeyToString(pool.poolKey)],
           allTicks[poolKeyToString(pool.poolKey)],
           xToY,
-          byAmountIn
-            ? amount - (amount * pool.poolKey.feeTier.fee) / PERCENTAGE_DENOMINATOR
-            : amount,
+          amount,
           byAmountIn,
           xToY ? MIN_SQRT_PRICE : MAX_SQRT_PRICE
         )
@@ -405,15 +400,13 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
           continue
         }
 
-        const calculatedAmountOut = byAmountIn ? result.amountOut : result.amountOut + result.fee
-
-        if (calculatedAmountOut === 0n) {
+        if (result.amountOut === 0n) {
           errors.push(SwapError.AmountIsZero)
           continue
         }
 
-        if (calculatedAmountOut > amountOut) {
-          amountOut = calculatedAmountOut
+        if (byAmountIn ? result.amountOut > amountOut : result.amountIn + result.fee > amountOut) {
+          amountOut = byAmountIn ? result.amountOut : result.amountIn + result.fee
           poolKey = pool.poolKey
           priceImpact = +printBigint(
             calculatePriceImpact(pool.sqrtPrice, result.targetSqrtPrice),
