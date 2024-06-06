@@ -22,7 +22,7 @@ const useStyles = makeStyles()((theme: Theme) => {
       [theme.breakpoints.down('xs')]: {
         width: '100vw'
       },
-      '& .Mui-checked': {
+      '& .MuiCheckbox-root.Mui-checked': {
         color: colors.green.button
       }
     },
