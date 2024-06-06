@@ -30,6 +30,7 @@ module.exports = {
     // 'generator-star-spacing': ['error', { before: false, after: true }],
     // 'yield-star-spacing': ['error', { before: false, after: true }],
     'react-hooks/exhaustive-deps': 'off',
+    // 'react-hooks/rules-of-hooks': 'error',
     '@typescript-eslint/no-unused-vars': [
       'error',
       {
