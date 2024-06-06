@@ -606,12 +606,11 @@ export const NewPosition: React.FC<INewPosition> = ({
           positionOpeningMethod={positionOpeningMethod}
         />
 
-        {(isCurrentPoolExisting ||
-          tokenAIndex === null ||
-          tokenBIndex === null ||
-          tokenAIndex === tokenBIndex ||
-          isWaitingForNewPool) &&
-        poolKey !== '' ? (
+        {isCurrentPoolExisting ||
+        tokenAIndex === null ||
+        tokenBIndex === null ||
+        tokenAIndex === tokenBIndex ||
+        isWaitingForNewPool ? (
           <RangeSelector
             poolIndex={poolIndex}
             onChangeRange={onChangeRange}
@@ -619,7 +618,8 @@ export const NewPosition: React.FC<INewPosition> = ({
               tokenAIndex === null ||
               tokenBIndex === null ||
               tokenAIndex === tokenBIndex ||
-              data.length === 0
+              data.length === 0 ||
+              isWaitingForNewPool
             }
             blockerInfo={setRangeBlockerInfo()}
             {...(tokenAIndex === null ||
