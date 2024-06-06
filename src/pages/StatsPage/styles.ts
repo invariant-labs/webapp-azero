@@ -11,7 +11,7 @@ export const useStyles = makeStyles()(() => ({
     paddingInline: 94
   },
   workInProgress: {
-    height: 209,
-    width: 277
+    height: 231,
+    width: 799
   }
 }))
