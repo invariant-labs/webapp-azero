@@ -30,7 +30,7 @@ import {
   printBigint
 } from '@store/consts/utils'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import { Simulate, actions } from '@store/reducers/swap'
+import { Simulate, Swap, actions } from '@store/reducers/swap'
 import { invariantAddress, networkType } from '@store/selectors/connection'
 import { poolTicks, pools, tickMaps, tokens } from '@store/selectors/pools'
 import { simulateResult, swap } from '@store/selectors/swap'
@@ -44,21 +44,32 @@ import { all, call, put, select, spawn, takeEvery } from 'typed-redux-saga'
 import { getConnection } from './connection'
 import { fetchBalances } from './wallet'
 
-export function* handleSwap(): Generator {
+export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generator {
+  const { poolKey, tokenFrom, slippage, amountIn, byAmountIn, estimatedPriceAfterSwap } =
+    action.payload
+
+  if (!poolKey) {
+    return
+  }
+
+  if (poolKey.tokenX === TESTNET_WAZERO_ADDRESS || poolKey.tokenY === TESTNET_WAZERO_ADDRESS) {
+    return yield* call(handleSwapWithAZERO, action)
+  }
+
   const loaderSwappingTokens = createLoaderKey()
+  const loaderSigningTx = createLoaderKey()
 
   try {
     const allTokens = yield* select(tokens)
-    const { poolKey, tokenFrom, slippage, amountIn, byAmountIn, estimatedPriceAfterSwap } =
-      yield* select(swap)
 
-    if (!poolKey) {
-      return
-    }
-
-    if (poolKey.tokenX === TESTNET_WAZERO_ADDRESS || poolKey.tokenY === TESTNET_WAZERO_ADDRESS) {
-      return yield* call(handleSwapWithAZERO)
-    }
+    yield put(
+      snackbarsActions.add({
+        message: 'Swapping tokens...',
+        variant: 'pending',
+        persist: true,
+        key: loaderSwappingTokens
+      })
+    )
 
     const api = yield* getConnection()
     const network = yield* select(networkType)
@@ -69,15 +80,6 @@ export function* handleSwap(): Generator {
     const tokenX = allTokens[poolKey.tokenX]
     const tokenY = allTokens[poolKey.tokenY]
     const xToY = tokenFrom.toString() === poolKey.tokenX
-
-    yield put(
-      snackbarsActions.add({
-        message: 'Swapping tokens',
-        variant: 'pending',
-        persist: true,
-        key: loaderSwappingTokens
-      })
-    )
 
     const txs = []
 
@@ -124,9 +126,23 @@ export function* handleSwap(): Generator {
     txs.push(swapTx)
 
     const batchedTx = api.tx.utility.batchAll(txs)
+
+    yield put(
+      snackbarsActions.add({
+        message: 'Signing transaction...',
+        variant: 'pending',
+        persist: true,
+        key: loaderSigningTx
+      })
+    )
+
     const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
     })
+
+    closeSnackbar(loaderSigningTx)
+    yield put(snackbarsActions.remove(loaderSigningTx))
+
     const txResult = yield* call(sendTx, signedBatchedTx)
 
     closeSnackbar(loaderSwappingTokens)
@@ -151,6 +167,8 @@ export function* handleSwap(): Generator {
 
     closeSnackbar(loaderSwappingTokens)
     yield put(snackbarsActions.remove(loaderSwappingTokens))
+    closeSnackbar(loaderSigningTx)
+    yield put(snackbarsActions.remove(loaderSigningTx))
 
     yield put(
       snackbarsActions.add({
@@ -162,17 +180,28 @@ export function* handleSwap(): Generator {
   }
 }
 
-export function* handleSwapWithAZERO(): Generator {
+export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>): Generator {
+  const { poolKey, tokenFrom, slippage, amountIn, byAmountIn, estimatedPriceAfterSwap } =
+    action.payload
+
+  if (!poolKey) {
+    return
+  }
+
   const loaderSwappingTokens = createLoaderKey()
+  const loaderSigningTx = createLoaderKey()
 
   try {
     const allTokens = yield* select(tokens)
-    const { poolKey, tokenFrom, slippage, amountIn, byAmountIn, estimatedPriceAfterSwap } =
-      yield* select(swap)
 
-    if (!poolKey) {
-      return
-    }
+    yield put(
+      snackbarsActions.add({
+        message: 'Swapping tokens...',
+        variant: 'pending',
+        persist: true,
+        key: loaderSwappingTokens
+      })
+    )
 
     const api = yield* getConnection()
     const network = yield* select(networkType)
@@ -184,15 +213,6 @@ export function* handleSwapWithAZERO(): Generator {
     const tokenX = allTokens[poolKey.tokenX]
     const tokenY = allTokens[poolKey.tokenY]
     const xToY = tokenFrom.toString() === poolKey.tokenX
-
-    yield put(
-      snackbarsActions.add({
-        message: 'Swapping tokens',
-        variant: 'pending',
-        persist: true,
-        key: loaderSwappingTokens
-      })
-    )
 
     const txs = []
 
@@ -280,9 +300,23 @@ export function* handleSwapWithAZERO(): Generator {
     txs.push(unwrapTx)
 
     const batchedTx = api.tx.utility.batchAll(txs)
+
+    yield put(
+      snackbarsActions.add({
+        message: 'Signing transaction...',
+        variant: 'pending',
+        persist: true,
+        key: loaderSigningTx
+      })
+    )
+
     const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
     })
+
+    closeSnackbar(loaderSigningTx)
+    yield put(snackbarsActions.remove(loaderSigningTx))
+
     const txResult = yield* call(sendTx, signedBatchedTx)
 
     closeSnackbar(loaderSwappingTokens)
@@ -309,6 +343,8 @@ export function* handleSwapWithAZERO(): Generator {
 
     closeSnackbar(loaderSwappingTokens)
     yield put(snackbarsActions.remove(loaderSwappingTokens))
+    closeSnackbar(loaderSigningTx)
+    yield put(snackbarsActions.remove(loaderSigningTx))
 
     yield put(
       snackbarsActions.add({

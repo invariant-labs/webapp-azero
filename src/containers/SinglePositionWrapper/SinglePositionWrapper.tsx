@@ -73,7 +73,13 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
     }
     if (position && waitingForTicksData === null) {
       setWaitingForTicksData(true)
-      dispatch(actions.getCurrentPositionTicks(id))
+      dispatch(
+        actions.getCurrentPositionTicks({
+          poolKey: position.poolKey,
+          lowerTickIndex: position.lowerTickIndex,
+          upperTickIndex: position.upperTickIndex
+        })
+      )
       dispatch(
         actions.getCurrentPlotTicks({
           poolKey: position.poolKey,
@@ -196,6 +202,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
       typeof lowerTick !== 'undefined' &&
       typeof upperTick !== 'undefined'
     ) {
+      console.log(position.poolData)
       const [bnX, bnY] = calculateFee(position.poolData, position, lowerTick, upperTick)
 
       setShowFeesLoader(false)
@@ -352,14 +359,24 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
         leftRange={leftRange}
         rightRange={rightRange}
         currentPrice={current}
-        onClickClaimFee={() => dispatch(actions.claimFee(id))}
+        onClickClaimFee={() =>
+          dispatch(
+            actions.claimFee({
+              index: id,
+              addressTokenX: position?.poolKey.tokenX,
+              addressTokenY: position?.poolKey.tokenY
+            })
+          )
+        }
         closePosition={() =>
           dispatch(
             actions.closePosition({
               positionIndex: id,
               onSuccess: () => {
                 navigate('/pool')
-              }
+              },
+              addressTokenX: position.poolKey.tokenX,
+              addressTokenY: position.poolKey.tokenY
             })
           )
         }

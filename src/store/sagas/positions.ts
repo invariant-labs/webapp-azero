@@ -20,7 +20,13 @@ import {
   poolKeyToString
 } from '@store/consts/utils'
 import { FetchTicksAndTickMaps, ListType, actions as poolsActions } from '@store/reducers/pools'
-import { ClosePositionData, InitPositionData, actions } from '@store/reducers/positions'
+import {
+  ClosePositionData,
+  GetPositionTicks,
+  HandleClaimFee,
+  InitPositionData,
+  actions
+} from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { actions as walletActions } from '@store/reducers/wallet'
 import { invariantAddress, networkType } from '@store/selectors/connection'
@@ -37,8 +43,6 @@ import { fetchAllPoolKeys, fetchTicksAndTickMaps } from './pools'
 import { fetchBalances } from './wallet'
 
 function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator {
-  const loaderCreatePosition = createLoaderKey()
-
   const {
     poolKeyData,
     lowerTick,
@@ -59,6 +63,9 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
   ) {
     return yield* call(handleInitPositionWithAZERO, action)
   }
+
+  const loaderCreatePosition = createLoaderKey()
+  const loaderSigningTx = createLoaderKey()
 
   try {
     yield put(
@@ -126,12 +133,29 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     txs.push(tx)
 
     const batchedTx = api.tx.utility.batchAll(txs)
+
+    yield put(
+      snackbarsActions.add({
+        message: 'Signing transaction...',
+        variant: 'pending',
+        persist: true,
+        key: loaderSigningTx
+      })
+    )
+
     const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
     })
+
+    closeSnackbar(loaderSigningTx)
+    yield put(snackbarsActions.remove(loaderSigningTx))
+
     const txResult = yield* call(sendTx, signedBatchedTx)
 
     yield* put(actions.setInitPositionSuccess(true))
+
+    closeSnackbar(loaderCreatePosition)
+    yield put(snackbarsActions.remove(loaderCreatePosition))
 
     yield put(
       snackbarsActions.add({
@@ -142,9 +166,6 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       })
     )
 
-    closeSnackbar(loaderCreatePosition)
-    yield put(snackbarsActions.remove(loaderCreatePosition))
-
     yield put(actions.getPositionsList())
 
     yield* call(fetchBalances, [tokenX, tokenY])
@@ -152,8 +173,11 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     console.log(error)
 
     yield* put(actions.setInitPositionSuccess(false))
+
     closeSnackbar(loaderCreatePosition)
     yield put(snackbarsActions.remove(loaderCreatePosition))
+    closeSnackbar(loaderSigningTx)
+    yield put(snackbarsActions.remove(loaderSigningTx))
 
     yield put(
       snackbarsActions.add({
@@ -167,6 +191,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
 
 function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): Generator {
   const loaderCreatePosition = createLoaderKey()
+  const loaderSigningTx = createLoaderKey()
 
   const {
     poolKeyData,
@@ -282,15 +307,29 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     txs.push(resetApproveTx)
 
     const batchedTx = api.tx.utility.batchAll(txs)
+
+    yield put(
+      snackbarsActions.add({
+        message: 'Signing transaction...',
+        variant: 'pending',
+        persist: true,
+        key: loaderSigningTx
+      })
+    )
+
     const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
     })
+
+    closeSnackbar(loaderSigningTx)
+    yield put(snackbarsActions.remove(loaderSigningTx))
+
     const txResult = yield* call(sendTx, signedBatchedTx)
+
+    yield* put(actions.setInitPositionSuccess(true))
 
     closeSnackbar(loaderCreatePosition)
     yield put(snackbarsActions.remove(loaderCreatePosition))
-
-    yield* put(actions.setInitPositionSuccess(true))
 
     yield put(
       snackbarsActions.add({
@@ -303,9 +342,6 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
 
     yield put(walletActions.getSelectedTokens([tokenX, tokenY]))
 
-    closeSnackbar(loaderCreatePosition)
-    yield put(snackbarsActions.remove(loaderCreatePosition))
-
     yield put(actions.getPositionsList())
 
     yield* call(fetchBalances, [tokenX === TESTNET_WAZERO_ADDRESS ? tokenY : tokenX])
@@ -313,8 +349,11 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     console.log(error)
 
     yield* put(actions.setInitPositionSuccess(false))
+
     closeSnackbar(loaderCreatePosition)
     yield put(snackbarsActions.remove(loaderCreatePosition))
+    closeSnackbar(loaderSigningTx)
+    yield put(snackbarsActions.remove(loaderSigningTx))
 
     yield put(
       snackbarsActions.add({
@@ -365,11 +404,13 @@ export function* handleGetPositionsList() {
   }
 }
 
-export function* handleGetCurrentPositionTicks(action: PayloadAction<bigint>) {
+export function* handleGetCurrentPositionTicks(action: PayloadAction<GetPositionTicks>) {
+  const { poolKey, lowerTickIndex, upperTickIndex } = action.payload
   const walletAddress = yield* select(address)
   const api = yield* getConnection()
   const network = yield* select(networkType)
   const invAddress = yield* select(invariantAddress)
+
   const invariant = yield* call(
     [invariantSingleton, invariantSingleton.loadInstance],
     api,
@@ -377,11 +418,9 @@ export function* handleGetCurrentPositionTicks(action: PayloadAction<bigint>) {
     invAddress
   )
 
-  const position = yield* call([invariant, invariant.getPosition], walletAddress, action.payload)
-
   const [lowerTick, upperTick] = yield* all([
-    call([invariant, invariant.getTick], position.poolKey, position.lowerTickIndex),
-    call([invariant, invariant.getTick], position.poolKey, position.upperTickIndex)
+    call([invariant, invariant.getTick], poolKey, lowerTickIndex),
+    call([invariant, invariant.getTick], poolKey, upperTickIndex)
   ])
 
   yield put(
@@ -395,13 +434,13 @@ export function* handleGetCurrentPositionTicks(action: PayloadAction<bigint>) {
 export function* handleGetCurrentPlotTicks(
   action: PayloadAction<{ poolKey: PoolKey; isXtoY: boolean }>
 ): Generator {
+  const { poolKey, isXtoY } = action.payload
   const api = yield* getConnection()
   const network = yield* select(networkType)
   const invAddress = yield* select(invariantAddress)
   let allTickmaps = yield* select(tickMaps)
   const allTokens = yield* select(tokens)
   const allPools = yield* select(poolsArraySortedByFees)
-  const { poolKey, isXtoY } = action.payload
 
   const xDecimal = allTokens[poolKey.tokenX].decimals
   const yDecimal = allTokens[poolKey.tokenY].decimals
@@ -468,15 +507,30 @@ export function* handleGetCurrentPlotTicks(
   }
 }
 
-export function* handleClaimFee(action: PayloadAction<bigint>) {
-  const loaderSigningTx = createLoaderKey()
-  const loaderKey = createLoaderKey()
+export function* handleClaimFee(action: PayloadAction<HandleClaimFee>) {
+  const { index, addressTokenX, addressTokenY } = action.payload
 
+  if (addressTokenX === TESTNET_WAZERO_ADDRESS || addressTokenY === TESTNET_WAZERO_ADDRESS) {
+    yield* call(handleClaimFeeWithAZERO, action)
+    return
+  }
+
+  const loaderKey = createLoaderKey()
+  const loaderSigningTx = createLoaderKey()
   try {
+    yield put(
+      snackbarsActions.add({
+        message: 'Claiming fee...',
+        variant: 'pending',
+        persist: true,
+        key: loaderKey
+      })
+    )
     const walletAddress = yield* select(address)
     const api = yield* getConnection()
     const network = yield* select(networkType)
     const invAddress = yield* select(invariantAddress)
+
     const invariant = yield* call(
       [invariantSingleton, invariantSingleton.loadInstance],
       api,
@@ -484,16 +538,9 @@ export function* handleClaimFee(action: PayloadAction<bigint>) {
       invAddress
     )
 
-    const position = yield* call([invariant, invariant.getPosition], walletAddress, action.payload)
-    if (
-      position.poolKey.tokenX === TESTNET_WAZERO_ADDRESS ||
-      position.poolKey.tokenY === TESTNET_WAZERO_ADDRESS
-    ) {
-      yield* call(handleClaimFeeWithAZERO, action, position)
-      return
-    }
-
     const adapter = yield* call(getAlephZeroWallet)
+
+    const tx = invariant.claimFeeTx(index, INVARIANT_CLAIM_FEE_OPTIONS)
 
     yield put(
       snackbarsActions.add({
@@ -504,21 +551,12 @@ export function* handleClaimFee(action: PayloadAction<bigint>) {
       })
     )
 
-    const tx = invariant.claimFeeTx(action.payload, INVARIANT_CLAIM_FEE_OPTIONS)
     const signedTx = yield* call([tx, tx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
     })
 
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
-    yield put(
-      snackbarsActions.add({
-        message: 'Claiming fee...',
-        variant: 'pending',
-        persist: true,
-        key: loaderKey
-      })
-    )
 
     const txResult = yield* call(sendTx, signedTx)
 
@@ -533,12 +571,10 @@ export function* handleClaimFee(action: PayloadAction<bigint>) {
       })
     )
 
-    yield put(actions.getSinglePosition(action.payload))
+    yield put(actions.getSinglePosition(index))
 
     yield* call(fetchBalances, [
-      position.poolKey.tokenX === TESTNET_WAZERO_ADDRESS
-        ? position.poolKey.tokenY
-        : position.poolKey.tokenX
+      addressTokenX === TESTNET_WAZERO_ADDRESS ? addressTokenY : addressTokenX
     ])
   } catch (e) {
     closeSnackbar(loaderSigningTx)
@@ -558,15 +594,26 @@ export function* handleClaimFee(action: PayloadAction<bigint>) {
   }
 }
 
-export function* handleClaimFeeWithAZERO(action: PayloadAction<bigint>, position: Position) {
-  const loaderSigningTx = createLoaderKey()
+export function* handleClaimFeeWithAZERO(action: PayloadAction<HandleClaimFee>) {
   const loaderKey = createLoaderKey()
+  const loaderSigningTx = createLoaderKey()
 
   try {
+    yield put(
+      snackbarsActions.add({
+        message: 'Claiming fee...',
+        variant: 'pending',
+        persist: true,
+        key: loaderKey
+      })
+    )
+
     const walletAddress = yield* select(address)
     const api = yield* getConnection()
     const network = yield* select(networkType)
     const invAddress = yield* select(invariantAddress)
+    const { index, addressTokenX, addressTokenY } = action.payload
+
     const invariant = yield* call(
       [invariantSingleton, invariantSingleton.loadInstance],
       api,
@@ -576,17 +623,8 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<bigint>, position
     const psp22 = yield* call([psp22Singleton, psp22Singleton.loadInstance], api, network)
     const adapter = yield* call(getAlephZeroWallet)
 
-    yield put(
-      snackbarsActions.add({
-        message: 'Signing transaction...',
-        variant: 'pending',
-        persist: true,
-        key: loaderSigningTx
-      })
-    )
-
     const txs = []
-    const claimTx = invariant.claimFeeTx(action.payload, INVARIANT_CLAIM_FEE_OPTIONS)
+    const claimTx = invariant.claimFeeTx(index, INVARIANT_CLAIM_FEE_OPTIONS)
     txs.push(claimTx)
 
     const approveTx = psp22.approveTx(
@@ -612,20 +650,22 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<bigint>, position
     txs.push(resetApproveTx)
 
     const batchedTx = api.tx.utility.batchAll(txs)
+
+    yield put(
+      snackbarsActions.add({
+        message: 'Signing transaction...',
+        variant: 'pending',
+        persist: true,
+        key: loaderSigningTx
+      })
+    )
+
     const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
     })
 
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
-    yield put(
-      snackbarsActions.add({
-        message: 'Claiming fee...',
-        variant: 'pending',
-        persist: true,
-        key: loaderKey
-      })
-    )
 
     const txResult = yield* call(sendTx, signedBatchedTx)
 
@@ -640,9 +680,9 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<bigint>, position
       })
     )
 
-    yield put(actions.getSinglePosition(action.payload))
+    yield put(actions.getSinglePosition(index))
 
-    yield* call(fetchBalances, [position.poolKey.tokenX, position.poolKey.tokenY])
+    yield* call(fetchBalances, [addressTokenX, addressTokenY])
   } catch (e) {
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
@@ -679,21 +719,44 @@ export function* handleGetSinglePosition(action: PayloadAction<bigint>) {
       position
     })
   )
-  yield* put(actions.getCurrentPositionTicks(action.payload))
+  yield* put(
+    actions.getCurrentPositionTicks({
+      poolKey: position.poolKey,
+      lowerTickIndex: position.lowerTickIndex,
+      upperTickIndex: position.upperTickIndex
+    })
+  )
   yield* put(
     poolsActions.getPoolsDataForList({ poolKeys: [position.poolKey], listType: ListType.POSITIONS })
   )
 }
 
 export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
-  const loaderSigningTx = createLoaderKey()
+  const { addressTokenX, addressTokenY, onSuccess, positionIndex } = action.payload
+
+  if (addressTokenX === TESTNET_WAZERO_ADDRESS || addressTokenY === TESTNET_WAZERO_ADDRESS) {
+    yield* call(handleClosePositionWithAZERO, action)
+    return
+  }
+
   const loaderKey = createLoaderKey()
+  const loaderSigningTx = createLoaderKey()
 
   try {
+    yield put(
+      snackbarsActions.add({
+        message: 'Removing position...',
+        variant: 'pending',
+        persist: true,
+        key: loaderKey
+      })
+    )
+
     const walletAddress = yield* select(address)
     const api = yield* getConnection()
     const network = yield* select(networkType)
     const invAddress = yield* select(invariantAddress)
+
     const invariant = yield* call(
       [invariantSingleton, invariantSingleton.loadInstance],
       api,
@@ -702,19 +765,7 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
     )
     const adapter = yield* call(getAlephZeroWallet)
 
-    const position = yield* call(
-      [invariant, invariant.getPosition],
-      walletAddress,
-      action.payload.positionIndex
-    )
-
-    if (
-      position.poolKey.tokenX === TESTNET_WAZERO_ADDRESS ||
-      position.poolKey.tokenY === TESTNET_WAZERO_ADDRESS
-    ) {
-      yield* call(handleClosePositionWithAZERO, action)
-      return
-    }
+    const tx = invariant.removePositionTx(positionIndex, INVARIANT_REMOVE_POSITION_OPTIONS)
 
     yield put(
       snackbarsActions.add({
@@ -725,25 +776,12 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
       })
     )
 
-    const tx = invariant.removePositionTx(
-      action.payload.positionIndex,
-      INVARIANT_REMOVE_POSITION_OPTIONS
-    )
     const signedTx = yield* call([tx, tx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
     })
 
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
-    const loaderKey = createLoaderKey()
-    yield put(
-      snackbarsActions.add({
-        message: 'Removing position...',
-        variant: 'pending',
-        persist: true,
-        key: loaderKey
-      })
-    )
 
     const txResult = yield* call(sendTx, signedTx)
 
@@ -759,9 +797,9 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
     )
 
     yield* put(actions.getPositionsList())
-    action.payload.onSuccess()
+    onSuccess()
 
-    yield* call(fetchBalances, [position.poolKey.tokenX, position.poolKey.tokenY])
+    yield* call(fetchBalances, [addressTokenX, addressTokenY])
   } catch (e) {
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
@@ -785,6 +823,15 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
   const loaderKey = createLoaderKey()
 
   try {
+    yield put(
+      snackbarsActions.add({
+        message: 'Removing position...',
+        variant: 'pending',
+        persist: true,
+        key: loaderKey
+      })
+    )
+
     const walletAddress = yield* select(address)
     const api = yield* getConnection()
     const network = yield* select(networkType)
@@ -797,15 +844,6 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
     )
     const psp22 = yield* call([psp22Singleton, psp22Singleton.loadInstance], api, network)
     const adapter = yield* call(getAlephZeroWallet)
-
-    yield put(
-      snackbarsActions.add({
-        message: 'Signing transaction...',
-        variant: 'pending',
-        persist: true,
-        key: loaderSigningTx
-      })
-    )
 
     const txs = []
 
@@ -822,21 +860,22 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
     txs.push(resetApproveTx)
 
     const batchedTx = api.tx.utility.batchAll(txs)
+
+    yield put(
+      snackbarsActions.add({
+        message: 'Signing transaction...',
+        variant: 'pending',
+        persist: true,
+        key: loaderSigningTx
+      })
+    )
+
     const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
     })
 
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
-    const loaderKey = createLoaderKey()
-    yield put(
-      snackbarsActions.add({
-        message: 'Removing position...',
-        variant: 'pending',
-        persist: true,
-        key: loaderKey
-      })
-    )
 
     const txResult = yield* call(sendTx, signedBatchedTx)
 
