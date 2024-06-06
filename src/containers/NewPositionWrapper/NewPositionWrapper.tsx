@@ -149,7 +149,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         })
       )
     }
-  }, [success])
+  }, [success, poolKey, tokenAIndex, tokenBIndex, poolIndex, loadingTicksAndTickMaps])
 
   const isXtoY = useMemo(() => {
     if (tokenAIndex !== null && tokenBIndex !== null) {
