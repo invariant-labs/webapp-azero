@@ -200,9 +200,9 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
       waitingForTicksData === false &&
       position &&
       typeof lowerTick !== 'undefined' &&
-      typeof upperTick !== 'undefined'
+      typeof upperTick !== 'undefined' &&
+      position.poolData
     ) {
-      console.log(position.poolData)
       const [bnX, bnY] = calculateFee(position.poolData, position, lowerTick, upperTick)
 
       setShowFeesLoader(false)
