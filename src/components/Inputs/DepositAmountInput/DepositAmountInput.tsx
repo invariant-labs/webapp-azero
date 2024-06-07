@@ -1,13 +1,8 @@
-import React, { useRef, CSSProperties } from 'react'
-import loadingAnimation from '@static/gif/loading.gif'
-import useStyles from './style'
-import {
-  FormatNumberThreshold,
-  formatNumbers,
-  getScaleFromString,
-  showPrefix
-} from '@store/consts/utils'
 import { Button, Grid, Input, Tooltip, Typography } from '@mui/material'
+import loadingAnimation from '@static/gif/loading.gif'
+import { FormatNumberThreshold, formatBalance, getScaleFromString } from '@store/consts/utils'
+import React, { CSSProperties, useRef } from 'react'
+import useStyles from './style'
 
 interface IProps {
   setValue: (value: string) => void
@@ -205,12 +200,7 @@ export const DepositAmountInput: React.FC<IProps> = ({
                 <Typography className={classes.caption2}>
                   Balance:{' '}
                   {currency
-                    ? `${
-                        balanceValue
-                          ? formatNumbers(thresholds)(balanceValue) +
-                            showPrefix(Number(balanceValue))
-                          : '0'
-                      } ${currency}`
+                    ? `${balanceValue ? formatBalance(balanceValue) : '0'} ${currency}`
                     : '- -'}
                 </Typography>
                 <Button
@@ -231,7 +221,7 @@ export const DepositAmountInput: React.FC<IProps> = ({
                 <img src={loadingAnimation} className={classes.loading} />
               ) : tokenPrice ? (
                 <Typography className={classes.caption2}>
-                  ~${formatNumbers(usdThresholds)(usdBalance.toString()) + showPrefix(usdBalance)}
+                  ~${formatBalance(usdBalance.toFixed(2))}
                 </Typography>
               ) : (
                 <Tooltip

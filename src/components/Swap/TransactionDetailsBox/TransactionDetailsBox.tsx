@@ -3,7 +3,7 @@ import React from 'react'
 import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { Grid, Typography } from '@mui/material'
 import loadingAnimation from '@static/gif/loading.gif'
-import { printBigint } from '@store/consts/utils'
+import { formatNumber, printBigint } from '@store/consts/utils'
 import { useStyles } from './styles'
 
 interface IProps {
@@ -51,7 +51,7 @@ const TransactionDetailsBox: React.FC<IProps> = ({
             <Typography className={classes.value}>
               {exchangeRate.val === Infinity
                 ? '-'
-                : `${exchangeRate.val.toFixed(exchangeRate.decimal)} ${exchangeRate.symbol}`}
+                : `${formatNumber(exchangeRate.val.toFixed(exchangeRate.decimal))} ${exchangeRate.symbol}`}
             </Typography>
           )}
         </Grid>

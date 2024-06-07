@@ -327,7 +327,9 @@ export const newPrintBigInt = (amount: bigint, decimals: bigint): string => {
 const subNumbers = ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉']
 
 export const printSubNumber = (amount: number): string => {
-  return String(Array.from(amount.toString()).map(char => subNumbers[+char]))
+  return Array.from(String(amount))
+    .map(char => subNumbers[+char])
+    .join('')
 }
 
 export const parseFeeToPathFee = (fee: bigint): string => {
@@ -784,4 +786,72 @@ export const createLiquidityPlot = (
   }
 
   return isXtoY ? ticksData : ticksData.reverse()
+}
+
+const B = 1000000000
+const M = 1000000
+const K = 1000
+
+const BDecimals = 9
+const MDecimals = 6
+const KDecimals = 3
+
+const DecimalsAfterDot = 2
+
+export const formatNumber = (number: number | bigint | string): string => {
+  const numberAsNumber = Number(number)
+  const numberAsString = String(number).includes('e-')
+    ? Number(number).toFixed(parseInt(String(number).split('e-')[1]))
+    : String(number)
+  const [beforeDot, afterDot] = numberAsString.split('.')
+
+  if (numberAsNumber > B) {
+    return (
+      beforeDot.slice(0, -BDecimals) +
+      (DecimalsAfterDot ? '.' : '') +
+      (beforeDot.slice(-BDecimals) + (afterDot ? afterDot : '')).slice(0, DecimalsAfterDot) +
+      'B'
+    )
+  } else if (numberAsNumber > M) {
+    return (
+      beforeDot.slice(0, -MDecimals) +
+      (DecimalsAfterDot ? '.' : '') +
+      (beforeDot.slice(-MDecimals) + (afterDot ? afterDot : '')).slice(0, DecimalsAfterDot) +
+      'M'
+    )
+  } else if (numberAsNumber > K) {
+    return (
+      beforeDot.slice(0, -KDecimals) +
+      (DecimalsAfterDot ? '.' : '') +
+      (beforeDot.slice(-KDecimals) + (afterDot ? afterDot : '')).slice(0, DecimalsAfterDot) +
+      'K'
+    )
+  } else {
+    const leadingZeros = afterDot ? countLeadingZeros(afterDot) : 0
+    const parsedAfterDot =
+      String(parseInt(afterDot)).length > 3 ? String(parseInt(afterDot)).slice(0, 3) : afterDot
+    return trimZeros(
+      beforeDot +
+        '.' +
+        (parsedAfterDot
+          ? leadingZeros > 3
+            ? '0' + printSubNumber(leadingZeros) + parseInt(parsedAfterDot)
+            : parsedAfterDot
+          : '')
+    )
+  }
+}
+
+export const formatBalance = (number: number | bigint | string): string => {
+  const numberAsString = String(number).includes('e-')
+    ? Number(number).toFixed(parseInt(String(number).split('e-')[1]))
+    : String(number)
+
+  const [beforeDot, afterDot] = numberAsString.split('.')
+
+  return beforeDot.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + (afterDot ? '.' + afterDot : '')
+}
+
+export const countLeadingZeros = (str: string): number => {
+  return (str.match(/^0+/) || [''])[0].length
 }

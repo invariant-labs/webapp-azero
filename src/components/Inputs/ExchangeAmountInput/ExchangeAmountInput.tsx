@@ -3,7 +3,7 @@ import { OutlinedButton } from '@components/OutlinedButton/OutlinedButton'
 import { Grid, Input, Tooltip, Typography } from '@mui/material'
 import { AddressOrPair } from '@polkadot/api/types'
 import loadingAnimation from '@static/gif/loading.gif'
-import { FormatNumberThreshold, formatNumbers, showPrefix } from '@store/consts/utils'
+import { formatBalance, showPrefix } from '@store/consts/utils'
 import { SwapToken } from '@store/selectors/wallet'
 import classNames from 'classnames'
 import React, { CSSProperties, useRef } from 'react'
@@ -64,65 +64,65 @@ export const AmountInput: React.FC<IProps> = ({
   const { classes } = useStyles({ walletDisconnected: hideBalances })
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const thresholds: FormatNumberThreshold[] = [
-    {
-      value: 10,
-      decimals: Number(decimal)
-    },
-    {
-      value: 100,
-      decimals: 4
-    },
-    {
-      value: 1000,
-      decimals: 2
-    },
-    {
-      value: 10000,
-      decimals: 1
-    },
-    {
-      value: 1000000,
-      decimals: 2,
-      divider: 1000
-    },
-    {
-      value: 1000000000,
-      decimals: 2,
-      divider: 1000000
-    },
-    {
-      value: Infinity,
-      decimals: 2,
-      divider: 1000000000
-    }
-  ]
+  // const thresholds: FormatNumberThreshold[] = [
+  //   {
+  //     value: 10,
+  //     decimals: Number(decimal)
+  //   },
+  //   {
+  //     value: 100,
+  //     decimals: 4
+  //   },
+  //   {
+  //     value: 1000,
+  //     decimals: 2
+  //   },
+  //   {
+  //     value: 10000,
+  //     decimals: 1
+  //   },
+  //   {
+  //     value: 1000000,
+  //     decimals: 2,
+  //     divider: 1000
+  //   },
+  //   {
+  //     value: 1000000000,
+  //     decimals: 2,
+  //     divider: 1000000
+  //   },
+  //   {
+  //     value: Infinity,
+  //     decimals: 2,
+  //     divider: 1000000000
+  //   }
+  // ]
 
-  const usdThresholds: FormatNumberThreshold[] = [
-    {
-      value: 1000,
-      decimals: 2
-    },
-    {
-      value: 10000,
-      decimals: 1
-    },
-    {
-      value: 1000000,
-      decimals: 2,
-      divider: 1000
-    },
-    {
-      value: 1000000000,
-      decimals: 2,
-      divider: 1000000
-    },
-    {
-      value: Infinity,
-      decimals: 2,
-      divider: 1000000000
-    }
-  ]
+  // const usdThresholds: FormatNumberThreshold[] = [
+  //   {
+  //     value: 1000,
+  //     decimals: 2
+  //   },
+  //   {
+  //     value: 10000,
+  //     decimals: 1
+  //   },
+  //   {
+  //     value: 1000000,
+  //     decimals: 2,
+  //     divider: 1000
+  //   },
+  //   {
+  //     value: 1000000000,
+  //     decimals: 2,
+  //     divider: 1000000
+  //   },
+  //   {
+  //     value: Infinity,
+  //     decimals: 2,
+  //     divider: 1000000000
+  //   }
+  // ]
 
   const allowOnlyDigitsAndTrimUnnecessaryZeros: React.ChangeEventHandler<HTMLInputElement> = e => {
     const onlyNumbersRegex = /^\d*\.?\d*$/
@@ -165,8 +165,6 @@ export const AmountInput: React.FC<IProps> = ({
 
   const usdBalance = tokenPrice && balance ? tokenPrice * +balance : 0
 
-  const formattedBalance = balance ? ' ' + formatNumbers(thresholds)(balance.toString()) : 0
-
   return (
     <>
       <Grid container alignItems='center' wrap='nowrap' className={classes.exchangeContainer}>
@@ -205,13 +203,13 @@ export const AmountInput: React.FC<IProps> = ({
           className={classes.bottom}>
           <Grid className={classes.balanceContainer} onClick={onMaxClick}>
             <Typography className={classes.BalanceTypography}>
-              Balance:
+              Balance:{' '}
               {isBalanceLoading ? (
                 <img src={loadingAnimation} className={classes.loadingBalance} />
               ) : (
-                formattedBalance
-              )}
-              {showPrefix(Number(balance))} {tokenIcon.slice(0, 8)}
+                formatBalance(balance || '')
+              )}{' '}
+              {tokenIcon.slice(0, 8)}
               {tokenIcon.length > 8 ? '...' : ''}
             </Typography>
             {showMaxButton && (
@@ -236,7 +234,7 @@ export const AmountInput: React.FC<IProps> = ({
               ) : tokenPrice ? (
                 <>
                   <Typography className={classes.caption2}>
-                    ~${formatNumbers(usdThresholds)(usdBalance.toString()) + showPrefix(usdBalance)}
+                    ~${formatBalance(usdBalance.toFixed(2)) + showPrefix(usdBalance)}
                   </Typography>
                 </>
               ) : (

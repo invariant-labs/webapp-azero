@@ -10,11 +10,12 @@ import infoIcon from '@static/svg/info.svg'
 import refreshIcon from '@static/svg/refresh.svg'
 import settingIcon from '@static/svg/settings.svg'
 import SwapArrows from '@static/svg/swap-arrows.svg'
-import { TokenPriceData } from '@store/consts/static'
+import { TokenPriceData, U128MAX } from '@store/consts/static'
 import {
   SimulateResult,
   convertBalanceToBigint,
-  newPrintBigInt,
+  formatBalance,
+  formatNumber,
   printBigint,
   trimLeadingZeros
 } from '@store/consts/utils'
@@ -122,12 +123,25 @@ export const Swap: React.FC<ISwap> = ({
   simulateResult
 }) => {
   console.log(
-    newPrintBigInt(1000n, 0n),
-    newPrintBigInt(1000n, 1n),
-    newPrintBigInt(1004n, 1n),
-    newPrintBigInt(1000n, 7n),
-    newPrintBigInt(1000n, 8n),
-    newPrintBigInt(1003n, 12n)
+    formatNumber(U128MAX),
+    formatNumber(123456),
+    formatNumber(1234567n),
+    formatNumber('1234567890'),
+    formatNumber('123000'),
+    formatNumber('12345.67890'),
+    formatNumber(123),
+    formatNumber('123.4567890'),
+    formatNumber('0.000030'),
+    formatNumber(0.000000007),
+    formatNumber(0.0004),
+    formatNumber('0.06'),
+    formatNumber('0.000000000000000000012300')
+  )
+  console.log(
+    formatBalance(10.0),
+    formatBalance(1000.345),
+    formatBalance(1234567890n),
+    formatBalance('1234567.1234567000')
   )
 
   const { classes } = useStyles()

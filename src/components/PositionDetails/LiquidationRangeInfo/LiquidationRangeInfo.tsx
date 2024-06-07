@@ -1,7 +1,7 @@
+import { Grid, Typography } from '@mui/material'
+import { formatNumber } from '@store/consts/utils'
 import React from 'react'
 import useStyles from './style'
-import { Grid, Typography } from '@mui/material'
-import { formatNumbers, showPrefix } from '@store/consts/utils'
 
 interface ILiquidationRangeInfo {
   label: string
@@ -27,8 +27,7 @@ const LiquidationRangeInfo: React.FC<ILiquidationRangeInfo> = ({
         </Grid>
         <Grid className={classes.infoSwap}>
           <Typography component='span' className={classes.infoAmount}>
-            {formatNumbers()(amount.toString())}
-            {showPrefix(amount)}
+            {formatNumber(amount)}
           </Typography>
           <Typography component='p' className={classes.infoSwapToken}>
             {tokenY} per {tokenX}

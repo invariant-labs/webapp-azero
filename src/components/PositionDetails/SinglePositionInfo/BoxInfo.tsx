@@ -1,10 +1,16 @@
+import { Button, Grid, Typography } from '@mui/material'
+import loader from '@static/gif/loading2.gif'
+import SwapPosition from '@static/svg/swap-position.svg'
+import {
+  FormatNumberThreshold,
+  PrefixConfig,
+  formatBalance,
+  formatNumbers,
+  showPrefix
+} from '@store/consts/utils'
 import React from 'react'
 import { ILiquidityToken } from './consts'
-import SwapPosition from '@static/svg/swap-position.svg'
-import loader from '@static/gif/loading2.gif'
 import useStyles from './style'
-import { FormatNumberThreshold, PrefixConfig, formatNumbers, showPrefix } from '@store/consts/utils'
-import { Button, Grid, Typography } from '@mui/material'
 
 export interface BoxInfoToken extends Omit<ILiquidityToken, 'claimValue' | 'liqValue'> {
   value: number
@@ -136,11 +142,11 @@ export const BoxInfo: React.FC<{
           {showBalance ? (
             <Grid className={classes.tokenAreaLowerPart}>
               <Typography className={classes.tokenBalance}>
-                Balance: {tokenA.balance} {tokenA.name}
+                Balance: {formatBalance(tokenA.balance)} {tokenA.name}
               </Typography>
               {typeof tokenA.usdValue !== 'undefined' && tokenA.price ? (
                 <Typography className={classes.tokenUSDValue}>
-                  ~${formatNumbers(usdThresholds)((tokenA.value * tokenA.price).toString())}
+                  ~${formatBalance((tokenA.value * tokenA.price).toFixed(2))}
                   {showPrefix(tokenA.value * tokenA.price)}
                 </Typography>
               ) : null}
@@ -168,11 +174,11 @@ export const BoxInfo: React.FC<{
           {showBalance ? (
             <Grid className={classes.tokenAreaLowerPart}>
               <Typography className={classes.tokenBalance}>
-                Balance: {tokenB.balance} {tokenB.name}
+                Balance: {formatBalance(tokenB.balance)} {tokenB.name}
               </Typography>
               {typeof tokenB.usdValue !== 'undefined' && tokenB.price ? (
                 <Typography className={classes.tokenUSDValue}>
-                  ~${formatNumbers(usdThresholds)((tokenB.value * tokenB.price).toString())}
+                  ~${formatBalance((tokenB.value * tokenB.price).toFixed(2))}
                   {showPrefix(tokenB.value * tokenB.price)}
                 </Typography>
               ) : null}
