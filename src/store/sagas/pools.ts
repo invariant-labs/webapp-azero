@@ -4,13 +4,17 @@ import { PayloadAction } from '@reduxjs/toolkit'
 import {
   createLoaderKey,
   findPairs,
-  findPairsByPoolKeys,
-  getPools,
   getPoolsByPoolKeys,
   getTokenBalances,
   getTokenDataByAddresses
 } from '@store/consts/utils'
-import { FetchTicksAndTickMaps, ListPoolsRequest, PairTokens, actions } from '@store/reducers/pools'
+import {
+  FetchTicksAndTickMaps,
+  ListPoolsRequest,
+  PairTokens,
+  PoolWithPoolKey,
+  actions
+} from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { invariantAddress, networkType } from '@store/selectors/connection'
 import { tokens } from '@store/selectors/pools'
@@ -205,15 +209,15 @@ export function* fetchAllPoolsForPairData(action: PayloadAction<PairTokens>) {
     network,
     invAddress
   )
-  const poolKeys = yield* call([invariant, invariant.getPoolKeys], 100n, 0n)
-  const filteredPoolKeys = findPairsByPoolKeys(
-    action.payload.first.toString(),
-    action.payload.second.toString(),
-    poolKeys
-  )
-  const pools = yield* call(getPools, invariant, filteredPoolKeys)
 
-  yield* put(actions.addPools(pools))
+  const token0 = action.payload.first.toString()
+  const token1 = action.payload.second.toString()
+  const poolPairs = yield* call([invariant, invariant.getAllPoolsForPair], token0, token1)
+  const poolsWithPoolKey: PoolWithPoolKey[] = poolPairs.map(([feeTier, pool]) => {
+    return { poolKey: newPoolKey(token0, token1, feeTier), ...pool }
+  })
+
+  yield* put(actions.addPools(poolsWithPoolKey))
 }
 
 export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMaps>) {
