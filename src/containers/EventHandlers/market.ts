@@ -1,24 +1,22 @@
 import { actions } from '@store/reducers/pools'
-import { networkType, status } from '@store/selectors/connection'
+import { status } from '@store/selectors/connection'
 import { poolsArraySortedByFees } from '@store/selectors/pools'
 import { swap } from '@store/selectors/swap'
-import { getCurrentAlephZeroConnection } from '@utils/web3/connection'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 const MarketEvents = () => {
   const dispatch = useDispatch()
-  const network = useSelector(networkType)
+  // const network = useSelector(networkType)
   const networkStatus = useSelector(status)
   const { tokenFrom, tokenTo } = useSelector(swap)
   const allPools = useSelector(poolsArraySortedByFees)
 
   useEffect(() => {
-    const connection = getCurrentAlephZeroConnection()
+    // const connection = getCurrentAlephZeroConnection()
 
     const connectEvents = () => {
       // let tokens = getNetworkTokensList(network)
-
       // const currentListStr = localStorage.getItem(`CUSTOM_TOKENS_${network}`)
       // const currentList: [] =
       //   currentListStr !== null
@@ -26,10 +24,8 @@ const MarketEvents = () => {
       //         .filter((address: string) => !tokens[address])
       //         .map((address: string) => address)
       //     : []
-
-      const lastTokenFrom = localStorage.getItem(`INVARIANT_LAST_TOKEN_FROM_${network}`)
-      const lastTokenTo = localStorage.getItem(`INVARIANT_LAST_TOKEN_FROM_${network}`)
-
+      // const lastTokenFrom = localStorage.getItem(`INVARIANT_LAST_TOKEN_FROM_${network}`)
+      // const lastTokenTo = localStorage.getItem(`INVARIANT_LAST_TOKEN_FROM_${network}`)
       //   if (
       //     lastTokenFrom !== null &&
       //     !tokens[lastTokenFrom] &&
@@ -37,7 +33,6 @@ const MarketEvents = () => {
       //   ) {
       //     currentList.push(new PublicKey(lastTokenFrom))
       //   }
-
       //   if (
       //     lastTokenTo !== null &&
       //     !tokens[lastTokenTo] &&
@@ -45,7 +40,6 @@ const MarketEvents = () => {
       //   ) {
       //     currentList.push(new PublicKey(lastTokenTo))
       //   }
-
       //   getFullNewTokensData(currentList, connection)
       //     .then(data => {
       //       tokens = {
@@ -63,7 +57,6 @@ const MarketEvents = () => {
       //     .catch(error => {
       //       console.log(error)
       //     })
-
       // dispatch(actions.addTokens(tokens))
     }
 

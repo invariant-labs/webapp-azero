@@ -58,7 +58,7 @@ export interface ISwap {
   swapData: SwapData
   tokens: SwapToken[]
   pools: PoolWithPoolKey[]
-  tickmap: { [x: string]: bigint[] } //TODO check if this is correct
+  tickmap: { [x: string]: string }
   onSwap: (
     poolKey: PoolKey,
     slippage: bigint,

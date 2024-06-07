@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import DepositSelector from './DepositSelector'
 import { fn } from '@storybook/test'
 import { useState } from 'react'
+import DepositSelector from './DepositSelector'
 
 const tokens: any[] = [
   {
@@ -103,7 +103,7 @@ export const Primary: Story = {
           setFeeTierIndex(fee)
         }}
         feeTierIndex={feeTierIndex}
-        poolIndex={0n}
+        poolIndex={0}
       />
     )
   }

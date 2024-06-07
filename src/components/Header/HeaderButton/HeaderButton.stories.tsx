@@ -1,16 +1,12 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import { AlephZeroNetworks } from '@store/consts/static'
+import type { StoryObj } from '@storybook/react'
 import { fn } from '@storybook/test'
 import ChangeWalletButton from './ChangeWalletButton'
 import SelectNetworkButton from './SelectNetworkButton'
 import SelectRPCButton from './SelectRPCButton'
-import { AlephZeroNetworks } from '@store/consts/static'
-import { MemoryRouter } from 'react-router-dom'
-import { on } from 'events'
-import { Typography } from '@mui/material'
-import { toBlur } from '@utils/uiUtils'
 
-import { action } from '@storybook/addon-actions'
 import { Network } from '@invariant-labs/a0-sdk'
+import { action } from '@storybook/addon-actions'
 
 const meta = {
   title: 'Buttons/HeaderButtons',
