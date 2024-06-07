@@ -521,7 +521,7 @@ export const Swap: React.FC<ISwap> = ({
             value={amountTo}
             balance={
               tokenToIndex !== null
-                ? printBigint(tokens[tokenToIndex].balance, tokens[tokenToIndex].decimals)
+                ? printBigint(tokens[tokenToIndex].balance || 0n, tokens[tokenToIndex].decimals)
                 : '- -'
             }
             className={classes.amountInput}

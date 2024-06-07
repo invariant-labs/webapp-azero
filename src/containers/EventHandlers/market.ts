@@ -1,8 +1,11 @@
+import { getNetworkTokensList, getTokenDataByAddresses } from '@store/consts/utils'
 import { actions } from '@store/reducers/pools'
-import { networkType, status } from '@store/selectors/connection'
+import { actions as walletActions } from '@store/reducers/wallet'
+import { networkType, rpcAddress, status } from '@store/selectors/connection'
 import { poolsArraySortedByFees } from '@store/selectors/pools'
 import { swap } from '@store/selectors/swap'
-import { getCurrentAlephZeroConnection } from '@utils/web3/connection'
+import { address } from '@store/selectors/wallet'
+import apiSingleton from '@store/services/apiSingleton'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -12,63 +15,57 @@ const MarketEvents = () => {
   const networkStatus = useSelector(status)
   const { tokenFrom, tokenTo } = useSelector(swap)
   const allPools = useSelector(poolsArraySortedByFees)
+  const rpc = useSelector(rpcAddress)
+  const walletAddress = useSelector(address)
 
   useEffect(() => {
-    const connection = getCurrentAlephZeroConnection()
+    const connectEvents = async () => {
+      const api = await apiSingleton.loadInstance(network, rpc)
+      let tokens = getNetworkTokensList(network)
 
-    const connectEvents = () => {
-      // let tokens = getNetworkTokensList(network)
-
-      // const currentListStr = localStorage.getItem(`CUSTOM_TOKENS_${network}`)
-      // const currentList: [] =
-      //   currentListStr !== null
-      //     ? JSON.parse(currentListStr)
-      //         .filter((address: string) => !tokens[address])
-      //         .map((address: string) => address)
-      //     : []
+      const currentListStr = localStorage.getItem(`CUSTOM_TOKENS_${network}`)
+      const currentList: string[] =
+        currentListStr !== null
+          ? JSON.parse(currentListStr)
+              .filter((address: string) => !tokens[address])
+              .map((address: string) => address)
+          : []
 
       const lastTokenFrom = localStorage.getItem(`INVARIANT_LAST_TOKEN_FROM_${network}`)
       const lastTokenTo = localStorage.getItem(`INVARIANT_LAST_TOKEN_FROM_${network}`)
 
-      //   if (
-      //     lastTokenFrom !== null &&
-      //     !tokens[lastTokenFrom] &&
-      //     !currentList.find(addr => addr.toString() === lastTokenFrom)
-      //   ) {
-      //     currentList.push(new PublicKey(lastTokenFrom))
-      //   }
+      // if (
+      //   lastTokenFrom !== null &&
+      //   !tokens[lastTokenFrom] &&
+      //   !currentList.find(addr => addr.toString() === lastTokenFrom)
+      // ) {
+      //   currentList.push(new PublicKey(lastTokenFrom))
+      // }
 
-      //   if (
-      //     lastTokenTo !== null &&
-      //     !tokens[lastTokenTo] &&
-      //     !currentList.find(addr => addr.toString() === lastTokenTo)
-      //   ) {
-      //     currentList.push(new PublicKey(lastTokenTo))
-      //   }
+      // if (
+      //   lastTokenTo !== null &&
+      //   !tokens[lastTokenTo] &&
+      //   !currentList.find(addr => addr.toString() === lastTokenTo)
+      // ) {
+      //   currentList.push(new PublicKey(lastTokenTo))
+      // }
 
-      //   getFullNewTokensData(currentList, connection)
-      //     .then(data => {
-      //       tokens = {
-      //         ...tokens,
-      //         ...data
-      //       }
-      //     })
-      //     .finally(() => {
-      //       dispatch(actions.addTokens(tokens))
-      //     })
-      //   getPoolsVolumeRanges(networkType.toLowerCase())
-      //     .then(ranges => {
-      //       dispatch(actions.setVolumeRanges(ranges))
-      //     })
-      //     .catch(error => {
-      //       console.log(error)
-      //     })
+      getTokenDataByAddresses(currentList, api, network, walletAddress)
+        .then(data => {
+          tokens = {
+            ...tokens,
+            ...data
+          }
+        })
+        .finally(() => {
+          dispatch(actions.addTokens(tokens))
+        })
 
-      // dispatch(actions.addTokens(tokens))
+      dispatch(walletActions.getSelectedTokens(currentList))
     }
 
     connectEvents()
-  }, [dispatch, networkStatus])
+  }, [dispatch, networkStatus, walletAddress])
 
   //   useEffect(() => {
   //     if (networkStatus !== Status.Initialized || !marketProgram) {
