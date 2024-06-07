@@ -1,22 +1,22 @@
-import { Box, Button, CardMedia, Grid, IconButton, useMediaQuery } from '@mui/material'
-import { Link } from 'react-router-dom'
-import useStyles from './style'
-import { useEffect, useState } from 'react'
-import NavbarButton from '@components/Navbar/Button'
-import icons from '@static/icons'
 import RoutesModal from '@components/Modals/RoutesModal'
-import Hamburger from '@static/svg/Hamburger.svg'
+import SelectTestnetRPC from '@components/Modals/SelectTestnetRPC/SelectTestnetRPC'
+import NavbarButton from '@components/Navbar/Button'
+import { Network } from '@invariant-labs/a0-sdk/src'
 import DotIcon from '@mui/icons-material/FiberManualRecordRounded'
-import { blurContent, unblurContent } from '@utils/uiUtils'
-import ChangeWalletButton from './HeaderButton/ChangeWalletButton'
-import { AlephZeroNetworks } from '@store/consts/static'
-import SelectNetworkButton from './HeaderButton/SelectNetworkButton'
+import { Box, Button, CardMedia, Grid, IconButton, useMediaQuery } from '@mui/material'
 import { AddressOrPair } from '@polkadot/api-base/types'
+import icons from '@static/icons'
+import Hamburger from '@static/svg/Hamburger.svg'
+import { theme } from '@static/theme'
+import { AlephZeroNetworks } from '@store/consts/static'
+import { blurContent, unblurContent } from '@utils/uiUtils'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import ChangeWalletButton from './HeaderButton/ChangeWalletButton'
+import SelectNetworkButton from './HeaderButton/SelectNetworkButton'
 import SelectRPCButton from './HeaderButton/SelectRPCButton'
 import useButtonStyles from './HeaderButton/style'
-import { theme } from '@static/theme'
-import SelectTestnetRPC from '@components/Modals/SelectTestnetRPC/SelectTestnetRPC'
-import { Network } from '@invariant-labs/a0-sdk/src'
+import useStyles from './style'
 
 export interface IHeader {
   address: AddressOrPair
@@ -48,7 +48,7 @@ export const Header: React.FC<IHeader> = ({
 
   const isXsDown = useMediaQuery(theme.breakpoints.down('sm'))
 
-  const routes = ['swap', 'pool'] // TODO add 'stats' later
+  const routes = ['swap', 'pool', 'stats']
 
   const otherRoutesToHighlight: Record<string, RegExp[]> = {
     pool: [/^newPosition\/*/, /^position\/*/]
