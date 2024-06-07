@@ -1,7 +1,7 @@
-import { fn } from '@storybook/test'
-import SinglePositionInfo from './SinglePositionInfo'
 import type { Meta, StoryObj } from '@storybook/react'
+import { fn } from '@storybook/test'
 import { MemoryRouter } from 'react-router-dom'
+import SinglePositionInfo from './SinglePositionInfo'
 
 const meta = {
   title: 'Components/SinglePositionInfo',
@@ -47,7 +47,7 @@ export const Primary: Story = {
     return (
       <SinglePositionInfo
         {...args}
-        fee={1n}
+        fee={1}
         tokenX={{
           name: 'BTC',
           icon: 'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E/logo.png',

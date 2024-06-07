@@ -1,6 +1,6 @@
-import { PositionsList } from './PositionsList'
-import { BrowserRouter, MemoryRouter } from 'react-router-dom'
 import type { Meta, StoryObj } from '@storybook/react'
+import { BrowserRouter } from 'react-router-dom'
+import { PositionsList } from './PositionsList'
 
 const meta = {
   title: 'PositionsList',
@@ -30,7 +30,8 @@ const data = [
     fee: 0.05,
     valueX: 10000.45,
     valueY: 2137.4,
-    id: '1'
+    id: 1,
+    address: '0x123132423423'
   },
   {
     tokenXName: 'BTC',
@@ -44,7 +45,8 @@ const data = [
     fee: 0.05,
     valueX: 10000.45,
     valueY: 2137.4,
-    id: '2'
+    id: 2,
+    address: '0x123132423423'
   },
   {
     tokenXName: 'BTC',
@@ -58,7 +60,8 @@ const data = [
     fee: 0.05,
     valueX: 10000.45,
     valueY: 2137.4,
-    id: '3'
+    id: 3,
+    address: '0x123132423423'
   },
   {
     tokenXName: 'BTC',
@@ -72,7 +75,8 @@ const data = [
     fee: 0.05,
     valueX: 10000.45,
     valueY: 2137.4,
-    id: '4'
+    id: 4,
+    address: '0x123132423423'
   }
 ]
 
