@@ -168,8 +168,9 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
         second: tokenTo
       })
     )
-  } catch (error) {
-    console.log(error)
+  } catch (e: any) {
+    console.log(e.message)
+    console.log(e)
 
     yield put(actions.setSwapSuccess(false))
 
@@ -178,13 +179,23 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
 
-    yield put(
-      snackbarsActions.add({
-        message: 'Tokens swapping failed. Please try again.',
-        variant: 'error',
-        persist: false
-      })
-    )
+    if (e.message === 'Cancelled') {
+      yield put(
+        snackbarsActions.add({
+          message: 'Transaction signing cancelled.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    } else {
+      yield put(
+        snackbarsActions.add({
+          message: 'Tokens swapping failed. Please try again.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    }
 
     yield put(
       poolActions.getAllPoolsForPairData({
@@ -358,8 +369,8 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
         second: tokenTo
       })
     )
-  } catch (error) {
-    console.log(error)
+  } catch (e: any) {
+    console.log(e)
 
     yield put(actions.setSwapSuccess(false))
 
@@ -368,13 +379,23 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
 
-    yield put(
-      snackbarsActions.add({
-        message: 'Tokens swapping failed. Please try again.',
-        variant: 'error',
-        persist: false
-      })
-    )
+    if (e.message === 'Cancelled') {
+      yield put(
+        snackbarsActions.add({
+          message: 'Transaction signing cancelled.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    } else {
+      yield put(
+        snackbarsActions.add({
+          message: 'Tokens swapping failed. Please try again.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    }
 
     yield put(
       poolActions.getAllPoolsForPairData({

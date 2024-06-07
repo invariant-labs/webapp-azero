@@ -169,8 +169,8 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     yield put(actions.getPositionsList())
 
     yield* call(fetchBalances, [tokenX, tokenY])
-  } catch (error) {
-    console.log(error)
+  } catch (e: any) {
+    console.log(e)
 
     yield* put(actions.setInitPositionSuccess(false))
 
@@ -179,13 +179,23 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
 
-    yield put(
-      snackbarsActions.add({
-        message: 'Failed to send. Please try again.',
-        variant: 'error',
-        persist: false
-      })
-    )
+    if (e.message === 'Cancelled') {
+      yield put(
+        snackbarsActions.add({
+          message: 'Transaction signing cancelled.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    } else {
+      yield put(
+        snackbarsActions.add({
+          message: 'Failed to send. Please try again.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    }
   }
 }
 
@@ -345,8 +355,8 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     yield put(actions.getPositionsList())
 
     yield* call(fetchBalances, [tokenX === TESTNET_WAZERO_ADDRESS ? tokenY : tokenX])
-  } catch (error) {
-    console.log(error)
+  } catch (e: any) {
+    console.log(e)
 
     yield* put(actions.setInitPositionSuccess(false))
 
@@ -355,13 +365,23 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
 
-    yield put(
-      snackbarsActions.add({
-        message: 'Failed to send. Please try again.',
-        variant: 'error',
-        persist: false
-      })
-    )
+    if (e.message === 'Cancelled') {
+      yield put(
+        snackbarsActions.add({
+          message: 'Transaction signing cancelled.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    } else {
+      yield put(
+        snackbarsActions.add({
+          message: 'Failed to send. Please try again.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    }
   }
 }
 
@@ -575,19 +595,29 @@ export function* handleClaimFee(action: PayloadAction<HandleClaimFee>) {
     yield* call(fetchBalances, [
       addressTokenX === TESTNET_WAZERO_ADDRESS ? addressTokenY : addressTokenX
     ])
-  } catch (e) {
+  } catch (e: any) {
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
     closeSnackbar(loaderKey)
     yield put(snackbarsActions.remove(loaderKey))
 
-    yield put(
-      snackbarsActions.add({
-        message: 'Failed to claim fee. Please try again.',
-        variant: 'error',
-        persist: false
-      })
-    )
+    if (e.message === 'Cancelled') {
+      yield put(
+        snackbarsActions.add({
+          message: 'Transaction signing cancelled.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    } else {
+      yield put(
+        snackbarsActions.add({
+          message: 'Failed to claim fee. Please try again.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    }
 
     console.log(e)
   }
@@ -799,19 +829,29 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
     onSuccess()
 
     yield* call(fetchBalances, [addressTokenX, addressTokenY])
-  } catch (e) {
+  } catch (e: any) {
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
     closeSnackbar(loaderKey)
     yield put(snackbarsActions.remove(loaderKey))
 
-    yield put(
-      snackbarsActions.add({
-        message: 'Failed to close position. Please try again.',
-        variant: 'error',
-        persist: false
-      })
-    )
+    if (e.message === 'Cancelled') {
+      yield put(
+        snackbarsActions.add({
+          message: 'Transaction signing cancelled.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    } else {
+      yield put(
+        snackbarsActions.add({
+          message: 'Failed to close position. Please try again.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    }
 
     console.log(e)
   }
@@ -894,19 +934,29 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
     onSuccess()
 
     yield* call(fetchBalances, [addressTokenX, addressTokenY])
-  } catch (e) {
+  } catch (e: any) {
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
     closeSnackbar(loaderKey)
     yield put(snackbarsActions.remove(loaderKey))
 
-    yield put(
-      snackbarsActions.add({
-        message: 'Failed to close position. Please try again.',
-        variant: 'error',
-        persist: false
-      })
-    )
+    if (e.message === 'Cancelled') {
+      yield put(
+        snackbarsActions.add({
+          message: 'Transaction signing cancelled.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    } else {
+      yield put(
+        snackbarsActions.add({
+          message: 'Failed to close position. Please try again.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    }
 
     console.log(e)
   }
