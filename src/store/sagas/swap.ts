@@ -438,7 +438,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
     }
 
     let poolKey = null
-    let amountOut = 0n
+    let amountOut = byAmountIn ? 0n : U128MAX
     let priceImpact = 0
     let targetSqrtPrice = 0n
     const errors = []
@@ -478,7 +478,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
           continue
         }
 
-        if (byAmountIn ? result.amountOut > amountOut : result.amountIn + result.fee > amountOut) {
+        if (byAmountIn ? result.amountOut > amountOut : result.amountIn + result.fee < amountOut) {
           amountOut = byAmountIn ? result.amountOut : result.amountIn + result.fee
           poolKey = pool.poolKey
           priceImpact = +printBigint(
