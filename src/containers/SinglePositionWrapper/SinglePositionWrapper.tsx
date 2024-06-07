@@ -234,54 +234,6 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   const [tokenXPriceData, setTokenXPriceData] = useState<TokenPriceData | undefined>(undefined)
   const [tokenYPriceData, setTokenYPriceData] = useState<TokenPriceData | undefined>(undefined)
 
-  // const currentVolumeRange = useMemo(() => {
-  //   if (!position?.poolKey) {
-  //     return undefined
-  //   }
-
-  //   const poolAddress = position.poolData.poolIndex.toString()
-  //   console.log(poolAddress)
-  //   if (!poolsVolumeRanges[poolAddress]) {
-  //     console.log('no pool volume range')
-  //     return undefined
-  //   }
-  //   console.log(poolsVolumeRanges[poolAddress])
-  //   const lowerTicks: number[] = poolsVolumeRanges[poolAddress]
-  //     .map(range => (range.START_TO_START === null ? undefined : range.START_TO_START))
-  //     .filter(tick => typeof tick !== 'undefined') as number[]
-  //   const upperTicks: number[] = poolsVolumeRanges[poolAddress]
-  //     .map(range => (range.START_TO_END === null ? undefined : range.START_TO_END))
-  //     .filter(tick => typeof tick !== 'undefined') as number[]
-
-  //   const lowerPrice = calcPrice(
-  //     !lowerTicks.length || !upperTicks.length
-  //       ? BigInt(position.lowerTickIndex)
-  //       : BigInt(Math.min(...lowerTicks)),
-  //     true,
-  //     position.tokenX.decimals,
-  //     position.tokenY.decimals
-  //   )
-
-  //   const upperPrice = calcPrice(
-  //     !lowerTicks.length || !upperTicks.length
-  //       ? BigInt(
-  //           Math.min(
-  //             position.positionIndex + Number(position.poolKey.feeTier.tickSpacing),
-  //             Number(getMaxTick(position.poolKey.feeTier.tickSpacing))
-  //           )
-  //         )
-  //       : BigInt(Math.max(...upperTicks)),
-  //     true,
-  //     position.tokenX.decimals,
-  //     position.tokenY.decimals
-  //   )
-
-  //   return {
-  //     min: BigInt(Math.min(lowerPrice, upperPrice)),
-  //     max: BigInt(Math.max(lowerPrice, upperPrice))
-  //   }
-  // }, [poolsVolumeRanges, position])
-
   useEffect(() => {
     if (!position) {
       return
@@ -408,7 +360,6 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
             })
           )
         }}
-        plotVolumeRange={undefined} // check is it needed?
       />
     )
   }

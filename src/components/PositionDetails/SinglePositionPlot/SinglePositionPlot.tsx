@@ -27,10 +27,6 @@ export interface ISinglePositionPlot {
   onDiscreteChange: (val: boolean) => void
   hasTicksError?: boolean
   reloadHandler: () => void
-  volumeRange?: {
-    min: bigint
-    max: bigint
-  }
 }
 
 const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
@@ -49,8 +45,7 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
   initialIsDiscreteValue,
   onDiscreteChange,
   hasTicksError,
-  reloadHandler,
-  volumeRange
+  reloadHandler
 }) => {
   const { classes } = useStyles()
 
@@ -106,7 +101,7 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
       setPlotMax(newMax)
     }
   }
-  console.log(data)
+
   return (
     <Grid item className={classes.root}>
       <Grid className={classes.headerContainer} container justifyContent='space-between'>
@@ -180,7 +175,6 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
           coverOnLoading
           hasError={hasTicksError}
           reloadHandler={reloadHandler}
-          volumeRange={volumeRange}
         />
       </Grid>
       <Grid className={classes.minMaxInfo}>

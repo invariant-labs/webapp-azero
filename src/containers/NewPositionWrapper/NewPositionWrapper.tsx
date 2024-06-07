@@ -33,8 +33,7 @@ import {
   isLoadingTicksAndTickMaps,
   poolKeys,
   pools,
-  poolsArraySortedByFees,
-  volumeRanges
+  poolsArraySortedByFees
 } from '@store/selectors/pools'
 import { initPosition, plotTicks } from '@store/selectors/positions'
 import { canCreateNewPool, canCreateNewPosition, status, swapTokens } from '@store/selectors/wallet'
@@ -60,7 +59,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const tokens = useSelector(swapTokens)
   const walletStatus = useSelector(status)
   const allPools = useSelector(poolsArraySortedByFees)
-  const poolsVolumeRanges = useSelector(volumeRanges)
   const allPoolKeys = useSelector(poolKeys)
   const poolsData = useSelector(pools)
   const loadingTicksAndTickMaps = useSelector(isLoadingTicksAndTickMaps)
@@ -117,17 +115,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     if (!inProgress && progress === 'progress') {
       setProgress(success ? 'approvedWithSuccess' : 'approvedWithFail')
 
-      if (poolKey !== '' && tokenAIndex !== null && tokenBIndex !== null && poolIndex !== null) {
-        dispatch(
-          positionsActions.getCurrentPlotTicks({
-            poolKey: allPoolKeys[poolKey],
-            isXtoY:
-              allPools[poolIndex].poolKey.tokenX ===
-              tokens[currentPairReversed === true ? tokenBIndex : tokenAIndex].assetAddress
-          })
-        )
-      }
-
       timeoutId1 = setTimeout(() => {
         setProgress(success ? 'success' : 'failed')
       }, 1500)
@@ -141,7 +128,28 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       clearTimeout(timeoutId1)
       clearTimeout(timeoutId2)
     }
-  }, [success, inProgress, poolKey])
+  }, [success, inProgress])
+
+  useEffect(() => {
+    if (
+      success &&
+      poolKey !== '' &&
+      tokenAIndex !== null &&
+      tokenBIndex !== null &&
+      poolIndex !== null &&
+      !loadingTicksAndTickMaps
+    ) {
+      dispatch(
+        positionsActions.getCurrentPlotTicks({
+          poolKey: allPoolKeys[poolKey],
+          isXtoY:
+            allPools[poolIndex].poolKey.tokenX ===
+            tokens[currentPairReversed === true ? tokenBIndex : tokenAIndex].assetAddress,
+          disableLoading: true
+        })
+      )
+    }
+  }, [success, poolKey, tokenAIndex, tokenBIndex, poolIndex, loadingTicksAndTickMaps])
 
   const isXtoY = useMemo(() => {
     if (tokenAIndex !== null && tokenBIndex !== null) {
@@ -397,51 +405,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     }
   }, [tokenBIndex])
 
-  const currentVolumeRange = useMemo(() => {
-    if (poolKey === '') {
-      return undefined
-    }
-
-    // const poolAddress = poolsData[Number(poolIndex)].poolKey.toString()
-
-    // if (!poolsVolumeRanges[poolAddress]) {
-    //   return undefined
-    // }
-
-    // const lowerTicks: number[] = poolsVolumeRanges[poolAddress]
-    //   .map(range => (range.tickLower === null ? undefined : range.tickLower))
-    //   .filter(tick => typeof tick !== 'undefined') as number[]
-    // const upperTicks: number[] = poolsVolumeRanges[poolAddress]
-    //   .map(range => (range.tickUpper === null ? undefined : range.tickUpper))
-    //   .filter(tick => typeof tick !== 'undefined') as number[]
-
-    // const lowerPrice = calcPrice(
-    //   !lowerTicks.length || !upperTicks.length
-    //     ? allPools[poolIndex].currentTickIndex
-    //     : Math.min(...lowerTicks),
-    //   isXtoY,
-    //   xDecimal,
-    //   yDecimal
-    // )
-
-    // const upperPrice = calcPrice(
-    //   !lowerTicks.length || !upperTicks.length
-    //     ? Math.min(
-    //         allPools[poolIndex].currentTickIndex + allPools[poolIndex].tickSpacing,
-    //         getMaxTick(tickSpacing)
-    //       )
-    //     : Math.max(...upperTicks),
-    //   isXtoY,
-    //   xDecimal,
-    //   yDecimal
-    // )
-
-    // return {
-    //   min: Math.min(lowerPrice, upperPrice),
-    //   max: Math.max(lowerPrice, upperPrice)
-    // }
-  }, [poolsVolumeRanges, poolIndex, isXtoY, xDecimal, yDecimal])
-
   const initialSlippage = localStorage.getItem('INVARIANT_NEW_POSITION_SLIPPAGE') ?? '1'
 
   const onSlippageChange = (slippage: string) => {
@@ -639,7 +602,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
           )
         }
       }}
-      plotVolumeRange={currentVolumeRange}
       currentFeeIndex={feeIndex}
       onSlippageChange={onSlippageChange}
       initialSlippage={initialSlippage}
