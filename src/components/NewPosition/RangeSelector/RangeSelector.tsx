@@ -38,10 +38,6 @@ export interface IRangeSelector {
   poolIndex: number | null
   hasTicksError?: boolean
   reloadHandler: () => void
-  volumeRange?: {
-    min: bigint
-    max: bigint
-  }
   concentrationArray: number[]
   minimumSliderIndex: number
   concentrationIndex: number
@@ -76,7 +72,6 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   poolIndex,
   hasTicksError,
   reloadHandler,
-  volumeRange,
   concentrationArray,
   minimumSliderIndex,
   concentrationIndex,
@@ -248,7 +243,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   }, [currentPairReversed])
 
   useEffect(() => {
-    if (ticksLoading && isMountedRef.current) {
+    if (!ticksLoading && isMountedRef.current) {
       resetPlot()
     }
   }, [ticksLoading, midPrice])
@@ -297,7 +292,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   }
 
   useEffect(() => {
-    if (positionOpeningMethod === 'concentration' && isMountedRef.current) {
+    if (positionOpeningMethod === 'concentration' && isMountedRef.current && !ticksLoading) {
       setConcentrationIndex(0)
       const { leftRange, rightRange } = calculateConcentrationRange(
         tickSpacing,
@@ -413,7 +408,6 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
           disabled={positionOpeningMethod === 'concentration'}
           hasError={hasTicksError}
           reloadHandler={reloadHandler}
-          volumeRange={volumeRange}
         />
         <Typography className={classes.subheader}>Set price range</Typography>
         <Grid container className={classes.inputs}>

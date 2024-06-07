@@ -50,17 +50,32 @@ export interface InitPositionData {
 export interface GetCurrentTicksData {
   poolKey: PoolKey
   isXtoY: boolean
+  disableLoading?: boolean
 }
 
 export interface ClosePositionData {
   positionIndex: bigint
   claimFarmRewards?: boolean
   onSuccess: () => void
+  addressTokenX: string
+  addressTokenY: string
 }
 
 export interface SetPositionData {
   index: bigint
   position: Position
+}
+
+export interface GetPositionTicks {
+  poolKey: PoolKey
+  lowerTickIndex: bigint
+  upperTickIndex: bigint
+}
+
+export interface HandleClaimFee {
+  index: bigint
+  addressTokenX: string
+  addressTokenY: string
 }
 
 export const defaultState: IPositionsStore = {
@@ -114,8 +129,8 @@ const positionsSlice = createSlice({
       state.plotTicks.hasError = true
       return state
     },
-    getCurrentPlotTicks(state, _action: PayloadAction<GetCurrentTicksData>) {
-      state.plotTicks.loading = true
+    getCurrentPlotTicks(state, action: PayloadAction<GetCurrentTicksData>) {
+      state.plotTicks.loading = !action.payload.disableLoading
       return state
     },
     setPositionsList(state, action: PayloadAction<Position[]>) {
@@ -134,7 +149,7 @@ const positionsSlice = createSlice({
       state.positionsList.list[Number(action.payload.index)] = action.payload.position
       return state
     },
-    getCurrentPositionTicks(state, _action: PayloadAction<bigint>) {
+    getCurrentPositionTicks(state, _action: PayloadAction<GetPositionTicks>) {
       state.currentPositionTicks.loading = true
       return state
     },
@@ -145,7 +160,7 @@ const positionsSlice = createSlice({
       }
       return state
     },
-    claimFee(state, _action: PayloadAction<bigint>) {
+    claimFee(state, _action: PayloadAction<HandleClaimFee>) {
       return state
     },
     closePosition(state, _action: PayloadAction<ClosePositionData>) {

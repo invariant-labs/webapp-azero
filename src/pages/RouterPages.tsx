@@ -3,7 +3,7 @@ import ListPage from './ListPage'
 import NewPositionPage from './NewPositionPage'
 import RootPage from './RootPage'
 import SinglePositionPage from './SinglePositionPage'
-import StatsPage from './Stats'
+import StatsPage from './StatsPage'
 import SwapPage from './SwapPage'
 
 export const router = createBrowserRouter(
