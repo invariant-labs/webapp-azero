@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import MarketIdLabel from './MarketIdLabel'
 import { fn } from '@storybook/test'
-import { useState } from 'react'
+import MarketIdLabel from './MarketIdLabel'
 
 const meta = {
   title: 'Components/MarketIdLabel',

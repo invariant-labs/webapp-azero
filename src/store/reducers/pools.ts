@@ -216,7 +216,8 @@ const poolsSlice = createSlice({
     //     state.poolTicks[action.payload.address].findIndex(e => e.index === action.payload.index)
     //   ] = action.payload.tick
     // },
-    getAllPoolsForPairData(state, action: PayloadAction<PairTokens>) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    getAllPoolsForPairData(state, _action: PayloadAction<PairTokens>) {
       state.isLoadingLatestPoolsForTransaction = true
       return state
     },
@@ -228,6 +229,7 @@ const poolsSlice = createSlice({
     // updateTickmap(state, action: PayloadAction<UpdateTickmap>) {
     //   state.tickMaps[action.payload.address].bitmap = action.payload.bitmap
     // },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     getTicksAndTickMaps(state, _action: PayloadAction<FetchTicksAndTickMaps>) {
       state.isLoadingTicksAndTickMaps = true
       return state

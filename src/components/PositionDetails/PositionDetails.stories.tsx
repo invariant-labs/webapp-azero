@@ -1,7 +1,7 @@
-import { fn } from '@storybook/test'
-import PositionDetails from './PositionDetails'
 import type { Meta, StoryObj } from '@storybook/react'
+import { fn } from '@storybook/test'
 import { MemoryRouter } from 'react-router-dom'
+import PositionDetails from './PositionDetails'
 
 const meta = {
   title: 'Components/PositionDetails',
@@ -39,7 +39,7 @@ export const Primary: Story = {
     onDiscreteChange: fn(),
     reloadHandler: fn(),
     ticksLoading: false,
-    tickSpacing: 0,
+    tickSpacing: 0n,
     closePosition: fn(),
     tokenX: {
       name: 'BTC',
@@ -83,18 +83,18 @@ export const Primary: Story = {
     return (
       <PositionDetails
         {...args}
-        currentPrice={1000n}
+        currentPrice={1000}
         leftRange={{
           index: 2n,
-          x: 23n
+          x: 23
         }}
         rightRange={{
           index: 2n,
-          x: 45354n
+          x: 45354
         }}
         midPrice={{
           index: 32n,
-          x: 4535n
+          x: 4535
         }}
         tokenX={{
           name: 'BTC',
@@ -116,13 +116,13 @@ export const Primary: Story = {
         }}
         detailsData={[
           {
-            x: 12n,
-            y: 1234n,
+            x: 12,
+            y: 1234,
             index: 1n
           },
           {
-            x: 123n,
-            y: 432n,
+            x: 123,
+            y: 432,
             index: 2n
           }
         ]}
