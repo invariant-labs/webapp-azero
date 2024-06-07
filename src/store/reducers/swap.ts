@@ -44,9 +44,9 @@ export const defaultState: ISwapStore = {
   simulateResult: {
     poolKey: null,
     amountOut: 0n,
-    fee: 0n,
     priceImpact: 0,
-    targetSqrtPrice: 0n
+    targetSqrtPrice: 0n,
+    errors: []
   }
 }
 
@@ -72,7 +72,7 @@ const swapSlice = createSlice({
       state.swap.tokenTo = action.payload.tokenTo
       return state
     },
-    getSimulateResult(state, action: PayloadAction<Simulate>) {
+    getSimulateResult(state, _action: PayloadAction<Simulate>) {
       return state
     },
     setSimulateResult(state, action: PayloadAction<SimulateResult>) {

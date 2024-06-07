@@ -280,7 +280,6 @@ export const printBigint = (amount: TokenAmount, decimals: bigint): string => {
 
   if (balanceString.length <= parsedDecimals) {
     return (
-      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
       (isNegative ? '-' : '') +
       '0.' +
       '0'.repeat(parsedDecimals - balanceString.length) +
@@ -290,7 +289,6 @@ export const printBigint = (amount: TokenAmount, decimals: bigint): string => {
     return (
       (isNegative ? '-' : '') +
       trimZeros(
-        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
         balanceString.substring(0, balanceString.length - parsedDecimals) +
           '.' +
           balanceString.substring(balanceString.length - parsedDecimals)
@@ -392,6 +390,7 @@ export const poolKeyToString = (poolKey: PoolKey): string => {
 export const getNetworkTokensList = (networkType: Network): Record<string, Token> => {
   switch (networkType) {
     case Network.Mainnet: {
+      return {}
     }
     case Network.Testnet:
       return {

@@ -29,7 +29,14 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     // 'generator-star-spacing': ['error', { before: false, after: true }],
     // 'yield-star-spacing': ['error', { before: false, after: true }],
-    'react-hooks/exhaustive-deps': 'off'
-    // 'react-hooks/rules-of-hooks': 'error'
+    'react-hooks/exhaustive-deps': 'off',
+    // 'react-hooks/rules-of-hooks': 'error',
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      {
+        varsIgnorePattern: '^_',
+        argsIgnorePattern: '^_'
+      }
+    ]
   }
 }
