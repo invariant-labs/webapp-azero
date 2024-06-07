@@ -1,7 +1,9 @@
+import { newPoolKey } from '@invariant-labs/a0-sdk'
+import { poolKeyToString } from '@store/consts/utils'
 import type { Meta, StoryObj } from '@storybook/react'
-import NewPosition from './NewPosition'
 import { fn } from '@storybook/test'
 import { MemoryRouter } from 'react-router-dom'
+import NewPosition from './NewPosition'
 
 const meta = {
   title: 'PageComponent/NewPosition',
@@ -25,7 +27,6 @@ export const Primary: Story = {
     addLiquidityHandler: fn(),
     midPrice: { x: 1234, index: 23 } as any,
     bestTiers: [],
-    calculatePoolAddress: fn(),
     canCreateNewPool: true,
     canCreateNewPosition: true,
     commonTokens: [],
@@ -55,8 +56,7 @@ export const Primary: Story = {
     onHideUnknownTokensChange: fn(),
     onPositionOpeningMethodChange: fn(),
     onSlippageChange: fn(),
-    poolAddress: '0x1233242343242',
-    poolIndex: 0n,
+    poolIndex: 0,
     progress: 'progress',
     reloadHandler: fn(),
     setMidPrice: fn(),
@@ -65,12 +65,21 @@ export const Primary: Story = {
     tokens: [],
     xDecimal: 9 as any,
     yDecimal: 12 as any,
-    hasTicksError: false
+    hasTicksError: false,
+    calcAmount: fn(),
+    loadingTicksAndTickMaps: false,
+    poolKey: poolKeyToString(
+      newPoolKey('0x123132423423', '0x123132423423', { fee: 1n, tickSpacing: 1n })
+    ),
+    noConnectedBlockerProps: {
+      onConnect: fn(),
+      descCustomText: 'Cannot add any liquidity.'
+    }
   },
   render: () => {
     return (
       <NewPosition
-        midPrice={{ x: 1234n, index: 23n }}
+        midPrice={{ x: 1234, index: 23n }}
         currentPriceSqrt={123n}
         tickSpacing={0n}
         xDecimal={9n}
@@ -83,7 +92,6 @@ export const Primary: Story = {
         onHideUnknownTokensChange={fn()}
         onDiscreteChange={fn()}
         copyPoolAddressHandler={fn()}
-        calculatePoolAddress={fn()}
         reloadHandler={fn()}
         setMidPrice={fn()}
         ticksLoading={false}
@@ -91,8 +99,7 @@ export const Primary: Story = {
         progress='progress'
         isCurrentPoolExisting={true}
         isWaitingForNewPool={false}
-        poolAddress='0x1233242343242'
-        poolIndex={0n}
+        poolIndex={0}
         tokens={[]}
         bestTiers={[]}
         currentPairReversed={false}
@@ -116,6 +123,15 @@ export const Primary: Story = {
         addLiquidityHandler={fn()}
         canCreateNewPool={true}
         canCreateNewPosition={true}
+        calcAmount={() => 1n}
+        loadingTicksAndTickMaps={false}
+        poolKey={poolKeyToString(
+          newPoolKey('0x123132423423', '0x123132423423', { fee: 1n, tickSpacing: 1n })
+        )}
+        noConnectedBlockerProps={{
+          onConnect: fn(),
+          descCustomText: 'Cannot add any liquidity.'
+        }}
       />
     )
   }
