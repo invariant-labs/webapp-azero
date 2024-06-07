@@ -23,6 +23,7 @@ export const Primary: Story = {
     fee: 0.05,
     valueX: 10000.45,
     valueY: 2137.4,
-    id: 'dd'
+    id: 0,
+    address: ''
   }
 }

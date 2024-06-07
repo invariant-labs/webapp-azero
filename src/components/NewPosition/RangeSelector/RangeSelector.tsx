@@ -1,13 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react'
-import ConcentrationSlider from '../ConcentrationSlider/ConcentrationSlider'
+import RangeInput from '@components/Inputs/RangeInput/RangeInput'
+import PlotTypeSwitch from '@components/PlotTypeSwitch/PlotTypeSwitch'
+import PriceRangePlot from '@components/PriceRangePlot/PriceRangePlot'
+import { getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
+import { Button, Grid, Tooltip, Typography } from '@mui/material'
 import loader from '@static/gif/loader.gif'
-import useStyles from './style'
 import activeLiquidity from '@static/svg/activeLiquidity.svg'
 import { PositionOpeningMethod } from '@store/consts/static'
-import { Button, Grid, Tooltip, Typography } from '@mui/material'
-import PlotTypeSwitch from '@components/PlotTypeSwitch/PlotTypeSwitch'
-import RangeInput from '@components/Inputs/RangeInput/RangeInput'
-import { getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
 import {
   calcPrice,
   calcTicksAmountInRange,
@@ -16,7 +14,9 @@ import {
   toMaxNumericPlaces
 } from '@store/consts/utils'
 import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
-import PriceRangePlot from '@components/PriceRangePlot/PriceRangePlot'
+import React, { useEffect, useRef, useState } from 'react'
+import ConcentrationSlider from '../ConcentrationSlider/ConcentrationSlider'
+import useStyles from './style'
 
 export interface IRangeSelector {
   data: PlotTickData[]
@@ -69,7 +69,6 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   initialIsDiscreteValue,
   onDiscreteChange,
   positionOpeningMethod,
-  poolIndex,
   hasTicksError,
   reloadHandler,
   concentrationArray,

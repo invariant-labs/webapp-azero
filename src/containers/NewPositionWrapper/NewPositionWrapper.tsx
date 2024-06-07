@@ -26,6 +26,7 @@ import {
 } from '@store/consts/utils'
 import { actions as poolsActions } from '@store/reducers/pools'
 import { TickPlotPositionData, actions as positionsActions } from '@store/reducers/positions'
+import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Status } from '@store/reducers/wallet'
 import { networkType } from '@store/selectors/connection'
 import {
@@ -38,11 +39,9 @@ import {
 import { initPosition, plotTicks } from '@store/selectors/positions'
 import { canCreateNewPool, canCreateNewPosition, status, swapTokens } from '@store/selectors/wallet'
 import { openWalletSelectorModal } from '@utils/web3/selector'
+import { VariantType } from 'notistack'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import { Color } from '@mui/material'
-import { VariantType } from 'notistack'
 
 export interface IProps {
   initialTokenFrom: string
@@ -68,8 +67,8 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const isFetchingNewPool = useSelector(isLoadingLatestPoolsForTransaction)
   const currentNetwork = useSelector(networkType)
 
-  const canUserCreateNewPool = useSelector(canCreateNewPool(currentNetwork))
-  const canUserCreateNewPosition = useSelector(canCreateNewPosition(currentNetwork))
+  const canUserCreateNewPool = useSelector(canCreateNewPool())
+  const canUserCreateNewPosition = useSelector(canCreateNewPosition())
 
   const [poolIndex, setPoolIndex] = useState<number | null>(null)
 
@@ -579,7 +578,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       }
       canCreateNewPool={canUserCreateNewPool}
       canCreateNewPosition={canUserCreateNewPosition}
-      handleAddToken={address => console.log('Add token mock function')} // TODO - add real data
+      handleAddToken={() => console.log('Add token mock function')} // TODO - add real data
       commonTokens={commonTokensForNetworks[currentNetwork]}
       initialOpeningPositionMethod={initialIsConcentrationOpening ? 'concentration' : 'range'}
       onPositionOpeningMethodChange={setPositionOpeningMethod}
