@@ -49,66 +49,66 @@ export interface BestTier {
   bestTierIndex: number
 }
 
-const mainnetBestTiersCreator = () => {
-  const stableTokens = {
-    USDC: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
-  }
+// const mainnetBestTiersCreator = () => {
+//   const stableTokens = {
+//     USDC: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
+//   }
 
-  const unstableTokens = {
-    BTC: '9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E'
-  }
+//   const unstableTokens = {
+//     BTC: '9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E'
+//   }
 
-  const bestTiers: BestTier[] = []
+//   const bestTiers: BestTier[] = []
 
-  for (let i = 0; i < 4; i++) {
-    const tokenX = Object.values(stableTokens)[i]
-    for (let j = i + 1; j < 4; j++) {
-      const tokenY = Object.values(stableTokens)[j]
+//   for (let i = 0; i < 4; i++) {
+//     const tokenX = Object.values(stableTokens)[i]
+//     for (let j = i + 1; j < 4; j++) {
+//       const tokenY = Object.values(stableTokens)[j]
 
-      bestTiers.push({
-        tokenX,
-        tokenY,
-        bestTierIndex: 0
-      })
-    }
-  }
+//       bestTiers.push({
+//         tokenX,
+//         tokenY,
+//         bestTierIndex: 0
+//       })
+//     }
+//   }
 
-  for (let i = 0; i < 5; i++) {
-    const [symbolX, tokenX] = Object.entries(unstableTokens)[i]
-    for (let j = i + 1; j < 5; j++) {
-      const [symbolY, tokenY] = Object.entries(unstableTokens)[j]
+//   for (let i = 0; i < 5; i++) {
+//     const [symbolX, tokenX] = Object.entries(unstableTokens)[i]
+//     for (let j = i + 1; j < 5; j++) {
+//       const [symbolY, tokenY] = Object.entries(unstableTokens)[j]
 
-      if (symbolX.slice(-3) === 'SOL' && symbolY.slice(-3) === 'SOL') {
-        bestTiers.push({
-          tokenX,
-          tokenY,
-          bestTierIndex: 0
-        })
-      } else {
-        bestTiers.push({
-          tokenX,
-          tokenY,
-          bestTierIndex: 2
-        })
-      }
-    }
-  }
+//       if (symbolX.slice(-3) === 'SOL' && symbolY.slice(-3) === 'SOL') {
+//         bestTiers.push({
+//           tokenX,
+//           tokenY,
+//           bestTierIndex: 0
+//         })
+//       } else {
+//         bestTiers.push({
+//           tokenX,
+//           tokenY,
+//           bestTierIndex: 2
+//         })
+//       }
+//     }
+//   }
 
-  for (let i = 0; i < 4; i++) {
-    const tokenX = Object.values(stableTokens)[i]
-    for (let j = 0; j < 5; j++) {
-      const tokenY = Object.values(unstableTokens)[j]
+//   for (let i = 0; i < 4; i++) {
+//     const tokenX = Object.values(stableTokens)[i]
+//     for (let j = 0; j < 5; j++) {
+//       const tokenY = Object.values(unstableTokens)[j]
 
-      bestTiers.push({
-        tokenX,
-        tokenY,
-        bestTierIndex: 2
-      })
-    }
-  }
+//       bestTiers.push({
+//         tokenX,
+//         tokenY,
+//         bestTierIndex: 2
+//       })
+//     }
+//   }
 
-  return bestTiers
-}
+//   return bestTiers
+// }
 
 export const bestTiers: Record<Network, BestTier[]> = {
   //TODO add best Tiers

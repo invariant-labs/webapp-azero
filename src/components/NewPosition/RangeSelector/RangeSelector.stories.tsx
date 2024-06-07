@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import RangeSelector from './RangeSelector'
 import { fn } from '@storybook/test'
 import { useState } from 'react'
+import RangeSelector from './RangeSelector'
 
 const meta = {
   title: 'Components/RangeSelector',
@@ -15,7 +15,7 @@ export const Primary: Story = {
   args: {
     currentPairReversed: false,
     isXtoY: true,
-    midPrice: 0,
+    midPrice: { x: 1, index: 1n },
     concentrationArray: [0.1, 0.2, 0.3, 0.4, 0.5],
     concentrationIndex: 2,
     data: [],
@@ -44,7 +44,7 @@ export const Primary: Story = {
         tickSpacing={0n}
         xDecimal={9n}
         yDecimal={12n}
-        poolIndex={0n}
+        poolIndex={0}
       />
     )
   }
