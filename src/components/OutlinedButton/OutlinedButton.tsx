@@ -1,7 +1,7 @@
-import React, { CSSProperties, ReactElement } from 'react'
+import React, { ReactElement } from 'react'
 import classNames from 'classnames'
 import useStyles from './style'
-import { Button, ButtonOwnProps, Color, PropTypes } from '@mui/material'
+import { Button, ButtonOwnProps } from '@mui/material'
 
 export interface IProps {
   name: ReactElement | string

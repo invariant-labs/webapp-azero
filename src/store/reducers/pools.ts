@@ -36,7 +36,6 @@ export interface IPoolsStore {
   isLoadingLatestPoolsForTransaction: boolean
   isLoadingTicksAndTickMaps: boolean
   tickMaps: { [key in string]: string }
-  volumeRanges: Record<string, Range[]>
 }
 
 export interface UpdatePool {
@@ -85,8 +84,7 @@ export const defaultState: IPoolsStore = {
   nearestPoolTicksForPair: {},
   isLoadingLatestPoolsForTransaction: false,
   isLoadingTicksAndTickMaps: false,
-  tickMaps: {},
-  volumeRanges: {}
+  tickMaps: {}
 }
 
 export interface PairTokens {
@@ -163,10 +161,6 @@ const poolsSlice = createSlice({
       state.isLoadingLatestPoolsForTransaction = true
       return state
     },
-    // setVolumeRanges(state, action: PayloadAction<Record<string, Range[]>>) {
-    //   state.volumeRanges = action.payload
-    //   return state
-    // },
     // setPools(state, action: PayloadAction<{ [key in string]: PoolWithAddress }>) {
     //   state.pools = action.payload
     //   return state
@@ -222,7 +216,8 @@ const poolsSlice = createSlice({
     //     state.poolTicks[action.payload.address].findIndex(e => e.index === action.payload.index)
     //   ] = action.payload.tick
     // },
-    getAllPoolsForPairData(state, action: PayloadAction<PairTokens>) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    getAllPoolsForPairData(state, _action: PayloadAction<PairTokens>) {
       state.isLoadingLatestPoolsForTransaction = true
       return state
     },
@@ -234,6 +229,7 @@ const poolsSlice = createSlice({
     // updateTickmap(state, action: PayloadAction<UpdateTickmap>) {
     //   state.tickMaps[action.payload.address].bitmap = action.payload.bitmap
     // },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     getTicksAndTickMaps(state, _action: PayloadAction<FetchTicksAndTickMaps>) {
       state.isLoadingTicksAndTickMaps = true
       return state

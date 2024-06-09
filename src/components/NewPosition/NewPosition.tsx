@@ -2,20 +2,13 @@ import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import Slippage from '@components/Modals/Slippage/Slippage'
 import { INoConnected, NoConnected } from '@components/NoConnected/NoConnected'
 import { TokenAmount, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
+import { getConcentrationArray } from '@invariant-labs/a0-sdk/src/utils'
+import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
 import { Button, Grid, Typography } from '@mui/material'
+import { AddressOrPair } from '@polkadot/api/types'
 import backIcon from '@static/svg/back-arrow.svg'
 import settingIcon from '@static/svg/settings.svg'
 import { BestTier, PositionOpeningMethod, TokenPriceData } from '@store/consts/static'
-import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
-import { SwapToken } from '@store/selectors/wallet'
-import { blurContent, unblurContent } from '@utils/uiUtils'
-import React, { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import ConcentrationTypeSwitch from './ConcentrationTypeSwitch/ConcentrationTypeSwitch'
-import DepositSelector from './DepositSelector/DepositSelector'
-import PoolInit from './PoolInit/PoolInit'
-import RangeSelector from './RangeSelector/RangeSelector'
-import useStyles from './style'
 import {
   PositionTokenBlock,
   calcPrice,
@@ -25,11 +18,18 @@ import {
   printBigint,
   trimLeadingZeros
 } from '@store/consts/utils'
-import { AddressOrPair } from '@polkadot/api/types'
-import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
-import { getConcentrationArray } from '@invariant-labs/a0-sdk/src/utils'
-import MarketIdLabel from './MarketIdLabel/MarketIdLabel'
+import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
+import { SwapToken } from '@store/selectors/wallet'
+import { blurContent, unblurContent } from '@utils/uiUtils'
 import { VariantType } from 'notistack'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import ConcentrationTypeSwitch from './ConcentrationTypeSwitch/ConcentrationTypeSwitch'
+import DepositSelector from './DepositSelector/DepositSelector'
+import MarketIdLabel from './MarketIdLabel/MarketIdLabel'
+import PoolInit from './PoolInit/PoolInit'
+import RangeSelector from './RangeSelector/RangeSelector'
+import useStyles from './style'
 
 export interface INewPosition {
   initialTokenFrom: string
@@ -93,10 +93,6 @@ export interface INewPosition {
   priceBLoading?: boolean
   hasTicksError?: boolean
   reloadHandler: () => void
-  plotVolumeRange?: {
-    min: bigint
-    max: bigint
-  }
   currentFeeIndex: number
   onSlippageChange: (slippage: string) => void
   initialSlippage: string
@@ -119,7 +115,6 @@ export const NewPosition: React.FC<INewPosition> = ({
   calcAmount,
   feeTiers,
   ticksLoading,
-  loadingTicksAndTickMaps,
   showNoConnected,
   noConnectedBlockerProps,
   isXtoY,
@@ -146,7 +141,6 @@ export const NewPosition: React.FC<INewPosition> = ({
   priceBLoading,
   hasTicksError,
   reloadHandler,
-  plotVolumeRange,
   currentFeeIndex,
   onSlippageChange,
   initialSlippage,
@@ -634,7 +628,7 @@ export const NewPosition: React.FC<INewPosition> = ({
                   tokenASymbol: tokens[tokenAIndex].symbol,
                   tokenBSymbol: tokens[tokenBIndex].symbol
                 })}
-            ticksLoading={ticksLoading || loadingTicksAndTickMaps}
+            ticksLoading={ticksLoading}
             isXtoY={isXtoY}
             tickSpacing={tickSpacing}
             xDecimal={xDecimal}
@@ -645,7 +639,6 @@ export const NewPosition: React.FC<INewPosition> = ({
             positionOpeningMethod={positionOpeningMethod}
             hasTicksError={hasTicksError}
             reloadHandler={reloadHandler}
-            volumeRange={plotVolumeRange}
             concentrationArray={concentrationArray}
             setConcentrationIndex={setConcentrationIndex}
             concentrationIndex={concentrationIndex}

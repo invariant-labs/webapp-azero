@@ -1,5 +1,5 @@
-import TransactionDetailsBox from './TransactionDetailsBox'
 import type { Meta, StoryObj } from '@storybook/react'
+import TransactionDetailsBox from './TransactionDetailsBox'
 
 const meta = {
   title: 'Components/TransactionDetailsBox',
@@ -14,11 +14,11 @@ export const Primary: Story = {
     exchangeRate: { val: 123, symbol: 'ABC', decimal: 12 },
     slippage: 0.5,
     priceImpact: 1 as any,
-    fee: { v: 2 as any },
+    fee: 2n,
     open: true,
     isLoadingRate: false
   },
   render: args => {
-    return <TransactionDetailsBox {...args} priceImpact={1n} fee={{ v: 2n }} />
+    return <TransactionDetailsBox {...args} priceImpact={1} fee={2n} />
   }
 }

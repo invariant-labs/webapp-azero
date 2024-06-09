@@ -1,7 +1,7 @@
-import { fn } from '@storybook/test'
-import SinglePositionPlot from './SinglePositionPlot'
 import type { Meta, StoryObj } from '@storybook/react'
+import { fn } from '@storybook/test'
 import { MemoryRouter } from 'react-router-dom'
+import SinglePositionPlot from './SinglePositionPlot'
 
 const meta = {
   title: 'Components/SinglePositionPlot',
@@ -37,7 +37,7 @@ export const Primary: Story = {
     onDiscreteChange: fn(),
     reloadHandler: fn(),
     ticksLoading: false,
-    tickSpacing: 0,
+    tickSpacing: 0n,
     tokenX: {
       name: 'BTC',
       decimal: 9 as any
@@ -53,18 +53,18 @@ export const Primary: Story = {
     return (
       <SinglePositionPlot
         {...args}
-        currentPrice={10000n}
+        currentPrice={10000}
         leftRange={{
           index: 2n,
-          x: 10000n
+          x: 10000
         }}
         rightRange={{
           index: 2n,
-          x: 10000n
+          x: 10000
         }}
         midPrice={{
           index: 2n,
-          x: 1020n
+          x: 1020
         }}
         tokenX={{
           name: 'BTC',

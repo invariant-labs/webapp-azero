@@ -1,4 +1,4 @@
-import { Network, TESTNET_WAZERO_ADDRESS, TokenAmount } from '@invariant-labs/a0-sdk'
+import { TESTNET_WAZERO_ADDRESS, TokenAmount } from '@invariant-labs/a0-sdk'
 import { AddressOrPair } from '@polkadot/api/types'
 import { BN } from '@polkadot/util'
 import { createSelector } from '@reduxjs/toolkit'
@@ -110,8 +110,8 @@ export const swapTokensDict = createSelector(
   }
 )
 
-export const canCreateNewPool = (network: Network) =>
-  createSelector(balance, ethBalance => {
+export const canCreateNewPool = () =>
+  createSelector(balance, () => {
     // switch (network) {
     //   case NetworkType.DEVNET:
     //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS)
@@ -124,8 +124,8 @@ export const canCreateNewPool = (network: Network) =>
     // }
     return true
   })
-export const canCreateNewPosition = (network: Network) =>
-  createSelector(balance, ethBalance => {
+export const canCreateNewPosition = () =>
+  createSelector(balance, () => {
     // switch (network) {
     //   case NetworkType.DEVNET:
     //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS)

@@ -6,7 +6,7 @@ const useStyles = makeStyles()((theme: Theme) => {
   return {
     popover: {
       marginTop: 'calc(50vh - 350px)',
-      marginLeft: 'calc(50vw - 231px)',
+      marginLeft: 'calc(50vw - 251px)',
       [theme.breakpoints.down('xs')]: {
         display: 'flex',
         marginLeft: 'auto',

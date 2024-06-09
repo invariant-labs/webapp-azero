@@ -11,7 +11,6 @@ export const {
   poolTicks,
   isLoadingLatestPoolsForTransaction,
   tickMaps,
-  volumeRanges,
   nearestPoolTicksForPair,
   isLoadingTicksAndTickMaps
 } = keySelectors(store, [
@@ -21,7 +20,6 @@ export const {
   'poolTicks',
   'isLoadingLatestPoolsForTransaction',
   'tickMaps',
-  'volumeRanges',
   'nearestPoolTicksForPair',
   'isLoadingTicksAndTickMaps'
 ])
@@ -39,7 +37,6 @@ export const poolsSelectors = {
   poolTicks,
   isLoadingLatestPoolsForTransaction,
   tickMaps,
-  volumeRanges,
   nearestPoolTicksForPair,
   isLoadingTicksAndTickMaps
 }
