@@ -4,7 +4,7 @@ import SwapPosition from '@static/svg/swap-position.svg'
 import {
   FormatNumberThreshold,
   PrefixConfig,
-  formatBalance,
+  formatNumber,
   formatNumbers,
   showPrefix
 } from '@store/consts/utils'
@@ -142,11 +142,11 @@ export const BoxInfo: React.FC<{
           {showBalance ? (
             <Grid className={classes.tokenAreaLowerPart}>
               <Typography className={classes.tokenBalance}>
-                Balance: {formatBalance(tokenA.balance)} {tokenA.name}
+                Balance: {formatNumber(tokenA.balance)} {tokenA.name}
               </Typography>
               {typeof tokenA.usdValue !== 'undefined' && tokenA.price ? (
                 <Typography className={classes.tokenUSDValue}>
-                  ~${formatBalance((tokenA.value * tokenA.price).toFixed(2))}
+                  ~${formatNumber((tokenA.value * tokenA.price).toFixed(2))}
                   {showPrefix(tokenA.value * tokenA.price)}
                 </Typography>
               ) : null}
@@ -174,11 +174,11 @@ export const BoxInfo: React.FC<{
           {showBalance ? (
             <Grid className={classes.tokenAreaLowerPart}>
               <Typography className={classes.tokenBalance}>
-                Balance: {formatBalance(tokenB.balance)} {tokenB.name}
+                Balance: {formatNumber(tokenB.balance)} {tokenB.name}
               </Typography>
               {typeof tokenB.usdValue !== 'undefined' && tokenB.price ? (
                 <Typography className={classes.tokenUSDValue}>
-                  ~${formatBalance((tokenB.value * tokenB.price).toFixed(2))}
+                  ~${formatNumber((tokenB.value * tokenB.price).toFixed(2))}
                   {showPrefix(tokenB.value * tokenB.price)}
                 </Typography>
               ) : null}

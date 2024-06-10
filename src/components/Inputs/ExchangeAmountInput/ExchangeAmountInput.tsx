@@ -3,7 +3,7 @@ import { OutlinedButton } from '@components/OutlinedButton/OutlinedButton'
 import { Grid, Input, Tooltip, Typography } from '@mui/material'
 import { AddressOrPair } from '@polkadot/api/types'
 import loadingAnimation from '@static/gif/loading.gif'
-import { formatBalance, showPrefix } from '@store/consts/utils'
+import { formatNumber, showPrefix } from '@store/consts/utils'
 import { SwapToken } from '@store/selectors/wallet'
 import classNames from 'classnames'
 import React, { CSSProperties, useRef } from 'react'
@@ -207,7 +207,7 @@ export const AmountInput: React.FC<IProps> = ({
               {isBalanceLoading ? (
                 <img src={loadingAnimation} className={classes.loadingBalance} />
               ) : (
-                formatBalance(balance || '')
+                formatNumber(balance || '0')
               )}{' '}
               {tokenIcon.slice(0, 8)}
               {tokenIcon.length > 8 ? '...' : ''}
@@ -234,7 +234,7 @@ export const AmountInput: React.FC<IProps> = ({
               ) : tokenPrice ? (
                 <>
                   <Typography className={classes.caption2}>
-                    ~${formatBalance(usdBalance.toFixed(2)) + showPrefix(usdBalance)}
+                    ~${formatNumber(usdBalance.toFixed(2)) + showPrefix(usdBalance)}
                   </Typography>
                 </>
               ) : (

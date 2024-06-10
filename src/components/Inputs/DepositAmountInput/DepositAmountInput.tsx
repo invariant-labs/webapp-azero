@@ -1,6 +1,6 @@
 import { Button, Grid, Input, Tooltip, Typography } from '@mui/material'
 import loadingAnimation from '@static/gif/loading.gif'
-import { formatBalance, getScaleFromString } from '@store/consts/utils'
+import { formatNumber, getScaleFromString } from '@store/consts/utils'
 import React, { CSSProperties, useRef } from 'react'
 import useStyles from './style'
 
@@ -200,7 +200,7 @@ export const DepositAmountInput: React.FC<IProps> = ({
                 <Typography className={classes.caption2}>
                   Balance:{' '}
                   {currency
-                    ? `${balanceValue ? formatBalance(balanceValue) : '0'} ${currency}`
+                    ? `${balanceValue ? formatNumber(balanceValue) : '0'} ${currency}`
                     : '- -'}
                 </Typography>
                 <Button
@@ -221,7 +221,7 @@ export const DepositAmountInput: React.FC<IProps> = ({
                 <img src={loadingAnimation} className={classes.loading} />
               ) : tokenPrice ? (
                 <Typography className={classes.caption2}>
-                  ~${formatBalance(usdBalance.toFixed(2))}
+                  ~${formatNumber(usdBalance.toFixed(2))}
                 </Typography>
               ) : (
                 <Tooltip

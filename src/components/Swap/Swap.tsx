@@ -135,7 +135,8 @@ export const Swap: React.FC<ISwap> = ({
     formatNumber(0.000000007),
     formatNumber(0.0004),
     formatNumber('0.06'),
-    formatNumber('0.000000000000000000012300')
+    formatNumber('0.000000000000000000012300'),
+    formatNumber('0.000000')
   )
   console.log(
     formatBalance(10.0),

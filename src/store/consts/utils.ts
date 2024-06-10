@@ -802,9 +802,12 @@ const DecimalsAfterDot = 2
 
 export const formatNumber = (number: number | bigint | string): string => {
   const numberAsNumber = Number(number)
-  const numberAsString = String(number).includes('e-')
-    ? Number(number).toFixed(parseInt(String(number).split('e-')[1]))
-    : String(number)
+  const numberAsString = numberToString(number)
+
+  if (containsOnlyZeroes(numberAsString)) {
+    return '0'
+  }
+
   const [beforeDot, afterDot] = numberAsString.split('.')
 
   if (numberAsNumber > B) {
@@ -845,9 +848,7 @@ export const formatNumber = (number: number | bigint | string): string => {
 }
 
 export const formatBalance = (number: number | bigint | string): string => {
-  const numberAsString = String(number).includes('e-')
-    ? Number(number).toFixed(parseInt(String(number).split('e-')[1]))
-    : String(number)
+  const numberAsString = numberToString(number)
 
   const [beforeDot, afterDot] = numberAsString.split('.')
 
@@ -883,4 +884,14 @@ export const addNewTokenToLocalStorage = (address: string, network: Network) => 
   currentList.push(address)
 
   localStorage.setItem(`CUSTOM_TOKENS_${network}`, JSON.stringify([...new Set(currentList)]))
+}
+
+export const numberToString = (number: number | bigint | string): string => {
+  return String(number).includes('e-')
+    ? Number(number).toFixed(parseInt(String(number).split('e-')[1]))
+    : String(number)
+}
+
+export const containsOnlyZeroes = (string: string): boolean => {
+  return /^(?!.*[1-9]).*$/.test(string)
 }

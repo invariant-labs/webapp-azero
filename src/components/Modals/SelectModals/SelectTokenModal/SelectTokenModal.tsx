@@ -19,7 +19,7 @@ import {
   useMediaQuery
 } from '@mui/material'
 import { AddressOrPair } from '@polkadot/api/types'
-import { formatBalance, printBigint } from '@store/consts/utils'
+import { formatNumber, printBigint } from '@store/consts/utils'
 import { SwapToken } from '@store/selectors/wallet'
 
 export interface ISelectTokenModal {
@@ -294,7 +294,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
                     </Grid>
                     {!hideBalances && Number(tokenBalance) > 0 ? (
                       <Typography className={classes.tokenBalanceStatus}>
-                        Balance: {formatBalance(tokenBalance)}
+                        Balance: {formatNumber(tokenBalance)}
                       </Typography>
                     ) : null}
                   </Grid>
