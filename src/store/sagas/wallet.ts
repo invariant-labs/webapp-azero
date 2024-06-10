@@ -23,6 +23,7 @@ import {
   takeLeading
 } from 'typed-redux-saga'
 import { getConnection } from './connection'
+import { tokens } from '@store/selectors/pools'
 
 export function* getWallet(): SagaGenerator<NightlyConnectAdapter> {
   const wallet = yield* call(getAlephZeroWallet)
@@ -261,9 +262,10 @@ export function* fetchTokensBalances(): Generator {
   const api = yield* getConnection()
   const network = yield* select(networkType)
   const walletAddress = yield* select(address)
+  const allTokens = yield* select(tokens)
+  const tokensList = Object.keys(allTokens)
 
-  const tokens = Object.values(FaucetTokenList)
-  const balances = yield* call(getTokenBalances, tokens, api, network, walletAddress)
+  const balances = yield* call(getTokenBalances, tokensList, api, network, walletAddress)
 
   const convertedBalances: ITokenBalance[] = balances.map(balance => ({
     address: balance[0],
