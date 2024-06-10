@@ -2,25 +2,39 @@ import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import { Swap } from '@components/Swap/Swap'
 import { AddressOrPair } from '@polkadot/api/types'
 import { TokenPriceData, commonTokensForNetworks } from '@store/consts/static'
-import { getCoingeckoTokenPrice, getMockedTokenPrice } from '@store/consts/utils'
+import {
+  addNewTokenToLocalStorage,
+  getCoingeckoTokenPrice,
+  getMockedTokenPrice,
+  getNewTokenOrThrow
+} from '@store/consts/utils'
 import { actions as poolsActions } from '@store/reducers/pools'
 import { actions } from '@store/reducers/swap'
 import { actions as walletActions } from '@store/reducers/wallet'
-import { networkType } from '@store/selectors/connection'
+import { networkType, rpcAddress } from '@store/selectors/connection'
 import {
   isLoadingLatestPoolsForTransaction,
   poolsArraySortedByFees,
   tickMaps
 } from '@store/selectors/pools'
 import { simulateResult, swap as swapPool } from '@store/selectors/swap'
-import { balanceLoading, status, swapTokens, swapTokensDict } from '@store/selectors/wallet'
+import {
+  address,
+  balanceLoading,
+  status,
+  swapTokens,
+  swapTokensDict
+} from '@store/selectors/wallet'
 import { openWalletSelectorModal } from '@utils/web3/selector'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import apiSingleton from '@store/services/apiSingleton'
+import { actions as snackbarsActions } from '@store/reducers/snackbars'
 
 export const WrappedSwap = () => {
   const dispatch = useDispatch()
 
+  const walletAddress = useSelector(address)
   const walletStatus = useSelector(status)
   const swap = useSelector(swapPool)
   const tickmap = useSelector(tickMaps)
@@ -32,8 +46,9 @@ export const WrappedSwap = () => {
   const { success, inProgress } = useSelector(swapPool)
   const isFetchingNewPool = useSelector(isLoadingLatestPoolsForTransaction)
   const network = useSelector(networkType)
+  const rpc = useSelector(rpcAddress)
   const swapSimulateResult = useSelector(simulateResult)
-
+  const api = apiSingleton.loadInstance(network, rpc)
   const [progress, setProgress] = useState<ProgressState>('none')
   const [tokenFrom, setTokenFrom] = useState<AddressOrPair | null>(null)
   const [tokenTo, setTokenTo] = useState<AddressOrPair | null>(null)
@@ -71,8 +86,8 @@ export const WrappedSwap = () => {
       )
     }
   }, [isFetchingNewPool])
-  const lastTokenFrom = localStorage.getItem(`INVARIANT_LAST_TOKEN_FROM_${networkType}`)
-  const lastTokenTo = localStorage.getItem(`INVARIANT_LAST_TOKEN_TO_${networkType}`)
+  const lastTokenFrom = localStorage.getItem(`INVARIANT_LAST_TOKEN_FROM_${network}`)
+  const lastTokenTo = localStorage.getItem(`INVARIANT_LAST_TOKEN_TO_${network}`)
 
   const initialTokenFromIndex =
     lastTokenFrom === null
@@ -81,42 +96,42 @@ export const WrappedSwap = () => {
   const initialTokenToIndex =
     lastTokenTo === null ? null : tokensList.findIndex(token => token.assetAddress === lastTokenTo)
 
-  // const addTokenHandler = (address: string) => {
-  //   if (
-  //     connection !== null &&
-  //     tokensList.findIndex(token => token.address.toString() === address) === -1
-  //   ) {
-  //     getNewTokenOrThrow(address, connection)
-  //       .then(data => {
-  //         dispatch(poolsActions.addTokens(data))
-  //         addNewTokenToLocalStorage(address, networkType)
-  //         dispatch(
-  //           snackbarsActions.add({
-  //             message: 'Token added to your list',
-  //             variant: 'success',
-  //             persist: false
-  //           })
-  //         )
-  //       })
-  //       .catch(() => {
-  //         dispatch(
-  //           snackbarsActions.add({
-  //             message: 'Token adding failed, check if address is valid and try again',
-  //             variant: 'error',
-  //             persist: false
-  //           })
-  //         )
-  //       })
-  //   } else {
-  //     dispatch(
-  //       snackbarsActions.add({
-  //         message: 'Token already exists on your list',
-  //         variant: 'info',
-  //         persist: false
-  //       })
-  //     )
-  //   }
-  // }
+  const addTokenHandler = async (address: string) => {
+    if (
+      api !== null &&
+      tokensList.findIndex(token => token.address.toString() === address) === -1
+    ) {
+      getNewTokenOrThrow(address, network, rpc, walletAddress)
+        .then(data => {
+          dispatch(poolsActions.addTokens(data))
+          addNewTokenToLocalStorage(address, network)
+          dispatch(
+            snackbarsActions.add({
+              message: 'Token added to your list',
+              variant: 'success',
+              persist: false
+            })
+          )
+        })
+        .catch(() => {
+          dispatch(
+            snackbarsActions.add({
+              message: 'Token adding failed, check if address is valid and try again',
+              variant: 'error',
+              persist: false
+            })
+          )
+        })
+    } else {
+      dispatch(
+        snackbarsActions.add({
+          message: 'Token already exists on your list',
+          variant: 'info',
+          persist: false
+        })
+      )
+    }
+  }
 
   const initialHideUnknownTokensValue =
     localStorage.getItem('HIDE_UNKNOWN_TOKENS') === 'true' ||
@@ -261,11 +276,11 @@ export const WrappedSwap = () => {
         setTokenTo(tokenTo)
 
         if (tokenFrom !== null) {
-          localStorage.setItem(`INVARIANT_LAST_TOKEN_FROM_${networkType}`, tokenFrom.toString())
+          localStorage.setItem(`INVARIANT_LAST_TOKEN_FROM_${network}`, tokenFrom.toString())
         }
 
         if (tokenTo !== null) {
-          localStorage.setItem(`INVARIANT_LAST_TOKEN_TO_${networkType}`, tokenTo.toString())
+          localStorage.setItem(`INVARIANT_LAST_TOKEN_TO_${network}`, tokenTo.toString())
         }
         if (tokenFrom !== null && tokenTo !== null && tokenFrom !== tokenTo) {
           dispatch(
@@ -290,8 +305,7 @@ export const WrappedSwap = () => {
       tickmap={tickmap}
       initialTokenFromIndex={initialTokenFromIndex === -1 ? null : initialTokenFromIndex}
       initialTokenToIndex={initialTokenToIndex === -1 ? null : initialTokenToIndex}
-      // handleAddToken={addTokenHandler}
-      handleAddToken={() => {}}
+      handleAddToken={addTokenHandler}
       commonTokens={commonTokensForNetworks[network]}
       initialHideUnknownTokensValue={initialHideUnknownTokensValue}
       onHideUnknownTokensChange={setHideUnknownTokensValue}
