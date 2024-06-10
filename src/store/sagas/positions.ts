@@ -752,19 +752,29 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<HandleClaimFee>) 
     yield put(actions.getSinglePosition(index))
 
     yield* call(fetchBalances, [addressTokenX, addressTokenY])
-  } catch (e) {
+  } catch (e: any) {
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
     closeSnackbar(loaderKey)
     yield put(snackbarsActions.remove(loaderKey))
 
-    yield put(
-      snackbarsActions.add({
-        message: 'Failed to claim fee. Please try again.',
-        variant: 'error',
-        persist: false
-      })
-    )
+    if (e.message === 'Error while signing transaction') {
+      yield put(
+        snackbarsActions.add({
+          message: 'Transaction signing failed.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    } else {
+      yield put(
+        snackbarsActions.add({
+          message: 'Failed to close position. Please try again.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    }
 
     console.log(e)
   }
