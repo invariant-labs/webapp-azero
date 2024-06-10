@@ -137,9 +137,19 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
       })
     )
 
-    const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
-      signer: adapter.signer as Signer
-    })
+    let signedBatchedTx = null
+
+    try {
+      signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
+        signer: adapter.signer as Signer
+      })
+    } catch (e) {
+      throw new Error('Error while signing transaction')
+    }
+
+    if (!signedBatchedTx) {
+      throw new Error('Error while signing transaction')
+    }
 
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
@@ -179,10 +189,10 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
 
-    if (e.message === 'Cancelled') {
+    if (e.message === 'Error while signing transaction') {
       yield put(
         snackbarsActions.add({
-          message: 'Transaction signing cancelled.',
+          message: 'Transaction signing failed.',
           variant: 'error',
           persist: false
         })
@@ -336,9 +346,19 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
       })
     )
 
-    const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
-      signer: adapter.signer as Signer
-    })
+    let signedBatchedTx = null
+
+    try {
+      signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
+        signer: adapter.signer as Signer
+      })
+    } catch (e) {
+      throw new Error('Error while signing transaction')
+    }
+
+    if (!signedBatchedTx) {
+      throw new Error('Error while signing transaction')
+    }
 
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
@@ -379,10 +399,10 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
 
-    if (e.message === 'Cancelled') {
+    if (e.message === 'Error while signing transaction') {
       yield put(
         snackbarsActions.add({
-          message: 'Transaction signing cancelled.',
+          message: 'Transaction signing failed.',
           variant: 'error',
           persist: false
         })
