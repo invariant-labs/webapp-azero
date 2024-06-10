@@ -468,6 +468,18 @@ export function* handleGetCurrentPlotTicks(
       allTickmaps = yield* select(tickMaps)
     }
 
+    if (!allTickmaps[poolKeyToString(poolKey)]) {
+      const data = createPlaceholderLiquidityPlot(
+        action.payload.isXtoY,
+        0,
+        poolKey.feeTier.tickSpacing,
+        xDecimal,
+        yDecimal
+      )
+      yield* put(actions.setPlotTicks(data))
+      return
+    }
+
     const rawTicks = yield* call(
       [invariant, invariant.getAllLiquidityTicks],
       poolKey,
