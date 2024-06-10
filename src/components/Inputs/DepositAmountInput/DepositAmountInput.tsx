@@ -1,6 +1,6 @@
 import { Button, Grid, Input, Tooltip, Typography } from '@mui/material'
 import loadingAnimation from '@static/gif/loading.gif'
-import { FormatNumberThreshold, formatBalance, getScaleFromString } from '@store/consts/utils'
+import { formatBalance, getScaleFromString } from '@store/consts/utils'
 import React, { CSSProperties, useRef } from 'react'
 import useStyles from './style'
 
@@ -44,65 +44,65 @@ export const DepositAmountInput: React.FC<IProps> = ({
 
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const thresholds: FormatNumberThreshold[] = [
-    {
-      value: 10,
-      decimals: decimalsLimit
-    },
-    {
-      value: 100,
-      decimals: 4
-    },
-    {
-      value: 1000,
-      decimals: 2
-    },
-    {
-      value: 10000,
-      decimals: 1
-    },
-    {
-      value: 1000000,
-      decimals: 2,
-      divider: 1000
-    },
-    {
-      value: 1000000000,
-      decimals: 2,
-      divider: 1000000
-    },
-    {
-      value: Infinity,
-      decimals: 2,
-      divider: 1000000000
-    }
-  ]
+  // const thresholds: FormatNumberThreshold[] = [
+  //   {
+  //     value: 10,
+  //     decimals: decimalsLimit
+  //   },
+  //   {
+  //     value: 100,
+  //     decimals: 4
+  //   },
+  //   {
+  //     value: 1000,
+  //     decimals: 2
+  //   },
+  //   {
+  //     value: 10000,
+  //     decimals: 1
+  //   },
+  //   {
+  //     value: 1000000,
+  //     decimals: 2,
+  //     divider: 1000
+  //   },
+  //   {
+  //     value: 1000000000,
+  //     decimals: 2,
+  //     divider: 1000000
+  //   },
+  //   {
+  //     value: Infinity,
+  //     decimals: 2,
+  //     divider: 1000000000
+  //   }
+  // ]
 
-  const usdThresholds: FormatNumberThreshold[] = [
-    {
-      value: 1000,
-      decimals: 2
-    },
-    {
-      value: 10000,
-      decimals: 1
-    },
-    {
-      value: 1000000,
-      decimals: 2,
-      divider: 1000
-    },
-    {
-      value: 1000000000,
-      decimals: 2,
-      divider: 1000000
-    },
-    {
-      value: Infinity,
-      decimals: 2,
-      divider: 1000000000
-    }
-  ]
+  // const usdThresholds: FormatNumberThreshold[] = [
+  //   {
+  //     value: 1000,
+  //     decimals: 2
+  //   },
+  //   {
+  //     value: 10000,
+  //     decimals: 1
+  //   },
+  //   {
+  //     value: 1000000,
+  //     decimals: 2,
+  //     divider: 1000
+  //   },
+  //   {
+  //     value: 1000000000,
+  //     decimals: 2,
+  //     divider: 1000000
+  //   },
+  //   {
+  //     value: Infinity,
+  //     decimals: 2,
+  //     divider: 1000000000
+  //   }
+  // ]
 
   const allowOnlyDigitsAndTrimUnnecessaryZeros: React.ChangeEventHandler<HTMLInputElement> = e => {
     const regex = /^\d*\.?\d*$/
