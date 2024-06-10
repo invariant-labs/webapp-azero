@@ -14,6 +14,7 @@ import {
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
 import {
+  ErrorMessage,
   INVARIANT_SWAP_OPTIONS,
   INVARIANT_WITHDRAW_ALL_WAZERO,
   PSP22_APPROVE_OPTIONS,
@@ -26,6 +27,7 @@ import {
   createLoaderKey,
   deserializeTickmap,
   findPairs,
+  isErrorMessage,
   poolKeyToString,
   printBigint
 } from '@store/consts/utils'
@@ -137,18 +139,13 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
       })
     )
 
-    let signedBatchedTx = null
-
+    let signedBatchedTx: any
     try {
       signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
         signer: adapter.signer as Signer
       })
     } catch (e) {
-      throw new Error('Error while signing transaction')
-    }
-
-    if (!signedBatchedTx) {
-      throw new Error('Error while signing transaction')
+      throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
     }
 
     closeSnackbar(loaderSigningTx)
@@ -189,10 +186,10 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
 
-    if (e.message === 'Error while signing transaction') {
+    if (isErrorMessage(e.message)) {
       yield put(
         snackbarsActions.add({
-          message: 'Transaction signing failed.',
+          message: e.message,
           variant: 'error',
           persist: false
         })
@@ -346,18 +343,13 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
       })
     )
 
-    let signedBatchedTx = null
-
+    let signedBatchedTx: any
     try {
       signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
         signer: adapter.signer as Signer
       })
     } catch (e) {
-      throw new Error('Error while signing transaction')
-    }
-
-    if (!signedBatchedTx) {
-      throw new Error('Error while signing transaction')
+      throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
     }
 
     closeSnackbar(loaderSigningTx)
@@ -399,10 +391,10 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
 
-    if (e.message === 'Error while signing transaction') {
+    if (isErrorMessage(e.message)) {
       yield put(
         snackbarsActions.add({
-          message: 'Transaction signing failed.',
+          message: e.message,
           variant: 'error',
           persist: false
         })

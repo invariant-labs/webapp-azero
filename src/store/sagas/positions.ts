@@ -3,6 +3,7 @@ import { calculateTokenAmountsWithSlippage } from '@invariant-labs/a0-sdk/src/ut
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
 import {
+  ErrorMessage,
   INVARIANT_CLAIM_FEE_OPTIONS,
   INVARIANT_CREATE_POOL_OPTIONS,
   INVARIANT_CREATE_POSITION_OPTIONS,
@@ -17,6 +18,7 @@ import {
   createLoaderKey,
   createPlaceholderLiquidityPlot,
   deserializeTickmap,
+  isErrorMessage,
   poolKeyToString
 } from '@store/consts/utils'
 import { FetchTicksAndTickMaps, ListType, actions as poolsActions } from '@store/reducers/pools'
@@ -143,18 +145,13 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       })
     )
 
-    let signedBatchedTx = null
-
+    let signedBatchedTx: any
     try {
       signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
         signer: adapter.signer as Signer
       })
     } catch (e) {
-      throw new Error('Error while signing transaction')
-    }
-
-    if (!signedBatchedTx) {
-      throw new Error('Error while signing transaction')
+      throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
     }
 
     closeSnackbar(loaderSigningTx)
@@ -189,10 +186,10 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
 
-    if (e.message === 'Error while signing transaction') {
+    if (isErrorMessage(e.message)) {
       yield put(
         snackbarsActions.add({
-          message: 'Transaction signing failed.',
+          message: e.message,
           variant: 'error',
           persist: false
         })
@@ -337,18 +334,14 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
       })
     )
 
-    let signedBatchedTx = null
+    let signedBatchedTx: any
 
     try {
       signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
         signer: adapter.signer as Signer
       })
     } catch (e) {
-      throw new Error('Error while signing transaction')
-    }
-
-    if (!signedBatchedTx) {
-      throw new Error('Error while signing transaction')
+      throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
     }
 
     closeSnackbar(loaderSigningTx)
@@ -385,10 +378,10 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
 
-    if (e.message === 'Error while signing transaction') {
+    if (isErrorMessage(e.message)) {
       yield put(
         snackbarsActions.add({
-          message: 'Transaction signing failed.',
+          message: e.message,
           variant: 'error',
           persist: false
         })
@@ -590,18 +583,13 @@ export function* handleClaimFee(action: PayloadAction<HandleClaimFee>) {
       })
     )
 
-    let signedTx = null
-
+    let signedTx: any
     try {
       signedTx = yield* call([tx, tx.signAsync], walletAddress, {
         signer: adapter.signer as Signer
       })
     } catch (e) {
-      throw new Error('Error while signing transaction')
-    }
-
-    if (!signedTx) {
-      throw new Error('Error while signing transaction')
+      throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
     }
 
     closeSnackbar(loaderSigningTx)
@@ -631,10 +619,10 @@ export function* handleClaimFee(action: PayloadAction<HandleClaimFee>) {
     closeSnackbar(loaderKey)
     yield put(snackbarsActions.remove(loaderKey))
 
-    if (e.message === 'Error while signing transaction') {
+    if (isErrorMessage(e.message)) {
       yield put(
         snackbarsActions.add({
-          message: 'Transaction signing failed.',
+          message: e.message,
           variant: 'error',
           persist: false
         })
@@ -719,18 +707,13 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<HandleClaimFee>) 
       })
     )
 
-    let signedBatchedTx = null
-
+    let signedBatchedTx: any
     try {
       signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
         signer: adapter.signer as Signer
       })
     } catch (e) {
-      throw new Error('Error while signing transaction')
-    }
-
-    if (!signedBatchedTx) {
-      throw new Error('Error while signing transaction')
+      throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
     }
 
     closeSnackbar(loaderSigningTx)
@@ -758,10 +741,10 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<HandleClaimFee>) 
     closeSnackbar(loaderKey)
     yield put(snackbarsActions.remove(loaderKey))
 
-    if (e.message === 'Error while signing transaction') {
+    if (isErrorMessage(e.message)) {
       yield put(
         snackbarsActions.add({
-          message: 'Transaction signing failed.',
+          message: e.message,
           variant: 'error',
           persist: false
         })
@@ -855,18 +838,13 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
       })
     )
 
-    let signedTx = null
-
+    let signedTx: any
     try {
       signedTx = yield* call([tx, tx.signAsync], walletAddress, {
         signer: adapter.signer as Signer
       })
     } catch (e) {
-      throw new Error('Error while signing transaction')
-    }
-
-    if (!signedTx) {
-      throw new Error('Error while signing transaction')
+      throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
     }
 
     closeSnackbar(loaderSigningTx)
@@ -895,10 +873,10 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
     closeSnackbar(loaderKey)
     yield put(snackbarsActions.remove(loaderKey))
 
-    if (e.message === 'Error while signing transaction') {
+    if (isErrorMessage(e.message)) {
       yield put(
         snackbarsActions.add({
-          message: 'Transaction signing failed.',
+          message: e.message,
           variant: 'error',
           persist: false
         })
@@ -970,19 +948,15 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
       })
     )
 
-    let signedBatchedTx = null
-
+    let signedBatchedTx: any
     try {
       signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
         signer: adapter.signer as Signer
       })
     } catch (e) {
-      throw new Error('Error while signing transaction')
+      throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
     }
 
-    if (!signedBatchedTx) {
-      throw new Error('Error while signing transaction')
-    }
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
 
@@ -1009,10 +983,10 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
     closeSnackbar(loaderKey)
     yield put(snackbarsActions.remove(loaderKey))
 
-    if (e.message === 'Error while signing transaction') {
+    if (isErrorMessage(e.message)) {
       yield put(
         snackbarsActions.add({
-          message: 'Transaction signing failed.',
+          message: e.message,
           variant: 'error',
           persist: false
         })
