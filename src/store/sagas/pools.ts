@@ -16,6 +16,7 @@ import {
   actions
 } from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
+import { actions as walletActions } from '@store/reducers/wallet'
 import { invariantAddress, networkType } from '@store/selectors/connection'
 import { tokens } from '@store/selectors/pools'
 import { address } from '@store/selectors/wallet'
@@ -64,6 +65,8 @@ export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) 
     network,
     walletAddress
   )
+
+  yield* put(walletActions.getSelectedTokens(Object.keys(unknownTokensData)))
   yield* put(actions.addTokens(unknownTokensData))
   yield* put(actions.updateTokenBalances(knownTokenBalances))
 

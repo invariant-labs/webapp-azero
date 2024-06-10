@@ -14,15 +14,16 @@ import {
   sqrtPriceToPrice
 } from '@invariant-labs/a0-sdk'
 import { CHUNK_SIZE, PRICE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
+import { calculateLiquidityBreakpoints } from '@invariant-labs/a0-sdk/target/utils'
 import { ApiPromise } from '@polkadot/api'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
 import { SwapError } from '@store/sagas/swap'
 import invariantSingleton from '@store/services/invariantSingleton'
 import psp22Singleton from '@store/services/psp22Singleton'
+import apiSingleton from '@store/services/apiSingleton'
 import axios from 'axios'
 import { BTC, ETH, Token, TokenPriceData, USDC, tokensPrices } from './static'
-import { calculateLiquidityBreakpoints } from '@invariant-labs/a0-sdk/target/utils'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -116,9 +117,10 @@ export const formatNumbers =
   }
 
 export const trimZeros = (numStr: string): string => {
-  numStr = numStr.replace(/(\.\d*?)0+$/, '$1')
-
   return numStr
+    .replace(/(\.\d*?)0+$/, '$1')
+    .replace(/^0+(\d)|(\d)0+$/gm, '$1$2')
+    .replace(/\.$/, '')
 }
 
 export const calcYPerXPriceByTickIndex = (
@@ -297,6 +299,38 @@ export const printBigint = (amount: TokenAmount, decimals: bigint): string => {
   }
 }
 
+export const newPrintBigInt = (amount: bigint, decimals: bigint): string => {
+  const parsedDecimals = Number(decimals)
+  const amountString = amount.toString()
+  const isNegative = amountString.length > 0 && amountString[0] === '-'
+
+  const balanceString = isNegative ? amountString.slice(1) : amountString
+
+  if (balanceString.length <= parsedDecimals) {
+    const diff = parsedDecimals - balanceString.length
+
+    return (
+      (isNegative ? '-' : '') +
+      trimZeros('0.' + (diff > 3 ? '0' + printSubNumber(diff) : '0'.repeat(diff)) + balanceString)
+    )
+  } else {
+    return (
+      (isNegative ? '-' : '') +
+      trimZeros(
+        balanceString.substring(0, balanceString.length - parsedDecimals) +
+          '.' +
+          balanceString.substring(balanceString.length - parsedDecimals)
+      )
+    )
+  }
+}
+
+const subNumbers = ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉']
+
+export const printSubNumber = (amount: number): string => {
+  return String(Array.from(amount.toString()).map(char => subNumbers[+char]))
+}
+
 export const parseFeeToPathFee = (fee: bigint): string => {
   const parsedFee = (fee / BigInt(Math.pow(10, 8))).toString().padStart(3, '0')
   return parsedFee.slice(0, parsedFee.length - 2) + '_' + parsedFee.slice(parsedFee.length - 2)
@@ -324,12 +358,13 @@ export const getTokenDataByAddresses = async (
   tokens.forEach((token, index) => {
     const baseIndex = index * 4
     newTokens[token] = {
-      symbol: results[baseIndex] as string,
+      symbol: results[baseIndex] ? (results[baseIndex] as string) : 'UNKNOWN',
       address: token,
-      name: results[baseIndex + 1] as string,
+      name: results[baseIndex + 1] ? (results[baseIndex + 1] as string) : '',
       decimals: results[baseIndex + 2] as bigint,
       balance: results[baseIndex + 3] as bigint,
-      logoURI: ''
+      logoURI: '/unknownToken.svg',
+      isUnknown: true
     }
   })
   return newTokens
@@ -751,4 +786,31 @@ export const createLiquidityPlot = (
   }
 
   return isXtoY ? ticksData : ticksData.reverse()
+}
+
+export const getNewTokenOrThrow = async (
+  address: string,
+  network: Network,
+  rpc: string,
+  walletAddress: string
+): Promise<Record<string, Token>> => {
+  const api = await apiSingleton.loadInstance(network, rpc)
+
+  const tokenData = await getTokenDataByAddresses([address], api, network, walletAddress)
+
+  if (tokenData) {
+    return tokenData
+  } else {
+    throw new Error('Failed to fetch token information')
+  }
+}
+
+export const addNewTokenToLocalStorage = (address: string, network: Network) => {
+  const currentListStr = localStorage.getItem(`CUSTOM_TOKENS_${network}`)
+
+  const currentList = currentListStr !== null ? JSON.parse(currentListStr) : []
+
+  currentList.push(address)
+
+  localStorage.setItem(`CUSTOM_TOKENS_${network}`, JSON.stringify([...new Set(currentList)]))
 }
