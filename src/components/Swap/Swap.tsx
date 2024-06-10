@@ -505,9 +505,14 @@ export const Swap: React.FC<ISwap> = ({
               setRotates(rotates + 1)
               swap !== null ? setSwap(!swap) : setSwap(true)
               setTimeout(() => {
+                const tmpAmount = amountTo
+
                 const tmp = tokenFromIndex
                 setTokenFromIndex(tokenToIndex)
                 setTokenToIndex(tmp)
+
+                setInputRef(inputTarget.FROM)
+                setAmountFrom(tmpAmount)
               }, 50)
             }}>
             <Box className={classes.swapImgRoot}>
