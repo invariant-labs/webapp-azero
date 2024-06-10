@@ -19,9 +19,9 @@ import { ApiPromise } from '@polkadot/api'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
 import { SwapError } from '@store/sagas/swap'
+import apiSingleton from '@store/services/apiSingleton'
 import invariantSingleton from '@store/services/invariantSingleton'
 import psp22Singleton from '@store/services/psp22Singleton'
-import apiSingleton from '@store/services/apiSingleton'
 import axios from 'axios'
 import { BTC, ETH, Token, TokenPriceData, USDC, tokensPrices } from './static'
 
@@ -814,3 +814,5 @@ export const addNewTokenToLocalStorage = (address: string, network: Network) => 
 
   localStorage.setItem(`CUSTOM_TOKENS_${network}`, JSON.stringify([...new Set(currentList)]))
 }
+
+export const REFRESHER_INTERVAL = 20

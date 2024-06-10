@@ -2,6 +2,7 @@ import AnimatedButton, { ProgressState } from '@components/AnimatedButton/Animat
 import ChangeWalletButton from '@components/Header/HeaderButton/ChangeWalletButton'
 import ExchangeAmountInput from '@components/Inputs/ExchangeAmountInput/ExchangeAmountInput'
 import Slippage from '@components/Modals/Slippage/Slippage'
+import Refresher from '@components/Refresher/Refresher'
 import { PoolKey, Price, Tick, TokenAmount } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
 import { Box, Button, CardMedia, Grid, Typography } from '@mui/material'
@@ -12,9 +13,9 @@ import settingIcon from '@static/svg/settings.svg'
 import SwapArrows from '@static/svg/swap-arrows.svg'
 import { TokenPriceData } from '@store/consts/static'
 import {
+  REFRESHER_INTERVAL,
   SimulateResult,
   convertBalanceToBigint,
-  newPrintBigInt,
   printBigint,
   trimLeadingZeros
 } from '@store/consts/utils'
@@ -121,15 +122,6 @@ export const Swap: React.FC<ISwap> = ({
   swapData,
   simulateResult
 }) => {
-  console.log(
-    newPrintBigInt(1000n, 0n),
-    newPrintBigInt(1000n, 1n),
-    newPrintBigInt(1004n, 1n),
-    newPrintBigInt(1000n, 7n),
-    newPrintBigInt(1000n, 8n),
-    newPrintBigInt(1003n, 12n)
-  )
-
   const { classes } = useStyles()
   enum inputTarget {
     FROM = 'from',
@@ -149,6 +141,7 @@ export const Swap: React.FC<ISwap> = ({
   const [detailsOpen, setDetailsOpen] = React.useState<boolean>(false)
   const [inputRef, setInputRef] = React.useState<string>(inputTarget.FROM)
   const [rateReversed, setRateReversed] = React.useState<boolean>(false)
+  const [refresherTime, setRefresherTime] = React.useState<number>(0)
 
   const timeoutRef = useRef<number>(0)
   const dispatch = useDispatch()
@@ -231,7 +224,21 @@ export const Swap: React.FC<ISwap> = ({
         setAmountFrom(+amount === 0 ? '' : trimLeadingZeros(amount))
       }
     }
+
+    setRefresherTime(REFRESHER_INTERVAL)
   }, [simulateResult])
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (refresherTime > 0) {
+        setRefresherTime(refresherTime - 1)
+      } else {
+        handleRefresh()
+      }
+    }, 1000)
+
+    return () => clearTimeout(timeout)
+  }, [refresherTime])
 
   useEffect(() => {
     updateEstimatedAmount()
@@ -600,16 +607,19 @@ export const Swap: React.FC<ISwap> = ({
             </Grid>
           </button>
           {canShowDetails ? (
-            <ExchangeRate
-              onClick={() => setRateReversed(!rateReversed)}
-              tokenFromSymbol={tokens[rateReversed ? tokenToIndex : tokenFromIndex].symbol}
-              tokenToSymbol={tokens[rateReversed ? tokenFromIndex : tokenToIndex].symbol}
-              amount={rateReversed ? 1 / swapRate : swapRate}
-              tokenToDecimals={Number(
-                tokens[rateReversed ? tokenFromIndex : tokenToIndex].decimals
-              )}
-              loading={getStateMessage() === 'Loading'}
-            />
+            <Grid className={classes.exchangeRateContainer}>
+              <Refresher currentIndex={refresherTime} maxIndex={REFRESHER_INTERVAL} />
+              <ExchangeRate
+                onClick={() => setRateReversed(!rateReversed)}
+                tokenFromSymbol={tokens[rateReversed ? tokenToIndex : tokenFromIndex].symbol}
+                tokenToSymbol={tokens[rateReversed ? tokenFromIndex : tokenToIndex].symbol}
+                amount={rateReversed ? 1 / swapRate : swapRate}
+                tokenToDecimals={Number(
+                  tokens[rateReversed ? tokenFromIndex : tokenToIndex].decimals
+                )}
+                loading={getStateMessage() === 'Loading'}
+              />
+            </Grid>
           ) : null}
         </Box>
         <TransactionDetailsBox
