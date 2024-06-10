@@ -19,6 +19,7 @@ import { ApiPromise } from '@polkadot/api'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
 import { SwapError } from '@store/sagas/swap'
+import apiSingleton from '@store/services/apiSingleton'
 import invariantSingleton from '@store/services/invariantSingleton'
 import psp22Singleton from '@store/services/psp22Singleton'
 import axios from 'axios'
@@ -357,12 +358,13 @@ export const getTokenDataByAddresses = async (
   tokens.forEach((token, index) => {
     const baseIndex = index * 4
     newTokens[token] = {
-      symbol: results[baseIndex] as string,
+      symbol: results[baseIndex] ? (results[baseIndex] as string) : 'UNKNOWN',
       address: token,
-      name: results[baseIndex + 1] as string,
+      name: results[baseIndex + 1] ? (results[baseIndex + 1] as string) : '',
       decimals: results[baseIndex + 2] as bigint,
       balance: results[baseIndex + 3] as bigint,
-      logoURI: ''
+      logoURI: '/unknownToken.svg',
+      isUnknown: true
     }
   })
   return newTokens
@@ -788,4 +790,31 @@ export const createLiquidityPlot = (
 
 export const isErrorMessage = (value: any): boolean => {
   return Object.values(ErrorMessage).includes(value)
+}
+
+export const getNewTokenOrThrow = async (
+  address: string,
+  network: Network,
+  rpc: string,
+  walletAddress: string
+): Promise<Record<string, Token>> => {
+  const api = await apiSingleton.loadInstance(network, rpc)
+
+  const tokenData = await getTokenDataByAddresses([address], api, network, walletAddress)
+
+  if (tokenData) {
+    return tokenData
+  } else {
+    throw new Error('Failed to fetch token information')
+  }
+}
+
+export const addNewTokenToLocalStorage = (address: string, network: Network) => {
+  const currentListStr = localStorage.getItem(`CUSTOM_TOKENS_${network}`)
+
+  const currentList = currentListStr !== null ? JSON.parse(currentListStr) : []
+
+  currentList.push(address)
+
+  localStorage.setItem(`CUSTOM_TOKENS_${network}`, JSON.stringify([...new Set(currentList)]))
 }

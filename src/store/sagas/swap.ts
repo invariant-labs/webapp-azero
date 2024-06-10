@@ -6,11 +6,7 @@ import {
   simulateInvariantSwap
 } from '@invariant-labs/a0-sdk'
 import { MIN_SQRT_PRICE } from '@invariant-labs/a0-sdk/src/consts'
-import {
-  MAX_SQRT_PRICE,
-  PERCENTAGE_DENOMINATOR,
-  PERCENTAGE_SCALE
-} from '@invariant-labs/a0-sdk/target/consts'
+import { MAX_SQRT_PRICE, PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
 import {
@@ -48,8 +44,16 @@ import { getConnection } from './connection'
 import { fetchBalances } from './wallet'
 
 export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generator {
-  const { poolKey, tokenFrom, slippage, amountIn, byAmountIn, estimatedPriceAfterSwap, tokenTo } =
-    action.payload
+  const {
+    poolKey,
+    tokenFrom,
+    slippage,
+    amountIn,
+    amountOut,
+    byAmountIn,
+    estimatedPriceAfterSwap,
+    tokenTo
+  } = action.payload
 
   if (!poolKey) {
     return
@@ -118,12 +122,13 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
       txs.push(approveTx)
     }
 
-    const swapTx = invariant.swapTx(
+    const swapTx = invariant.swapWithSlippageTx(
       poolKey,
       xToY,
-      amountIn,
+      byAmountIn ? amountIn : amountOut,
       byAmountIn,
-      sqrtPriceLimit,
+      estimatedPriceAfterSwap,
+      slippage,
       INVARIANT_SWAP_OPTIONS
     )
     txs.push(swapTx)
@@ -466,7 +471,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
     }
 
     let poolKey = null
-    let amountOut = 0n
+    let amountOut = byAmountIn ? 0n : U128MAX
     let priceImpact = 0
     let targetSqrtPrice = 0n
     const errors = []
@@ -481,9 +486,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
           allPools[poolKeyToString(pool.poolKey)],
           allTicks[poolKeyToString(pool.poolKey)],
           xToY,
-          byAmountIn
-            ? amount - (amount * pool.poolKey.feeTier.fee) / PERCENTAGE_DENOMINATOR
-            : amount,
+          amount,
           byAmountIn,
           xToY ? MIN_SQRT_PRICE : MAX_SQRT_PRICE
         )
@@ -503,15 +506,13 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
           continue
         }
 
-        const calculatedAmountOut = byAmountIn ? result.amountOut : result.amountOut + result.fee
-
-        if (calculatedAmountOut === 0n) {
+        if (result.amountOut === 0n) {
           errors.push(SwapError.AmountIsZero)
           continue
         }
 
-        if (calculatedAmountOut > amountOut) {
-          amountOut = calculatedAmountOut
+        if (byAmountIn ? result.amountOut > amountOut : result.amountIn + result.fee < amountOut) {
+          amountOut = byAmountIn ? result.amountOut : result.amountIn + result.fee
           poolKey = pool.poolKey
           priceImpact = +printBigint(
             calculatePriceImpact(pool.sqrtPrice, result.targetSqrtPrice),

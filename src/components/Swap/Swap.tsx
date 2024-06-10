@@ -450,7 +450,7 @@ export const Swap: React.FC<ISwap> = ({
             value={amountFrom}
             balance={
               tokenFromIndex !== null
-                ? printBigint(tokens[tokenFromIndex].balance, tokens[tokenFromIndex].decimals)
+                ? printBigint(tokens[tokenFromIndex].balance || 0n, tokens[tokenFromIndex].decimals)
                 : '- -'
             }
             decimal={tokenFromIndex !== null ? tokens[tokenFromIndex].decimals : 12n}
@@ -495,9 +495,14 @@ export const Swap: React.FC<ISwap> = ({
               setRotates(rotates + 1)
               swap !== null ? setSwap(!swap) : setSwap(true)
               setTimeout(() => {
+                const tmpAmount = amountTo
+
                 const tmp = tokenFromIndex
                 setTokenFromIndex(tokenToIndex)
                 setTokenToIndex(tmp)
+
+                setInputRef(inputTarget.FROM)
+                setAmountFrom(tmpAmount)
               }, 50)
             }}>
             <Box className={classes.swapImgRoot}>
@@ -521,7 +526,7 @@ export const Swap: React.FC<ISwap> = ({
             value={amountTo}
             balance={
               tokenToIndex !== null
-                ? printBigint(tokens[tokenToIndex].balance, tokens[tokenToIndex].decimals)
+                ? printBigint(tokens[tokenToIndex].balance || 0n, tokens[tokenToIndex].decimals)
                 : '- -'
             }
             className={classes.amountInput}
