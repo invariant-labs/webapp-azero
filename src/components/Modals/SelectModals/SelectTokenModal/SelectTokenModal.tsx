@@ -143,7 +143,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
       }
       return aBalance === 0 ? 1 : -1
     })
-    return list // TODO delete this line
+
     return hideUnknown ? sorted.filter(token => !token.isUnknown) : sorted
   }, [value, tokensWithIndexes, hideUnknown])
 
@@ -288,7 +288,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
                     <Grid container className={classes.tokenContainer}>
                       <Typography className={classes.tokenName}>{token.symbol}</Typography>
                       <Typography className={classes.tokenDescrpiption}>
-                        {token.name.slice(0, isXs ? 20 : 30)}
+                        {token.name ? token.name.slice(0, isXs ? 20 : 30) : 'Unknown token'}
                         {token.name.length > (isXs ? 20 : 30) ? '...' : ''}
                       </Typography>
                     </Grid>
