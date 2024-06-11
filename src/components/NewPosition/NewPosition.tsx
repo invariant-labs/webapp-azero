@@ -103,6 +103,7 @@ export interface INewPosition {
   onSlippageChange: (slippage: string) => void
   initialSlippage: string
   poolKey: string
+  onRefresh: () => void
 }
 
 export const NewPosition: React.FC<INewPosition> = ({
@@ -151,7 +152,8 @@ export const NewPosition: React.FC<INewPosition> = ({
   onSlippageChange,
   initialSlippage,
   poolKey,
-  currentPriceSqrt
+  currentPriceSqrt,
+  onRefresh
 }) => {
   const { classes } = useStyles()
   const navigate = useNavigate()
@@ -433,7 +435,7 @@ export const NewPosition: React.FC<INewPosition> = ({
       if (refresherTime > 0 && poolKey !== '') {
         setRefresherTime(refresherTime - 1)
       } else {
-        reloadHandler()
+        onRefresh()
         setRefresherTime(REFRESHER_INTERVAL)
       }
     }, 1000)
@@ -467,7 +469,7 @@ export const NewPosition: React.FC<INewPosition> = ({
               currentIndex={refresherTime}
               maxIndex={REFRESHER_INTERVAL}
               onClick={() => {
-                reloadHandler()
+                onRefresh()
                 setRefresherTime(REFRESHER_INTERVAL)
               }}
             />

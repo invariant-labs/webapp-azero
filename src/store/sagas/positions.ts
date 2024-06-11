@@ -24,6 +24,7 @@ import {
 import { FetchTicksAndTickMaps, ListType, actions as poolsActions } from '@store/reducers/pools'
 import {
   ClosePositionData,
+  GetCurrentTicksData,
   GetPositionTicks,
   HandleClaimFee,
   InitPositionData,
@@ -463,10 +464,8 @@ export function* handleGetCurrentPositionTicks(action: PayloadAction<GetPosition
   )
 }
 
-export function* handleGetCurrentPlotTicks(
-  action: PayloadAction<{ poolKey: PoolKey; isXtoY: boolean }>
-): Generator {
-  const { poolKey, isXtoY } = action.payload
+export function* handleGetCurrentPlotTicks(action: PayloadAction<GetCurrentTicksData>): Generator {
+  const { poolKey, isXtoY, fetchTicksAndTickmap } = action.payload
   const api = yield* getConnection()
   const network = yield* select(networkType)
   const invAddress = yield* select(invariantAddress)
@@ -485,7 +484,7 @@ export function* handleGetCurrentPlotTicks(
       invAddress
     )
 
-    if (!allTickmaps[poolKeyToString(poolKey)]) {
+    if (!allTickmaps[poolKeyToString(poolKey)] || fetchTicksAndTickmap) {
       const fetchTicksAndTickMapsAction: PayloadAction<FetchTicksAndTickMaps> = {
         type: poolsActions.getTicksAndTickMaps.type,
         payload: {
