@@ -23,7 +23,7 @@ import apiSingleton from '@store/services/apiSingleton'
 import invariantSingleton from '@store/services/invariantSingleton'
 import psp22Singleton from '@store/services/psp22Singleton'
 import axios from 'axios'
-import { BTC, ETH, Token, TokenPriceData, USDC, tokensPrices } from './static'
+import { BTC, ETH, ErrorMessage, Token, TokenPriceData, USDC, tokensPrices } from './static'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -328,7 +328,9 @@ export const newPrintBigInt = (amount: bigint, decimals: bigint): string => {
 const subNumbers = ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉']
 
 export const printSubNumber = (amount: number): string => {
-  return String(Array.from(amount.toString()).map(char => subNumbers[+char]))
+  return Array.from(String(amount))
+    .map(char => subNumbers[+char])
+    .join('')
 }
 
 export const parseFeeToPathFee = (fee: bigint): string => {
@@ -788,6 +790,79 @@ export const createLiquidityPlot = (
   return isXtoY ? ticksData : ticksData.reverse()
 }
 
+const B = 1000000000
+const M = 1000000
+const K = 1000
+
+const BDecimals = 9
+const MDecimals = 6
+const KDecimals = 3
+
+const DecimalsAfterDot = 2
+
+export const formatNumber = (number: number | bigint | string): string => {
+  const numberAsNumber = Number(number)
+  const numberAsString = numberToString(number)
+
+  if (containsOnlyZeroes(numberAsString)) {
+    return '0'
+  }
+
+  const [beforeDot, afterDot] = numberAsString.split('.')
+
+  if (numberAsNumber > B) {
+    return (
+      beforeDot.slice(0, -BDecimals) +
+      (DecimalsAfterDot ? '.' : '') +
+      (beforeDot.slice(-BDecimals) + (afterDot ? afterDot : '')).slice(0, DecimalsAfterDot) +
+      'B'
+    )
+  } else if (numberAsNumber > M) {
+    return (
+      beforeDot.slice(0, -MDecimals) +
+      (DecimalsAfterDot ? '.' : '') +
+      (beforeDot.slice(-MDecimals) + (afterDot ? afterDot : '')).slice(0, DecimalsAfterDot) +
+      'M'
+    )
+  } else if (numberAsNumber > K) {
+    return (
+      beforeDot.slice(0, -KDecimals) +
+      (DecimalsAfterDot ? '.' : '') +
+      (beforeDot.slice(-KDecimals) + (afterDot ? afterDot : '')).slice(0, DecimalsAfterDot) +
+      'K'
+    )
+  } else {
+    const leadingZeros = afterDot ? countLeadingZeros(afterDot) : 0
+    const parsedAfterDot =
+      String(parseInt(afterDot)).length > 3 ? String(parseInt(afterDot)).slice(0, 3) : afterDot
+    return trimZeros(
+      beforeDot +
+        '.' +
+        (parsedAfterDot
+          ? leadingZeros > 3
+            ? '0' + printSubNumber(leadingZeros) + parseInt(parsedAfterDot)
+            : parsedAfterDot
+          : '')
+    )
+  }
+}
+
+export const formatBalance = (number: number | bigint | string): string => {
+  const numberAsString = numberToString(number)
+
+  const [beforeDot, afterDot] = numberAsString.split('.')
+
+  return beforeDot.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + (afterDot ? '.' + afterDot : '')
+}
+
+export const countLeadingZeros = (str: string): number => {
+  return (str.match(/^0+/) || [''])[0].length
+}
+
+export const isErrorMessage = (value: any): boolean => {
+  return Object.values(ErrorMessage).includes(value)
+}
+
 export const getNewTokenOrThrow = async (
   address: string,
   network: Network,
@@ -815,4 +890,12 @@ export const addNewTokenToLocalStorage = (address: string, network: Network) => 
   localStorage.setItem(`CUSTOM_TOKENS_${network}`, JSON.stringify([...new Set(currentList)]))
 }
 
-export const REFRESHER_INTERVAL = 20
+export const numberToString = (number: number | bigint | string): string => {
+  return String(number).includes('e-')
+    ? Number(number).toFixed(parseInt(String(number).split('e-')[1]))
+    : String(number)
+}
+
+export const containsOnlyZeroes = (string: string): boolean => {
+  return /^(?!.*[1-9]).*$/.test(string)
+}

@@ -2,7 +2,7 @@ import { Grid, Hidden, Tooltip, Typography, useMediaQuery } from '@mui/material'
 import SwapList from '@static/svg/swap-list.svg'
 import { theme } from '@static/theme'
 import { initialXtoY, tickerToAddress } from '@store/consts/uiUtiils'
-import { FormatNumberThreshold, PrefixConfig, formatNumbers, showPrefix } from '@store/consts/utils'
+import { formatNumber } from '@store/consts/utils'
 import classNames from 'classnames'
 import { useMemo, useState } from 'react'
 import { useStyles } from './style'
@@ -24,55 +24,55 @@ export interface IPositionItem {
   isActive?: boolean
 }
 
-const shorterThresholds: FormatNumberThreshold[] = [
-  {
-    value: 100,
-    decimals: 2
-  },
-  {
-    value: 1000,
-    decimals: 1
-  },
-  {
-    value: 10000,
-    decimals: 1,
-    divider: 1000
-  },
-  {
-    value: 1000000,
-    decimals: 0,
-    divider: 1000
-  },
-  {
-    value: 10000000,
-    decimals: 1,
-    divider: 1000000
-  },
-  {
-    value: 1000000000,
-    decimals: 0,
-    divider: 1000000
-  },
-  {
-    value: 10000000000,
-    decimals: 1,
-    divider: 1000000000
-  }
-]
+// const shorterThresholds: FormatNumberThreshold[] = [
+//   {
+//     value: 100,
+//     decimals: 2
+//   },
+//   {
+//     value: 1000,
+//     decimals: 1
+//   },
+//   {
+//     value: 10000,
+//     decimals: 1,
+//     divider: 1000
+//   },
+//   {
+//     value: 1000000,
+//     decimals: 0,
+//     divider: 1000
+//   },
+//   {
+//     value: 10000000,
+//     decimals: 1,
+//     divider: 1000000
+//   },
+//   {
+//     value: 1000000000,
+//     decimals: 0,
+//     divider: 1000000
+//   },
+//   {
+//     value: 10000000000,
+//     decimals: 1,
+//     divider: 1000000000
+//   }
+// ]
 
-const minMaxShorterThresholds: FormatNumberThreshold[] = [
-  {
-    value: 10,
-    decimals: 3
-  },
-  ...shorterThresholds
-]
+// const minMaxShorterThresholds: FormatNumberThreshold[] = [
+//   {
+//     value: 10,
+//     decimals: 3
+//   },
+//   ...shorterThresholds
+// ]
 
-const shorterPrefixConfig: PrefixConfig = {
-  B: 1000000000,
-  M: 1000000,
-  K: 1000
-}
+// const shorterPrefixConfig: PrefixConfig = {
+//   B: 1000000000,
+//   M: 1000000,
+//   K: 1000
+// }
 
 export const PositionItem: React.FC<IPositionItem> = ({
   tokenXName,
@@ -137,14 +137,7 @@ export const PositionItem: React.FC<IPositionItem> = ({
         <Typography className={classNames(classes.infoText, classes.label)}>Value</Typography>
         <Grid className={classes.infoCenter} container item justifyContent='center'>
           <Typography className={classes.greenText}>
-            {formatNumbers(isXs || isDesktop ? shorterThresholds : undefined)(
-              (xToY ? valueX : valueY).toString()
-            )}
-            {showPrefix(
-              xToY ? valueX : valueY,
-              isXs || isDesktop ? shorterPrefixConfig : undefined
-            )}{' '}
-            {xToY ? tokenXName : tokenYName}
+            {formatNumber(xToY ? valueX : valueY)} {xToY ? tokenXName : tokenYName}
           </Typography>
         </Grid>
       </Grid>
@@ -201,23 +194,8 @@ export const PositionItem: React.FC<IPositionItem> = ({
           justifyContent='center'
           alignItems='center'>
           <Typography className={classes.infoText}>
-            {formatNumbers(isXs || isDesktop ? shorterThresholds : undefined)(
-              (xToY ? tokenXLiq : tokenYLiq).toString()
-            )}
-            {showPrefix(
-              xToY ? tokenXLiq : tokenYLiq,
-              isXs || isDesktop ? shorterPrefixConfig : undefined
-            )}{' '}
-            {xToY ? tokenXName : tokenYName}
-            {' - '}
-            {formatNumbers(isXs || isDesktop ? shorterThresholds : undefined)(
-              (xToY ? tokenYLiq : tokenXLiq).toString()
-            )}
-            {showPrefix(
-              xToY ? tokenYLiq : tokenXLiq,
-              isXs || isDesktop ? shorterPrefixConfig : undefined
-            )}{' '}
-            {xToY ? tokenYName : tokenXName}
+            {formatNumber(xToY ? tokenXLiq : tokenYLiq)} {xToY ? tokenXName : tokenYName} {' - '}
+            {formatNumber(xToY ? tokenYLiq : tokenXLiq)} {xToY ? tokenYName : tokenXName}
           </Typography>
         </Grid>
 
@@ -235,21 +213,7 @@ export const PositionItem: React.FC<IPositionItem> = ({
           </Typography>
           <Grid className={classes.infoCenter} container item justifyContent='center'>
             <Typography className={classes.infoText}>
-              {formatNumbers(isXs || isDesktop ? minMaxShorterThresholds : undefined)(
-                (xToY ? min : 1 / max).toString()
-              )}
-              {showPrefix(
-                xToY ? min : 1 / max,
-                isXs || isDesktop ? shorterPrefixConfig : undefined
-              )}
-              {' - '}
-              {formatNumbers(isXs || isDesktop ? minMaxShorterThresholds : undefined)(
-                (xToY ? max : 1 / min).toString()
-              )}
-              {showPrefix(
-                xToY ? max : 1 / min,
-                isXs || isDesktop ? shorterPrefixConfig : undefined
-              )}{' '}
+              {formatNumber(xToY ? min : 1 / max)} - {formatNumber(xToY ? max : 1 / min)}{' '}
               {xToY ? tokenYName : tokenXName} per {xToY ? tokenXName : tokenYName}
             </Typography>
           </Grid>

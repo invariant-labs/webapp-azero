@@ -1,12 +1,12 @@
-import React, { useMemo, useState, useRef, useCallback } from 'react'
-import CustomScrollbar from '../CustomScrollbar'
-import searchIcon from '@static/svg/lupa.svg'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
-import { FixedSizeList as List } from 'react-window'
-import useStyles from '../style'
+import searchIcon from '@static/svg/lupa.svg'
 import { theme } from '@static/theme'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
+import { FixedSizeList as List } from 'react-window'
+import CustomScrollbar from '../CustomScrollbar'
+import useStyles from '../style'
 
-import { AddressOrPair } from '@polkadot/api/types'
+import AddTokenModal from '@components/Modals/AddTokenModal/AddTokenModal'
 import {
   Box,
   Button,
@@ -18,8 +18,8 @@ import {
   Typography,
   useMediaQuery
 } from '@mui/material'
-import { FormatNumberThreshold, formatNumbers, printBigint, showPrefix } from '@store/consts/utils'
-import AddTokenModal from '@components/Modals/AddTokenModal/AddTokenModal'
+import { AddressOrPair } from '@polkadot/api/types'
+import { formatNumber, printBigint } from '@store/consts/utils'
 import { SwapToken } from '@store/selectors/wallet'
 
 export interface ISelectTokenModal {
@@ -151,39 +151,39 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
     setValue(e.target.value)
   }
 
-  const thresholds = (decimals: number): FormatNumberThreshold[] => [
-    {
-      value: 10,
-      decimals
-    },
-    {
-      value: 100,
-      decimals: 4
-    },
-    {
-      value: 1000,
-      decimals: 2
-    },
-    {
-      value: 10000,
-      decimals: 1
-    },
-    {
-      value: 1000000,
-      decimals: 2,
-      divider: 1000
-    },
-    {
-      value: 1000000000,
-      decimals: 2,
-      divider: 1000000
-    },
-    {
-      value: Infinity,
-      decimals: 2,
-      divider: 1000000000
-    }
-  ]
+  // const thresholds = (decimals: number): FormatNumberThreshold[] => [
+  //   {
+  //     value: 10,
+  //     decimals
+  //   },
+  //   {
+  //     value: 100,
+  //     decimals: 4
+  //   },
+  //   {
+  //     value: 1000,
+  //     decimals: 2
+  //   },
+  //   {
+  //     value: 10000,
+  //     decimals: 1
+  //   },
+  //   {
+  //     value: 1000000,
+  //     decimals: 2,
+  //     divider: 1000
+  //   },
+  //   {
+  //     value: 1000000000,
+  //     decimals: 2,
+  //     divider: 1000000
+  //   },
+  //   {
+  //     value: Infinity,
+  //     decimals: 2,
+  //     divider: 1000000000
+  //   }
+  // ]
 
   return (
     <>
@@ -294,8 +294,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
                     </Grid>
                     {!hideBalances && Number(tokenBalance) > 0 ? (
                       <Typography className={classes.tokenBalanceStatus}>
-                        Balance: {formatNumbers(thresholds(Number(token.decimals)))(tokenBalance)}
-                        {showPrefix(Number(tokenBalance))}
+                        Balance: {formatNumber(tokenBalance)}
                       </Typography>
                     ) : null}
                   </Grid>

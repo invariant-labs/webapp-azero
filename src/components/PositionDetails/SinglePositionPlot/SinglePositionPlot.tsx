@@ -1,14 +1,19 @@
 import PlotTypeSwitch from '@components/PlotTypeSwitch/PlotTypeSwitch'
 import LiquidationRangeInfo from '@components/PositionDetails/LiquidationRangeInfo/LiquidationRangeInfo'
+import PriceRangePlot from '@components/PriceRangePlot/PriceRangePlot'
+import { getMinTick } from '@invariant-labs/a0-sdk'
 import { Card, Grid, Tooltip, Typography } from '@mui/material'
 import activeLiquidity from '@static/svg/activeLiquidity.svg'
+import {
+  calcPrice,
+  calcTicksAmountInRange,
+  numberToString,
+  spacingMultiplicityGte
+} from '@store/consts/utils'
 import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
 import React, { useEffect, useState } from 'react'
 import { ILiquidityToken } from '../SinglePositionInfo/consts'
 import useStyles from './style'
-import { calcPrice, calcTicksAmountInRange, spacingMultiplicityGte } from '@store/consts/utils'
-import { getMinTick } from '@invariant-labs/a0-sdk'
-import PriceRangePlot from '@components/PriceRangePlot/PriceRangePlot'
 
 export interface ISinglePositionPlot {
   data: PlotTickData[]
@@ -197,7 +202,7 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
         </Card>
         <Card className={classes.currentPriceAmonut}>
           <Typography component='p'>
-            <Typography component='span'>{currentPrice.toString()}</Typography>
+            <Typography component='span'>{numberToString(currentPrice)}</Typography>
             {xToY ? tokenY.name : tokenX.name} per {xToY ? tokenX.name : tokenY.name}
           </Typography>
         </Card>

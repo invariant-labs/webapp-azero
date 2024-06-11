@@ -1,13 +1,8 @@
-import React, { useRef, CSSProperties } from 'react'
-import loadingAnimation from '@static/gif/loading.gif'
-import useStyles from './style'
-import {
-  FormatNumberThreshold,
-  formatNumbers,
-  getScaleFromString,
-  showPrefix
-} from '@store/consts/utils'
 import { Button, Grid, Input, Tooltip, Typography } from '@mui/material'
+import loadingAnimation from '@static/gif/loading.gif'
+import { formatNumber, getScaleFromString } from '@store/consts/utils'
+import React, { CSSProperties, useRef } from 'react'
+import useStyles from './style'
 
 interface IProps {
   setValue: (value: string) => void
@@ -49,65 +44,65 @@ export const DepositAmountInput: React.FC<IProps> = ({
 
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const thresholds: FormatNumberThreshold[] = [
-    {
-      value: 10,
-      decimals: decimalsLimit
-    },
-    {
-      value: 100,
-      decimals: 4
-    },
-    {
-      value: 1000,
-      decimals: 2
-    },
-    {
-      value: 10000,
-      decimals: 1
-    },
-    {
-      value: 1000000,
-      decimals: 2,
-      divider: 1000
-    },
-    {
-      value: 1000000000,
-      decimals: 2,
-      divider: 1000000
-    },
-    {
-      value: Infinity,
-      decimals: 2,
-      divider: 1000000000
-    }
-  ]
+  // const thresholds: FormatNumberThreshold[] = [
+  //   {
+  //     value: 10,
+  //     decimals: decimalsLimit
+  //   },
+  //   {
+  //     value: 100,
+  //     decimals: 4
+  //   },
+  //   {
+  //     value: 1000,
+  //     decimals: 2
+  //   },
+  //   {
+  //     value: 10000,
+  //     decimals: 1
+  //   },
+  //   {
+  //     value: 1000000,
+  //     decimals: 2,
+  //     divider: 1000
+  //   },
+  //   {
+  //     value: 1000000000,
+  //     decimals: 2,
+  //     divider: 1000000
+  //   },
+  //   {
+  //     value: Infinity,
+  //     decimals: 2,
+  //     divider: 1000000000
+  //   }
+  // ]
 
-  const usdThresholds: FormatNumberThreshold[] = [
-    {
-      value: 1000,
-      decimals: 2
-    },
-    {
-      value: 10000,
-      decimals: 1
-    },
-    {
-      value: 1000000,
-      decimals: 2,
-      divider: 1000
-    },
-    {
-      value: 1000000000,
-      decimals: 2,
-      divider: 1000000
-    },
-    {
-      value: Infinity,
-      decimals: 2,
-      divider: 1000000000
-    }
-  ]
+  // const usdThresholds: FormatNumberThreshold[] = [
+  //   {
+  //     value: 1000,
+  //     decimals: 2
+  //   },
+  //   {
+  //     value: 10000,
+  //     decimals: 1
+  //   },
+  //   {
+  //     value: 1000000,
+  //     decimals: 2,
+  //     divider: 1000
+  //   },
+  //   {
+  //     value: 1000000000,
+  //     decimals: 2,
+  //     divider: 1000000
+  //   },
+  //   {
+  //     value: Infinity,
+  //     decimals: 2,
+  //     divider: 1000000000
+  //   }
+  // ]
 
   const allowOnlyDigitsAndTrimUnnecessaryZeros: React.ChangeEventHandler<HTMLInputElement> = e => {
     const regex = /^\d*\.?\d*$/
@@ -205,12 +200,7 @@ export const DepositAmountInput: React.FC<IProps> = ({
                 <Typography className={classes.caption2}>
                   Balance:{' '}
                   {currency
-                    ? `${
-                        balanceValue
-                          ? formatNumbers(thresholds)(balanceValue) +
-                            showPrefix(Number(balanceValue))
-                          : '0'
-                      } ${currency}`
+                    ? `${balanceValue ? formatNumber(balanceValue) : '0'} ${currency}`
                     : '- -'}
                 </Typography>
                 <Button
@@ -231,7 +221,7 @@ export const DepositAmountInput: React.FC<IProps> = ({
                 <img src={loadingAnimation} className={classes.loading} />
               ) : tokenPrice ? (
                 <Typography className={classes.caption2}>
-                  ~${formatNumbers(usdThresholds)(usdBalance.toString()) + showPrefix(usdBalance)}
+                  ~${formatNumber(usdBalance.toFixed(2))}
                 </Typography>
               ) : (
                 <Tooltip
