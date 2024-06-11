@@ -32,7 +32,6 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   },
   back: {
     height: 40,
-    marginBottom: 16,
     width: 'fit-content',
     transition: 'filter 300ms',
 
@@ -73,5 +72,11 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   },
   buttonText: {
     WebkitPaddingBefore: '2px'
+  },
+  backContainer: {
+    marginBottom: 16,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   }
 }))

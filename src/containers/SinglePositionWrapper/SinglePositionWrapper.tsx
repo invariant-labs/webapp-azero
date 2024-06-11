@@ -296,8 +296,22 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   }, [walletStatus])
 
   useEffect(() => {
-    dispatch(actions.getSinglePosition(id))
+    onRefresh()
   }, [])
+
+  const onRefresh = () => {
+    dispatch(actions.getSinglePosition(id))
+
+    if (position) {
+      dispatch(
+        actions.getCurrentPlotTicks({
+          poolKey: position.poolKey,
+          isXtoY: true,
+          fetchTicksAndTickmap: true
+        })
+      )
+    }
+  }
 
   if (position) {
     return (
@@ -377,6 +391,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
             })
           )
         }}
+        onRefresh={onRefresh}
       />
     )
   }
