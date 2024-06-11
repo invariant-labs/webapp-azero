@@ -242,7 +242,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         )
       }
     }
-  }, [isWaitingForNewPool, tokenAIndex, tokenBIndex, feeIndex, poolIndex, poolKey])
+  }, [isWaitingForNewPool, tokenAIndex, tokenBIndex, feeIndex, poolIndex, poolKey, walletStatus])
 
   useEffect(() => {
     if (poolsData[poolKey]) {

@@ -23,7 +23,7 @@ import apiSingleton from '@store/services/apiSingleton'
 import invariantSingleton from '@store/services/invariantSingleton'
 import psp22Singleton from '@store/services/psp22Singleton'
 import axios from 'axios'
-import { BTC, ETH, Token, TokenPriceData, USDC, tokensPrices } from './static'
+import { BTC, ETH, ErrorMessage, Token, TokenPriceData, USDC, tokensPrices } from './static'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -857,6 +857,10 @@ export const formatBalance = (number: number | bigint | string): string => {
 
 export const countLeadingZeros = (str: string): number => {
   return (str.match(/^0+/) || [''])[0].length
+}
+
+export const isErrorMessage = (value: any): boolean => {
+  return Object.values(ErrorMessage).includes(value)
 }
 
 export const getNewTokenOrThrow = async (
