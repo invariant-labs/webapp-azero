@@ -9,6 +9,7 @@ import {
   getNewTokenOrThrow
 } from '@store/consts/utils'
 import { actions as poolsActions } from '@store/reducers/pools'
+import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { actions } from '@store/reducers/swap'
 import { actions as walletActions } from '@store/reducers/wallet'
 import { networkType, rpcAddress } from '@store/selectors/connection'
@@ -25,11 +26,10 @@ import {
   swapTokens,
   swapTokensDict
 } from '@store/selectors/wallet'
+import apiSingleton from '@store/services/apiSingleton'
 import { openWalletSelectorModal } from '@utils/web3/selector'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import apiSingleton from '@store/services/apiSingleton'
-import { actions as snackbarsActions } from '@store/reducers/snackbars'
 
 export const WrappedSwap = () => {
   const dispatch = useDispatch()

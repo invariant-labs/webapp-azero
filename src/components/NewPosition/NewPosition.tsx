@@ -1,6 +1,7 @@
 import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import Slippage from '@components/Modals/Slippage/Slippage'
 import { INoConnected, NoConnected } from '@components/NoConnected/NoConnected'
+import Refresher from '@components/Refresher/Refresher'
 import { TokenAmount, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
 import { getConcentrationArray } from '@invariant-labs/a0-sdk/src/utils'
 import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
@@ -8,7 +9,12 @@ import { Button, Grid, Typography } from '@mui/material'
 import { AddressOrPair } from '@polkadot/api/types'
 import backIcon from '@static/svg/back-arrow.svg'
 import settingIcon from '@static/svg/settings.svg'
-import { BestTier, PositionOpeningMethod, TokenPriceData } from '@store/consts/static'
+import {
+  BestTier,
+  PositionOpeningMethod,
+  REFRESHER_INTERVAL,
+  TokenPriceData
+} from '@store/consts/static'
 import {
   PositionTokenBlock,
   calcPrice,
@@ -170,6 +176,7 @@ export const NewPosition: React.FC<INewPosition> = ({
   const [concentrationIndex, setConcentrationIndex] = useState(0)
 
   const [minimumSliderIndex, setMinimumSliderIndex] = useState<number>(0)
+  const [refresherTime, setRefresherTime] = React.useState<number>(REFRESHER_INTERVAL)
 
   const concentrationArray = useMemo(
     () =>
@@ -421,6 +428,28 @@ export const NewPosition: React.FC<INewPosition> = ({
     }
   }
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (refresherTime > 0 && poolKey !== '') {
+        setRefresherTime(refresherTime - 1)
+      } else {
+        reloadHandler()
+        setRefresherTime(REFRESHER_INTERVAL)
+      }
+    }, 1000)
+
+    return () => clearTimeout(timeout)
+  }, [refresherTime, poolKey])
+
+  const [lastPoolKey, setLastPoolKey] = useState<string | null>(poolKey)
+
+  useEffect(() => {
+    if (poolKey != lastPoolKey) {
+      setLastPoolKey(lastPoolKey)
+      setRefresherTime(REFRESHER_INTERVAL)
+    }
+  }, [poolKey])
+
   return (
     <Grid container className={classes.wrapper} direction='column'>
       <Link to='/pool' style={{ textDecoration: 'none', maxWidth: 'fit-content' }}>
@@ -430,8 +459,20 @@ export const NewPosition: React.FC<INewPosition> = ({
         </Grid>
       </Link>
 
-      <Grid container justifyContent='space-between'>
-        <Typography className={classes.title}>Add new liquidity position</Typography>
+      <Grid container justifyContent='space-between' alignItems='center'>
+        <Grid className={classes.titleContainer}>
+          <Typography className={classes.title}>Add new liquidity position</Typography>
+          {poolKey !== '' && (
+            <Refresher
+              currentIndex={refresherTime}
+              maxIndex={REFRESHER_INTERVAL}
+              onClick={() => {
+                reloadHandler()
+                setRefresherTime(REFRESHER_INTERVAL)
+              }}
+            />
+          )}
+        </Grid>
         <Grid container item alignItems='center' className={classes.options}>
           {poolKey !== '' ? (
             <MarketIdLabel

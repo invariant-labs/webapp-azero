@@ -29,7 +29,6 @@ const useStyles = makeStyles()(theme => {
     title: {
       color: colors.white.main,
       ...typography.heading4,
-      marginBottom: 18,
 
       [theme.breakpoints.down('xs')]: {
         fontSize: 18
@@ -91,6 +90,18 @@ const useStyles = makeStyles()(theme => {
     },
     switch: {
       transition: 'opacity 500ms'
+    },
+    titleContainer: {
+      width: 'calc(50% - 12px)',
+      marginBottom: 18,
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+
+      [theme.breakpoints.down('lg')]: {
+        width: '100%'
+      }
     }
   }
 })
