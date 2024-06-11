@@ -234,7 +234,7 @@ export const AmountInput: React.FC<IProps> = ({
               ) : tokenPrice ? (
                 <>
                   <Typography className={classes.caption2}>
-                    ~${formatNumber(usdBalance.toFixed(2)) + showPrefix(usdBalance)}
+                    ~${formatNumber(usdBalance.toFixed(2))}
                   </Typography>
                 </>
               ) : (
