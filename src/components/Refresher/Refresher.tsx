@@ -4,9 +4,10 @@ import { useStyles } from './style'
 type Props = {
   currentIndex: number
   maxIndex: number
+  onClick: () => void
 }
 
-export const Refresher = ({ currentIndex, maxIndex }: Props) => {
+export const Refresher = ({ currentIndex, maxIndex, onClick }: Props) => {
   const [circumference, setCircumference] = useState(0)
   const circleRef = createRef<SVGCircleElement>()
 
@@ -29,7 +30,7 @@ export const Refresher = ({ currentIndex, maxIndex }: Props) => {
   }, [circleRef, currentIndex, maxIndex])
 
   return (
-    <svg width='20' height='20'>
+    <svg className={classes.ring} width='20' height='20' onClick={onClick}>
       <circle stroke='#3A466B' strokeWidth='2' fill='transparent' r='8' cx='10' cy='10' />
       <circle
         className={classes.innerCircle}

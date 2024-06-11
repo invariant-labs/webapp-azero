@@ -141,7 +141,7 @@ export const Swap: React.FC<ISwap> = ({
   const [detailsOpen, setDetailsOpen] = React.useState<boolean>(false)
   const [inputRef, setInputRef] = React.useState<string>(inputTarget.FROM)
   const [rateReversed, setRateReversed] = React.useState<boolean>(false)
-  const [refresherTime, setRefresherTime] = React.useState<number>(0)
+  const [refresherTime, setRefresherTime] = React.useState<number>(REFRESHER_INTERVAL)
 
   const timeoutRef = useRef<number>(0)
   const dispatch = useDispatch()
@@ -224,8 +224,6 @@ export const Swap: React.FC<ISwap> = ({
         setAmountFrom(+amount === 0 ? '' : trimLeadingZeros(amount))
       }
     }
-
-    setRefresherTime(REFRESHER_INTERVAL)
   }, [simulateResult])
 
   useEffect(() => {
@@ -419,6 +417,7 @@ export const Swap: React.FC<ISwap> = ({
 
   const handleRefresh = async () => {
     onRefresh(tokenFromIndex, tokenToIndex)
+    setRefresherTime(REFRESHER_INTERVAL)
   }
 
   useEffect(() => {
@@ -580,46 +579,50 @@ export const Swap: React.FC<ISwap> = ({
           />
         </Box>
         <Box className={classes.transactionDetails}>
-          <button
-            onClick={
-              tokenFromIndex !== null &&
-              tokenToIndex !== null &&
-              hasShowRateMessage() &&
-              amountFrom !== '' &&
-              amountTo !== ''
-                ? handleOpenTransactionDetails
-                : undefined
-            }
-            className={
-              tokenFromIndex !== null &&
-              tokenToIndex !== null &&
-              hasShowRateMessage() &&
-              amountFrom !== '' &&
-              amountTo !== ''
-                ? classes.HiddenTransactionButton
-                : classes.transactionDetailDisabled
-            }>
-            <Grid className={classes.transactionDetailsWrapper}>
-              <Typography className={classes.transactionDetailsHeader}>
-                See transaction details
-              </Typography>
-              <CardMedia image={infoIcon} className={classes.infoIcon} />
-            </Grid>
-          </button>
+          <Grid className={classes.exchangeRateContainer}>
+            <button
+              onClick={
+                tokenFromIndex !== null &&
+                tokenToIndex !== null &&
+                hasShowRateMessage() &&
+                amountFrom !== '' &&
+                amountTo !== ''
+                  ? handleOpenTransactionDetails
+                  : undefined
+              }
+              className={
+                tokenFromIndex !== null &&
+                tokenToIndex !== null &&
+                hasShowRateMessage() &&
+                amountFrom !== '' &&
+                amountTo !== ''
+                  ? classes.HiddenTransactionButton
+                  : classes.transactionDetailDisabled
+              }>
+              <Grid className={classes.transactionDetailsWrapper}>
+                <Typography className={classes.transactionDetailsHeader}>
+                  See transaction details
+                </Typography>
+                <CardMedia image={infoIcon} className={classes.infoIcon} />
+              </Grid>
+            </button>
+            <Refresher
+              currentIndex={refresherTime}
+              maxIndex={REFRESHER_INTERVAL}
+              onClick={handleRefresh}
+            />
+          </Grid>
           {canShowDetails ? (
-            <Grid className={classes.exchangeRateContainer}>
-              <Refresher currentIndex={refresherTime} maxIndex={REFRESHER_INTERVAL} />
-              <ExchangeRate
-                onClick={() => setRateReversed(!rateReversed)}
-                tokenFromSymbol={tokens[rateReversed ? tokenToIndex : tokenFromIndex].symbol}
-                tokenToSymbol={tokens[rateReversed ? tokenFromIndex : tokenToIndex].symbol}
-                amount={rateReversed ? 1 / swapRate : swapRate}
-                tokenToDecimals={Number(
-                  tokens[rateReversed ? tokenFromIndex : tokenToIndex].decimals
-                )}
-                loading={getStateMessage() === 'Loading'}
-              />
-            </Grid>
+            <ExchangeRate
+              onClick={() => setRateReversed(!rateReversed)}
+              tokenFromSymbol={tokens[rateReversed ? tokenToIndex : tokenFromIndex].symbol}
+              tokenToSymbol={tokens[rateReversed ? tokenFromIndex : tokenToIndex].symbol}
+              amount={rateReversed ? 1 / swapRate : swapRate}
+              tokenToDecimals={Number(
+                tokens[rateReversed ? tokenFromIndex : tokenToIndex].decimals
+              )}
+              loading={getStateMessage() === 'Loading'}
+            />
           ) : null}
         </Box>
         <TransactionDetailsBox
