@@ -83,14 +83,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const isMountedRef = useRef(false)
 
   useEffect(() => {
-    if (tokenAIndex !== null && tokenBIndex !== null) {
-      const tokenFrom = isXtoY ? tokens[tokenAIndex].assetAddress : tokens[tokenBIndex].assetAddress
-      const tokenTo = isXtoY ? tokens[tokenBIndex].assetAddress : tokens[tokenAIndex].assetAddress
-      dispatch(poolsActions.getTicksAndTickMaps({ tokenFrom, tokenTo, allPools }))
-    }
-  }, [tokenAIndex, tokenBIndex, allPools])
-
-  useEffect(() => {
     dispatch(poolsActions.getPoolKeys())
   }, [])
 
@@ -242,7 +234,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         )
       }
     }
-  }, [isWaitingForNewPool, tokenAIndex, tokenBIndex, feeIndex, poolIndex, poolKey, walletStatus])
+  }, [isWaitingForNewPool, tokenAIndex, tokenBIndex, feeIndex, poolKey, walletStatus])
 
   useEffect(() => {
     if (poolsData[poolKey]) {

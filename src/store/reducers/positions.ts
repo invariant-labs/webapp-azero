@@ -130,6 +130,7 @@ const positionsSlice = createSlice({
       return state
     },
     getCurrentPlotTicks(state, action: PayloadAction<GetCurrentTicksData>) {
+      state.plotTicks.hasError = false
       state.plotTicks.loading = !action.payload.disableLoading
       return state
     },
