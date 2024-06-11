@@ -3,6 +3,7 @@ import { calculateTokenAmountsWithSlippage } from '@invariant-labs/a0-sdk/src/ut
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
 import {
+  ErrorMessage,
   INVARIANT_CLAIM_FEE_OPTIONS,
   INVARIANT_CREATE_POOL_OPTIONS,
   INVARIANT_CREATE_POSITION_OPTIONS,
@@ -17,6 +18,7 @@ import {
   createLoaderKey,
   createPlaceholderLiquidityPlot,
   deserializeTickmap,
+  isErrorMessage,
   poolKeyToString
 } from '@store/consts/utils'
 import { FetchTicksAndTickMaps, ListType, actions as poolsActions } from '@store/reducers/pools'
@@ -143,9 +145,14 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       })
     )
 
-    const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
-      signer: adapter.signer as Signer
-    })
+    let signedBatchedTx: any
+    try {
+      signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
+        signer: adapter.signer as Signer
+      })
+    } catch (e) {
+      throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
+    }
 
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
@@ -169,8 +176,8 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     yield put(actions.getPositionsList())
 
     yield* call(fetchBalances, [tokenX, tokenY])
-  } catch (error) {
-    console.log(error)
+  } catch (e: any) {
+    console.log(e)
 
     yield* put(actions.setInitPositionSuccess(false))
 
@@ -179,13 +186,23 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
 
-    yield put(
-      snackbarsActions.add({
-        message: 'Failed to send. Please try again.',
-        variant: 'error',
-        persist: false
-      })
-    )
+    if (isErrorMessage(e.message)) {
+      yield put(
+        snackbarsActions.add({
+          message: e.message,
+          variant: 'error',
+          persist: false
+        })
+      )
+    } else {
+      yield put(
+        snackbarsActions.add({
+          message: 'Failed to send. Please try again.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    }
   }
 }
 
@@ -317,9 +334,15 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
       })
     )
 
-    const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
-      signer: adapter.signer as Signer
-    })
+    let signedBatchedTx: any
+
+    try {
+      signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
+        signer: adapter.signer as Signer
+      })
+    } catch (e) {
+      throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
+    }
 
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
@@ -345,8 +368,8 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     yield put(actions.getPositionsList())
 
     yield* call(fetchBalances, [tokenX === TESTNET_WAZERO_ADDRESS ? tokenY : tokenX])
-  } catch (error) {
-    console.log(error)
+  } catch (e: any) {
+    console.log(e)
 
     yield* put(actions.setInitPositionSuccess(false))
 
@@ -355,13 +378,23 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
 
-    yield put(
-      snackbarsActions.add({
-        message: 'Failed to send. Please try again.',
-        variant: 'error',
-        persist: false
-      })
-    )
+    if (isErrorMessage(e.message)) {
+      yield put(
+        snackbarsActions.add({
+          message: e.message,
+          variant: 'error',
+          persist: false
+        })
+      )
+    } else {
+      yield put(
+        snackbarsActions.add({
+          message: 'Failed to send. Please try again.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    }
   }
 }
 
@@ -562,9 +595,14 @@ export function* handleClaimFee(action: PayloadAction<HandleClaimFee>) {
       })
     )
 
-    const signedTx = yield* call([tx, tx.signAsync], walletAddress, {
-      signer: adapter.signer as Signer
-    })
+    let signedTx: any
+    try {
+      signedTx = yield* call([tx, tx.signAsync], walletAddress, {
+        signer: adapter.signer as Signer
+      })
+    } catch (e) {
+      throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
+    }
 
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
@@ -587,19 +625,29 @@ export function* handleClaimFee(action: PayloadAction<HandleClaimFee>) {
     yield* call(fetchBalances, [
       addressTokenX === TESTNET_WAZERO_ADDRESS ? addressTokenY : addressTokenX
     ])
-  } catch (e) {
+  } catch (e: any) {
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
     closeSnackbar(loaderKey)
     yield put(snackbarsActions.remove(loaderKey))
 
-    yield put(
-      snackbarsActions.add({
-        message: 'Failed to claim fee. Please try again.',
-        variant: 'error',
-        persist: false
-      })
-    )
+    if (isErrorMessage(e.message)) {
+      yield put(
+        snackbarsActions.add({
+          message: e.message,
+          variant: 'error',
+          persist: false
+        })
+      )
+    } else {
+      yield put(
+        snackbarsActions.add({
+          message: 'Failed to claim fee. Please try again.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    }
 
     console.log(e)
   }
@@ -671,9 +719,14 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<HandleClaimFee>) 
       })
     )
 
-    const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
-      signer: adapter.signer as Signer
-    })
+    let signedBatchedTx: any
+    try {
+      signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
+        signer: adapter.signer as Signer
+      })
+    } catch (e) {
+      throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
+    }
 
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
@@ -694,19 +747,29 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<HandleClaimFee>) 
     yield put(actions.getSinglePosition(index))
 
     yield* call(fetchBalances, [addressTokenX, addressTokenY])
-  } catch (e) {
+  } catch (e: any) {
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
     closeSnackbar(loaderKey)
     yield put(snackbarsActions.remove(loaderKey))
 
-    yield put(
-      snackbarsActions.add({
-        message: 'Failed to claim fee. Please try again.',
-        variant: 'error',
-        persist: false
-      })
-    )
+    if (isErrorMessage(e.message)) {
+      yield put(
+        snackbarsActions.add({
+          message: e.message,
+          variant: 'error',
+          persist: false
+        })
+      )
+    } else {
+      yield put(
+        snackbarsActions.add({
+          message: 'Failed to close position. Please try again.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    }
 
     console.log(e)
   }
@@ -787,9 +850,14 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
       })
     )
 
-    const signedTx = yield* call([tx, tx.signAsync], walletAddress, {
-      signer: adapter.signer as Signer
-    })
+    let signedTx: any
+    try {
+      signedTx = yield* call([tx, tx.signAsync], walletAddress, {
+        signer: adapter.signer as Signer
+      })
+    } catch (e) {
+      throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
+    }
 
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
@@ -811,19 +879,29 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
     onSuccess()
 
     yield* call(fetchBalances, [addressTokenX, addressTokenY])
-  } catch (e) {
+  } catch (e: any) {
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
     closeSnackbar(loaderKey)
     yield put(snackbarsActions.remove(loaderKey))
 
-    yield put(
-      snackbarsActions.add({
-        message: 'Failed to close position. Please try again.',
-        variant: 'error',
-        persist: false
-      })
-    )
+    if (isErrorMessage(e.message)) {
+      yield put(
+        snackbarsActions.add({
+          message: e.message,
+          variant: 'error',
+          persist: false
+        })
+      )
+    } else {
+      yield put(
+        snackbarsActions.add({
+          message: 'Failed to close position. Please try again.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    }
 
     console.log(e)
   }
@@ -882,9 +960,14 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
       })
     )
 
-    const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
-      signer: adapter.signer as Signer
-    })
+    let signedBatchedTx: any
+    try {
+      signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
+        signer: adapter.signer as Signer
+      })
+    } catch (e) {
+      throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
+    }
 
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
@@ -906,19 +989,29 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
     onSuccess()
 
     yield* call(fetchBalances, [addressTokenX, addressTokenY])
-  } catch (e) {
+  } catch (e: any) {
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
     closeSnackbar(loaderKey)
     yield put(snackbarsActions.remove(loaderKey))
 
-    yield put(
-      snackbarsActions.add({
-        message: 'Failed to close position. Please try again.',
-        variant: 'error',
-        persist: false
-      })
-    )
+    if (isErrorMessage(e.message)) {
+      yield put(
+        snackbarsActions.add({
+          message: e.message,
+          variant: 'error',
+          persist: false
+        })
+      )
+    } else {
+      yield put(
+        snackbarsActions.add({
+          message: 'Failed to close position. Please try again.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    }
 
     console.log(e)
   }

@@ -10,6 +10,7 @@ import { MAX_SQRT_PRICE, PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
 import {
+  ErrorMessage,
   INVARIANT_SWAP_OPTIONS,
   INVARIANT_WITHDRAW_ALL_WAZERO,
   PSP22_APPROVE_OPTIONS,
@@ -22,6 +23,7 @@ import {
   createLoaderKey,
   deserializeTickmap,
   findPairs,
+  isErrorMessage,
   poolKeyToString,
   printBigint
 } from '@store/consts/utils'
@@ -142,9 +144,14 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
       })
     )
 
-    const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
-      signer: adapter.signer as Signer
-    })
+    let signedBatchedTx: any
+    try {
+      signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
+        signer: adapter.signer as Signer
+      })
+    } catch (e) {
+      throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
+    }
 
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
@@ -173,8 +180,9 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
         second: tokenTo
       })
     )
-  } catch (error) {
-    console.log(error)
+  } catch (e: any) {
+    console.log(e.message)
+    console.log(e)
 
     yield put(actions.setSwapSuccess(false))
 
@@ -183,13 +191,23 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
 
-    yield put(
-      snackbarsActions.add({
-        message: 'Tokens swapping failed. Please try again.',
-        variant: 'error',
-        persist: false
-      })
-    )
+    if (isErrorMessage(e.message)) {
+      yield put(
+        snackbarsActions.add({
+          message: e.message,
+          variant: 'error',
+          persist: false
+        })
+      )
+    } else {
+      yield put(
+        snackbarsActions.add({
+          message: 'Tokens swapping failed. Please try again.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    }
 
     yield put(
       poolActions.getAllPoolsForPairData({
@@ -330,9 +348,14 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
       })
     )
 
-    const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
-      signer: adapter.signer as Signer
-    })
+    let signedBatchedTx: any
+    try {
+      signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
+        signer: adapter.signer as Signer
+      })
+    } catch (e) {
+      throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
+    }
 
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
@@ -363,8 +386,8 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
         second: tokenTo
       })
     )
-  } catch (error) {
-    console.log(error)
+  } catch (e: any) {
+    console.log(e)
 
     yield put(actions.setSwapSuccess(false))
 
@@ -373,13 +396,23 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
 
-    yield put(
-      snackbarsActions.add({
-        message: 'Tokens swapping failed. Please try again.',
-        variant: 'error',
-        persist: false
-      })
-    )
+    if (isErrorMessage(e.message)) {
+      yield put(
+        snackbarsActions.add({
+          message: e.message,
+          variant: 'error',
+          persist: false
+        })
+      )
+    } else {
+      yield put(
+        snackbarsActions.add({
+          message: 'Tokens swapping failed. Please try again.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    }
 
     yield put(
       poolActions.getAllPoolsForPairData({

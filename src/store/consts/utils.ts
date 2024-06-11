@@ -19,11 +19,11 @@ import { ApiPromise } from '@polkadot/api'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
 import { SwapError } from '@store/sagas/swap'
+import apiSingleton from '@store/services/apiSingleton'
 import invariantSingleton from '@store/services/invariantSingleton'
 import psp22Singleton from '@store/services/psp22Singleton'
-import apiSingleton from '@store/services/apiSingleton'
 import axios from 'axios'
-import { BTC, ETH, Token, TokenPriceData, USDC, tokensPrices } from './static'
+import { BTC, ETH, ErrorMessage, Token, TokenPriceData, USDC, tokensPrices } from './static'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -786,6 +786,10 @@ export const createLiquidityPlot = (
   }
 
   return isXtoY ? ticksData : ticksData.reverse()
+}
+
+export const isErrorMessage = (value: any): boolean => {
+  return Object.values(ErrorMessage).includes(value)
 }
 
 export const getNewTokenOrThrow = async (

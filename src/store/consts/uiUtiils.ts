@@ -38,5 +38,5 @@ export const initialXtoY = (tokenXAddress?: string, tokenYAddress?: string) => {
 }
 
 export const parsePathFeeToFeeString = (pathFee: string): string => {
-  return (+pathFee.replace('_', '') * Math.pow(10, Number(PERCENTAGE_SCALE) - 4)).toString()
+  return (+pathFee.replace('_', '') * Math.pow(10, Number(PERCENTAGE_SCALE) - 2)).toString()
 }
