@@ -23,7 +23,6 @@ import {
   getCoingeckoTokenPrice,
   getMockedTokenPrice,
   getNewTokenOrThrow,
-  getTokenDataByAddresses,
   poolKeyToString,
   printBigint
 } from '@store/consts/utils'
