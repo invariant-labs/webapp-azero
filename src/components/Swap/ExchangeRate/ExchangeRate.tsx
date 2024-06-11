@@ -1,5 +1,6 @@
 import { Box, Typography } from '@mui/material'
 import loadingAnimation from '@static/gif/loading.gif'
+import { formatNumber } from '@store/consts/utils'
 import React from 'react'
 import useStyles from './style'
 
@@ -28,7 +29,8 @@ const ExchangeRate: React.FC<iProps> = ({
       </Box>
     ) : (
       <Typography className={classes.rateText} onClick={onClick}>
-        1 {tokenFromSymbol} = {isNaN(amount) ? 0 : amount.toFixed(tokenToDecimals)} {tokenToSymbol}
+        1 {tokenFromSymbol} = {isNaN(amount) ? 0 : formatNumber(amount.toFixed(tokenToDecimals))}{' '}
+        {tokenToSymbol}
       </Typography>
     )
   }
