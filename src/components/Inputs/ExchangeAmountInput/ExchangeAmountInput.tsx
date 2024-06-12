@@ -191,6 +191,7 @@ export const AmountInput: React.FC<IProps> = ({
           disableUnderline={true}
           placeholder={placeholder}
           onChange={allowOnlyDigitsAndTrimUnnecessaryZeros}
+          disabled={disabled}
         />
       </Grid>
       {!hideBalances && (
