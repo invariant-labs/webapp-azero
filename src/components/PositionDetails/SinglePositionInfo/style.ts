@@ -193,7 +193,8 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    padding: '8px 13px'
+    padding: '8px 13px',
+    minWidth: 'fit-content'
   },
   tokenName: {
     color: colors.white.main,
@@ -201,10 +202,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     fontWeight: 400
   },
   tokenValue: {
+    display: 'inline-block',
     color: colors.invariant.lightGrey,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignSelf: 'center',
+    overflow: 'auto',
     ...typography.heading2
   },
   tokenBalance: {
