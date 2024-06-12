@@ -2,6 +2,7 @@ import AnimatedButton, { ProgressState } from '@components/AnimatedButton/Animat
 import ChangeWalletButton from '@components/Header/HeaderButton/ChangeWalletButton'
 import ExchangeAmountInput from '@components/Inputs/ExchangeAmountInput/ExchangeAmountInput'
 import Slippage from '@components/Modals/Slippage/Slippage'
+import Refresher from '@components/Refresher/Refresher'
 import { PoolKey, Price, Tick, TokenAmount } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
 import { Box, Button, CardMedia, Grid, Typography } from '@mui/material'
@@ -10,7 +11,7 @@ import infoIcon from '@static/svg/info.svg'
 import refreshIcon from '@static/svg/refresh.svg'
 import settingIcon from '@static/svg/settings.svg'
 import SwapArrows from '@static/svg/swap-arrows.svg'
-import { TokenPriceData } from '@store/consts/static'
+import { REFRESHER_INTERVAL, TokenPriceData } from '@store/consts/static'
 import {
   SimulateResult,
   convertBalanceToBigint,
@@ -139,6 +140,7 @@ export const Swap: React.FC<ISwap> = ({
   const [detailsOpen, setDetailsOpen] = React.useState<boolean>(false)
   const [inputRef, setInputRef] = React.useState<string>(inputTarget.FROM)
   const [rateReversed, setRateReversed] = React.useState<boolean>(false)
+  const [refresherTime, setRefresherTime] = React.useState<number>(REFRESHER_INTERVAL)
 
   const timeoutRef = useRef<number>(0)
   const dispatch = useDispatch()
@@ -222,6 +224,18 @@ export const Swap: React.FC<ISwap> = ({
       }
     }
   }, [simulateResult])
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (refresherTime > 0) {
+        setRefresherTime(refresherTime - 1)
+      } else {
+        handleRefresh()
+      }
+    }, 1000)
+
+    return () => clearTimeout(timeout)
+  }, [refresherTime])
 
   useEffect(() => {
     updateEstimatedAmount()
@@ -402,6 +416,7 @@ export const Swap: React.FC<ISwap> = ({
 
   const handleRefresh = async () => {
     onRefresh(tokenFromIndex, tokenToIndex)
+    setRefresherTime(REFRESHER_INTERVAL)
   }
 
   useEffect(() => {
@@ -563,32 +578,39 @@ export const Swap: React.FC<ISwap> = ({
           />
         </Box>
         <Box className={classes.transactionDetails}>
-          <button
-            onClick={
-              tokenFromIndex !== null &&
-              tokenToIndex !== null &&
-              hasShowRateMessage() &&
-              amountFrom !== '' &&
-              amountTo !== ''
-                ? handleOpenTransactionDetails
-                : undefined
-            }
-            className={
-              tokenFromIndex !== null &&
-              tokenToIndex !== null &&
-              hasShowRateMessage() &&
-              amountFrom !== '' &&
-              amountTo !== ''
-                ? classes.HiddenTransactionButton
-                : classes.transactionDetailDisabled
-            }>
-            <Grid className={classes.transactionDetailsWrapper}>
-              <Typography className={classes.transactionDetailsHeader}>
-                See transaction details
-              </Typography>
-              <CardMedia image={infoIcon} className={classes.infoIcon} />
-            </Grid>
-          </button>
+          <Grid className={classes.exchangeRateContainer}>
+            <button
+              onClick={
+                tokenFromIndex !== null &&
+                tokenToIndex !== null &&
+                hasShowRateMessage() &&
+                amountFrom !== '' &&
+                amountTo !== ''
+                  ? handleOpenTransactionDetails
+                  : undefined
+              }
+              className={
+                tokenFromIndex !== null &&
+                tokenToIndex !== null &&
+                hasShowRateMessage() &&
+                amountFrom !== '' &&
+                amountTo !== ''
+                  ? classes.HiddenTransactionButton
+                  : classes.transactionDetailDisabled
+              }>
+              <Grid className={classes.transactionDetailsWrapper}>
+                <Typography className={classes.transactionDetailsHeader}>
+                  See transaction details
+                </Typography>
+                <CardMedia image={infoIcon} className={classes.infoIcon} />
+              </Grid>
+            </button>
+            <Refresher
+              currentIndex={refresherTime}
+              maxIndex={REFRESHER_INTERVAL}
+              onClick={handleRefresh}
+            />
+          </Grid>
           {canShowDetails ? (
             <ExchangeRate
               onClick={() => setRateReversed(!rateReversed)}

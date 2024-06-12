@@ -269,3 +269,5 @@ export const POOL_SAFE_TRANSACTION_FEE = BigInt(Math.ceil(0.05 * 10 ** 12))
 export enum ErrorMessage {
   TRANSACTION_SIGNING_ERROR = 'Error while signing transaction.'
 }
+
+export const REFRESHER_INTERVAL = 20
