@@ -51,6 +51,7 @@ export interface GetCurrentTicksData {
   poolKey: PoolKey
   isXtoY: boolean
   disableLoading?: boolean
+  fetchTicksAndTickmap?: boolean
 }
 
 export interface ClosePositionData {

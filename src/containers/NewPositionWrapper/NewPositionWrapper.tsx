@@ -29,7 +29,7 @@ import {
 import { actions as poolsActions } from '@store/reducers/pools'
 import { TickPlotPositionData, actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import { actions as walletActions, Status } from '@store/reducers/wallet'
+import { Status, actions as walletActions } from '@store/reducers/wallet'
 import { networkType, rpcAddress } from '@store/selectors/connection'
 import {
   isLoadingLatestPoolsForTransaction,
@@ -241,12 +241,22 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         dispatch(
           positionsActions.getCurrentPlotTicks({
             poolKey: allPoolKeys[poolKey],
-            isXtoY
+            isXtoY,
+            fetchTicksAndTickmap: true
           })
         )
       }
     }
-  }, [isWaitingForNewPool, tokenAIndex, tokenBIndex, feeIndex, poolKey, walletStatus, allPoolKeys])
+  }, [
+    isWaitingForNewPool,
+    tokenAIndex,
+    tokenBIndex,
+    feeIndex,
+    poolKey,
+    walletStatus,
+    allPoolKeys,
+    allPools
+  ])
 
   useEffect(() => {
     if (poolsData[poolKey]) {
