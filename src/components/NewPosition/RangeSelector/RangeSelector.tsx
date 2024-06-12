@@ -238,14 +238,10 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   useEffect(() => {
     if (currentPairReversed !== null && isMountedRef.current) {
       reversePlot()
-    }
-  }, [currentPairReversed])
-
-  useEffect(() => {
-    if (!ticksLoading && isMountedRef.current) {
+    } else if (!ticksLoading && isMountedRef.current) {
       resetPlot()
     }
-  }, [ticksLoading, midPrice])
+  }, [ticksLoading, midPrice, currentPairReversed])
 
   const autoZoomHandler = (left: bigint, right: bigint, canZoomCloser: boolean = false) => {
     const leftX = calcPrice(left, isXtoY, xDecimal, yDecimal)

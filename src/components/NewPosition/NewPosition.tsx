@@ -196,7 +196,7 @@ export const NewPosition: React.FC<INewPosition> = ({
   const noRangePlaceholderProps = {
     data: Array(100)
       .fill(1)
-      .map((_e, index) => ({ x: index, y: index, index: BigInt(index) })),
+      .map((_e, index) => ({ x: 0, y: 0, index: BigInt(index) })),
     midPrice: {
       x: 50,
       index: 50n
