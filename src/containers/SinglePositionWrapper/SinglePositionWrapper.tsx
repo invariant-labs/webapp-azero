@@ -16,7 +16,7 @@ import {
 import { actions as poolsActions } from '@store/reducers/pools'
 import { actions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import { Status } from '@store/reducers/wallet'
+import { Status, actions as walletActions } from '@store/reducers/wallet'
 import { networkType } from '@store/selectors/connection'
 import { poolsArraySortedByFees } from '@store/selectors/pools'
 import {
@@ -310,6 +310,8 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
           fetchTicksAndTickmap: true
         })
       )
+
+      dispatch(walletActions.getBalances([position?.poolKey.tokenX, position?.poolKey.tokenY]))
     }
   }
 
