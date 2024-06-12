@@ -5,13 +5,14 @@ type Props = {
   currentIndex: number
   maxIndex: number
   onClick: () => void
+  disabled?: boolean
 }
 
-export const Refresher = ({ currentIndex, maxIndex, onClick }: Props) => {
+export const Refresher = ({ currentIndex, maxIndex, onClick, disabled }: Props) => {
   const [circumference, setCircumference] = useState(0)
   const circleRef = createRef<SVGCircleElement>()
 
-  const { classes } = useStyles()
+  const { classes } = useStyles({ disabled: disabled })
 
   useEffect(() => {
     if (circleRef.current) {
@@ -30,20 +31,23 @@ export const Refresher = ({ currentIndex, maxIndex, onClick }: Props) => {
   }, [circleRef, currentIndex, maxIndex])
 
   return (
-    <svg className={classes.ring} width='20' height='20' onClick={onClick}>
+    <svg className={classes.ring} width='20' height='20' onClick={!disabled ? onClick : () => {}}>
       <circle stroke='#3A466B' strokeWidth='2' fill='transparent' r='8' cx='10' cy='10' />
-      <circle
-        className={classes.innerCircle}
-        strokeDasharray='0'
-        strokeDashoffset='0'
-        stroke='#EF84F5'
-        strokeWidth='2'
-        fill='transparent'
-        r='8'
-        cx='10'
-        cy='10'
-        ref={circleRef}
-      />
+
+      {!disabled && (
+        <circle
+          className={classes.innerCircle}
+          strokeDasharray='0'
+          strokeDashoffset='0'
+          stroke='#EF84F5'
+          strokeWidth='2'
+          fill='transparent'
+          r='8'
+          cx='10'
+          cy='10'
+          ref={circleRef}
+        />
+      )}
     </svg>
   )
 }

@@ -1,8 +1,8 @@
 import { makeStyles } from 'tss-react/mui'
 
-export const useStyles = makeStyles()(() => ({
+export const useStyles = makeStyles<{ disabled?: boolean }>()((_theme, { disabled }) => ({
   ring: {
-    cursor: 'pointer'
+    cursor: disabled ? 'default' : 'pointer'
   },
   innerCircle: {
     transition: '0.35s stroke-dashoffset',

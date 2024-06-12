@@ -238,6 +238,11 @@ export const Swap: React.FC<ISwap> = ({
   }, [refresherTime])
 
   useEffect(() => {
+    if (walletStatus === Status.Initialized) {
+      handleRefresh()
+    }
+  }, [walletStatus])
+  useEffect(() => {
     updateEstimatedAmount()
   }, [tokenToIndex, tokenFromIndex, pools.length])
 
@@ -614,6 +619,7 @@ export const Swap: React.FC<ISwap> = ({
               currentIndex={refresherTime}
               maxIndex={REFRESHER_INTERVAL}
               onClick={handleRefresh}
+              disabled={walletStatus !== Status.Initialized}
             />
           </Grid>
           {canShowDetails ? (
