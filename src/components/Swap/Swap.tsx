@@ -259,7 +259,12 @@ export const Swap: React.FC<ISwap> = ({
   }
 
   const setSimulateAmount = async () => {
-    if (tokenFromIndex !== null && tokenToIndex !== null && swapData) {
+    if (
+      tokenFromIndex !== null &&
+      tokenToIndex !== null &&
+      tokenFromIndex !== tokenToIndex &&
+      swapData
+    ) {
       if (inputRef === inputTarget.FROM) {
         dispatch(
           actions.getSimulateResult({
