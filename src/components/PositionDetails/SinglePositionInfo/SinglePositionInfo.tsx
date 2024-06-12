@@ -8,7 +8,6 @@ import React, { useState } from 'react'
 import { BoxInfo } from './BoxInfo'
 import { ILiquidityToken } from './consts'
 import useStyles from './style'
-import { parseFeeToPathFee } from '@store/consts/utils'
 import { addressToTicker } from '@store/consts/uiUtiils'
 import { useNavigate } from 'react-router-dom'
 
