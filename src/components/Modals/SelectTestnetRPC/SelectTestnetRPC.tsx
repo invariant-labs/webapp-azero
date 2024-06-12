@@ -1,11 +1,11 @@
+import { Network } from '@invariant-labs/a0-sdk'
+import DotIcon from '@mui/icons-material/FiberManualRecord'
+import { Button, Grid, Input, Popover, Typography } from '@mui/material'
 import icons from '@static/icons'
+import { ISelectNetwork } from '@store/consts/types'
 import classNames from 'classnames'
 import React, { useState } from 'react'
 import useStyles from './styles'
-import { ISelectNetwork } from '@store/consts/types'
-import { Button, Grid, Input, Popover, Typography } from '@mui/material'
-import DotIcon from '@mui/icons-material/FiberManualRecord'
-import { Network } from '@invariant-labs/a0-sdk'
 
 export interface ISelectTestnetRPC {
   networks: ISelectNetwork[]
@@ -30,7 +30,7 @@ export const SelectTestnetRPC: React.FC<ISelectTestnetRPC> = ({
   )
 
   const isAddressValid = () => {
-    const urlRegex = /^https?:\/\/[^.]+\.[^.]+/
+    const urlRegex = /^wss?:\/\/[^.]+\.[^.]+/
 
     return urlRegex.test(address)
   }
