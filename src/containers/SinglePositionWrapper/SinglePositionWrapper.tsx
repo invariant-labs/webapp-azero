@@ -300,6 +300,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   }, [])
 
   const onRefresh = () => {
+    setShowFeesLoader(true)
     dispatch(actions.getSinglePosition(id))
 
     if (position) {
