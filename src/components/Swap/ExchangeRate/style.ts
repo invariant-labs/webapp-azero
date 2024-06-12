@@ -10,7 +10,7 @@ export const useStyles = makeStyles()(() => ({
     textOverflow: 'ellipsis',
     overflow: 'hidden',
 
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       ...typography.tiny2
     }
   },

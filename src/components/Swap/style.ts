@@ -6,7 +6,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   swapWrapper: {
     display: 'flex',
     flexDirection: 'column',
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       padding: '0 16px'
     }
   },
@@ -101,7 +101,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     borderRadius: '16px !important',
     width: '100%',
 
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       width: '100% !important'
     }
   },
@@ -116,7 +116,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   amountInputDown: {
     animation: 'slide-down 300ms linear',
 
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       animation: 'slide-down-xs 300ms linear'
     }
   },
@@ -124,7 +124,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   amountInputUp: {
     animation: 'slide-up 300ms linear',
 
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       animation: 'slide-up-xs 300ms linear'
     }
   },
@@ -145,7 +145,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     cursor: 'pointer',
     transition: 'background-color 200ms',
 
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       transform: 'translateX(-50%) translateY(-14%)'
     }
   },
@@ -197,7 +197,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     whiteSpace: 'nowrap',
     pointerEvents: 'none',
 
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       ...typography.tiny2
     }
   },
@@ -223,7 +223,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   transactionBottom: {
     marginTop: 10,
 
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       marginTop: 36
     }
   },

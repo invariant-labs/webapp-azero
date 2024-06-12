@@ -16,7 +16,7 @@ const useStyles = makeStyles()(() => ({
       background: `${colors.invariant.green} !important`
     },
 
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       ...typography.tiny2,
       width: 26,
       maxWidth: 26,

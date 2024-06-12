@@ -9,15 +9,15 @@ const useStyles = makeStyles()((theme: Theme) => {
       paddingInline: 138,
       minHeight: '70vh',
 
-      [theme.breakpoints.down('md')]: {
+      [theme.breakpoints.down('lg')]: {
         paddingInline: 36
       },
 
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.down('md')]: {
         paddingInline: 40
       },
 
-      [theme.breakpoints.down('xs')]: {
+      [theme.breakpoints.down('sm')]: {
         paddingInline: 16
       }
     }

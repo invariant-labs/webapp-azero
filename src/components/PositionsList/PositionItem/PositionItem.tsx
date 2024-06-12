@@ -185,7 +185,7 @@ export const PositionItem: React.FC<IPositionItem> = ({
       </Grid>
 
       <Grid container item className={classes.mdInfo} direction='row'>
-        <Hidden smDown>{feeFragment}</Hidden>
+        <Hidden mdDown>{feeFragment}</Hidden>
 
         <Grid
           container
@@ -219,7 +219,7 @@ export const PositionItem: React.FC<IPositionItem> = ({
           </Grid>
         </Grid>
 
-        <Hidden smDown>{valueFragment}</Hidden>
+        <Hidden mdDown>{valueFragment}</Hidden>
       </Grid>
     </Grid>
   )
