@@ -1,3 +1,4 @@
+import { theme } from '@static/theme'
 import { makeStyles } from 'tss-react/mui'
 
 export const useStyles = makeStyles()(() => ({
@@ -8,10 +9,18 @@ export const useStyles = makeStyles()(() => ({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'transparent',
-    paddingInline: 94
-  },
-  workInProgress: {
-    height: 231,
-    width: 799
+    paddingInline: 94,
+
+    [theme.breakpoints.down('lg')]: {
+      paddingInline: 36
+    },
+
+    [theme.breakpoints.down('md')]: {
+      paddingInline: 40
+    },
+
+    [theme.breakpoints.down('sm')]: {
+      paddingInline: 16
+    }
   }
 }))
