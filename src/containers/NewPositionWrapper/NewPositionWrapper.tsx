@@ -16,19 +16,21 @@ import {
   commonTokensForNetworks
 } from '@store/consts/static'
 import {
+  addNewTokenToLocalStorage,
   calcPrice,
   calcYPerXPriceBySqrtPrice,
   createPlaceholderLiquidityPlot,
   getCoingeckoTokenPrice,
   getMockedTokenPrice,
+  getNewTokenOrThrow,
   poolKeyToString,
   printBigint
 } from '@store/consts/utils'
 import { actions as poolsActions } from '@store/reducers/pools'
 import { TickPlotPositionData, actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import { Status } from '@store/reducers/wallet'
-import { networkType } from '@store/selectors/connection'
+import { actions as walletActions, Status } from '@store/reducers/wallet'
+import { networkType, rpcAddress } from '@store/selectors/connection'
 import {
   isLoadingLatestPoolsForTransaction,
   isLoadingTicksAndTickMaps,
@@ -37,7 +39,13 @@ import {
   poolsArraySortedByFees
 } from '@store/selectors/pools'
 import { initPosition, plotTicks } from '@store/selectors/positions'
-import { canCreateNewPool, canCreateNewPosition, status, swapTokens } from '@store/selectors/wallet'
+import {
+  address,
+  canCreateNewPool,
+  canCreateNewPosition,
+  status,
+  swapTokens
+} from '@store/selectors/wallet'
 import { openWalletSelectorModal } from '@utils/web3/selector'
 import { VariantType } from 'notistack'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
@@ -55,6 +63,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   initialFee
 }) => {
   const dispatch = useDispatch()
+  const walletAddress = useSelector(address)
   const tokens = useSelector(swapTokens)
   const walletStatus = useSelector(status)
   const allPools = useSelector(poolsArraySortedByFees)
@@ -66,9 +75,12 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const { data: ticksData, loading: ticksLoading, hasError: hasTicksError } = useSelector(plotTicks)
   const isFetchingNewPool = useSelector(isLoadingLatestPoolsForTransaction)
   const currentNetwork = useSelector(networkType)
+  const rpc = useSelector(rpcAddress)
 
   const canUserCreateNewPool = useSelector(canCreateNewPool())
   const canUserCreateNewPosition = useSelector(canCreateNewPosition())
+
+  const tokensList = useSelector(swapTokens)
 
   const [poolIndex, setPoolIndex] = useState<number | null>(null)
 
@@ -291,42 +303,40 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     localStorage.setItem('IS_PLOT_DISCRETE', val ? 'true' : 'false')
   }
 
-  // const addTokenHandler = (address: string) => {
-  //   if (
-  //     connection !== null &&
-  //     tokens.findIndex(token => token.address.toString() === address) === -1
-  //   ) {
-  //     getNewTokenOrThrow(address, connection)
-  //       .then(data => {
-  //         dispatch(poolsActions.addTokens(data))
-  //         addNewTokenToLocalStorage(address, currentNetwork)
-  //         dispatch(
-  //           snackbarsActions.add({
-  //             message: 'Token added to your list',
-  //             variant: 'success',
-  //             persist: false
-  //           })
-  //         )
-  //       })
-  //       .catch(() => {
-  //         dispatch(
-  //           snackbarsActions.add({
-  //             message: 'Token adding failed,
-  //             variant: 'error',
-  //             persist: false
-  //           })
-  //         )
-  //       })
-  //   } else {
-  //     dispatch(
-  //       snackbarsActions.add({
-  //         message: 'Token already exists on your list',
-  //         variant: 'info',
-  //         persist: false
-  //       })
-  //     )
-  //   }
-  // }
+  const addTokenHandler = async (address: string) => {
+    if (tokensList.findIndex(token => token.address.toString() === address) === -1) {
+      getNewTokenOrThrow(address, currentNetwork, rpc, walletAddress)
+        .then(data => {
+          dispatch(poolsActions.addTokens(data))
+          dispatch(walletActions.getSelectedTokens(Object.keys(data)))
+          addNewTokenToLocalStorage(address, currentNetwork)
+          dispatch(
+            snackbarsActions.add({
+              message: 'Token added to your list',
+              variant: 'success',
+              persist: false
+            })
+          )
+        })
+        .catch(() => {
+          dispatch(
+            snackbarsActions.add({
+              message: 'Token adding failed',
+              variant: 'error',
+              persist: false
+            })
+          )
+        })
+    } else {
+      dispatch(
+        snackbarsActions.add({
+          message: 'Token already exists on your list',
+          variant: 'info',
+          persist: false
+        })
+      )
+    }
+  }
 
   const copyPoolAddressHandler = (message: string, variant: VariantType) => {
     dispatch(
@@ -570,7 +580,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       }
       canCreateNewPool={canUserCreateNewPool}
       canCreateNewPosition={canUserCreateNewPosition}
-      handleAddToken={() => console.log('Add token mock function')} // TODO - add real data
+      handleAddToken={addTokenHandler}
       commonTokens={commonTokensForNetworks[currentNetwork]}
       initialOpeningPositionMethod={initialIsConcentrationOpening ? 'concentration' : 'range'}
       onPositionOpeningMethodChange={setPositionOpeningMethod}
