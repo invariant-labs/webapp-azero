@@ -1,16 +1,16 @@
-import React, { useCallback, useMemo, useRef } from 'react'
-import { Layer, ResponsiveLine } from '@nivo/line'
+import { Button, Grid, Typography, useMediaQuery } from '@mui/material'
 import { linearGradientDef } from '@nivo/core'
-import { colors, theme } from '@static/theme'
-import classNames from 'classnames'
+import { Layer, ResponsiveLine } from '@nivo/line'
+import loader from '@static/gif/loader.gif'
 import ZoomInIcon from '@static/svg/zoom-in-icon.svg'
 import ZoomOutIcon from '@static/svg/zoom-out-icon.svg'
-import Brush from './Brush/Brush'
-import loader from '@static/gif/loader.gif'
-import useStyles from './style'
-import { PlotTickData } from '@store/reducers/positions'
-import { Button, Grid, Typography, useMediaQuery } from '@mui/material'
+import { colors, theme } from '@static/theme'
 import { nearestTickIndex } from '@store/consts/utils'
+import { PlotTickData } from '@store/reducers/positions'
+import classNames from 'classnames'
+import React, { useCallback, useMemo, useRef } from 'react'
+import Brush from './Brush/Brush'
+import useStyles from './style'
 
 export type TickPlotPositionData = Omit<PlotTickData, 'y'>
 
@@ -392,6 +392,24 @@ export const PriceRangePlot: React.FC<IPriceRangePlot> = ({
         </Button>
       </Grid>
       <ResponsiveLine
+        sliceTooltip={() => <></>}
+        tooltip={() => <></>}
+        useMesh={false}
+        enableCrosshair={false}
+        enablePointLabel={false}
+        debugSlices={false}
+        enableSlices={false}
+        debugMesh={false}
+        areaBaselineValue={0}
+        pointBorderWidth={0}
+        areaBlendMode='normal'
+        crosshairType='x'
+        pointLabel=''
+        pointBorderColor=''
+        pointColor=''
+        lineWidth={2}
+        pointSize={2}
+        areaOpacity={0.2}
         data={[
           {
             id: 'less than range',
