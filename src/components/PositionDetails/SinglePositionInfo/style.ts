@@ -205,7 +205,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     display: 'inline-block',
     color: colors.invariant.lightGrey,
     alignSelf: 'center',
-    overflow: 'auto',
+    overflow: 'hidden',
     ...typography.heading2
   },
   tokenBalance: {
