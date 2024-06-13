@@ -1,15 +1,14 @@
-import React from 'react'
 import { Scrollbars } from 'rc-scrollbars'
+import React, { forwardRef } from 'react'
 import useStyles from './style'
 
 export interface IProps {
   onScroll?: (e: React.UIEvent<HTMLElement>) => void
-  ref?: React.LegacyRef<Scrollbars>
   style?: React.CSSProperties
   children: React.ReactNode
 }
 
-export const CustomScrollbar: React.FC<IProps> = props => {
+export const CustomScrollbar = forwardRef<React.LegacyRef<Scrollbars>, IProps>((props, ref) => {
   const { classes } = useStyles()
 
   return (
@@ -24,10 +23,11 @@ export const CustomScrollbar: React.FC<IProps> = props => {
         return <div className={classes.scrollbarTrack} />
       }}
       className={classes.hideScroll}
-      {...props}>
+      {...props}
+      ref={ref as any}>
       {props.children}
     </Scrollbars>
   )
-}
+})
 
 export default CustomScrollbar
