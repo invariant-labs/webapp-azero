@@ -202,10 +202,18 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     fontWeight: 400
   },
   tokenValue: {
-    display: 'inline-block',
+    overflowX: 'auto',
+    overflowY: 'hidden',
+    display: 'block',
+    whiteSpace: 'nowrap',
     color: colors.invariant.lightGrey,
     alignSelf: 'center',
-    overflow: 'hidden',
+
+    '&::-webkit-scrollbar': {
+      display: 'none',
+      scrollbarWidth: 'none',
+      msOverflowStyle: 'none'
+    },
     ...typography.heading2
   },
   tokenBalance: {
