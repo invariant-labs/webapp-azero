@@ -5,7 +5,7 @@ import Refresher from '@components/Refresher/Refresher'
 import { TokenAmount, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
 import { getConcentrationArray } from '@invariant-labs/a0-sdk/src/utils'
 import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
-import { Button, Grid, Typography } from '@mui/material'
+import { Button, Grid, Hidden, Typography } from '@mui/material'
 import { AddressOrPair } from '@polkadot/api/types'
 import backIcon from '@static/svg/back-arrow.svg'
 import settingIcon from '@static/svg/settings.svg'
@@ -489,23 +489,25 @@ export const NewPosition: React.FC<INewPosition> = ({
               copyPoolAddressHandler={copyPoolAddressHandler}
             />
           ) : null}
-          <ConcentrationTypeSwitch
-            onSwitch={val => {
-              if (val) {
-                setPositionOpeningMethod('concentration')
-                onPositionOpeningMethodChange('concentration')
-              } else {
-                setPositionOpeningMethod('range')
-                onPositionOpeningMethodChange('range')
-              }
-            }}
-            initialValue={initialOpeningPositionMethod === 'concentration' ? 0 : 1}
-            className={classes.switch}
-            style={{
-              opacity: poolKey ? 1 : 0
-            }}
-            disabled={poolKey === ''}
-          />
+          <Hidden mdDown>
+            <ConcentrationTypeSwitch
+              onSwitch={val => {
+                if (val) {
+                  setPositionOpeningMethod('concentration')
+                  onPositionOpeningMethodChange('concentration')
+                } else {
+                  setPositionOpeningMethod('range')
+                  onPositionOpeningMethodChange('range')
+                }
+              }}
+              className={classes.switch}
+              style={{
+                opacity: poolKey ? 1 : 0
+              }}
+              disabled={poolKey === ''}
+              currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
+            />
+          </Hidden>
           <Button onClick={handleClickSettings} className={classes.settingsIconBtn} disableRipple>
             <img src={settingIcon} className={classes.settingsIcon} />
           </Button>
@@ -648,7 +650,27 @@ export const NewPosition: React.FC<INewPosition> = ({
           minimumSliderIndex={minimumSliderIndex}
           positionOpeningMethod={positionOpeningMethod}
         />
-
+        <Hidden mdUp>
+          <Grid container justifyContent='end' mb={2}>
+            <ConcentrationTypeSwitch
+              onSwitch={val => {
+                if (val) {
+                  setPositionOpeningMethod('concentration')
+                  onPositionOpeningMethodChange('concentration')
+                } else {
+                  setPositionOpeningMethod('range')
+                  onPositionOpeningMethodChange('range')
+                }
+              }}
+              className={classes.switch}
+              style={{
+                opacity: poolKey ? 1 : 0
+              }}
+              disabled={poolKey === ''}
+              currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
+            />
+          </Grid>
+        </Hidden>
         {isCurrentPoolExisting ||
         tokenAIndex === null ||
         tokenBIndex === null ||

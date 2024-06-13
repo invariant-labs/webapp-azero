@@ -41,7 +41,7 @@ const useStyles = makeStyles()(theme => {
       flex: '1 1 0%',
       gap: 12,
 
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.down('md')]: {
         '&:first-of-type': {
           marginRight: 0,
           marginBottom: 8
@@ -59,7 +59,7 @@ const useStyles = makeStyles()(theme => {
       backgroundColor: colors.invariant.light,
       borderRadius: 11,
 
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.down('md')]: {
         '&:first-of-type': {
           marginRight: 0,
           marginBottom: 8
@@ -76,7 +76,7 @@ const useStyles = makeStyles()(theme => {
       height: '100%',
       backgroundColor: 'rgba(11, 12, 13, 0.8)',
       borderRadius: 11,
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.down('md')]: {
         top: 562,
         right: 0,
         zIndex: 11,
@@ -85,7 +85,7 @@ const useStyles = makeStyles()(theme => {
         borderRadius: 9
       },
 
-      [theme.breakpoints.down('xs')]: {
+      [theme.breakpoints.down('sm')]: {
         top: 545
       }
     },
@@ -116,7 +116,7 @@ const useStyles = makeStyles()(theme => {
       top: 60,
       left: 30,
 
-      [theme.breakpoints.down('xs')]: {
+      [theme.breakpoints.down('sm')]: {
         top: 61
       }
     },
@@ -124,7 +124,7 @@ const useStyles = makeStyles()(theme => {
       ...typography.body2,
       color: colors.invariant.Error,
 
-      [theme.breakpoints.down('xs')]: {
+      [theme.breakpoints.down('sm')]: {
         ...typography.caption4
       }
     },
@@ -184,7 +184,7 @@ const useStyles = makeStyles()(theme => {
       maxWidth: 376,
       boxSizing: 'border-box',
 
-      [theme.breakpoints.down('xs')]: {
+      [theme.breakpoints.down('sm')]: {
         maxWidth: 360
       }
     },

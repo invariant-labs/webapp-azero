@@ -39,7 +39,7 @@ const useStyles = makeStyles()(theme => {
       flex: '1 1 0%',
       gap: 12,
 
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.down('md')]: {
         '&:first-of-type': {
           marginRight: 0,
           marginBottom: 8
@@ -57,7 +57,7 @@ const useStyles = makeStyles()(theme => {
       backgroundColor: colors.invariant.light,
       borderRadius: 11,
 
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.down('md')]: {
         '&:first-of-type': {
           marginRight: 0,
           marginBottom: 8

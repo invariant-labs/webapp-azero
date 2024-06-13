@@ -30,7 +30,7 @@ const useStyles = makeStyles()(theme => {
       color: colors.white.main,
       ...typography.heading4,
 
-      [theme.breakpoints.down('xs')]: {
+      [theme.breakpoints.down('sm')]: {
         fontSize: 18
       }
     },
@@ -44,7 +44,7 @@ const useStyles = makeStyles()(theme => {
         height: '100%'
       },
 
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.down('md')]: {
         flexDirection: 'column',
         minWidth: 0,
 
@@ -57,7 +57,7 @@ const useStyles = makeStyles()(theme => {
     deposit: {
       marginRight: 24,
 
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.down('md')]: {
         marginBottom: 24,
         marginRight: 0
       }

@@ -81,7 +81,7 @@ export const Header: React.FC<IHeader> = ({
           item
           className={classes.leftSide}
           justifyContent='flex-start'
-          sx={{ display: { xs: 'none', lg: 'block' } }}>
+          sx={{ display: { xs: 'none', md: 'block' } }}>
           <Grid container>
             <CardMedia className={classes.logo} image={icons.LogoTitle} />
           </Grid>
@@ -92,7 +92,7 @@ export const Header: React.FC<IHeader> = ({
             item
             className={classes.leftSide}
             justifyContent='flex-start'
-            sx={{ display: { xs: 'block', lg: 'none' } }}>
+            sx={{ display: { xs: 'block', md: 'none' } }}>
             <Grid container>
               <CardMedia className={classes.logoShort} image={icons.LogoShort} />
             </Grid>
@@ -103,7 +103,7 @@ export const Header: React.FC<IHeader> = ({
           item
           className={classes.routers}
           wrap='nowrap'
-          sx={{ display: { xs: 'none', lg: 'block' } }}>
+          sx={{ display: { xs: 'none', md: 'block' } }}>
           {routes.map(path => (
             <Link key={`path-${path}`} to={`/${path}`} className={classes.link}>
               <NavbarButton
@@ -171,7 +171,7 @@ export const Header: React.FC<IHeader> = ({
           />
         </Grid>
 
-        <Grid sx={{ display: { xs: 'block', lg: 'none' } }}>
+        <Grid sx={{ display: { xs: 'block', md: 'none' } }}>
           <IconButton
             className={classes.menuButton}
             onClick={(event: React.MouseEvent<HTMLButtonElement>) => {

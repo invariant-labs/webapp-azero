@@ -33,7 +33,7 @@ export const useStyles = makeStyles<{ walletDisconnected: boolean }>()(
         backgroundColor: colors.invariant.green,
         boxShadow: '0px 0px 20px -10px white'
       },
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.down('md')]: {
         width: 26,
         minWidth: 26,
         height: 14,

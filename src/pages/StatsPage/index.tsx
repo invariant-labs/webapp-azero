@@ -7,7 +7,7 @@ export const StatsPage: React.FC = () => {
 
   return (
     <Grid container className={classes.container}>
-      <img className={classes.workInProgress} src={workInProgress} alt='Work in progress icon' />
+      <img src={workInProgress} alt='Work in progress icon' />
     </Grid>
   )
 }

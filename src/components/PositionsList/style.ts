@@ -54,7 +54,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     border: '1px solid #202946',
     color: colors.invariant.lightGrey,
     ...typography.body2,
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       maxWidth: 200
     }
   },
@@ -111,7 +111,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
       display: 'block',
       marginBottom: 20,
 
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.down('md')]: {
         marginBottom: 16
       }
     }

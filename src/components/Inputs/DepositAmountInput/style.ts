@@ -8,7 +8,7 @@ export const useStyles = makeStyles()((theme: Theme) => {
       position: 'relative',
       marginBottom: 16,
 
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.down('md')]: {
         minWidth: 0
       }
     },
@@ -22,7 +22,7 @@ export const useStyles = makeStyles()((theme: Theme) => {
     inputContainer: {
       marginBottom: 6,
 
-      [theme.breakpoints.down('xs')]: {
+      [theme.breakpoints.down('sm')]: {
         marginBottom: 0
       }
     },
@@ -53,7 +53,7 @@ export const useStyles = makeStyles()((theme: Theme) => {
       padding: '6px 12px 6px 12px',
       cursor: 'default',
 
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.down('md')]: {
         height: 36,
         minWidth: 85
       }
@@ -132,7 +132,7 @@ export const useStyles = makeStyles()((theme: Theme) => {
         backgroundColor: colors.invariant.green,
         boxShadow: '0px 0px 20px -10px white'
       },
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.down('md')]: {
         width: 26,
         minWidth: 26,
         height: 14,
