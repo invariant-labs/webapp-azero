@@ -441,7 +441,8 @@ export const Swap: React.FC<ISwap> = ({
               priceToLoading ||
               isBalanceLoading ||
               getStateMessage() === 'Loading' ||
-              walletStatus !== Status.Initialized
+              tokenFromIndex === null ||
+              tokenToIndex === null
             }>
             <img src={refreshIcon} className={classes.refreshIcon} />
           </Button>
