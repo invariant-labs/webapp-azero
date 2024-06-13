@@ -16,6 +16,7 @@ import {
   SimulateResult,
   convertBalanceToBigint,
   printBigint,
+  stringToFixed,
   trimLeadingZeros
 } from '@store/consts/utils'
 import { PoolWithPoolKey } from '@store/reducers/pools'
@@ -253,9 +254,9 @@ export const Swap: React.FC<ISwap> = ({
   }, [tokenFromIndex, tokenToIndex])
 
   const getAmountOut = (assetFor: SwapToken) => {
-    const amountOut = Number(printBigint(simulateResult.amountOut, assetFor.decimals))
+    const amountOut = printBigint(simulateResult.amountOut, assetFor.decimals)
 
-    return amountOut.toFixed(Number(assetFor.decimals))
+    return stringToFixed(amountOut, Number(assetFor.decimals))
   }
 
   const setSimulateAmount = async () => {
