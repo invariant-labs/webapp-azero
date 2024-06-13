@@ -111,7 +111,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
       index: 0n,
       x: 0
     }
-  }, [position?.poolKey])
+  }, [position])
 
   const leftRange = useMemo(() => {
     if (position) {
