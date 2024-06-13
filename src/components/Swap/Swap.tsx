@@ -259,7 +259,12 @@ export const Swap: React.FC<ISwap> = ({
   }
 
   const setSimulateAmount = async () => {
-    if (tokenFromIndex !== null && tokenToIndex !== null && swapData) {
+    if (
+      tokenFromIndex !== null &&
+      tokenToIndex !== null &&
+      tokenFromIndex !== tokenToIndex &&
+      swapData
+    ) {
       if (inputRef === inputTarget.FROM) {
         dispatch(
           actions.getSimulateResult({
@@ -440,7 +445,8 @@ export const Swap: React.FC<ISwap> = ({
               priceToLoading ||
               isBalanceLoading ||
               getStateMessage() === 'Loading' ||
-              walletStatus !== Status.Initialized
+              tokenFromIndex === null ||
+              tokenToIndex === null
             }>
             <img src={refreshIcon} className={classes.refreshIcon} />
           </Button>

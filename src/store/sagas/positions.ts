@@ -42,7 +42,7 @@ import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
 import { all, call, fork, join, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
 import { getConnection } from './connection'
-import { fetchAllPoolKeys, fetchTicksAndTickMaps } from './pools'
+import { fetchTicksAndTickMaps } from './pools'
 import { fetchBalances } from './wallet'
 
 function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator {
@@ -120,8 +120,6 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
         INVARIANT_CREATE_POOL_OPTIONS
       )
       txs.push(createPoolTx)
-
-      yield* call(fetchAllPoolKeys)
     }
 
     const tx = invariant.createPositionTx(
@@ -177,6 +175,8 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     yield put(actions.getPositionsList())
 
     yield* call(fetchBalances, [tokenX, tokenY])
+
+    yield* put(poolsActions.getPoolKeys())
   } catch (e: any) {
     console.log(e)
 
@@ -287,8 +287,6 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
         INVARIANT_CREATE_POOL_OPTIONS
       )
       txs.push(createPoolTx)
-
-      yield* call(fetchAllPoolKeys)
     }
 
     const tx = invariant.createPositionTx(
@@ -369,6 +367,8 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     yield put(actions.getPositionsList())
 
     yield* call(fetchBalances, [tokenX === TESTNET_WAZERO_ADDRESS ? tokenY : tokenX])
+
+    yield* put(poolsActions.getPoolKeys())
   } catch (e: any) {
     console.log(e)
 
