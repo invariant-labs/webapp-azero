@@ -494,7 +494,9 @@ export const Swap: React.FC<ISwap> = ({
             tokens={tokens}
             current={tokenFromIndex !== null ? tokens[tokenFromIndex] : null}
             onSelect={setTokenFromIndex}
-            disabled={tokenFromIndex === null}
+            disabled={
+              tokenFromIndex === null || tokenToIndex === null || tokenFromIndex === tokenToIndex
+            }
             hideBalances={walletStatus !== Status.Initialized}
             handleAddToken={handleAddToken}
             commonTokens={commonTokens}
@@ -570,7 +572,9 @@ export const Swap: React.FC<ISwap> = ({
             tokens={tokens}
             current={tokenToIndex !== null ? tokens[tokenToIndex] : null}
             onSelect={setTokenToIndex}
-            disabled={tokenFromIndex === null}
+            disabled={
+              tokenFromIndex === null || tokenToIndex === null || tokenFromIndex === tokenToIndex
+            }
             hideBalances={walletStatus !== Status.Initialized}
             handleAddToken={handleAddToken}
             commonTokens={commonTokens}
