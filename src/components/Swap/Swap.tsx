@@ -227,7 +227,7 @@ export const Swap: React.FC<ISwap> = ({
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      if (refresherTime > 0) {
+      if (refresherTime > 0 && tokenFromIndex !== null && tokenToIndex !== null) {
         setRefresherTime(refresherTime - 1)
       } else {
         handleRefresh()
@@ -235,7 +235,7 @@ export const Swap: React.FC<ISwap> = ({
     }, 1000)
 
     return () => clearTimeout(timeout)
-  }, [refresherTime])
+  }, [refresherTime, tokenFromIndex, tokenToIndex])
 
   useEffect(() => {
     updateEstimatedAmount()
@@ -428,6 +428,10 @@ export const Swap: React.FC<ISwap> = ({
     void setSimulateAmount()
   }, [isFetchingNewPool])
 
+  useEffect(() => {
+    setRefresherTime(REFRESHER_INTERVAL)
+  }, [tokenFromIndex, tokenToIndex])
+
   return (
     <Grid container className={classes.swapWrapper} alignItems='center'>
       <Grid container className={classes.header}>
@@ -615,11 +619,13 @@ export const Swap: React.FC<ISwap> = ({
                 <CardMedia image={infoIcon} className={classes.infoIcon} />
               </Grid>
             </button>
-            <Refresher
-              currentIndex={refresherTime}
-              maxIndex={REFRESHER_INTERVAL}
-              onClick={handleRefresh}
-            />
+            {tokenFromIndex !== null && tokenToIndex !== null && (
+              <Refresher
+                currentIndex={refresherTime}
+                maxIndex={REFRESHER_INTERVAL}
+                onClick={handleRefresh}
+              />
+            )}
           </Grid>
           {canShowDetails ? (
             <ExchangeRate

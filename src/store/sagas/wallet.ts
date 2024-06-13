@@ -8,6 +8,7 @@ import { actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { ITokenBalance, Status, actions, actions as walletActions } from '@store/reducers/wallet'
 import { networkType } from '@store/selectors/connection'
+import { tokens } from '@store/selectors/pools'
 import { address, status } from '@store/selectors/wallet'
 import psp22Singleton from '@store/services/psp22Singleton'
 import { disconnectWallet, getAlephZeroWallet } from '@utils/web3/wallet'
@@ -23,7 +24,6 @@ import {
   takeLeading
 } from 'typed-redux-saga'
 import { getConnection } from './connection'
-import { tokens } from '@store/selectors/pools'
 
 export function* getWallet(): SagaGenerator<NightlyConnectAdapter> {
   const wallet = yield* call(getAlephZeroWallet)
@@ -354,6 +354,10 @@ export function* fetchBalances(tokens: string[]): Generator {
   )
 }
 
+export function* handleGetBalances(action: PayloadAction<string[]>): Generator {
+  yield* call(fetchBalances, action.payload)
+}
+
 export function* connectHandler(): Generator {
   yield takeLatest(actions.connect, handleConnect)
 }
@@ -382,6 +386,10 @@ export function* handleFetchSelectedTokensBalances(): Generator {
   yield takeLeading(actions.getSelectedTokens, fetchSelectedTokensBalances)
 }
 
+export function* getBalancesHandler(): Generator {
+  yield takeLeading(actions.getBalances, handleGetBalances)
+}
+
 export function* walletSaga(): Generator {
   yield all(
     [
@@ -390,7 +398,8 @@ export function* walletSaga(): Generator {
       connectHandler,
       disconnectHandler,
       handleFetchTokensBalances,
-      handleFetchSelectedTokensBalances
+      handleFetchSelectedTokensBalances,
+      getBalancesHandler
     ].map(spawn)
   )
 }
