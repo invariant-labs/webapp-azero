@@ -27,7 +27,7 @@ import {
 import { actions as poolsActions } from '@store/reducers/pools'
 import { TickPlotPositionData, actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import { Status } from '@store/reducers/wallet'
+import { Status, actions as walletActions } from '@store/reducers/wallet'
 import { networkType } from '@store/selectors/connection'
 import {
   isLoadingLatestPoolsForTransaction,
@@ -467,6 +467,13 @@ export const NewPositionWrapper: React.FC<IProps> = ({
 
   const onRefresh = () => {
     if (poolKey !== '' && tokenAIndex !== null && tokenBIndex !== null && poolIndex !== null) {
+      dispatch(
+        walletActions.getBalances([
+          tokens[tokenAIndex].assetAddress.toString(),
+          tokens[tokenBIndex].assetAddress.toString()
+        ])
+      )
+
       dispatch(
         poolsActions.getPoolData(
           newPoolKey(

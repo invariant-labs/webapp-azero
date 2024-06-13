@@ -69,6 +69,9 @@ const walletSlice = createSlice({
     getBalance(state) {
       return state
     },
+    getBalances(state, _action: PayloadAction<string[]>) {
+      return state
+    },
     setIsBalanceLoading(state, action: PayloadAction<boolean>) {
       action.payload ? (state.balanceLoading = true) : (state.balanceLoading = false)
       return state

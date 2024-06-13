@@ -396,6 +396,10 @@ export const NewPosition: React.FC<INewPosition> = ({
     }
   }, [midPrice.index])
 
+  useEffect(() => {
+    onChangeRange(leftRange, rightRange)
+  }, [currentPriceSqrt])
+
   const handleClickSettings = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
     blurContent()
