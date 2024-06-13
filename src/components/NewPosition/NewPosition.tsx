@@ -10,6 +10,7 @@ import { AddressOrPair } from '@polkadot/api/types'
 import backIcon from '@static/svg/back-arrow.svg'
 import settingIcon from '@static/svg/settings.svg'
 import {
+  ALL_FEE_TIERS_DATA,
   BestTier,
   PositionOpeningMethod,
   REFRESHER_INTERVAL,
@@ -21,6 +22,7 @@ import {
   calculateConcentrationRange,
   convertBalanceToBigint,
   determinePositionTokenBlock,
+  parseFeeToPathFee,
   printBigint,
   trimLeadingZeros
 } from '@store/consts/utils'
@@ -417,7 +419,7 @@ export const NewPosition: React.FC<INewPosition> = ({
   }
 
   const updatePath = (index1: number | null, index2: number | null, fee: number) => {
-    const parsedFee = feeTiers[fee].feeValue
+    const parsedFee = parseFeeToPathFee(ALL_FEE_TIERS_DATA[fee].tier.fee)
 
     if (index1 != null && index2 != null) {
       const token1Symbol = tokens[index1].symbol
