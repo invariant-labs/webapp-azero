@@ -29,7 +29,7 @@ import {
 import { actions as poolsActions } from '@store/reducers/pools'
 import { TickPlotPositionData, actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import { actions as walletActions, Status } from '@store/reducers/wallet'
+import { Status, actions as walletActions } from '@store/reducers/wallet'
 import { networkType, rpcAddress } from '@store/selectors/connection'
 import {
   isLoadingLatestPoolsForTransaction,
@@ -475,6 +475,37 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     return BigInt(0)
   }
 
+  const onRefresh = () => {
+    if (poolKey !== '' && tokenAIndex !== null && tokenBIndex !== null && poolIndex !== null) {
+      dispatch(
+        walletActions.getBalances([
+          tokens[tokenAIndex].assetAddress.toString(),
+          tokens[tokenBIndex].assetAddress.toString()
+        ])
+      )
+
+      dispatch(
+        poolsActions.getPoolData(
+          newPoolKey(
+            tokens[tokenAIndex].assetAddress.toString(),
+            tokens[tokenBIndex].assetAddress.toString(),
+            ALL_FEE_TIERS_DATA[feeIndex].tier
+          )
+        )
+      )
+
+      dispatch(
+        positionsActions.getCurrentPlotTicks({
+          poolKey: allPoolKeys[poolKey],
+          isXtoY:
+            allPools[poolIndex].poolKey.tokenX ===
+            tokens[currentPairReversed === true ? tokenBIndex : tokenAIndex].assetAddress,
+          fetchTicksAndTickmap: true
+        })
+      )
+    }
+  }
+
   return (
     <NewPosition
       initialTokenFrom={initialTokenFrom}
@@ -645,6 +676,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         descCustomText: 'Cannot add any liquidity.'
       }}
       poolKey={poolKey}
+      onRefresh={onRefresh}
     />
   )
 }

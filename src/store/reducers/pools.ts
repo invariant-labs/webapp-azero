@@ -147,10 +147,10 @@ const poolsSlice = createSlice({
         const keyStringified = poolKeyToString(poolKey)
 
         // Check if a pool with the same PoolKey already exists
-        if (!state.pools[keyStringified]) {
-          // If the pool does not exist, add it to the pools object
-          state.pools[keyStringified] = action.payload
-        }
+        // if (!state.pools[keyStringified]) {
+        // If the pool does not exist, add it to the pools object
+        state.pools[keyStringified] = action.payload
+        // }
       }
 
       // TODO add new pool, but not repeat existing ones
