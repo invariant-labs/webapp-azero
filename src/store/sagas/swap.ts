@@ -475,6 +475,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
     let priceImpact = 0
     let targetSqrtPrice = 0n
     let maxAvailableAmountOut = 0n
+    let poolKeyWithMaxLiquidity = null
     const errors = []
 
     for (const pool of filteredPools) {
@@ -495,6 +496,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
         if (result.globalInsufficientLiquidity) {
           errors.push(SwapError.InsufficientLiquidity)
           maxAvailableAmountOut = result.amountOut
+          poolKeyWithMaxLiquidity = pool.poolKey
           continue
         }
 
@@ -527,12 +529,23 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
       }
     }
 
+    if (errors.includes(SwapError.InsufficientLiquidity)) {
+      yield put(
+        actions.setSimulateResult({
+          poolKey: poolKeyWithMaxLiquidity,
+          amountOut: maxAvailableAmountOut,
+          priceImpact: 1,
+          targetSqrtPrice,
+          errors
+        })
+      )
+      return
+    }
+
     yield put(
       actions.setSimulateResult({
         poolKey,
-        amountOut: errors.includes(SwapError.InsufficientLiquidity)
-          ? maxAvailableAmountOut
-          : amountOut,
+        amountOut,
         priceImpact,
         targetSqrtPrice,
         errors

@@ -331,10 +331,7 @@ export const Swap: React.FC<ISwap> = ({
       return 'No route found'
     }
 
-    if (
-      simulateResult.poolKey === null &&
-      (isError(SwapError.InsufficientLiquidity) || isError(SwapError.MaxTicksCrossed))
-    ) {
+    if (isError(SwapError.InsufficientLiquidity) || isError(SwapError.MaxTicksCrossed)) {
       return 'Insufficient liquidity'
     }
 
