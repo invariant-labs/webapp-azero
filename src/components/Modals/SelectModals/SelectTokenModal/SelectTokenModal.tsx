@@ -1,7 +1,7 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import searchIcon from '@static/svg/lupa.svg'
 import { theme } from '@static/theme'
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { forwardRef, useMemo, useRef, useState } from 'react'
 import { FixedSizeList as List } from 'react-window'
 import CustomScrollbar from '../CustomScrollbar'
 import useStyles from '../style'
@@ -21,6 +21,7 @@ import {
 import { AddressOrPair } from '@polkadot/api/types'
 import { formatNumber, printBigint } from '@store/consts/utils'
 import { SwapToken } from '@store/selectors/wallet'
+import Scrollbars from 'rc-scrollbars'
 
 export interface ISelectTokenModal {
   tokens: SwapToken[]
@@ -38,39 +39,20 @@ export interface ISelectTokenModal {
 
 interface IScroll {
   onScroll: (e: React.UIEvent<HTMLElement>) => void
-  forwardedRef:
-    | ((instance: HTMLElement | null) => void)
-    | React.MutableRefObject<HTMLElement | null>
-    | null
   children: React.ReactNode
 }
 
-const Scroll: React.FC<IScroll> = ({ onScroll, forwardedRef, children }) => {
-  const refSetter = useCallback(
-    (scrollbarsRef: any) => {
-      if (forwardedRef === null || !(forwardedRef instanceof Function)) {
-        return
-      }
-
-      if (scrollbarsRef) {
-        forwardedRef(scrollbarsRef.view)
-      } else {
-        forwardedRef(null)
-      }
-    },
-    [forwardedRef]
-  )
-
+const Scroll = forwardRef<React.LegacyRef<Scrollbars>, IScroll>(({ onScroll, children }, ref) => {
   return (
-    <CustomScrollbar ref={refSetter} style={{ overflow: 'hidden' }} onScroll={onScroll}>
+    <CustomScrollbar ref={ref} style={{ overflow: 'hidden' }} onScroll={onScroll}>
       {children}
     </CustomScrollbar>
   )
-}
+})
 
-const CustomScrollbarsVirtualList = React.forwardRef<HTMLElement, IScroll>((props, ref) => (
-  <Scroll {...props} forwardedRef={ref} />
-))
+const CustomScrollbarsVirtualList = React.forwardRef<React.LegacyRef<Scrollbars>, IScroll>(
+  (props, ref) => <Scroll {...props} ref={ref} />
+)
 
 export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
   tokens,
