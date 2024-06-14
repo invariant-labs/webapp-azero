@@ -1,5 +1,5 @@
 import ClosePositionWarning from '@components/Modals/ClosePositionWarning/ClosePositionWarning'
-import { Button, Grid, Typography } from '@mui/material'
+import { Button, Grid, Hidden, Typography } from '@mui/material'
 import icons from '@static/icons'
 import { TokenPriceData } from '@store/consts/static'
 import { blurContent, unblurContent } from '@utils/uiUtils'
@@ -8,6 +8,8 @@ import React, { useState } from 'react'
 import { BoxInfo } from './BoxInfo'
 import { ILiquidityToken } from './consts'
 import useStyles from './style'
+import { addressToTicker } from '@store/consts/uiUtiils'
+import { useNavigate } from 'react-router-dom'
 
 interface IProp {
   fee: number
@@ -36,6 +38,8 @@ const SinglePositionInfo: React.FC<IProp> = ({
   showFeesLoader = false,
   userHasStakes = false
 }) => {
+  const navigate = useNavigate()
+
   const [isModalOpen, setIsModalOpen] = useState(false)
   const { classes } = useStyles()
 
@@ -99,6 +103,20 @@ const SinglePositionInfo: React.FC<IProp> = ({
             }}>
             Close position
           </Button>
+          <Hidden smUp>
+            {' '}
+            <Button
+              className={classes.button}
+              variant='contained'
+              onClick={() => {
+                const address1 = addressToTicker(tokenX.name)
+                const address2 = addressToTicker(tokenY.name)
+
+                navigate(`/newPosition/${address1}/${address2}/${fee}`)
+              }}>
+              <span className={classes.buttonText}>+ Add Liquidity</span>
+            </Button>
+          </Hidden>
         </Grid>
       </Grid>
       <Grid className={classes.bottomGrid}>

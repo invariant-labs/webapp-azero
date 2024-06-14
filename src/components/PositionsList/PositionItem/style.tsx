@@ -17,7 +17,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
       background: `${colors.invariant.component}B0`
     },
 
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('lg')]: {
       padding: 16,
       flexWrap: 'wrap'
     }
@@ -26,7 +26,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     marginRight: 12,
     width: 'fit-content',
 
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('lg')]: {
       marginRight: 12
     }
   },
@@ -34,7 +34,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     width: 40,
     borderRadius: '100%',
 
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       width: 28
     }
   },
@@ -43,11 +43,11 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     marginLeft: 4,
     marginRight: 4,
 
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('lg')]: {
       width: 30
     },
 
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       width: 24
     },
 
@@ -63,14 +63,14 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     lineHeight: '40px',
     whiteSpace: 'nowrap',
     width: 180,
-    [theme.breakpoints.down('lg')]: {
+    [theme.breakpoints.down('xl')]: {
       ...typography.heading2
     },
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('lg')]: {
       lineHeight: '32px',
       width: 'unset'
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       ...typography.heading3,
       lineHeight: '25px'
     }
@@ -81,7 +81,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     whiteSpace: 'nowrap',
     textOverflow: 'ellipsis',
     overflow: 'hidden',
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       ...typography.caption1
     }
   },
@@ -94,7 +94,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     whiteSpace: 'nowrap',
     textOverflow: 'ellipsis',
     overflow: 'hidden',
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       ...typography.caption1
     }
   },
@@ -105,7 +105,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     width: 170,
     marginRight: 8,
     lineHeight: 20,
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('lg')]: {
       flex: '1 1 0%'
     }
   },
@@ -116,7 +116,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     width: 90,
     marginRight: 8,
 
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       marginRight: 0
     }
   },
@@ -134,7 +134,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     paddingInline: 10,
     marginRight: 8,
 
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       width: '100%',
       marginRight: 0,
       marginTop: 8
@@ -147,7 +147,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     width: 160,
     paddingInline: 12,
 
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       width: 144,
       paddingInline: 6
     }
@@ -156,20 +156,20 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     width: 'fit-content',
     flexWrap: 'nowrap',
 
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('lg')]: {
       flexWrap: 'nowrap',
       marginTop: 16,
       width: '100%'
     },
 
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       flexWrap: 'wrap'
     }
   },
   mdTop: {
     width: 'fit-content',
 
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('lg')]: {
       width: '100%',
       justifyContent: 'space-between'
     }

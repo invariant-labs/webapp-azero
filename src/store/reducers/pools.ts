@@ -147,10 +147,10 @@ const poolsSlice = createSlice({
         const keyStringified = poolKeyToString(poolKey)
 
         // Check if a pool with the same PoolKey already exists
-        if (!state.pools[keyStringified]) {
-          // If the pool does not exist, add it to the pools object
-          state.pools[keyStringified] = action.payload
-        }
+        // if (!state.pools[keyStringified]) {
+        // If the pool does not exist, add it to the pools object
+        state.pools[keyStringified] = action.payload
+        // }
       }
 
       // TODO add new pool, but not repeat existing ones
@@ -216,12 +216,10 @@ const poolsSlice = createSlice({
     //     state.poolTicks[action.payload.address].findIndex(e => e.index === action.payload.index)
     //   ] = action.payload.tick
     // },
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     getAllPoolsForPairData(state, _action: PayloadAction<PairTokens>) {
       state.isLoadingLatestPoolsForTransaction = true
       return state
     },
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     getPoolsDataForList(_state, _action: PayloadAction<ListPoolsRequest>) {},
     // deleteTick(state, action: PayloadAction<DeleteTick>) {
     //   state.poolTicks[action.payload.address].splice(action.payload.index, 1)
@@ -229,7 +227,6 @@ const poolsSlice = createSlice({
     // updateTickmap(state, action: PayloadAction<UpdateTickmap>) {
     //   state.tickMaps[action.payload.address].bitmap = action.payload.bitmap
     // },
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     getTicksAndTickMaps(state, _action: PayloadAction<FetchTicksAndTickMaps>) {
       state.isLoadingTicksAndTickMaps = true
       return state

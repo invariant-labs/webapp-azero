@@ -29,9 +29,8 @@ const useStyles = makeStyles()(theme => {
     title: {
       color: colors.white.main,
       ...typography.heading4,
-      marginBottom: 18,
 
-      [theme.breakpoints.down('xs')]: {
+      [theme.breakpoints.down('sm')]: {
         fontSize: 18
       }
     },
@@ -45,7 +44,7 @@ const useStyles = makeStyles()(theme => {
         height: '100%'
       },
 
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.down('md')]: {
         flexDirection: 'column',
         minWidth: 0,
 
@@ -58,7 +57,7 @@ const useStyles = makeStyles()(theme => {
     deposit: {
       marginRight: 24,
 
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.down('md')]: {
         marginBottom: 24,
         marginRight: 0
       }
@@ -91,6 +90,18 @@ const useStyles = makeStyles()(theme => {
     },
     switch: {
       transition: 'opacity 500ms'
+    },
+    titleContainer: {
+      width: 'calc(50% - 12px)',
+      marginBottom: 18,
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+
+      [theme.breakpoints.down('lg')]: {
+        width: '100%'
+      }
     }
   }
 })

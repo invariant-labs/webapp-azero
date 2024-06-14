@@ -17,7 +17,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     width: 35,
     borderRadius: '100%',
 
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       width: 22
     }
   },
@@ -26,7 +26,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     marginRight: 8,
     marginLeft: 8,
 
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       width: 15,
       marginRight: 2,
       marginLeft: 2
@@ -52,7 +52,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       flexDirection: 'column'
     }
   },
@@ -60,7 +60,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       justifyContent: 'space-between',
       marginTop: 16
     }
@@ -69,7 +69,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     marginLeft: 12,
     minWidth: 90,
 
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       minWidth: 84
     }
   },
@@ -87,7 +87,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
       padding: ' 0px 3px'
     },
 
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       paddingLeft: 4
     }
   },
@@ -96,7 +96,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     color: colors.invariant.text,
     lineHeight: '28px',
 
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       ...typography.heading4
     }
   },
@@ -149,7 +149,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
       color: colors.invariant.dark
     },
 
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       ...typography.body1,
       maxHeight: 28,
       minWidth: 105
@@ -193,7 +193,8 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    padding: '8px 13px'
+    padding: '8px 13px',
+    minWidth: 'fit-content'
   },
   tokenName: {
     color: colors.white.main,
@@ -201,10 +202,18 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     fontWeight: 400
   },
   tokenValue: {
+    overflowX: 'auto',
+    overflowY: 'hidden',
+    display: 'block',
+    whiteSpace: 'nowrap',
     color: colors.invariant.lightGrey,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignSelf: 'center',
+
+    '&::-webkit-scrollbar': {
+      display: 'none',
+      scrollbarWidth: 'none',
+      msOverflowStyle: 'none'
+    },
     ...typography.heading2
   },
   tokenBalance: {
@@ -230,11 +239,11 @@ export const useStyles = makeStyles()((theme: Theme) => ({
       background: colors.invariant.greenLinearGradient,
       boxShadow: '0px 0px 16px rgba(46, 224, 154, 0.35)'
     },
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('lg')]: {
       marginRight: 10
     },
 
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       width: '50%',
       ...typography.caption1,
       height: 40
@@ -256,14 +265,14 @@ export const useStyles = makeStyles()((theme: Theme) => ({
       background: colors.invariant.pinkLinearGradient,
       boxShadow: `0 0 16px ${colors.invariant.pink}`
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       width: '50%',
       ...typography.caption1
     }
   },
   buttonText: {
     WebkitPaddingBefore: '2px',
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       WebkitPaddingBefore: 0
     }
   },

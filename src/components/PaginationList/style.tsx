@@ -6,7 +6,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   root: {
     width: 1122,
     display: 'flex',
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('lg')]: {
       width: '100%'
     },
     '& .MuiPagination-ul': {

@@ -24,7 +24,7 @@ export const useStyles = makeStyles()((theme: Theme) => {
         backgroundColor: colors.invariant.light
       },
 
-      [theme.breakpoints.down('xs')]: {
+      [theme.breakpoints.down('sm')]: {
         minWidth: 'auto'
       }
     },

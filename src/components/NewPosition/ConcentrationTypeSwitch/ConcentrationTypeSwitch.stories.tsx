@@ -12,7 +12,7 @@ type Story = StoryObj<typeof meta>
 
 export const Primary: Story = {
   args: {
-    initialValue: 0,
+    currentValue: 0,
     onSwitch: fn()
   }
 }

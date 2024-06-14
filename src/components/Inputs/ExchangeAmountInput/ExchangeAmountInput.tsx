@@ -3,7 +3,7 @@ import { OutlinedButton } from '@components/OutlinedButton/OutlinedButton'
 import { Grid, Input, Tooltip, Typography } from '@mui/material'
 import { AddressOrPair } from '@polkadot/api/types'
 import loadingAnimation from '@static/gif/loading.gif'
-import { formatNumber, showPrefix } from '@store/consts/utils'
+import { formatNumber } from '@store/consts/utils'
 import { SwapToken } from '@store/selectors/wallet'
 import classNames from 'classnames'
 import React, { CSSProperties, useRef } from 'react'
@@ -129,7 +129,7 @@ export const AmountInput: React.FC<IProps> = ({
     const trimDecimal = `^\\d*\\.?\\d{0,${decimal}}$`
     const regex = new RegExp(trimDecimal, 'g')
     if (e.target.value === '' || regex.test(e.target.value)) {
-      if (typeof limit !== 'undefined' && +e.target.value > limit) {
+      if ((typeof limit !== 'undefined' && +e.target.value > limit) || disabled) {
         return
       }
 
@@ -234,7 +234,7 @@ export const AmountInput: React.FC<IProps> = ({
               ) : tokenPrice ? (
                 <>
                   <Typography className={classes.caption2}>
-                    ~${formatNumber(usdBalance.toFixed(2)) + showPrefix(usdBalance)}
+                    ~${formatNumber(usdBalance.toFixed(2))}
                   </Typography>
                 </>
               ) : (

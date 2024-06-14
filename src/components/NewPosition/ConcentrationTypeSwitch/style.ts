@@ -10,7 +10,7 @@ export const useTabsStyles = makeStyles<{ value: number }>()((_theme, { value })
     width: 160,
     backgroundColor: colors.invariant.black,
 
-    [_theme.breakpoints.down('xs')]: {
+    [_theme.breakpoints.down('sm')]: {
       width: 90
     }
   },
@@ -46,7 +46,7 @@ export const useSingleTabStyles = makeStyles()(theme => {
         color: colors.invariant.lightHover
       },
 
-      [theme.breakpoints.down('xs')]: {
+      [theme.breakpoints.down('sm')]: {
         minWidth: 45,
         width: 45
       }

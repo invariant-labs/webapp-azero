@@ -13,7 +13,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     backgroundColor: colors.invariant.light,
     borderRadius: 11,
 
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       height: 36
     }
   },
@@ -23,10 +23,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     marginRight: 16,
     ...typography.body1,
 
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       ...typography.body1
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       ...typography.caption3
     }
   },
@@ -37,11 +37,11 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     overflow: 'hidden',
     whiteSpace: 'nowrap',
 
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       marginInline: 'auto',
       ...typography.body2
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       ...typography.caption3
     }
   },
@@ -66,7 +66,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
       boxShadow: `0 0 10px ${colors.invariant.green}`
     },
 
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       minWidth: 40,
       width: 40,
       height: 40
@@ -95,10 +95,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
       color: colors.white.main
     },
 
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       height: 36
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       ...typography.caption2
     }
   },

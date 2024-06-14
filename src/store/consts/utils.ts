@@ -899,3 +899,7 @@ export const numberToString = (number: number | bigint | string): string => {
 export const containsOnlyZeroes = (string: string): boolean => {
   return /^(?!.*[1-9]).*$/.test(string)
 }
+
+export const stringToFixed = (string: string, numbersAfterDot: number): string => {
+  return string.includes('.') ? string.slice(0, string.indexOf('.') + 1 + numbersAfterDot) : string
+}

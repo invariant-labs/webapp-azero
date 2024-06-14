@@ -7,7 +7,7 @@ const useStyles = makeStyles()((theme: Theme) => {
     popover: {
       marginTop: 'calc(50vh - 350px)',
       marginLeft: 'calc(50vw - 251px)',
-      [theme.breakpoints.down('xs')]: {
+      [theme.breakpoints.down('sm')]: {
         display: 'flex',
         marginLeft: 'auto',
         justifyContent: 'center'
@@ -19,7 +19,7 @@ const useStyles = makeStyles()((theme: Theme) => {
       backgroundColor: colors.invariant.component,
       borderRadius: 20,
       width: 500,
-      [theme.breakpoints.down('xs')]: {
+      [theme.breakpoints.down('sm')]: {
         width: '100vw'
       },
       '& .MuiCheckbox-root.Mui-checked': {
