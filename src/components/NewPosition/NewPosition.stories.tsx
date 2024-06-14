@@ -74,7 +74,8 @@ export const Primary: Story = {
     noConnectedBlockerProps: {
       onConnect: fn(),
       descCustomText: 'Cannot add any liquidity.'
-    }
+    },
+    onRefresh: fn()
   },
   render: () => {
     return (
@@ -132,6 +133,7 @@ export const Primary: Story = {
           onConnect: fn(),
           descCustomText: 'Cannot add any liquidity.'
         }}
+        onRefresh={fn()}
       />
     )
   }

@@ -26,7 +26,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     gridGap: '15px',
     paddingBottom: 16,
 
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       gridTemplateColumns: '1fr',
       gridGap: '8px'
     }
@@ -75,7 +75,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     backgroundColor: colors.invariant.component,
     borderRadius: 10,
 
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       height: 253
     }
   },
@@ -113,7 +113,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     maxWidth: 376,
     boxSizing: 'border-box',
 
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       maxWidth: 360
     }
   },

@@ -331,11 +331,11 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   }, [midPrice.index, concentrationArray])
 
   const [fullLoaded, setFullLoaded] = useState<boolean | null>(false)
-  const [lastLoadedPoolIndex, setLoadedLastPoolIndex] = useState<string | null>(null)
+  const [lastLoadedPoolKey, setLoadedLastPoolKey] = useState<string | null>(null)
 
   useEffect(() => {
-    if (fullLoaded && poolKey !== lastLoadedPoolIndex) {
-      setLoadedLastPoolIndex(poolKey)
+    if (fullLoaded && poolKey !== lastLoadedPoolKey) {
+      setLoadedLastPoolKey(poolKey)
 
       if (leftRange > midPrice.index || rightRange < midPrice.index) {
         resetPlot()

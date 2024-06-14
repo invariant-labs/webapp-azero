@@ -16,7 +16,7 @@ import {
 import { actions as poolsActions } from '@store/reducers/pools'
 import { actions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import { Status } from '@store/reducers/wallet'
+import { Status, actions as walletActions } from '@store/reducers/wallet'
 import { networkType } from '@store/selectors/connection'
 import { poolsArraySortedByFees } from '@store/selectors/pools'
 import {
@@ -111,7 +111,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
       index: 0n,
       x: 0
     }
-  }, [position?.poolKey])
+  }, [position])
 
   const leftRange = useMemo(() => {
     if (position) {
@@ -296,8 +296,25 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   }, [walletStatus])
 
   useEffect(() => {
-    dispatch(actions.getSinglePosition(id))
+    onRefresh()
   }, [])
+
+  const onRefresh = () => {
+    setShowFeesLoader(true)
+    dispatch(actions.getSinglePosition(id))
+
+    if (position) {
+      dispatch(
+        actions.getCurrentPlotTicks({
+          poolKey: position.poolKey,
+          isXtoY: true,
+          fetchTicksAndTickmap: true
+        })
+      )
+
+      dispatch(walletActions.getBalances([position?.poolKey.tokenX, position?.poolKey.tokenY]))
+    }
+  }
 
   if (position) {
     return (
@@ -377,6 +394,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
             })
           )
         }}
+        onRefresh={onRefresh}
       />
     )
   }

@@ -2,7 +2,7 @@ import PlotTypeSwitch from '@components/PlotTypeSwitch/PlotTypeSwitch'
 import LiquidationRangeInfo from '@components/PositionDetails/LiquidationRangeInfo/LiquidationRangeInfo'
 import PriceRangePlot from '@components/PriceRangePlot/PriceRangePlot'
 import { getMinTick } from '@invariant-labs/a0-sdk'
-import { Card, Grid, Tooltip, Typography } from '@mui/material'
+import { Card, Grid, Hidden, Tooltip, Typography } from '@mui/material'
 import activeLiquidity from '@static/svg/activeLiquidity.svg'
 import {
   calcPrice,
@@ -59,6 +59,8 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
 
   const [isPlotDiscrete, setIsPlotDiscrete] = useState(initialIsDiscreteValue)
 
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
+
   useEffect(() => {
     const initSideDist = Math.abs(
       leftRange.x -
@@ -75,9 +77,12 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
         )
     )
 
-    setPlotMin(leftRange.x - initSideDist)
-    setPlotMax(rightRange.x + initSideDist)
-  }, [ticksLoading, leftRange, rightRange])
+    if (isInitialLoad) {
+      setIsInitialLoad(false)
+      setPlotMin(leftRange.x - initSideDist)
+      setPlotMax(rightRange.x + initSideDist)
+    }
+  }, [ticksLoading, leftRange, rightRange, isInitialLoad])
 
   const zoomMinus = () => {
     const diff = plotMax - plotMin
@@ -111,13 +116,15 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
     <Grid item className={classes.root}>
       <Grid className={classes.headerContainer} container justifyContent='space-between'>
         <Typography className={classes.header}>Price range</Typography>
-        <PlotTypeSwitch
-          onSwitch={val => {
-            setIsPlotDiscrete(val)
-            onDiscreteChange(val)
-          }}
-          initialValue={isPlotDiscrete ? 1 : 0}
-        />
+        <Hidden mdDown>
+          <PlotTypeSwitch
+            onSwitch={val => {
+              setIsPlotDiscrete(val)
+              onDiscreteChange(val)
+            }}
+            initialValue={isPlotDiscrete ? 1 : 0}
+          />
+        </Hidden>
       </Grid>
       <Grid className={classes.infoRow} container justifyContent='flex-end'>
         <Grid>
