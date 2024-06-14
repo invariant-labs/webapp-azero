@@ -2,16 +2,17 @@ import MarketIdLabel from '@components/NewPosition/MarketIdLabel/MarketIdLabel'
 import SinglePositionInfo from '@components/PositionDetails/SinglePositionInfo/SinglePositionInfo'
 import SinglePositionPlot from '@components/PositionDetails/SinglePositionPlot/SinglePositionPlot'
 import { TickPlotPositionData } from '@components/PriceRangePlot/PriceRangePlot'
+import Refresher from '@components/Refresher/Refresher'
 import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { Box, Button, Grid, Typography } from '@mui/material'
 import { AddressOrPair } from '@polkadot/api/types'
 import backIcon from '@static/svg/back-arrow.svg'
-import { TokenPriceData } from '@store/consts/static'
+import { REFRESHER_INTERVAL, TokenPriceData } from '@store/consts/static'
 import { addressToTicker, initialXtoY } from '@store/consts/uiUtiils'
 import { parseFeeToPathFee, printBigint } from '@store/consts/utils'
 import { PlotTickData } from '@store/reducers/positions'
 import { VariantType } from 'notistack'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ILiquidityToken } from './SinglePositionInfo/consts'
 import { useStyles } from './style'
@@ -43,6 +44,7 @@ interface IProps {
   hasTicksError?: boolean
   reloadHandler: () => void
   userHasStakes?: boolean
+  onRefresh: () => void
 }
 
 const PositionDetails: React.FC<IProps> = ({
@@ -71,7 +73,8 @@ const PositionDetails: React.FC<IProps> = ({
   showFeesLoader = false,
   hasTicksError,
   reloadHandler,
-  userHasStakes = false
+  userHasStakes = false,
+  onRefresh
 }) => {
   const { classes } = useStyles()
 
@@ -80,16 +83,40 @@ const PositionDetails: React.FC<IProps> = ({
   const [xToY, setXToY] = useState<boolean>(
     initialXtoY(tokenXAddress.toString(), tokenYAddress.toString())
   )
+  const [refresherTime, setRefresherTime] = useState<number>(REFRESHER_INTERVAL)
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (refresherTime > 0) {
+        setRefresherTime(refresherTime - 1)
+      } else {
+        onRefresh()
+        setRefresherTime(REFRESHER_INTERVAL)
+      }
+    }, 1000)
+
+    return () => clearTimeout(timeout)
+  }, [refresherTime])
 
   return (
     <Grid container className={classes.wrapperContainer} wrap='nowrap'>
       <Grid className={classes.positionDetails} container item direction='column'>
-        <Link to='/pool' style={{ textDecoration: 'none' }}>
-          <Grid className={classes.back} container item alignItems='center'>
-            <img className={classes.backIcon} src={backIcon} />
-            <Typography className={classes.backText}>Back to Liquidity Positions List</Typography>
-          </Grid>
-        </Link>
+        <Grid className={classes.backContainer} container>
+          <Link to='/pool' style={{ textDecoration: 'none' }}>
+            <Grid className={classes.back} container item alignItems='center'>
+              <img className={classes.backIcon} src={backIcon} />
+              <Typography className={classes.backText}>Back to Liquidity Positions List</Typography>
+            </Grid>
+          </Link>
+          <Refresher
+            currentIndex={refresherTime}
+            maxIndex={REFRESHER_INTERVAL}
+            onClick={() => {
+              onRefresh()
+              setRefresherTime(REFRESHER_INTERVAL)
+            }}
+          />
+        </Grid>
 
         <SinglePositionInfo
           fee={+printBigint(fee, PERCENTAGE_SCALE - 2n)}

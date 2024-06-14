@@ -59,6 +59,8 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
 
   const [isPlotDiscrete, setIsPlotDiscrete] = useState(initialIsDiscreteValue)
 
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
+
   useEffect(() => {
     const initSideDist = Math.abs(
       leftRange.x -
@@ -75,9 +77,12 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
         )
     )
 
-    setPlotMin(leftRange.x - initSideDist)
-    setPlotMax(rightRange.x + initSideDist)
-  }, [ticksLoading, leftRange, rightRange])
+    if (isInitialLoad) {
+      setIsInitialLoad(false)
+      setPlotMin(leftRange.x - initSideDist)
+      setPlotMax(rightRange.x + initSideDist)
+    }
+  }, [ticksLoading, leftRange, rightRange, isInitialLoad])
 
   const zoomMinus = () => {
     const diff = plotMax - plotMin
