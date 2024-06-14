@@ -485,6 +485,37 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     return BigInt(0)
   }
 
+  const onRefresh = () => {
+    if (poolKey !== '' && tokenAIndex !== null && tokenBIndex !== null && poolIndex !== null) {
+      dispatch(
+        walletActions.getBalances([
+          tokens[tokenAIndex].assetAddress.toString(),
+          tokens[tokenBIndex].assetAddress.toString()
+        ])
+      )
+
+      dispatch(
+        poolsActions.getPoolData(
+          newPoolKey(
+            tokens[tokenAIndex].assetAddress.toString(),
+            tokens[tokenBIndex].assetAddress.toString(),
+            ALL_FEE_TIERS_DATA[feeIndex].tier
+          )
+        )
+      )
+
+      dispatch(
+        positionsActions.getCurrentPlotTicks({
+          poolKey: allPoolKeys[poolKey],
+          isXtoY:
+            allPools[poolIndex].poolKey.tokenX ===
+            tokens[currentPairReversed === true ? tokenBIndex : tokenAIndex].assetAddress,
+          fetchTicksAndTickmap: true
+        })
+      )
+    }
+  }
+
   return (
     <NewPosition
       initialTokenFrom={initialTokenFrom}
@@ -655,6 +686,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         descCustomText: 'Cannot add any liquidity.'
       }}
       poolKey={poolKey}
+      onRefresh={onRefresh}
     />
   )
 }

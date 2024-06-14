@@ -77,7 +77,8 @@ export const Primary: Story = {
     onClickClaimFee: fn(),
     poolAddress: '0x1234567890',
     tokenXAddress: '0x1234567890',
-    tokenYAddress: '0x1234567890'
+    tokenYAddress: '0x1234567890',
+    onRefresh: fn()
   },
   render: args => {
     return (

@@ -24,11 +24,11 @@ export const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ them
       fontSize: '16px !important',
       color: colors.invariant.green,
       marginTop: -2,
-      [theme.breakpoints.down('xs')]: {
+      [theme.breakpoints.down('sm')]: {
         marginTop: 2
       }
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       maxWidth: 'none',
       width: 'auto'
     }
@@ -53,11 +53,11 @@ export const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ them
       fontSize: '16px !important',
       color: colors.invariant.Error,
       marginTop: -2,
-      [theme.breakpoints.down('xs')]: {
+      [theme.breakpoints.down('sm')]: {
         marginTop: 2
       }
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       maxWidth: 'none',
       width: 'auto'
     }
@@ -82,11 +82,11 @@ export const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ them
       fontSize: '16px !important',
       color: colors.invariant.textGrey,
       marginTop: -2,
-      [theme.breakpoints.down('xs')]: {
+      [theme.breakpoints.down('sm')]: {
         marginTop: 2
       }
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       maxWidth: 'none',
       width: 'auto'
     }
@@ -111,11 +111,11 @@ export const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ them
       fontSize: '16px !important',
       color: colors.invariant.warning,
       marginTop: -2,
-      [theme.breakpoints.down('xs')]: {
+      [theme.breakpoints.down('sm')]: {
         marginTop: 2
       }
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       maxWidth: 'none',
       width: 'auto'
     }

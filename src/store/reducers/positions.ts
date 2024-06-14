@@ -50,6 +50,7 @@ export interface InitPositionData {
 export interface GetCurrentTicksData {
   poolKey: PoolKey
   isXtoY: boolean
+  fetchTicksAndTickmap?: boolean
   disableLoading?: boolean
   fetchTicksAndTickmap?: boolean
 }

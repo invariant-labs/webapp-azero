@@ -338,6 +338,31 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
     }
   }, [midPrice.index, concentrationArray])
 
+  const [fullLoaded, setFullLoaded] = useState<boolean | null>(false)
+  const [lastLoadedPoolKey, setLoadedLastPoolKey] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (fullLoaded && poolKey !== lastLoadedPoolKey) {
+      setLoadedLastPoolKey(poolKey)
+
+      if (leftRange > midPrice.index || rightRange < midPrice.index) {
+        resetPlot()
+      }
+
+      setFullLoaded(null)
+    }
+  }, [fullLoaded])
+
+  useEffect(() => {
+    if (ticksLoading === true && fullLoaded === null) {
+      setFullLoaded(false)
+    }
+
+    if (ticksLoading === false && fullLoaded === false) {
+      setFullLoaded(true)
+    }
+  }, [ticksLoading])
+
   return (
     <Grid container className={classes.wrapper} direction='column'>
       <Grid className={classes.headerContainer} container justifyContent='space-between'>

@@ -7,7 +7,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     width: 1004,
     flexDirection: 'row',
 
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       flexDirection: 'column'
     }
   },
@@ -15,24 +15,23 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     width: 517,
     marginRight: 24,
 
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('lg')]: {
       width: '100%'
     },
 
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       marginRight: 0,
       marginBottom: 32
     }
   },
   right: {
     width: 517,
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('lg')]: {
       width: '100%'
     }
   },
   back: {
     height: 40,
-    marginBottom: 16,
     width: 'fit-content',
     transition: 'filter 300ms',
 
@@ -73,5 +72,11 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   },
   buttonText: {
     WebkitPaddingBefore: '2px'
+  },
+  backContainer: {
+    marginBottom: 16,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   }
 }))

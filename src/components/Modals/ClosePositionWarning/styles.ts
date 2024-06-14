@@ -12,7 +12,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   popover: {
     marginTop: 'calc(50vh - 143px)',
     marginLeft: 'calc(50vw - 241px)',
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       display: 'flex',
       marginLeft: 'auto',
       justifyContent: 'center'

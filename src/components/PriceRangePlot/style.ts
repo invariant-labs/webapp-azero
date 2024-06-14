@@ -11,7 +11,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
       fill: '#A9B6BF!important',
       fontFamily: 'Mukta!important',
 
-      [theme.breakpoints.down('sm')]: {
+      [theme.breakpoints.down('md')]: {
         fontSize: '8px!important'
       }
     }
@@ -21,7 +21,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     height: 'auto',
     fill: '#111931',
 
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       width: 22
     }
   },
@@ -41,7 +41,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
       boxShadow: `0 0 10px ${colors.invariant.green}`
     },
 
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       width: 40,
       height: 40
     }
@@ -55,7 +55,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     zIndex: 10,
     flexDirection: 'row',
 
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       flexDirection: 'row',
       maxWidth: 92,
       height: 40

@@ -10,15 +10,15 @@ const useStyles = makeStyles()((theme: Theme) => {
       paddingInline: 150,
       height: 70,
 
-      [theme.breakpoints.down('lg')]: {
+      [theme.breakpoints.down('xl')]: {
         paddingInline: 32
       },
 
-      [theme.breakpoints.down('md')]: {
+      [theme.breakpoints.down('lg')]: {
         paddingInline: 24
       },
 
-      [theme.breakpoints.down('xs')]: {
+      [theme.breakpoints.down('sm')]: {
         paddingInline: 16
       }
     },
@@ -35,7 +35,8 @@ const useStyles = makeStyles()((theme: Theme) => {
       backgroundColor: colors.invariant.black,
       borderRadius: '10px',
       transition: 'left 300ms',
-      width: 'fit-content'
+      width: 'fit-content',
+      margin: '0 10px 0 10px'
     },
     connectedWalletIcon: {
       minWidth: 21,
@@ -58,11 +59,11 @@ const useStyles = makeStyles()((theme: Theme) => {
         minWidth: 350
       },
 
-      [theme.breakpoints.down('lg')]: {
+      [theme.breakpoints.down('md')]: {
         marginLeft: 0
       },
 
-      [theme.breakpoints.down('lg')]: {
+      [theme.breakpoints.down('md')]: {
         justifyContent: 'center'
       }
     },
