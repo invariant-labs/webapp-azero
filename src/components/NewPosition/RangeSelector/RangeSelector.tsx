@@ -50,6 +50,7 @@ export interface IRangeSelector {
     leftInRange: bigint
     rightInRange: bigint
   }
+  poolKey: string
 }
 
 export const RangeSelector: React.FC<IRangeSelector> = ({
@@ -75,7 +76,8 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   minimumSliderIndex,
   concentrationIndex,
   setConcentrationIndex,
-  getTicksInsideRange
+  getTicksInsideRange,
+  poolKey
 }) => {
   const { classes } = useStyles()
 
@@ -92,6 +94,8 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   const [plotMax, setPlotMax] = useState(1)
 
   const [isPlotDiscrete, setIsPlotDiscrete] = useState(initialIsDiscreteValue)
+
+  const [currentPoolKey, setCurrentPoolKey] = useState('')
 
   const isMountedRef = useRef(false)
 
@@ -234,14 +238,18 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
       setPlotMax(midPrice.x + initSideDist)
     }
   }
-
   useEffect(() => {
     if (currentPairReversed !== null && isMountedRef.current) {
       reversePlot()
-    } else if (!ticksLoading && isMountedRef.current) {
-      resetPlot()
     }
-  }, [ticksLoading, midPrice, currentPairReversed])
+  }, [currentPairReversed])
+
+  useEffect(() => {
+    if (!ticksLoading && isMountedRef.current && poolKey !== currentPoolKey) {
+      resetPlot()
+      setCurrentPoolKey(poolKey)
+    }
+  }, [poolKey, midPrice, ticksLoading])
 
   const autoZoomHandler = (left: bigint, right: bigint, canZoomCloser: boolean = false) => {
     const leftX = calcPrice(left, isXtoY, xDecimal, yDecimal)

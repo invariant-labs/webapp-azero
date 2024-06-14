@@ -644,6 +644,7 @@ export const NewPosition: React.FC<INewPosition> = ({
             concentrationIndex={concentrationIndex}
             minimumSliderIndex={minimumSliderIndex}
             getTicksInsideRange={getTicksInsideRange}
+            poolKey={poolKey}
           />
         ) : (
           <PoolInit
