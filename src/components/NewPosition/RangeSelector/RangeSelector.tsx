@@ -95,6 +95,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
 
   const [isPlotDiscrete, setIsPlotDiscrete] = useState(initialIsDiscreteValue)
 
+  const [currentMidPrice, setCurrentMidPrice] = useState(midPrice)
   const [currentPoolKey, setCurrentPoolKey] = useState('')
 
   const isMountedRef = useRef(false)
@@ -245,11 +246,18 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   }, [currentPairReversed])
 
   useEffect(() => {
-    if (!ticksLoading && isMountedRef.current && poolKey !== currentPoolKey) {
+    if (
+      !ticksLoading &&
+      isMountedRef.current &&
+      poolKey !== '' &&
+      currentMidPrice !== midPrice &&
+      poolKey !== currentPoolKey
+    ) {
       resetPlot()
+      setCurrentMidPrice(midPrice)
       setCurrentPoolKey(poolKey)
     }
-  }, [poolKey, midPrice, ticksLoading])
+  }, [ticksLoading, isMountedRef, midPrice.index])
 
   const autoZoomHandler = (left: bigint, right: bigint, canZoomCloser: boolean = false) => {
     const leftX = calcPrice(left, isXtoY, xDecimal, yDecimal)

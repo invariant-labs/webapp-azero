@@ -199,7 +199,7 @@ export const NewPosition: React.FC<INewPosition> = ({
       .map((_e, index) => ({ x: 0, y: 0, index: BigInt(index) })),
     midPrice: {
       x: 50,
-      index: 50n
+      index: 0n
     },
     tokenASymbol: 'ABC',
     tokenBSymbol: 'XYZ'
@@ -385,7 +385,7 @@ export const NewPosition: React.FC<INewPosition> = ({
     if (!ticksLoading && positionOpeningMethod === 'range') {
       onChangeRange(leftRange, rightRange)
     }
-  }, [midPrice.index])
+  }, [midPrice.index, leftRange, rightRange])
 
   const handleClickSettings = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
