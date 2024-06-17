@@ -511,8 +511,8 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
           continue
         }
 
-        if (byAmountIn ? result.amountOut > amountOut : result.amountIn + result.fee < amountOut) {
-          amountOut = byAmountIn ? result.amountOut : result.amountIn + result.fee
+        if (byAmountIn ? result.amountOut > amountOut : result.amountIn < amountOut) {
+          amountOut = byAmountIn ? result.amountOut : result.amountIn
           poolKey = pool.poolKey
           priceImpact = +printBigint(
             calculatePriceImpact(pool.sqrtPrice, result.targetSqrtPrice),
