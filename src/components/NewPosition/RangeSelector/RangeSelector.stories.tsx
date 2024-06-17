@@ -32,7 +32,8 @@ export const Primary: Story = {
     tokenASymbol: 'BTC',
     tokenBSymbol: 'ETH',
     xDecimal: 9 as any,
-    yDecimal: 12 as any
+    yDecimal: 12 as any,
+    poolKey: ''
   },
   render: args => {
     const [concentrationIndex, setConcentrationIndex] = useState(2)
