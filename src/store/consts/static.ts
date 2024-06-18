@@ -135,7 +135,7 @@ export const FAUCET_TOKEN_AMOUNT = 1000n
 
 export const TokenAirdropAmount = {
   BTC: 100000n,
-  ETH: 20000000000000000n,
+  ETH: 20000000000n,
   USDC: 50000000n
 }
 
@@ -158,7 +158,7 @@ export const BTC: Token = {
 export const ETH: Token = {
   symbol: 'ETH',
   address: TESTNET_ETH_ADDRESS,
-  decimals: 18n,
+  decimals: 12n,
   name: 'Ether',
   logoURI:
     'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk/logo.png',

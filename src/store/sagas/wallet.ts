@@ -149,12 +149,8 @@ export function* handleAirdrop(): Generator {
       const address = FaucetTokenList[ticker as keyof typeof FaucetTokenList]
       const airdropAmount = TokenAirdropAmount[ticker as keyof typeof FaucetTokenList]
 
-      const mintTx = psp22.mintTx(airdropAmount, address)
-
+      const mintTx = psp22.mintTx(walletAddress, airdropAmount, address)
       txs.push(mintTx)
-
-      const transferTx = psp22.transferTx(walletAddress, airdropAmount, data, address)
-      txs.push(transferTx)
     }
 
     const batchedTx = connection.tx.utility.batchAll(txs)
