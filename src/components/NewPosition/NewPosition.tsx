@@ -89,8 +89,7 @@ export interface INewPosition {
   canCreateNewPool: boolean
   canCreateNewPosition: boolean
   handleAddToken: (address: string) => void
-  // commonTokens: PublicKey[]
-  commonTokens: any[]
+  commonTokens: any[] // TODO delete any
   initialOpeningPositionMethod: PositionOpeningMethod
   onPositionOpeningMethodChange: (val: PositionOpeningMethod) => void
   initialHideUnknownTokensValue: boolean
