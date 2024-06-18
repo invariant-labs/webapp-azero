@@ -22,8 +22,7 @@ export interface IDepositSelector {
   initialTokenFrom: string
   initialTokenTo: string
   initialFee: string
-  // tokens: SwapToken[]
-  tokens: any[]
+  tokens: any[] // TODO delete any
   setPositionTokens: (
     tokenAIndex: number | null,
     tokenBindex: number | null,
@@ -43,8 +42,7 @@ export interface IDepositSelector {
   canCreateNewPool: boolean
   canCreateNewPosition: boolean
   handleAddToken: (address: string) => void
-  // commonTokens: PublicKey[]
-  commonTokens: any[]
+  commonTokens: any[] // TODO delete any
   initialHideUnknownTokensValue: boolean
   onHideUnknownTokensChange: (val: boolean) => void
   priceALoading?: boolean

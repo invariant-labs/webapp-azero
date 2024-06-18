@@ -54,60 +54,6 @@ export function* getBalance(walletAddress: AddressOrPair): SagaGenerator<string>
   return accountInfo.data.free
 }
 
-export function* handleBalance(): Generator {
-  // const wallet = yield* call(getWallet)
-  // yield* put(actions.setAddress(wallet.))
-  // yield* put(actions.setIsBalanceLoading(true))
-  // const balance = yield* call(getBalance, wallet.address)
-  // yield* put(actions.setBalance(balance))
-  // // yield* call(fetchTokensAccounts)
-  // yield* put(actions.setIsBalanceLoading(false))
-}
-
-// export function* fetchTokensAccounts(): Generator {
-//   const connection = yield* call(getConnection)
-//   const wallet = yield* call(getWallet)
-//   const tokensAccounts = yield* call(
-//     [connection, connection.getParsedTokenAccountsByOwner],
-//     wallet.publicKey,
-//     {
-//       programId: TOKEN_PROGRAM_ID
-//     }
-//   )
-//   const allTokens = yield* select(tokens)
-//   const newAccounts: ITokenAccount[] = []
-//   const unknownTokens: Record<string, StoreToken> = {}
-//   for (const account of tokensAccounts.value) {
-//     const info: IparsedTokenInfo = account.account.data.parsed.info
-//     newAccounts.push({
-//       programId: new PublicKey(info.mint),
-//       balance: new BN(info.tokenAmount.amount),
-//       address: account.pubkey,
-//       decimals: info.tokenAmount.decimals
-//     })
-
-//     if (!allTokens[info.mint]) {
-//       unknownTokens[info.mint] = {
-//         name: info.mint,
-//         symbol: `${info.mint.slice(0, 4)}...${info.mint.slice(-4)}`,
-//         decimals: info.tokenAmount.decimals,
-//         address: new PublicKey(info.mint),
-//         logoURI: '/unknownToken.svg',
-//         isUnknown: true
-//       }
-//     }
-//   }
-
-//   yield* put(actions.addTokenAccounts(newAccounts))
-//   yield* put(poolsActions.addTokens(unknownTokens))
-// }
-
-// export function* getToken(tokenAddress: PublicKey): SagaGenerator<Token> {
-//   const connection = yield* call(getConnection)
-//   const token = new Token(connection, tokenAddress, TOKEN_PROGRAM_ID, new Account())
-//   return token
-// }
-
 export function* handleAirdrop(): Generator {
   const walletAddress = yield* select(address)
 
@@ -187,60 +133,6 @@ export function* handleAirdrop(): Generator {
     yield put(snackbarsActions.remove(loaderAirdrop))
   }
 }
-
-// export function* setEmptyAccounts(collateralsAddresses: PublicKey[]): Generator {
-//   const tokensAccounts = yield* select(accounts)
-//   const acc: PublicKey[] = []
-//   for (const collateral of collateralsAddresses) {
-//     const collateralTokenProgram = yield* call(getToken, collateral)
-//     const accountAddress = tokensAccounts[collateral.toString()]
-//       ? tokensAccounts[collateral.toString()].address
-//       : null
-//     if (accountAddress == null) {
-//       acc.push(collateralTokenProgram.publicKey)
-//     }
-//   }
-//   if (acc.length !== 0) {
-//     yield* call(createMultipleAccounts, acc)
-//   }
-// }
-
-// export function* getCollateralTokenAirdrop(
-//   collateralsAddresses: PublicKey[],
-//   collateralsQuantities: number[]
-// ): Generator {
-//   const wallet = yield* call(getWallet)
-//   const instructions: TransactionInstruction[] = []
-//   yield* call(setEmptyAccounts, collateralsAddresses)
-//   const tokensAccounts = yield* select(accounts)
-//   for (const [index, collateral] of collateralsAddresses.entries()) {
-//     instructions.push(
-//       Token.createMintToInstruction(
-//         TOKEN_PROGRAM_ID,
-//         collateral,
-//         tokensAccounts[collateral.toString()].address,
-//         airdropAdmin.publicKey,
-//         [],
-//         collateralsQuantities[index]
-//       )
-//     )
-//   }
-//   const tx = instructions.reduce((tx, ix) => tx.add(ix), new Transaction())
-//   const connection = yield* call(getConnection)
-//   const blockhash = yield* call([connection, connection.getRecentBlockhash])
-//   tx.feePayer = wallet.publicKey
-//   tx.recentBlockhash = blockhash.blockhash
-//   const signedTx = yield* call([wallet, wallet.signTransaction], tx)
-//   signedTx.partialSign(airdropAdmin)
-//   yield* call([connection, connection.sendRawTransaction], signedTx.serialize(), {
-//     skipPreflight: true
-//   })
-// }
-// export function* getTokenProgram(pubKey: PublicKey): SagaGenerator<number> {
-//   const connection = yield* call(getConnection)
-//   const balance = yield* call(, pubKey)
-//   return balance
-// }
 
 export function* fetchSelectedTokensBalances(action: PayloadAction<string[]>): Generator {
   const api = yield* getConnection()
@@ -373,10 +265,6 @@ export function* airdropSaga(): Generator {
 export function* initSaga(): Generator {
   yield takeLeading(actions.initWallet, init)
 }
-
-// export function* handleBalanceSaga(): Generator {
-//   yield takeLeading(actions.getBalance, handleBalance)
-// }
 
 export function* handleFetchTokensBalances(): Generator {
   yield takeLeading(actions.getTokens, fetchTokensBalances)

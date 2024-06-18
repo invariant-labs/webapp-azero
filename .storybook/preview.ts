@@ -1,14 +1,8 @@
 import type { Preview } from '@storybook/react'
-import {
-  reactRouterParameters,
-  reactRouterOutlet,
-  withRouter
-} from 'storybook-addon-remix-react-router'
+import { withRouter } from 'storybook-addon-remix-react-router'
 import { ThemeProvider, CssBaseline } from '@mui/material'
 import { withThemeFromJSXProvider } from '@storybook/addon-themes'
 import { theme } from '../src/static/theme'
-import { createBrowserRouter } from 'react-router-dom'
-import { withStore } from './decorators'
 
 const customViewports = {
   sx375: {
