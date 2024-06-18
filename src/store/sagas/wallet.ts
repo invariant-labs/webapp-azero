@@ -135,7 +135,6 @@ export function* handleAirdrop(): Generator {
 
     const connection = yield* getConnection()
     const adapter = yield* call(getAlephZeroWallet)
-    const data = connection.createType('Vec<u8>', [])
 
     const psp22 = yield* call(
       [psp22Singleton, psp22Singleton.loadInstance],
@@ -149,12 +148,8 @@ export function* handleAirdrop(): Generator {
       const address = FaucetTokenList[ticker as keyof typeof FaucetTokenList]
       const airdropAmount = TokenAirdropAmount[ticker as keyof typeof FaucetTokenList]
 
-      const mintTx = psp22.mintTx(airdropAmount, address)
-
+      const mintTx = psp22.mintTx(walletAddress, airdropAmount, address)
       txs.push(mintTx)
-
-      const transferTx = psp22.transferTx(walletAddress, airdropAmount, data, address)
-      txs.push(transferTx)
     }
 
     const batchedTx = connection.tx.utility.batchAll(txs)
@@ -163,7 +158,7 @@ export function* handleAirdrop(): Generator {
       signer: adapter.signer as Signer
     })
 
-    const txResult = yield* call(sendTx, signedBatchedTx)
+    const txResult = yield* call(sendTx, signedBatchedTx as any)
 
     closeSnackbar(loaderAirdrop)
     yield put(snackbarsActions.remove(loaderAirdrop))
