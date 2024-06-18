@@ -58,16 +58,6 @@ export function* handleNetworkChange(action: PayloadAction<PayloadTypes['setNetw
   )
 }
 
-// export function* updateSlot(): Generator {
-//   const connection = yield* call(getConnection)
-//   const slot = yield* call([connection, connection.getSlot])
-//   yield* put(actions.setSlot(slot))
-// }
-
-// export function* updateSlotSaga(): Generator {
-//   yield takeLeading(actions.updateSlot, updateSlot)
-// }
-
 export function* networkChangeSaga(): Generator {
   yield takeLeading(actions.setNetwork, handleNetworkChange)
 }
