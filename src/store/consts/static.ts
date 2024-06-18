@@ -172,7 +172,7 @@ export const USDC: Token = {
   name: 'USDC',
   logoURI:
     'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
-  coingeckoId: 'usdc'
+  coingeckoId: 'usd-coin'
 }
 
 export const AZERO: Token = {
