@@ -149,11 +149,11 @@ export function* handleAirdrop(): Generator {
       const address = FaucetTokenList[ticker as keyof typeof FaucetTokenList]
       const airdropAmount = TokenAirdropAmount[ticker as keyof typeof FaucetTokenList]
 
-      const mintTx = psp22.mintTx(airdropAmount, address)
+      const mintTx = psp22.mintTx(walletAddress, airdropAmount, address)
 
       txs.push(mintTx)
 
-      const transferTx = psp22.transferTx(walletAddress, airdropAmount, data, address)
+      const transferTx = psp22.transferTx(walletAddress, airdropAmount, data as any, address)
       txs.push(transferTx)
     }
 
@@ -163,7 +163,7 @@ export function* handleAirdrop(): Generator {
       signer: adapter.signer as Signer
     })
 
-    const txResult = yield* call(sendTx, signedBatchedTx)
+    const txResult = yield* call(sendTx, signedBatchedTx as any)
 
     closeSnackbar(loaderAirdrop)
     yield put(snackbarsActions.remove(loaderAirdrop))
