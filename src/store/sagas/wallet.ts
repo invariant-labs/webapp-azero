@@ -122,6 +122,7 @@ export function* handleAirdrop(): Generator {
   }
 
   const loaderAirdrop = createLoaderKey()
+  const loaderSigningTx = createLoaderKey()
 
   try {
     yield put(
@@ -159,9 +160,21 @@ export function* handleAirdrop(): Generator {
 
     const batchedTx = connection.tx.utility.batchAll(txs)
 
+    yield put(
+      snackbarsActions.add({
+        message: 'Signing transaction...',
+        variant: 'pending',
+        persist: true,
+        key: loaderSigningTx
+      })
+    )
+
     const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
       signer: adapter.signer as Signer
     })
+
+    closeSnackbar(loaderSigningTx)
+    yield put(snackbarsActions.remove(loaderSigningTx))
 
     const txResult = yield* call(sendTx, signedBatchedTx)
 
@@ -183,6 +196,8 @@ export function* handleAirdrop(): Generator {
   } catch (error) {
     console.log(error)
 
+    closeSnackbar(loaderSigningTx)
+    yield put(snackbarsActions.remove(loaderSigningTx))
     closeSnackbar(loaderAirdrop)
     yield put(snackbarsActions.remove(loaderAirdrop))
   }
