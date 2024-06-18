@@ -375,7 +375,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     if (id.length) {
       setPriceALoading(true)
       getCoingeckoTokenPrice(id)
-        .then(data => setTokenAPriceData(data))
+        .then(data => setTokenAPriceData({ price: data ?? 0 }))
         .catch(() =>
           setTokenAPriceData(getMockedTokenPrice(tokens[tokenAIndex].symbol, currentNetwork))
         )
@@ -396,7 +396,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     if (id.length) {
       setPriceBLoading(true)
       getCoingeckoTokenPrice(id)
-        .then(data => setTokenBPriceData(data))
+        .then(data => setTokenBPriceData({ price: data ?? 0 }))
         .catch(() =>
           setTokenBPriceData(getMockedTokenPrice(tokens[tokenBIndex].symbol, currentNetwork))
         )

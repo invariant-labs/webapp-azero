@@ -156,7 +156,7 @@ export const WrappedSwap = () => {
     if (id.length) {
       setPriceFromLoading(true)
       getCoingeckoTokenPrice(id)
-        .then(data => setTokenFromPriceData(data))
+        .then(data => setTokenFromPriceData({ price: data ?? 0 }))
         .catch(() =>
           setTokenFromPriceData(
             getMockedTokenPrice(tokensDict[tokenFrom.toString()].symbol, network)
@@ -179,7 +179,7 @@ export const WrappedSwap = () => {
     if (id.length) {
       setPriceToLoading(true)
       getCoingeckoTokenPrice(id)
-        .then(data => setTokenToPriceData(data))
+        .then(data => setTokenToPriceData({ price: data ?? 0 }))
         .catch(() =>
           setTokenToPriceData(getMockedTokenPrice(tokensDict[tokenTo.toString()].symbol, network))
         )
@@ -218,7 +218,7 @@ export const WrappedSwap = () => {
     if (idTo.length) {
       setPriceToLoading(true)
       getCoingeckoTokenPrice(idTo)
-        .then(data => setTokenToPriceData(data))
+        .then(data => setTokenToPriceData({ price: data ?? 0 }))
         .catch(() =>
           setTokenToPriceData(getMockedTokenPrice(tokensDict[tokenTo.toString()].symbol, network))
         )
@@ -232,7 +232,7 @@ export const WrappedSwap = () => {
     if (idFrom.length) {
       setPriceFromLoading(true)
       getCoingeckoTokenPrice(idFrom)
-        .then(data => setTokenFromPriceData(data))
+        .then(data => setTokenFromPriceData({ price: data ?? 0 }))
         .catch(() =>
           setTokenFromPriceData(
             getMockedTokenPrice(tokensDict[tokenFrom.toString()].symbol, network)

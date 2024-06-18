@@ -184,6 +184,8 @@ export const AZERO: Token = {
   coingeckoId: 'aleph-zero'
 }
 
+export const DEFAULT_TOKENS = [BTC, ETH, USDC, AZERO]
+
 export const DEFAULT_INVARIANT_OPTIONS = {
   storageDepositLimit: null,
   refTime: 100000000000,
