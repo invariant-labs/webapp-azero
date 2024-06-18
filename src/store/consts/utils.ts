@@ -380,7 +380,7 @@ export const getTokenBalances = async (
 ): Promise<[string, bigint][]> => {
   const psp22 = await psp22Singleton.loadInstance(api, network)
 
-  const promises: Promise<any>[] = []
+  const promises: Promise<any>[] = [] // TODO delete any
   tokens.map(token => {
     promises.push(psp22.balanceOf(address, token))
   })

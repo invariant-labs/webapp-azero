@@ -64,66 +64,6 @@ export const AmountInput: React.FC<IProps> = ({
   const { classes } = useStyles({ walletDisconnected: hideBalances })
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // const thresholds: FormatNumberThreshold[] = [
-  //   {
-  //     value: 10,
-  //     decimals: Number(decimal)
-  //   },
-  //   {
-  //     value: 100,
-  //     decimals: 4
-  //   },
-  //   {
-  //     value: 1000,
-  //     decimals: 2
-  //   },
-  //   {
-  //     value: 10000,
-  //     decimals: 1
-  //   },
-  //   {
-  //     value: 1000000,
-  //     decimals: 2,
-  //     divider: 1000
-  //   },
-  //   {
-  //     value: 1000000000,
-  //     decimals: 2,
-  //     divider: 1000000
-  //   },
-  //   {
-  //     value: Infinity,
-  //     decimals: 2,
-  //     divider: 1000000000
-  //   }
-  // ]
-
-  // const usdThresholds: FormatNumberThreshold[] = [
-  //   {
-  //     value: 1000,
-  //     decimals: 2
-  //   },
-  //   {
-  //     value: 10000,
-  //     decimals: 1
-  //   },
-  //   {
-  //     value: 1000000,
-  //     decimals: 2,
-  //     divider: 1000
-  //   },
-  //   {
-  //     value: 1000000000,
-  //     decimals: 2,
-  //     divider: 1000000
-  //   },
-  //   {
-  //     value: Infinity,
-  //     decimals: 2,
-  //     divider: 1000000000
-  //   }
-  // ]
-
   const allowOnlyDigitsAndTrimUnnecessaryZeros: React.ChangeEventHandler<HTMLInputElement> = e => {
     const onlyNumbersRegex = /^\d*\.?\d*$/
     const trimDecimal = `^\\d*\\.?\\d{0,${decimal}}$`

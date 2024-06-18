@@ -11,8 +11,6 @@ export interface IProps {
   style?: React.CSSProperties
   disabled?: boolean
   startIcon?: JSX.Element
-  // fontWeight?: CSSProperties['fontWeight']
-  // padding?: CSSProperties['padding']
   labelClassName?: string
 }
 

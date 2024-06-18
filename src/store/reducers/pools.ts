@@ -153,7 +153,6 @@ const poolsSlice = createSlice({
         // }
       }
 
-      // TODO add new pool, but not repeat existing ones
       state.isLoadingLatestPoolsForTransaction = false
       return state
     },
@@ -161,10 +160,6 @@ const poolsSlice = createSlice({
       state.isLoadingLatestPoolsForTransaction = true
       return state
     },
-    // setPools(state, action: PayloadAction<{ [key in string]: PoolWithAddress }>) {
-    //   state.pools = action.payload
-    //   return state
-    // },
     setTickMaps(state, action: PayloadAction<updateTickMaps>) {
       state.tickMaps[poolKeyToString(action.payload.poolKey)] = JSON.stringify(
         Array.from(action.payload.tickMapStructure.bitmap.entries()).map(([key, value]) => [
@@ -181,13 +176,6 @@ const poolsSlice = createSlice({
       state.poolTicks[poolKeyToString(action.payload.poolKey)] = action.payload.tickStructure
       return state
     },
-    // updatePool(state, action: PayloadAction<UpdatePool>) {
-    //   state.pools[action.payload.address.toString()] = {
-    //     address: state.pools[action.payload.address.toString()].address,
-    //     ...action.payload.poolStructure
-    //   }
-    //   return state
-    // },
     addPools(state, action: PayloadAction<PoolWithPoolKey[]>) {
       const newData = action.payload.reduce(
         (acc, pool) => ({
@@ -211,38 +199,15 @@ const poolsSlice = createSlice({
       state.pools = R.merge(state.pools, newData)
       return state
     },
-    // updateTicks(state, action: PayloadAction<UpdateTicks>) {
-    //   state.poolTicks[action.payload.address][
-    //     state.poolTicks[action.payload.address].findIndex(e => e.index === action.payload.index)
-    //   ] = action.payload.tick
-    // },
     getAllPoolsForPairData(state, _action: PayloadAction<PairTokens>) {
       state.isLoadingLatestPoolsForTransaction = true
       return state
     },
     getPoolsDataForList(_state, _action: PayloadAction<ListPoolsRequest>) {},
-    // deleteTick(state, action: PayloadAction<DeleteTick>) {
-    //   state.poolTicks[action.payload.address].splice(action.payload.index, 1)
-    // },
-    // updateTickmap(state, action: PayloadAction<UpdateTickmap>) {
-    //   state.tickMaps[action.payload.address].bitmap = action.payload.bitmap
-    // },
     getTicksAndTickMaps(state, _action: PayloadAction<FetchTicksAndTickMaps>) {
       state.isLoadingTicksAndTickMaps = true
       return state
     }
-    // addTicksToArray(state, action: PayloadAction<UpdateTick>) {
-    //   const { index, tickStructure } = action.payload
-    //   if (!state.poolTicks[index]) {
-    //     state.poolTicks[index] = []
-    //   }
-    //   state.poolTicks[index] = [...state.poolTicks[index], ...tickStructure]
-    // },
-    // setNearestTicksForPair(state, action: PayloadAction<UpdateTick>) {
-    //   state.nearestPoolTicksForPair[action.payload.index] = action.payload.tickStructure
-    //   return state
-    // },
-    // getNearestTicksForPair(_state, _action: PayloadAction<FetchTicksAndTickMaps>) {}
   }
 })
 
