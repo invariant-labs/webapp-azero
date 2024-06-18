@@ -13,21 +13,7 @@ export interface ITokenBalance {
   address: string
   balance: bigint
 }
-// export interface ITokenData {
-//   programId: string
-//   mintAuthority: string | null
-//   freezeAuthority: string | null
-//   supply: number
-//   decimals: number
-// }
-// export interface ITransaction {
-//   recipient: string
-//   amount: number
-//   txid: string
-//   sending: boolean
-//   token?: PublicKey
-//   error?: string
-// }
+
 export interface IAlephZeroWallet {
   status: Status
   address: string

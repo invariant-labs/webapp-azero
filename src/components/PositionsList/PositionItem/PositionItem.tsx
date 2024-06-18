@@ -24,56 +24,6 @@ export interface IPositionItem {
   isActive?: boolean
 }
 
-// const shorterThresholds: FormatNumberThreshold[] = [
-//   {
-//     value: 100,
-//     decimals: 2
-//   },
-//   {
-//     value: 1000,
-//     decimals: 1
-//   },
-//   {
-//     value: 10000,
-//     decimals: 1,
-//     divider: 1000
-//   },
-//   {
-//     value: 1000000,
-//     decimals: 0,
-//     divider: 1000
-//   },
-//   {
-//     value: 10000000,
-//     decimals: 1,
-//     divider: 1000000
-//   },
-//   {
-//     value: 1000000000,
-//     decimals: 0,
-//     divider: 1000000
-//   },
-//   {
-//     value: 10000000000,
-//     decimals: 1,
-//     divider: 1000000000
-//   }
-// ]
-
-// const minMaxShorterThresholds: FormatNumberThreshold[] = [
-//   {
-//     value: 10,
-//     decimals: 3
-//   },
-//   ...shorterThresholds
-// ]
-
-// const shorterPrefixConfig: PrefixConfig = {
-//   B: 1000000000,
-//   M: 1000000,
-//   K: 1000
-// }
-
 export const PositionItem: React.FC<IPositionItem> = ({
   tokenXName,
   tokenYName,

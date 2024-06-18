@@ -17,21 +17,6 @@ export const { address, balance, tokensBalances, status, balanceLoading } = keyS
   'balanceLoading'
 ])
 
-// export const tokenBalance = (tokenAddress: Keyring) =>
-//   createSelector(accounts, balance, (tokensAccounts, solBalance) => {
-//     if (tokenAddress.equals(new Keyring(MOCK_TOKENS.SOL))) {
-//       return { balance: solBalance, decimals: 9 }
-//     } else {
-//       if (!tokensAccounts[tokenAddress.toString()]) {
-//         return { balance: new BN(0), decimals: 9 }
-//       }
-//       return {
-//         balance: tokensAccounts[tokenAddress.toString()].balance,
-//         decimals: tokensAccounts[tokenAddress.toString()].decimals
-//       }
-//     }
-//   })
-
 export const tokenBalance = (tokenAddress: AddressOrPair) =>
   createSelector(tokensBalances, tokensAccounts => {
     if (tokensAccounts[tokenAddress.toString()]) {
