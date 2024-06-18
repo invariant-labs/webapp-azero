@@ -472,6 +472,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
 
     let poolKey = null
     let amountOut = byAmountIn ? 0n : U128MAX
+    let insufficientLiquidityAmountOut = byAmountIn ? 0n : U128MAX
     let priceImpact = 0
     let targetSqrtPrice = 0n
     const errors = []
@@ -492,6 +493,14 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
         )
 
         if (result.globalInsufficientLiquidity) {
+          if (
+            byAmountIn
+              ? result.amountOut > insufficientLiquidityAmountOut
+              : result.amountIn < insufficientLiquidityAmountOut
+          ) {
+            insufficientLiquidityAmountOut = byAmountIn ? result.amountOut : result.amountIn
+          }
+
           errors.push(SwapError.InsufficientLiquidity)
           continue
         }
@@ -511,8 +520,8 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
           continue
         }
 
-        if (byAmountIn ? result.amountOut > amountOut : result.amountIn + result.fee < amountOut) {
-          amountOut = byAmountIn ? result.amountOut : result.amountIn + result.fee
+        if (byAmountIn ? result.amountOut > amountOut : result.amountIn < amountOut) {
+          amountOut = byAmountIn ? result.amountOut : result.amountIn
           poolKey = pool.poolKey
           priceImpact = +printBigint(
             calculatePriceImpact(pool.sqrtPrice, result.targetSqrtPrice),
@@ -528,7 +537,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
     yield put(
       actions.setSimulateResult({
         poolKey,
-        amountOut,
+        amountOut: amountOut ? amountOut : insufficientLiquidityAmountOut,
         priceImpact,
         targetSqrtPrice,
         errors
