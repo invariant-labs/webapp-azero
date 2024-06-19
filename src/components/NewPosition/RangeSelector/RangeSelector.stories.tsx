@@ -33,7 +33,9 @@ export const Primary: Story = {
     tokenBSymbol: 'ETH',
     xDecimal: 9 as any,
     yDecimal: 12 as any,
-    poolKey: ''
+    poolKey: '',
+    setShouldReversePlot: fn(),
+    shouldReversePlot: false
   },
   render: args => {
     const [concentrationIndex, setConcentrationIndex] = useState(2)
