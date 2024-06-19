@@ -75,7 +75,8 @@ export const Primary: Story = {
       onConnect: fn(),
       descCustomText: 'Cannot add any liquidity.'
     },
-    onRefresh: fn()
+    onRefresh: fn(),
+    isBalanceLoading: false
   },
   render: () => {
     return (
@@ -134,6 +135,7 @@ export const Primary: Story = {
           descCustomText: 'Cannot add any liquidity.'
         }}
         onRefresh={fn()}
+        isBalanceLoading={false}
       />
     )
   }

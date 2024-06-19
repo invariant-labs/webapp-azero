@@ -92,7 +92,8 @@ export const Primary: Story = {
     },
     bestTierIndex: 2,
     priceA: 1111,
-    priceB: 2222
+    priceB: 2222,
+    isBalanceLoading: false
   },
   render: args => {
     const [feeTierIndex, setFeeTierIndex] = useState<number>(0)
