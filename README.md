@@ -27,7 +27,7 @@ nvm install 20
 - Clone repository
 
 ```bash
-git clone git@github.com:invariant-labs/protocol-a0.git
+git clone git@github.com:invariant-labs/webapp-a0.git
 ```
 
 - Install dependencies
