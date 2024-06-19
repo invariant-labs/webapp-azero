@@ -34,6 +34,7 @@ import {
   tokensPrices
 } from './static'
 import { sleep } from '@store/sagas/wallet'
+import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/src/consts'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -732,12 +733,22 @@ export const deserializeTickmap = (serializedTickmap: string): Tickmap => {
 export const calculateAmountInWithSlippage = (
   amountOut: bigint,
   sqrtPriceLimit: bigint,
-  xToY: boolean
+  xToY: boolean,
+  fee: bigint
 ): bigint => {
   const price = +printBigint(sqrtPriceToPrice(sqrtPriceLimit), PRICE_SCALE)
-  const amountIn = xToY ? Number(amountOut) * price : Number(amountOut) / price
+  const amountIn = xToY
+    ? Math.ceil(Number(amountOut) / price)
+    : Math.ceil(Number(amountOut) * price)
 
-  return BigInt(Math.ceil(amountIn))
+  const amountInWithFee = BigInt(
+    Math.ceil(
+      Number(amountIn) *
+        (Number(PERCENTAGE_DENOMINATOR) / (Number(PERCENTAGE_DENOMINATOR) - Number(fee)))
+    )
+  )
+
+  return amountInWithFee
 }
 
 export const createLiquidityPlot = (

@@ -98,11 +98,9 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
       invAddress
     )
     const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(estimatedPriceAfterSwap, slippage, !xToY)
-
-    let calculatedAmountIn = amountIn
-    if (!byAmountIn) {
-      calculatedAmountIn = calculateAmountInWithSlippage(amountIn, sqrtPriceLimit, !xToY)
-    }
+    const calculatedAmountIn = slippage
+      ? calculateAmountInWithSlippage(amountOut, sqrtPriceLimit, xToY, poolKey.feeTier.fee)
+      : amountIn
 
     if (xToY) {
       const approveTx = psp22.approveTx(
@@ -219,8 +217,16 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
 }
 
 export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>): Generator {
-  const { poolKey, tokenFrom, slippage, amountIn, byAmountIn, estimatedPriceAfterSwap, tokenTo } =
-    action.payload
+  const {
+    poolKey,
+    tokenFrom,
+    slippage,
+    amountIn,
+    amountOut,
+    byAmountIn,
+    estimatedPriceAfterSwap,
+    tokenTo
+  } = action.payload
 
   if (!poolKey) {
     return
@@ -266,12 +272,10 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
       network,
       invAddress
     )
-
     const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(estimatedPriceAfterSwap, slippage, !xToY)
-    let calculatedAmountIn = amountIn
-    if (!byAmountIn) {
-      calculatedAmountIn = calculateAmountInWithSlippage(amountIn, sqrtPriceLimit, !xToY)
-    }
+    const calculatedAmountIn = slippage
+      ? calculateAmountInWithSlippage(amountOut, sqrtPriceLimit, xToY, poolKey.feeTier.fee)
+      : amountIn
 
     if (
       (xToY && poolKey.tokenX === TESTNET_WAZERO_ADDRESS) ||
@@ -280,10 +284,7 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
       const azeroBalance = yield* select(balance)
       const azeroAmountInWithSlippage =
         azeroBalance > calculatedAmountIn ? calculatedAmountIn : azeroBalance
-      const depositTx = wazero.depositTx(
-        byAmountIn ? amountIn : azeroAmountInWithSlippage,
-        WAZERO_DEPOSIT_OPTIONS
-      )
+      const depositTx = wazero.depositTx(azeroAmountInWithSlippage, WAZERO_DEPOSIT_OPTIONS)
       txs.push(depositTx)
     }
 
@@ -305,12 +306,13 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
       txs.push(approveTx)
     }
 
-    const swapTx = invariant.swapTx(
+    const swapTx = invariant.swapWithSlippageTx(
       poolKey,
       xToY,
-      amountIn,
+      byAmountIn ? amountIn : amountOut,
       byAmountIn,
-      sqrtPriceLimit,
+      estimatedPriceAfterSwap,
+      slippage,
       INVARIANT_SWAP_OPTIONS
     )
     txs.push(swapTx)
