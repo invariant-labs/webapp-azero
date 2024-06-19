@@ -50,6 +50,9 @@ export interface IRangeSelector {
     leftInRange: bigint
     rightInRange: bigint
   }
+  poolKey: string
+  shouldReversePlot: boolean
+  setShouldReversePlot: (val: boolean) => void
 }
 
 export const RangeSelector: React.FC<IRangeSelector> = ({
@@ -76,7 +79,9 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   concentrationIndex,
   setConcentrationIndex,
   getTicksInsideRange,
-  poolIndex
+  poolKey,
+  shouldReversePlot,
+  setShouldReversePlot
 }) => {
   const { classes } = useStyles()
 
@@ -93,7 +98,8 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   const [plotMax, setPlotMax] = useState(1)
 
   const [isPlotDiscrete, setIsPlotDiscrete] = useState(initialIsDiscreteValue)
-  const [lastPoolIndex, setLastPoolIndex] = useState(poolIndex)
+
+  const [currentMidPrice, setCurrentMidPrice] = useState(midPrice)
 
   const isMountedRef = useRef(false)
 
@@ -236,7 +242,6 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
       setPlotMax(midPrice.x + initSideDist)
     }
   }
-
   useEffect(() => {
     if (currentPairReversed !== null && isMountedRef.current) {
       reversePlot()
@@ -244,11 +249,25 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   }, [currentPairReversed])
 
   useEffect(() => {
-    if (!ticksLoading && isMountedRef.current && poolIndex != lastPoolIndex) {
-      resetPlot()
-      setLastPoolIndex(poolIndex)
+    return () => {
+      if (shouldReversePlot) {
+        setShouldReversePlot(false)
+      }
     }
-  }, [ticksLoading, midPrice, lastPoolIndex])
+  }, [shouldReversePlot])
+
+  useEffect(() => {
+    if (
+      !ticksLoading &&
+      isMountedRef.current &&
+      poolKey !== '' &&
+      currentMidPrice !== midPrice &&
+      !shouldReversePlot
+    ) {
+      resetPlot()
+      setCurrentMidPrice(midPrice)
+    }
+  }, [ticksLoading, isMountedRef, midPrice.index])
 
   const autoZoomHandler = (left: bigint, right: bigint, canZoomCloser: boolean = false) => {
     const leftX = calcPrice(left, isXtoY, xDecimal, yDecimal)

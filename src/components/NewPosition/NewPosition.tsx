@@ -181,6 +181,8 @@ export const NewPosition: React.FC<INewPosition> = ({
   const [minimumSliderIndex, setMinimumSliderIndex] = useState<number>(0)
   const [refresherTime, setRefresherTime] = React.useState<number>(REFRESHER_INTERVAL)
 
+  const [shouldReversePlot, setShouldReversePlot] = useState(false)
+
   const concentrationArray = useMemo(
     () =>
       getConcentrationArray(Number(tickSpacing), 2, Number(midPrice.index)).sort((a, b) => a - b),
@@ -206,10 +208,10 @@ export const NewPosition: React.FC<INewPosition> = ({
   const noRangePlaceholderProps = {
     data: Array(100)
       .fill(1)
-      .map((_e, index) => ({ x: index, y: index, index: BigInt(index) })),
+      .map((_e, index) => ({ x: 0, y: 0, index: BigInt(index) })),
     midPrice: {
       x: 50,
-      index: 50n
+      index: 0n
     },
     tokenASymbol: 'ABC',
     tokenBSymbol: 'XYZ'
@@ -395,7 +397,7 @@ export const NewPosition: React.FC<INewPosition> = ({
     if (!ticksLoading && positionOpeningMethod === 'range') {
       onChangeRange(leftRange, rightRange)
     }
-  }, [midPrice.index])
+  }, [midPrice.index, leftRange, rightRange])
 
   useEffect(() => {
     onChangeRange(leftRange, rightRange)
@@ -623,7 +625,7 @@ export const NewPosition: React.FC<INewPosition> = ({
             if (tokenAIndex === null || tokenBIndex === null) {
               return
             }
-
+            setShouldReversePlot(true)
             const pom = tokenAIndex
             setTokenAIndex(tokenBIndex)
             setTokenBIndex(pom)
@@ -714,6 +716,9 @@ export const NewPosition: React.FC<INewPosition> = ({
             concentrationIndex={concentrationIndex}
             minimumSliderIndex={minimumSliderIndex}
             getTicksInsideRange={getTicksInsideRange}
+            poolKey={poolKey}
+            shouldReversePlot={shouldReversePlot}
+            setShouldReversePlot={setShouldReversePlot}
           />
         ) : (
           <PoolInit
