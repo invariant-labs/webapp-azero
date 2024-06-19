@@ -172,7 +172,7 @@ export const USDC: Token = {
   name: 'USDC',
   logoURI:
     'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
-  coingeckoId: 'usdc'
+  coingeckoId: 'usd-coin'
 }
 
 export const AZERO: Token = {
@@ -183,6 +183,8 @@ export const AZERO: Token = {
   logoURI: 'https://assets.coingecko.com/coins/images/17212/standard/azero-logo_coingecko.png',
   coingeckoId: 'aleph-zero'
 }
+
+export const DEFAULT_TOKENS = [BTC, ETH, USDC, AZERO]
 
 export const DEFAULT_INVARIANT_OPTIONS = {
   storageDepositLimit: null,
