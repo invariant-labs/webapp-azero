@@ -135,7 +135,7 @@ export const FAUCET_TOKEN_AMOUNT = 1000n
 
 export const TokenAirdropAmount = {
   BTC: 100000n,
-  ETH: 20000000000000000n,
+  ETH: 20000000000n,
   USDC: 50000000n
 }
 
@@ -158,7 +158,7 @@ export const BTC: Token = {
 export const ETH: Token = {
   symbol: 'ETH',
   address: TESTNET_ETH_ADDRESS,
-  decimals: 18n,
+  decimals: 12n,
   name: 'Ether',
   logoURI:
     'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk/logo.png',
@@ -172,7 +172,7 @@ export const USDC: Token = {
   name: 'USDC',
   logoURI:
     'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
-  coingeckoId: 'usdc'
+  coingeckoId: 'usd-coin'
 }
 
 export const AZERO: Token = {
@@ -183,6 +183,8 @@ export const AZERO: Token = {
   logoURI: 'https://assets.coingecko.com/coins/images/17212/standard/azero-logo_coingecko.png',
   coingeckoId: 'aleph-zero'
 }
+
+export const DEFAULT_TOKENS = [BTC, ETH, USDC, AZERO]
 
 export const DEFAULT_INVARIANT_OPTIONS = {
   storageDepositLimit: null,

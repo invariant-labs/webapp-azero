@@ -61,7 +61,6 @@ export const Header: React.FC<IHeader> = ({
   const [routesModalAnchor, setRoutesModalAnchor] = useState<HTMLButtonElement | null>(null)
 
   useEffect(() => {
-    // if there will be no redirects, get rid of this
     setActive(landing)
   }, [landing])
 

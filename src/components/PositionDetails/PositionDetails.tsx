@@ -145,7 +145,6 @@ const PositionDetails: React.FC<IProps> = ({
           item
           direction='row'
           alignItems='flex-end'
-          // justifyContent='space-between'
           style={{ paddingLeft: 20, flexDirection: 'row-reverse' }}
           className={classes.right}
           wrap='nowrap'>

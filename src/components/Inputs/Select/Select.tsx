@@ -76,8 +76,6 @@ export const Select: React.FC<ISelectModal> = ({
       </Button>
       <SelectTokenModal
         tokens={tokens}
-        // commonTokens={tokens ? tokens.slice(0, 4)
-        //   : [{ symbol: 'SOL', name: 'Solana', logoURI: 'solana' }]}
         open={open}
         centered={centered}
         anchorEl={anchorEl}

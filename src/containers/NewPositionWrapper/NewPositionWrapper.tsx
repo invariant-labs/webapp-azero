@@ -20,7 +20,7 @@ import {
   calcPrice,
   calcYPerXPriceBySqrtPrice,
   createPlaceholderLiquidityPlot,
-  getCoingeckoTokenPrice,
+  getCoinGeckoTokenPrice,
   getMockedTokenPrice,
   getNewTokenOrThrow,
   poolKeyToString,
@@ -36,7 +36,8 @@ import {
   isLoadingTicksAndTickMaps,
   poolKeys,
   pools,
-  poolsArraySortedByFees
+  poolsArraySortedByFees,
+  isLoadingPoolKeys
 } from '@store/selectors/pools'
 import { initPosition, plotTicks } from '@store/selectors/positions'
 import {
@@ -70,6 +71,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const allPoolKeys = useSelector(poolKeys)
   const poolsData = useSelector(pools)
   const loadingTicksAndTickMaps = useSelector(isLoadingTicksAndTickMaps)
+  const loadingPoolKeys = useSelector(isLoadingPoolKeys)
 
   const { success, inProgress } = useSelector(initPosition)
   const { data: ticksData, loading: ticksLoading, hasError: hasTicksError } = useSelector(plotTicks)
@@ -92,6 +94,8 @@ export const NewPositionWrapper: React.FC<IProps> = ({
 
   const [currentPairReversed, setCurrentPairReversed] = useState<boolean | null>(null)
 
+  const [initialLoader, setInitialLoader] = useState(true)
+
   const isMountedRef = useRef(false)
 
   useEffect(() => {
@@ -105,7 +109,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     }
   }, [])
 
-  const liquidityRef = useRef<any>(0n)
+  const liquidityRef = useRef<any>(0n) // TODO delete any
 
   useEffect(() => {
     setProgress('none')
@@ -205,8 +209,14 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       return false
     }
 
-    return isFetchingNewPool
-  }, [isFetchingNewPool, poolKey])
+    return isFetchingNewPool || loadingPoolKeys
+  }, [isFetchingNewPool, poolKey, loadingPoolKeys])
+
+  useEffect(() => {
+    if (initialLoader && !isWaitingForNewPool) {
+      setInitialLoader(false)
+    }
+  }, [isWaitingForNewPool])
 
   useEffect(() => {
     if (tokenAIndex !== null && tokenBIndex !== null) {
@@ -241,12 +251,22 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         dispatch(
           positionsActions.getCurrentPlotTicks({
             poolKey: allPoolKeys[poolKey],
-            isXtoY
+            isXtoY,
+            fetchTicksAndTickmap: true
           })
         )
       }
     }
-  }, [isWaitingForNewPool, tokenAIndex, tokenBIndex, feeIndex, poolKey, walletStatus, allPoolKeys])
+  }, [
+    isWaitingForNewPool,
+    tokenAIndex,
+    tokenBIndex,
+    feeIndex,
+    poolKey,
+    walletStatus,
+    allPoolKeys,
+    allPools
+  ])
 
   useEffect(() => {
     if (poolsData[poolKey]) {
@@ -294,6 +314,20 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       )
     }
   }, [progress])
+
+  useEffect(() => {
+    if (tokenAIndex !== null && tokenBIndex !== null && !poolsData[poolKey]) {
+      dispatch(
+        poolsActions.getPoolData(
+          newPoolKey(
+            tokens[tokenAIndex].assetAddress.toString(),
+            tokens[tokenBIndex].assetAddress.toString(),
+            ALL_FEE_TIERS_DATA[feeIndex].tier
+          )
+        )
+      )
+    }
+  }, [poolKey])
 
   const initialIsDiscreteValue = localStorage.getItem('IS_PLOT_DISCRETE')
     ? localStorage.getItem('IS_PLOT_DISCRETE') === 'true'
@@ -374,8 +408,8 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     const id = tokens[tokenAIndex].coingeckoId ?? ''
     if (id.length) {
       setPriceALoading(true)
-      getCoingeckoTokenPrice(id)
-        .then(data => setTokenAPriceData(data))
+      getCoinGeckoTokenPrice(id)
+        .then(data => setTokenAPriceData({ price: data ?? 0 }))
         .catch(() =>
           setTokenAPriceData(getMockedTokenPrice(tokens[tokenAIndex].symbol, currentNetwork))
         )
@@ -395,8 +429,8 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     const id = tokens[tokenBIndex].coingeckoId ?? ''
     if (id.length) {
       setPriceBLoading(true)
-      getCoingeckoTokenPrice(id)
-        .then(data => setTokenBPriceData(data))
+      getCoinGeckoTokenPrice(id)
+        .then(data => setTokenBPriceData({ price: data ?? 0 }))
         .catch(() =>
           setTokenBPriceData(getMockedTokenPrice(tokens[tokenBIndex].symbol, currentNetwork))
         )
@@ -587,7 +621,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         setTokenBIndex(tokenB)
         setFeeIndex(feeTierIndex)
       }}
-      isCurrentPoolExisting={poolKey !== ''}
+      isCurrentPoolExisting={!!allPoolKeys[poolKey] || poolKey !== ''}
       calcAmount={calcAmount}
       feeTiers={ALL_FEE_TIERS_DATA.map(tier => {
         return {
@@ -600,7 +634,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       xDecimal={xDecimal}
       yDecimal={yDecimal}
       tickSpacing={tickSpacing}
-      isWaitingForNewPool={isWaitingForNewPool}
+      isWaitingForNewPool={isWaitingForNewPool || initialLoader}
       poolIndex={poolIndex}
       currentPairReversed={currentPairReversed}
       bestTiers={bestTiers[currentNetwork]}
