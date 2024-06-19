@@ -200,6 +200,11 @@ export const useStyles = makeStyles()((theme: Theme) => {
       ...typography.caption4,
       fontSize: 13,
       color: colors.white.main
+    },
+    loadingBalance: {
+      padding: '0 10px 0 20px',
+      width: 15,
+      height: 15
     }
   }
 })

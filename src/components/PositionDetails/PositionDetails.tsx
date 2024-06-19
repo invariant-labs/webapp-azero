@@ -45,6 +45,7 @@ interface IProps {
   reloadHandler: () => void
   userHasStakes?: boolean
   onRefresh: () => void
+  isBalanceLoading: boolean
 }
 
 const PositionDetails: React.FC<IProps> = ({
@@ -74,7 +75,8 @@ const PositionDetails: React.FC<IProps> = ({
   hasTicksError,
   reloadHandler,
   userHasStakes = false,
-  onRefresh
+  onRefresh,
+  isBalanceLoading
 }) => {
   const { classes } = useStyles()
 
@@ -130,6 +132,7 @@ const PositionDetails: React.FC<IProps> = ({
           swapHandler={() => setXToY(!xToY)}
           showFeesLoader={showFeesLoader}
           userHasStakes={userHasStakes}
+          isBalanceLoading={isBalanceLoading}
         />
       </Grid>
 

@@ -312,6 +312,11 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     height: 50,
     width: 50,
     margin: 'auto'
+  },
+  loadingBalance: {
+    padding: '0 10px 0 20px',
+    width: 15,
+    height: 15
   }
 }))
 

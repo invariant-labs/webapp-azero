@@ -41,6 +41,7 @@ import {
 import { initPosition, plotTicks } from '@store/selectors/positions'
 import {
   address,
+  balanceLoading,
   canCreateNewPool,
   canCreateNewPosition,
   status,
@@ -70,6 +71,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const allPoolKeys = useSelector(poolKeys)
   const poolsData = useSelector(pools)
   const loadingTicksAndTickMaps = useSelector(isLoadingTicksAndTickMaps)
+  const isBalanceLoading = useSelector(balanceLoading)
 
   const { success, inProgress } = useSelector(initPosition)
   const { data: ticksData, loading: ticksLoading, hasError: hasTicksError } = useSelector(plotTicks)
@@ -476,7 +478,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   }
 
   const onRefresh = () => {
-    if (poolKey !== '' && tokenAIndex !== null && tokenBIndex !== null && poolIndex !== null) {
+    if (tokenAIndex !== null && tokenBIndex !== null) {
       dispatch(
         walletActions.getBalances([
           tokens[tokenAIndex].assetAddress.toString(),
@@ -494,15 +496,17 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         )
       )
 
-      dispatch(
-        positionsActions.getCurrentPlotTicks({
-          poolKey: allPoolKeys[poolKey],
-          isXtoY:
-            allPools[poolIndex].poolKey.tokenX ===
-            tokens[currentPairReversed === true ? tokenBIndex : tokenAIndex].assetAddress,
-          fetchTicksAndTickmap: true
-        })
-      )
+      if (poolKey !== '' && poolIndex !== null) {
+        dispatch(
+          positionsActions.getCurrentPlotTicks({
+            poolKey: allPoolKeys[poolKey],
+            isXtoY:
+              allPools[poolIndex].poolKey.tokenX ===
+              tokens[currentPairReversed === true ? tokenBIndex : tokenAIndex].assetAddress,
+            fetchTicksAndTickmap: true
+          })
+        )
+      }
     }
   }
 
@@ -677,6 +681,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       }}
       poolKey={poolKey}
       onRefresh={onRefresh}
+      isBalanceLoading={isBalanceLoading}
     />
   )
 }
