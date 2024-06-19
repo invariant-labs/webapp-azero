@@ -257,7 +257,7 @@ const COINGECKO_QUERY_COOLDOWN = 20 * 60 * 1000
 let isCoinGeckoQueryRunning = false
 
 export const getCoinGeckoTokenPrice = async (id: string): Promise<number | undefined> => {
-  while(isCoinGeckoQueryRunning) {
+  while (isCoinGeckoQueryRunning) {
     await sleep(100)
   }
   isCoinGeckoQueryRunning = true
@@ -271,7 +271,12 @@ export const getCoinGeckoTokenPrice = async (id: string): Promise<number | undef
     localStorage.setItem('COINGECKO_LAST_QUERY_TIMESTAMP', String(lastQueryTimestamp))
   }
 
-  console.log(Number(lastQueryTimestamp), Number(lastQueryTimestamp) + COINGECKO_QUERY_COOLDOWN, Date.now(), Number(lastQueryTimestamp) + COINGECKO_QUERY_COOLDOWN > Date.now())
+  console.log(
+    Number(lastQueryTimestamp),
+    Number(lastQueryTimestamp) + COINGECKO_QUERY_COOLDOWN,
+    Date.now(),
+    Number(lastQueryTimestamp) + COINGECKO_QUERY_COOLDOWN > Date.now()
+  )
   const cachedPriceData = localStorage.getItem('COINGECKO_PRICE_DATA')
   let priceData: CoinGeckoAPIData = []
   if (cachedPriceData && Number(lastQueryTimestamp) + COINGECKO_QUERY_COOLDOWN > Date.now()) {
@@ -283,9 +288,9 @@ export const getCoinGeckoTokenPrice = async (id: string): Promise<number | undef
       )
       priceData = data
       localStorage.setItem('COINGECKO_PRICE_DATA', JSON.stringify(priceData))
-    } catch(e) {
-      localStorage.removeItem("COINGECKO_LAST_QUERY_TIMESTAMP")
-      localStorage.removeItem("COINGECKO_PRICE_DATA")
+    } catch (e) {
+      localStorage.removeItem('COINGECKO_LAST_QUERY_TIMESTAMP')
+      localStorage.removeItem('COINGECKO_PRICE_DATA')
       console.log(e)
     }
   }
@@ -838,40 +843,40 @@ const DecimalsAfterDot = 2
 
 export const formatNumber = (number: number | bigint | string): string => {
   const numberAsNumber = Number(number)
-  const numberAsString = numberToString(number)
+  const isNegative = numberAsNumber < 0
+  const absNumberAsString = numberToString(Math.abs(numberAsNumber))
 
-  if (containsOnlyZeroes(numberAsString)) {
+  if (containsOnlyZeroes(absNumberAsString)) {
     return '0'
   }
 
-  const [beforeDot, afterDot] = numberAsString.split('.')
+  const [beforeDot, afterDot] = absNumberAsString.split('.')
 
-  if (numberAsNumber > B) {
-    return (
+  let formattedNumber
+
+  if (Math.abs(numberAsNumber) > B) {
+    formattedNumber =
       beforeDot.slice(0, -BDecimals) +
       (DecimalsAfterDot ? '.' : '') +
       (beforeDot.slice(-BDecimals) + (afterDot ? afterDot : '')).slice(0, DecimalsAfterDot) +
       'B'
-    )
-  } else if (numberAsNumber > M) {
-    return (
+  } else if (Math.abs(numberAsNumber) > M) {
+    formattedNumber =
       beforeDot.slice(0, -MDecimals) +
       (DecimalsAfterDot ? '.' : '') +
       (beforeDot.slice(-MDecimals) + (afterDot ? afterDot : '')).slice(0, DecimalsAfterDot) +
       'M'
-    )
-  } else if (numberAsNumber > K) {
-    return (
+  } else if (Math.abs(numberAsNumber) > K) {
+    formattedNumber =
       beforeDot.slice(0, -KDecimals) +
       (DecimalsAfterDot ? '.' : '') +
       (beforeDot.slice(-KDecimals) + (afterDot ? afterDot : '')).slice(0, DecimalsAfterDot) +
       'K'
-    )
   } else {
     const leadingZeros = afterDot ? countLeadingZeros(afterDot) : 0
     const parsedAfterDot =
       String(parseInt(afterDot)).length > 3 ? String(parseInt(afterDot)).slice(0, 3) : afterDot
-    return trimZeros(
+    formattedNumber = trimZeros(
       beforeDot +
         '.' +
         (parsedAfterDot
@@ -881,6 +886,8 @@ export const formatNumber = (number: number | bigint | string): string => {
           : '')
     )
   }
+
+  return isNegative ? '-' + formattedNumber : formattedNumber
 }
 
 export const formatBalance = (number: number | bigint | string): string => {

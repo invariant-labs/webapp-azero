@@ -409,7 +409,7 @@ export const PriceRangePlot: React.FC<IPriceRangePlot> = ({
         pointColor=''
         lineWidth={2}
         pointSize={2}
-        areaOpacity={0.2}          
+        areaOpacity={0.2}
         data={[
           {
             id: 'less than range',
@@ -436,7 +436,6 @@ export const PriceRangePlot: React.FC<IPriceRangePlot> = ({
           tickRotation: 0,
           tickValues: 5,
           format: value => formatNumber(value.toString())
-        
         }}
         xScale={{
           type: 'linear',
