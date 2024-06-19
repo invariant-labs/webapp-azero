@@ -33,6 +33,7 @@ import {
   USDC,
   tokensPrices
 } from './static'
+import { sleep } from '@store/sagas/wallet'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -253,8 +254,14 @@ export type CoinGeckoAPIPriceData = {
 }
 
 const COINGECKO_QUERY_COOLDOWN = 20 * 60 * 1000
+let isCoinGeckoQueryRunning = false
 
-export const getCoingeckoTokenPrice = async (id: string): Promise<number | undefined> => {
+export const getCoinGeckoTokenPrice = async (id: string): Promise<number | undefined> => {
+  while(isCoinGeckoQueryRunning) {
+    await sleep(100)
+  }
+  isCoinGeckoQueryRunning = true
+
   const cachedLastQueryTimestamp = localStorage.getItem('COINGECKO_LAST_QUERY_TIMESTAMP')
   let lastQueryTimestamp = Date.now()
   if (cachedLastQueryTimestamp) {
@@ -274,6 +281,7 @@ export const getCoingeckoTokenPrice = async (id: string): Promise<number | undef
   }
   localStorage.setItem('COINGECKO_PRICE_DATA', JSON.stringify(priceData))
 
+  isCoinGeckoQueryRunning = false
   return priceData.find(entry => entry.id === id)?.current_price
 }
 

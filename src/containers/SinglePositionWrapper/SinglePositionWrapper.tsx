@@ -8,7 +8,7 @@ import {
   calcPrice,
   calcYPerXPriceByTickIndex,
   createPlaceholderLiquidityPlot,
-  getCoingeckoTokenPrice,
+  getCoinGeckoTokenPrice,
   getMockedTokenPrice,
   poolKeyToString,
   printBigint
@@ -248,7 +248,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
 
     const xId = position.tokenX.coingeckoId ?? ''
     if (xId.length) {
-      getCoingeckoTokenPrice(xId)
+      getCoinGeckoTokenPrice(xId)
         .then(data => setTokenXPriceData({ price: data ?? 0 }))
         .catch(() =>
           setTokenXPriceData(getMockedTokenPrice(position.tokenX.symbol, currentNetwork))
@@ -259,7 +259,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
 
     const yId = position.tokenY.coingeckoId ?? ''
     if (yId.length) {
-      getCoingeckoTokenPrice(yId)
+      getCoinGeckoTokenPrice(yId)
         .then(data => setTokenYPriceData({ price: data ?? 0 }))
         .catch(() =>
           setTokenYPriceData(getMockedTokenPrice(position.tokenY.symbol, currentNetwork))
