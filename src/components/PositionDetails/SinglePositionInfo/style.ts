@@ -218,7 +218,12 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   },
   tokenBalance: {
     color: '#A9B6BF',
-    ...typography.caption2
+    ...typography.caption2,
+    display: 'flex',
+    alignItems: 'center',
+    cursor: 'pointer',
+    flexShrink: 1,
+    marginRight: 10
   },
   tokenUSDValue: {
     color: '#A9B6BF',

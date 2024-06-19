@@ -147,7 +147,7 @@ export const AmountInput: React.FC<IProps> = ({
               {isBalanceLoading ? (
                 <img src={loadingAnimation} className={classes.loadingBalance} />
               ) : (
-                formatNumber(balance || '0')
+                formatNumber(balance || 0)
               )}{' '}
               {tokenIcon.slice(0, 8)}
               {tokenIcon.length > 8 ? '...' : ''}

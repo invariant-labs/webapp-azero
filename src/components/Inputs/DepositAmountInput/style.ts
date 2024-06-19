@@ -110,6 +110,12 @@ export const useStyles = makeStyles()((theme: Theme) => {
       overflow: 'hidden',
       whiteSpace: 'nowrap',
       textOverflow: 'ellipsis',
+      display: 'flex',
+      alignItems: 'center',
+      cursor: 'pointer',
+      paddingBlock: 6,
+      flexShrink: 1,
+      marginRight: 10,
 
       '&:hover': {
         color: colors.white.main
