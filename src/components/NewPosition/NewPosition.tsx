@@ -490,25 +490,27 @@ export const NewPosition: React.FC<INewPosition> = ({
               copyPoolAddressHandler={copyPoolAddressHandler}
             />
           ) : null}
-          <Hidden mdDown>
-            <ConcentrationTypeSwitch
-              onSwitch={val => {
-                if (val) {
-                  setPositionOpeningMethod('concentration')
-                  onPositionOpeningMethodChange('concentration')
-                } else {
-                  setPositionOpeningMethod('range')
-                  onPositionOpeningMethodChange('range')
-                }
-              }}
-              className={classes.switch}
-              style={{
-                opacity: poolKey ? 1 : 0
-              }}
-              disabled={poolKey === ''}
-              currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
-            />
-          </Hidden>
+          {poolKey !== '' && (
+            <Hidden mdDown>
+              <ConcentrationTypeSwitch
+                onSwitch={val => {
+                  if (val) {
+                    setPositionOpeningMethod('concentration')
+                    onPositionOpeningMethodChange('concentration')
+                  } else {
+                    setPositionOpeningMethod('range')
+                    onPositionOpeningMethodChange('range')
+                  }
+                }}
+                className={classes.switch}
+                style={{
+                  opacity: poolKey ? 1 : 0
+                }}
+                disabled={poolKey === ''}
+                currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
+              />
+            </Hidden>
+          )}
           <Button onClick={handleClickSettings} className={classes.settingsIconBtn} disableRipple>
             <img src={settingIcon} className={classes.settingsIcon} />
           </Button>
