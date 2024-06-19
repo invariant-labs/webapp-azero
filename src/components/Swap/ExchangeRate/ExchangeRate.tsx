@@ -28,14 +28,18 @@ const ExchangeRate: React.FC<iProps> = ({
         <img src={loadingAnimation} className={classes.loading}></img>
       </Box>
     ) : (
-      <Typography className={classes.rateText} onClick={onClick}>
+      <Typography className={classes.rateText}>
         1 {tokenFromSymbol} = {isNaN(amount) ? 0 : formatNumber(amount.toFixed(tokenToDecimals))}{' '}
         {tokenToSymbol}
       </Typography>
     )
   }
 
-  return <Box className={classes.ableToHover}>{setLoading()}</Box>
+  return (
+    <Box className={classes.ableToHover} onClick={onClick}>
+      {setLoading()}
+    </Box>
+  )
 }
 
 export default ExchangeRate
