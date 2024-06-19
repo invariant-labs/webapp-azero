@@ -51,6 +51,8 @@ export interface IRangeSelector {
     rightInRange: bigint
   }
   poolKey: string
+  shouldReversePlot: boolean
+  setShouldReversePlot: (val: boolean) => void
 }
 
 export const RangeSelector: React.FC<IRangeSelector> = ({
@@ -77,7 +79,9 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   concentrationIndex,
   setConcentrationIndex,
   getTicksInsideRange,
-  poolKey
+  poolKey,
+  shouldReversePlot,
+  setShouldReversePlot
 }) => {
   const { classes } = useStyles()
 
@@ -96,7 +100,6 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   const [isPlotDiscrete, setIsPlotDiscrete] = useState(initialIsDiscreteValue)
 
   const [currentMidPrice, setCurrentMidPrice] = useState(midPrice)
-  const [currentPoolKey, setCurrentPoolKey] = useState('')
 
   const isMountedRef = useRef(false)
 
@@ -246,16 +249,23 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   }, [currentPairReversed])
 
   useEffect(() => {
+    return () => {
+      if (shouldReversePlot) {
+        setShouldReversePlot(false)
+      }
+    }
+  }, [shouldReversePlot])
+
+  useEffect(() => {
     if (
       !ticksLoading &&
       isMountedRef.current &&
       poolKey !== '' &&
       currentMidPrice !== midPrice &&
-      poolKey !== currentPoolKey
+      !shouldReversePlot
     ) {
       resetPlot()
       setCurrentMidPrice(midPrice)
-      setCurrentPoolKey(poolKey)
     }
   }, [ticksLoading, isMountedRef, midPrice.index])
 
