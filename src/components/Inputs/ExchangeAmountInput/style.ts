@@ -64,10 +64,12 @@ export const useStyles = makeStyles<{ walletDisconnected: boolean }>()(
     balanceContainer: {
       display: 'flex',
       alignItems: 'center',
-      cursor: 'pointer',
       paddingBlock: 6,
       flexShrink: 1,
       marginRight: 10
+    },
+    showMaxButton: {
+      cursor: 'pointer'
     },
     BalanceTypography: {
       color: colors.invariant.lightGrey,

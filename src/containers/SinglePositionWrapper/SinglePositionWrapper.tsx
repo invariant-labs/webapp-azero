@@ -8,7 +8,7 @@ import {
   calcPrice,
   calcYPerXPriceByTickIndex,
   createPlaceholderLiquidityPlot,
-  getCoingeckoTokenPrice,
+  getCoinGeckoTokenPrice,
   getMockedTokenPrice,
   poolKeyToString,
   printBigint
@@ -18,7 +18,7 @@ import { actions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Status, actions as walletActions } from '@store/reducers/wallet'
 import { networkType } from '@store/selectors/connection'
-import { poolsArraySortedByFees } from '@store/selectors/pools'
+import { poolsArraySortedByFees, tickMaps } from '@store/selectors/pools'
 import {
   currentPositionTicks,
   isLoadingPositionsList,
@@ -48,6 +48,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   const position = useSelector(singlePositionData(id))
   const isLoadingList = useSelector(isLoadingPositionsList)
   const { data: ticksData, loading: ticksLoading, hasError: hasTicksError } = useSelector(plotTicks)
+  const allTickMaps = useSelector(tickMaps)
   const {
     lowerTick,
     upperTick,
@@ -62,8 +63,10 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
 
   const [isFinishedDelayRender, setIsFinishedDelayRender] = useState(false)
 
-  useEffect(() => {
-    if (position?.tokenX && position.tokenY) {
+  const poolKey =position?  poolKeyToString(position?.poolKey) || '' : ''
+
+  useEffect(() => { 
+    if (position && position.tokenX && position.tokenY ) {
       dispatch(
         poolsActions.getTicksAndTickMaps({
           tokenFrom: position.tokenX.address,
@@ -72,8 +75,12 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
         })
       )
     }
-    if (position && waitingForTicksData === null) {
+}, [waitingForTicksData, position?.tokenX , position?.tokenY])
+
+  useEffect(() => {
+    if (position &&  position.poolKey &&  (waitingForTicksData === null && allTickMaps[poolKey] !== undefined)) {
       setWaitingForTicksData(true)
+
       dispatch(
         actions.getCurrentPositionTicks({
           poolKey: position.poolKey,
@@ -88,7 +95,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
         })
       )
     }
-  }, [position])
+  }, [position, position?.poolKey, allTickMaps, waitingForTicksData])
 
   useEffect(() => {
     if (waitingForTicksData === true && !currentPositionTicksLoading) {
@@ -249,8 +256,8 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
 
     const xId = position.tokenX.coingeckoId ?? ''
     if (xId.length) {
-      getCoingeckoTokenPrice(xId)
-        .then(data => setTokenXPriceData(data))
+      getCoinGeckoTokenPrice(xId)
+        .then(data => setTokenXPriceData({ price: data ?? 0 }))
         .catch(() =>
           setTokenXPriceData(getMockedTokenPrice(position.tokenX.symbol, currentNetwork))
         )
@@ -260,8 +267,8 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
 
     const yId = position.tokenY.coingeckoId ?? ''
     if (yId.length) {
-      getCoingeckoTokenPrice(yId)
-        .then(data => setTokenYPriceData(data))
+      getCoinGeckoTokenPrice(yId)
+        .then(data => setTokenYPriceData({ price: data ?? 0 }))
         .catch(() =>
           setTokenYPriceData(getMockedTokenPrice(position.tokenY.symbol, currentNetwork))
         )
@@ -350,7 +357,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
             })
           )
         }
-        ticksLoading={ticksLoading}
+        ticksLoading={ticksLoading || !!waitingForTicksData || !position || allTickMaps[poolKey] === undefined}
         tickSpacing={position.poolKey.feeTier.tickSpacing}
         tokenX={{
           name: position.tokenX.symbol,

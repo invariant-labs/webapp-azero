@@ -35,6 +35,7 @@ export interface IPoolsStore {
   nearestPoolTicksForPair: { [key in string]: Tick[] }
   isLoadingLatestPoolsForTransaction: boolean
   isLoadingTicksAndTickMaps: boolean
+  isLoadingPoolKeys: boolean
   tickMaps: { [key in string]: string }
 }
 
@@ -84,6 +85,7 @@ export const defaultState: IPoolsStore = {
   nearestPoolTicksForPair: {},
   isLoadingLatestPoolsForTransaction: false,
   isLoadingTicksAndTickMaps: false,
+  isLoadingPoolKeys: true,
   tickMaps: {}
 }
 
@@ -132,6 +134,7 @@ const poolsSlice = createSlice({
       return state
     },
     setPoolKeys(state, action: PayloadAction<PoolKey[]>) {
+      state.isLoadingPoolKeys = false
       action.payload.map(poolKey => {
         const keyStringified = poolKeyToString(poolKey)
         state.poolKeys[keyStringified] = poolKey
@@ -139,6 +142,7 @@ const poolsSlice = createSlice({
       return state
     },
     getPoolKeys(state) {
+      state.isLoadingPoolKeys = true
       return state
     },
     addPool(state, action: PayloadAction<PoolWithPoolKey | undefined>) {

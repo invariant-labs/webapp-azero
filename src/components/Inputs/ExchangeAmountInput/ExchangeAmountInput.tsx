@@ -141,7 +141,11 @@ export const AmountInput: React.FC<IProps> = ({
           direction='row'
           wrap='nowrap'
           className={classes.bottom}>
-          <Grid className={classes.balanceContainer} onClick={onMaxClick}>
+          <Grid
+            className={classNames(classes.balanceContainer, {
+              [classes.showMaxButton]: showMaxButton
+            })}
+            onClick={showMaxButton ? onMaxClick : () => {}}>
             <Typography className={classes.BalanceTypography}>
               Balance:{' '}
               {isBalanceLoading ? (

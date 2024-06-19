@@ -23,7 +23,17 @@ import apiSingleton from '@store/services/apiSingleton'
 import invariantSingleton from '@store/services/invariantSingleton'
 import psp22Singleton from '@store/services/psp22Singleton'
 import axios from 'axios'
-import { BTC, ETH, ErrorMessage, Token, TokenPriceData, USDC, tokensPrices } from './static'
+import {
+  BTC,
+  DEFAULT_TOKENS,
+  ETH,
+  ErrorMessage,
+  Token,
+  TokenPriceData,
+  USDC,
+  tokensPrices
+} from './static'
+import { sleep } from '@store/sagas/wallet'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -235,27 +245,52 @@ export const createPlaceholderLiquidityPlot = (
   return isXtoY ? ticksData : ticksData.reverse()
 }
 
-export interface CoingeckoPriceData {
-  price: number
-  priceChange: number
-}
-export interface CoingeckoApiPriceData {
+export type CoinGeckoAPIData = CoinGeckoAPIPriceData[]
+
+export type CoinGeckoAPIPriceData = {
   id: string
   current_price: number
   price_change_percentage_24h: number
 }
 
-export const getCoingeckoTokenPrice = async (id: string): Promise<CoingeckoPriceData> => {
-  return await axios
-    .get<
-      CoingeckoApiPriceData[]
-    >(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${id}`)
-    .then(res => {
-      return {
-        price: res.data[0].current_price ?? 0,
-        priceChange: res.data[0].price_change_percentage_24h ?? 0
-      }
-    })
+const COINGECKO_QUERY_COOLDOWN = 20 * 60 * 1000
+let isCoinGeckoQueryRunning = false
+
+export const getCoinGeckoTokenPrice = async (id: string): Promise<number | undefined> => {
+  while (isCoinGeckoQueryRunning) {
+    await sleep(100)
+  }
+  isCoinGeckoQueryRunning = true
+
+  const cachedLastQueryTimestamp = localStorage.getItem('COINGECKO_LAST_QUERY_TIMESTAMP')
+  let lastQueryTimestamp = 0
+  if (cachedLastQueryTimestamp) {
+    lastQueryTimestamp = Number(cachedLastQueryTimestamp)
+  } else {
+    lastQueryTimestamp = Date.now()
+    localStorage.setItem('COINGECKO_LAST_QUERY_TIMESTAMP', String(lastQueryTimestamp))
+  }
+
+  const cachedPriceData = localStorage.getItem('COINGECKO_PRICE_DATA')
+  let priceData: CoinGeckoAPIData = []
+  if (cachedPriceData && Number(lastQueryTimestamp) + COINGECKO_QUERY_COOLDOWN > Date.now()) {
+    priceData = JSON.parse(cachedPriceData)
+  } else {
+    try {
+      const { data } = await axios.get<CoinGeckoAPIData>(
+        `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${DEFAULT_TOKENS.map(token => token.coingeckoId)}`
+      )
+      priceData = data
+      localStorage.setItem('COINGECKO_PRICE_DATA', JSON.stringify(priceData))
+    } catch (e) {
+      localStorage.removeItem('COINGECKO_LAST_QUERY_TIMESTAMP')
+      localStorage.removeItem('COINGECKO_PRICE_DATA')
+      console.log(e)
+    }
+  }
+
+  isCoinGeckoQueryRunning = false
+  return priceData.find(entry => entry.id === id)?.current_price
 }
 
 export const getMockedTokenPrice = (symbol: string, network: Network): TokenPriceData => {

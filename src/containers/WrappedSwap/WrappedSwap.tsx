@@ -4,7 +4,7 @@ import { AddressOrPair } from '@polkadot/api/types'
 import { TokenPriceData, commonTokensForNetworks } from '@store/consts/static'
 import {
   addNewTokenToLocalStorage,
-  getCoingeckoTokenPrice,
+  getCoinGeckoTokenPrice,
   getMockedTokenPrice,
   getNewTokenOrThrow
 } from '@store/consts/utils'
@@ -155,8 +155,8 @@ export const WrappedSwap = () => {
 
     if (id.length) {
       setPriceFromLoading(true)
-      getCoingeckoTokenPrice(id)
-        .then(data => setTokenFromPriceData(data))
+      getCoinGeckoTokenPrice(id)
+        .then(data => setTokenFromPriceData({ price: data ?? 0 }))
         .catch(() =>
           setTokenFromPriceData(
             getMockedTokenPrice(tokensDict[tokenFrom.toString()].symbol, network)
@@ -178,8 +178,8 @@ export const WrappedSwap = () => {
     const id = tokensDict[tokenTo.toString()].coingeckoId ?? ''
     if (id.length) {
       setPriceToLoading(true)
-      getCoingeckoTokenPrice(id)
-        .then(data => setTokenToPriceData(data))
+      getCoinGeckoTokenPrice(id)
+        .then(data => setTokenToPriceData({ price: data ?? 0 }))
         .catch(() =>
           setTokenToPriceData(getMockedTokenPrice(tokensDict[tokenTo.toString()].symbol, network))
         )
@@ -222,8 +222,8 @@ export const WrappedSwap = () => {
 
     if (idTo.length) {
       setPriceToLoading(true)
-      getCoingeckoTokenPrice(idTo)
-        .then(data => setTokenToPriceData(data))
+      getCoinGeckoTokenPrice(idTo)
+        .then(data => setTokenToPriceData({ price: data ?? 0 }))
         .catch(() =>
           setTokenToPriceData(getMockedTokenPrice(tokensDict[tokenTo.toString()].symbol, network))
         )
@@ -236,8 +236,8 @@ export const WrappedSwap = () => {
 
     if (idFrom.length) {
       setPriceFromLoading(true)
-      getCoingeckoTokenPrice(idFrom)
-        .then(data => setTokenFromPriceData(data))
+      getCoinGeckoTokenPrice(idFrom)
+        .then(data => setTokenFromPriceData({ price: data ?? 0 }))
         .catch(() =>
           setTokenFromPriceData(
             getMockedTokenPrice(tokensDict[tokenFrom.toString()].symbol, network)
