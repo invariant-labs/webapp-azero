@@ -117,7 +117,7 @@ export function* handleAirdrop(): Generator {
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
 
-    const txResult = yield* call(sendTx, signedBatchedTx as any)
+    const txResult = yield* call(sendTx, signedBatchedTx)
 
     closeSnackbar(loaderAirdrop)
     yield put(snackbarsActions.remove(loaderAirdrop))

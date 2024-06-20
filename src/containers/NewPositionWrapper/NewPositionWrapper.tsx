@@ -111,7 +111,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     }
   }, [])
 
-  const liquidityRef = useRef<any>(0n) // TODO delete any
+  const liquidityRef = useRef<bigint>(0n)
 
   useEffect(() => {
     setProgress('none')

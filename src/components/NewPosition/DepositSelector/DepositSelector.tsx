@@ -10,6 +10,8 @@ import classNames from 'classnames'
 import React, { useCallback, useEffect, useState } from 'react'
 import FeeSwitch from '../FeeSwitch/FeeSwitch'
 import { useStyles } from './style'
+import { AddressOrPair } from '@polkadot/api/types'
+import { SwapToken } from '@store/selectors/wallet'
 export interface InputState {
   value: string
   setValue: (value: string) => void
@@ -22,7 +24,7 @@ export interface IDepositSelector {
   initialTokenFrom: string
   initialTokenTo: string
   initialFee: string
-  tokens: any[] // TODO delete any
+  tokens: SwapToken[]
   setPositionTokens: (
     tokenAIndex: number | null,
     tokenBindex: number | null,
@@ -42,7 +44,7 @@ export interface IDepositSelector {
   canCreateNewPool: boolean
   canCreateNewPosition: boolean
   handleAddToken: (address: string) => void
-  commonTokens: any[] // TODO delete any
+  commonTokens: AddressOrPair[]
   initialHideUnknownTokensValue: boolean
   onHideUnknownTokensChange: (val: boolean) => void
   priceALoading?: boolean

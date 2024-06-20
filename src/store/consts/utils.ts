@@ -416,7 +416,7 @@ export const getTokenBalances = async (
 ): Promise<[string, bigint][]> => {
   const psp22 = await psp22Singleton.loadInstance(api, network)
 
-  const promises: Promise<any>[] = [] // TODO delete any
+  const promises: Promise<bigint>[] = []
   tokens.map(token => {
     promises.push(psp22.balanceOf(address, token))
   })
@@ -907,8 +907,13 @@ export const countLeadingZeros = (str: string): number => {
   return (str.match(/^0+/) || [''])[0].length
 }
 
-export const isErrorMessage = (value: any): boolean => {
-  return Object.values(ErrorMessage).includes(value)
+export const isErrorMessage = (message: string): boolean => {
+  for (const value of Object.values(ErrorMessage)) {
+    if (message === value) {
+      return true
+    }
+  }
+  return false
 }
 
 export const getNewTokenOrThrow = async (
@@ -950,4 +955,15 @@ export const containsOnlyZeroes = (string: string): boolean => {
 
 export const stringToFixed = (string: string, numbersAfterDot: number): string => {
   return string.includes('.') ? string.slice(0, string.indexOf('.') + 1 + numbersAfterDot) : string
+}
+
+export const ensureError = (value: unknown): Error => {
+  if (value instanceof Error) return value
+
+  let stringified = '[Unable to stringify the thrown value]'
+
+  stringified = JSON.stringify(value)
+
+  const error = new Error(stringified)
+  return error
 }
