@@ -159,7 +159,7 @@ export const NewPosition: React.FC<INewPosition> = ({
   isBalanceLoading
 }) => {
   const { classes } = useStyles()
-  const navigate = useNavigate()
+  // const navigate = useNavigate()
 
   const [positionOpeningMethod, setPositionOpeningMethod] = useState<PositionOpeningMethod>(
     initialOpeningPositionMethod
@@ -427,15 +427,15 @@ export const NewPosition: React.FC<INewPosition> = ({
     if (index1 != null && index2 != null) {
       const token1Symbol = tokens[index1].symbol
       const token2Symbol = tokens[index2].symbol
-      navigate(`/newPosition/${token1Symbol}/${token2Symbol}/${parsedFee}`, { replace: true })
+      // navigate(`/newPosition/${token1Symbol}/${token2Symbol}/${parsedFee}`, { replace: true })
     } else if (index1 != null) {
       const tokenSymbol = tokens[index1].symbol
-      navigate(`/newPosition/${tokenSymbol}/${parsedFee}`, { replace: true })
+      // navigate(`/newPosition/${tokenSymbol}/${parsedFee}`, { replace: true })
     } else if (index2 != null) {
       const tokenSymbol = tokens[index2].symbol
-      navigate(`/newPosition/${tokenSymbol}/${parsedFee}`, { replace: true })
+      // navigate(`/newPosition/${tokenSymbol}/${parsedFee}`, { replace: true })
     } else if (fee != null) {
-      navigate(`/newPosition/${parsedFee}`, { replace: true })
+      // navigate(`/newPosition/${parsedFee}`, { replace: true })
     }
   }
 

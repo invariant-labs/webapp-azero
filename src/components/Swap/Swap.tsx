@@ -20,14 +20,14 @@ import {
   trimLeadingZeros
 } from '@store/consts/utils'
 import { PoolWithPoolKey } from '@store/reducers/pools'
-import { Swap as SwapData, actions } from '@store/reducers/swap'
+import { Swap as SwapData } from '@store/reducers/swap'
 import { Status } from '@store/reducers/wallet'
 import { SwapError } from '@store/sagas/swap'
 import { SwapToken } from '@store/selectors/wallet'
 import { blurContent, unblurContent } from '@utils/uiUtils'
 import classNames from 'classnames'
 import React, { useEffect, useRef, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { Simulate } from '@store/reducers/swap'
 import ExchangeRate from './ExchangeRate/ExchangeRate'
 import TransactionDetailsBox from './TransactionDetailsBox/TransactionDetailsBox'
 import useStyles from './style'
@@ -90,6 +90,7 @@ export interface ISwap {
   initialSlippage: string
   isBalanceLoading: boolean
   simulateResult: SimulateResult
+  simulateSwap: (simulate: Simulate) => void
 }
 
 export const Swap: React.FC<ISwap> = ({
@@ -120,7 +121,8 @@ export const Swap: React.FC<ISwap> = ({
   initialSlippage,
   isBalanceLoading,
   swapData,
-  simulateResult
+  simulateResult,
+  simulateSwap
 }) => {
   const { classes } = useStyles()
   enum inputTarget {
@@ -144,7 +146,6 @@ export const Swap: React.FC<ISwap> = ({
   const [refresherTime, setRefresherTime] = React.useState<number>(REFRESHER_INTERVAL)
 
   const timeoutRef = useRef<number>(0)
-  const dispatch = useDispatch()
 
   useEffect(() => {
     if (!!tokens.length && tokenFromIndex === null && tokenToIndex === null) {
@@ -267,23 +268,19 @@ export const Swap: React.FC<ISwap> = ({
       swapData
     ) {
       if (inputRef === inputTarget.FROM) {
-        dispatch(
-          actions.getSimulateResult({
-            fromToken: tokens[tokenFromIndex].assetAddress,
-            toToken: tokens[tokenToIndex].assetAddress,
-            amount: convertBalanceToBigint(amountFrom, Number(tokens[tokenFromIndex].decimals)),
-            byAmountIn: true
-          })
-        )
+        simulateSwap({
+          fromToken: tokens[tokenFromIndex].assetAddress,
+          toToken: tokens[tokenToIndex].assetAddress,
+          amount: convertBalanceToBigint(amountFrom, Number(tokens[tokenFromIndex].decimals)),
+          byAmountIn: true
+        })
       } else {
-        dispatch(
-          actions.getSimulateResult({
-            fromToken: tokens[tokenFromIndex].assetAddress,
-            toToken: tokens[tokenToIndex].assetAddress,
-            amount: convertBalanceToBigint(amountTo, Number(tokens[tokenToIndex].decimals)),
-            byAmountIn: false
-          })
-        )
+        simulateSwap({
+          fromToken: tokens[tokenFromIndex].assetAddress,
+          toToken: tokens[tokenToIndex].assetAddress,
+          amount: convertBalanceToBigint(amountTo, Number(tokens[tokenToIndex].decimals)),
+          byAmountIn: false
+        })
       }
     }
   }

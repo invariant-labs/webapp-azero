@@ -66,16 +66,16 @@ export const Primary: Story = {
       amountIn: 123 as any,
       byAmountIn: false,
       amountOut: 1114 as any,
-      poolKey: newPoolKey('0x123132423423', '0x123132423423', { fee: 1n, tickSpacing: 1n })
+      poolKey: null
     },
     tickmap: {},
     tokens: [],
     walletStatus: Status.Initialized,
     simulateResult: {
-      poolKey: newPoolKey('0x123132423423', '0x123132423423', { fee: 1n, tickSpacing: 1n }),
-      amountOut: 1000000000000n,
+      poolKey: null,
+      amountOut: 1000000000000 as any,
       priceImpact: 1.23,
-      targetSqrtPrice: 1000000000000000000000000n,
+      targetSqrtPrice: 1000000000000000000000000 as any,
       errors: []
     }
   },
@@ -117,7 +117,14 @@ export const Primary: Story = {
           amountIn: 123n,
           byAmountIn: false,
           amountOut: 1114n,
-          poolKey: newPoolKey('0x123132423423', '0x123132423423', { fee: 1n, tickSpacing: 1n })
+          poolKey: null
+        }}
+        simulateResult={{
+          poolKey: null,
+          amountOut: 1000000000000n,
+          priceImpact: 1.23,
+          targetSqrtPrice: 1000000000000000000000000n,
+          errors: []
         }}
       />
     )

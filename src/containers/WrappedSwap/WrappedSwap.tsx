@@ -10,7 +10,7 @@ import {
 } from '@store/consts/utils'
 import { actions as poolsActions } from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import { actions } from '@store/reducers/swap'
+import { Simulate, actions } from '@store/reducers/swap'
 import { actions as walletActions } from '@store/reducers/wallet'
 import { networkType, rpcAddress } from '@store/selectors/connection'
 import {
@@ -249,6 +249,10 @@ export const WrappedSwap = () => {
     }
   }
 
+  const simulateSwap = (simulate: Simulate) => {
+    dispatch(actions.getSimulateResult(simulate))
+  }
+
   return (
     <Swap
       isFetchingNewPool={isFetchingNewPool}
@@ -323,6 +327,7 @@ export const WrappedSwap = () => {
       initialSlippage={initialSlippage}
       isBalanceLoading={isBalanceLoading}
       simulateResult={swapSimulateResult}
+      simulateSwap={simulateSwap}
     />
   )
 }
