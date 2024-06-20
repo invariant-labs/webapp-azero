@@ -76,9 +76,6 @@ const walletSlice = createSlice({
       state.tokensBalances[action.payload.address.toString()] = action.payload
       return state
     },
-    getTokens(state) {
-      return state
-    },
     airdrop() {},
     connect() {},
     disconnect() {}

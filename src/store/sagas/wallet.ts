@@ -6,7 +6,7 @@ import { FaucetTokenList, TokenAirdropAmount } from '@store/consts/static'
 import { createLoaderKey, getTokenBalances } from '@store/consts/utils'
 import { actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import { ITokenBalance, Status, actions, actions as walletActions } from '@store/reducers/wallet'
+import { Status, actions, actions as walletActions } from '@store/reducers/wallet'
 import { networkType } from '@store/selectors/connection'
 import { tokens } from '@store/selectors/pools'
 import { address, status } from '@store/selectors/wallet'
@@ -144,23 +144,6 @@ export function* handleAirdrop(): Generator {
   }
 }
 
-export function* fetchTokensBalances(): Generator {
-  const api = yield* getConnection()
-  const network = yield* select(networkType)
-  const walletAddress = yield* select(address)
-  const allTokens = yield* select(tokens)
-  const tokensList = Object.keys(allTokens)
-
-  const balances = yield* call(getTokenBalances, tokensList, api, network, walletAddress)
-
-  const convertedBalances: ITokenBalance[] = balances.map(balance => ({
-    address: balance[0],
-    balance: balance[1]
-  }))
-
-  yield* put(actions.addTokenBalances(convertedBalances))
-}
-
 export function* init(): Generator {
   try {
     yield* put(actions.setStatus(Status.Init))
@@ -176,7 +159,8 @@ export function* init(): Generator {
 
     yield* put(actions.setBalance(BigInt(balance)))
     yield* put(actions.setStatus(Status.Initialized))
-    yield* call(fetchTokensBalances)
+    const allTokens = yield* select(tokens)
+    yield* call(fetchBalances, Object.keys(allTokens))
     yield* put(actions.setIsBalanceLoading(false))
   } catch (error) {
     console.log(error)
@@ -264,23 +248,12 @@ export function* initSaga(): Generator {
   yield takeLeading(actions.initWallet, init)
 }
 
-export function* handleFetchTokensBalances(): Generator {
-  yield takeLeading(actions.getTokens, fetchTokensBalances)
-}
-
 export function* getBalancesHandler(): Generator {
   yield takeLeading(actions.getBalances, handleGetBalances)
 }
 
 export function* walletSaga(): Generator {
   yield all(
-    [
-      initSaga,
-      airdropSaga,
-      connectHandler,
-      disconnectHandler,
-      handleFetchTokensBalances,
-      getBalancesHandler
-    ].map(spawn)
+    [initSaga, airdropSaga, connectHandler, disconnectHandler, getBalancesHandler].map(spawn)
   )
 }
