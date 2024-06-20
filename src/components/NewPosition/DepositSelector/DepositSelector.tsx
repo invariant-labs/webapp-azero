@@ -39,8 +39,6 @@ export interface IDepositSelector {
   onReverseTokens: () => void
   poolIndex: number | null
   bestTierIndex?: number
-  canCreateNewPool: boolean
-  canCreateNewPosition: boolean
   handleAddToken: (address: string) => void
   commonTokens: any[] // TODO delete any
   initialHideUnknownTokensValue: boolean
@@ -71,8 +69,6 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
   onReverseTokens,
   poolIndex,
   bestTierIndex,
-  canCreateNewPool,
-  canCreateNewPosition,
   handleAddToken,
   commonTokens,
   initialHideUnknownTokensValue,
@@ -139,13 +135,6 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
       return concentrationArray[minimumSliderIndex]
         ? `Set concentration to at least ${concentrationArray[minimumSliderIndex].toFixed(0)}x`
         : 'Set higher fee tier'
-    }
-
-    if (
-      (poolIndex === null && !canCreateNewPool) ||
-      (poolIndex !== null && !canCreateNewPosition)
-    ) {
-      return 'Insufficient AZERO'
     }
 
     if (

@@ -43,8 +43,6 @@ type Story = StoryObj<typeof meta>
 
 export const Primary: Story = {
   args: {
-    canCreateNewPool: true,
-    canCreateNewPosition: true,
     commonTokens: [
       'So11111111111111111111111111111111111111112',
       '9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E',

@@ -86,8 +86,6 @@ export interface INewPosition {
   initialIsDiscreteValue: boolean
   onDiscreteChange: (val: boolean) => void
   currentPriceSqrt: TokenAmount
-  canCreateNewPool: boolean
-  canCreateNewPosition: boolean
   handleAddToken: (address: string) => void
   commonTokens: any[] // TODO delete any
   initialOpeningPositionMethod: PositionOpeningMethod
@@ -135,8 +133,6 @@ export const NewPosition: React.FC<INewPosition> = ({
   bestTiers,
   initialIsDiscreteValue,
   onDiscreteChange,
-  canCreateNewPool,
-  canCreateNewPosition,
   handleAddToken,
   commonTokens,
   initialOpeningPositionMethod,
@@ -637,8 +633,6 @@ export const NewPosition: React.FC<INewPosition> = ({
           }}
           poolIndex={poolIndex}
           bestTierIndex={bestTierIndex}
-          canCreateNewPool={canCreateNewPool}
-          canCreateNewPosition={canCreateNewPosition}
           handleAddToken={handleAddToken}
           commonTokens={commonTokens}
           initialHideUnknownTokensValue={initialHideUnknownTokensValue}
