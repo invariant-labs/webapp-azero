@@ -50,6 +50,7 @@ export interface IDepositSelector {
   concentrationIndex: number
   minimumSliderIndex: number
   positionOpeningMethod: PositionOpeningMethod
+  isBalanceLoading: boolean
 }
 
 export const DepositSelector: React.FC<IDepositSelector> = ({
@@ -79,7 +80,8 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
   concentrationArray,
   concentrationIndex,
   minimumSliderIndex,
-  positionOpeningMethod
+  positionOpeningMethod,
+  isBalanceLoading
 }) => {
   const { classes } = useStyles()
 
@@ -303,6 +305,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
           }}
           {...tokenAInputState}
           priceLoading={priceALoading}
+          isBalanceLoading={isBalanceLoading}
         />
 
         <DepositAmountInput
@@ -335,6 +338,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
           }}
           {...tokenBInputState}
           priceLoading={priceBLoading}
+          isBalanceLoading={isBalanceLoading}
         />
       </Grid>
 

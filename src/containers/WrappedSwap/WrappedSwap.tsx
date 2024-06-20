@@ -195,11 +195,16 @@ export const WrappedSwap = () => {
   }
 
   const onRefresh = (tokenFromIndex: number | null, tokenToIndex: number | null) => {
-    dispatch(walletActions.getBalance())
-
     if (tokenFromIndex === null || tokenToIndex == null) {
       return
     }
+
+    dispatch(
+      walletActions.getBalances([
+        tokensList[tokenFromIndex].address.toString(),
+        tokensList[tokenToIndex].address.toString()
+      ])
+    )
 
     dispatch(
       poolsActions.getAllPoolsForPairData({

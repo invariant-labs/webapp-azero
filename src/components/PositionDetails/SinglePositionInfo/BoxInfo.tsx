@@ -9,6 +9,7 @@ import {
   showPrefix
 } from '@store/consts/utils'
 import React from 'react'
+import loadingAnimation from '@static/gif/loading.gif'
 import { ILiquidityToken } from './consts'
 import useStyles from './style'
 
@@ -25,6 +26,7 @@ export const BoxInfo: React.FC<{
   showBalance?: boolean
   swapHandler?: () => void
   showLoader?: boolean
+  isBalanceLoading: boolean
 }> = ({
   title,
   onClickButton,
@@ -32,7 +34,8 @@ export const BoxInfo: React.FC<{
   tokenA,
   showBalance = false,
   swapHandler,
-  showLoader = false
+  showLoader = false,
+  isBalanceLoading
 }) => {
   const { classes } = useStyles()
 
@@ -116,7 +119,13 @@ export const BoxInfo: React.FC<{
           {showBalance ? (
             <Grid className={classes.tokenAreaLowerPart}>
               <Typography className={classes.tokenBalance}>
-                Balance: {formatNumber(tokenA.balance)} {tokenA.name}
+                Balance:{' '}
+                {isBalanceLoading ? (
+                  <img src={loadingAnimation} className={classes.loadingBalance} />
+                ) : (
+                  formatNumber(tokenA.balance)
+                )}{' '}
+                {tokenA.name}
               </Typography>
               {typeof tokenA.usdValue !== 'undefined' && tokenA.price ? (
                 <Typography className={classes.tokenUSDValue}>
@@ -148,7 +157,13 @@ export const BoxInfo: React.FC<{
           {showBalance ? (
             <Grid className={classes.tokenAreaLowerPart}>
               <Typography className={classes.tokenBalance}>
-                Balance: {formatNumber(tokenB.balance)} {tokenB.name}
+                Balance:{' '}
+                {isBalanceLoading ? (
+                  <img src={loadingAnimation} className={classes.loadingBalance} />
+                ) : (
+                  formatNumber(tokenB.balance)
+                )}{' '}
+                {tokenB.name}
               </Typography>
               {typeof tokenB.usdValue !== 'undefined' && tokenB.price ? (
                 <Typography className={classes.tokenUSDValue}>

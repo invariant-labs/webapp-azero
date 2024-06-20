@@ -110,6 +110,12 @@ export const useStyles = makeStyles()((theme: Theme) => {
       overflow: 'hidden',
       whiteSpace: 'nowrap',
       textOverflow: 'ellipsis',
+      display: 'flex',
+      alignItems: 'center',
+      cursor: 'pointer',
+      paddingBlock: 6,
+      flexShrink: 1,
+      marginRight: 10,
 
       '&:hover': {
         color: colors.white.main
@@ -200,6 +206,11 @@ export const useStyles = makeStyles()((theme: Theme) => {
       ...typography.caption4,
       fontSize: 13,
       color: colors.white.main
+    },
+    loadingBalance: {
+      padding: '0 10px 0 20px',
+      width: 15,
+      height: 15
     }
   }
 })

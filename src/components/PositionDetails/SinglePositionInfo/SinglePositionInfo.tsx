@@ -23,6 +23,7 @@ interface IProp {
   swapHandler: () => void
   showFeesLoader?: boolean
   userHasStakes?: boolean
+  isBalanceLoading: boolean
 }
 
 const SinglePositionInfo: React.FC<IProp> = ({
@@ -36,7 +37,8 @@ const SinglePositionInfo: React.FC<IProp> = ({
   xToY,
   swapHandler,
   showFeesLoader = false,
-  userHasStakes = false
+  userHasStakes = false,
+  isBalanceLoading
 }) => {
   const navigate = useNavigate()
 
@@ -134,6 +136,7 @@ const SinglePositionInfo: React.FC<IProp> = ({
           }
           showBalance
           swapHandler={swapHandler}
+          isBalanceLoading={isBalanceLoading}
         />
         <BoxInfo
           title={'Unclaimed fees'}
@@ -145,6 +148,7 @@ const SinglePositionInfo: React.FC<IProp> = ({
           }
           onClickButton={onClickClaimFee}
           showLoader={showFeesLoader}
+          isBalanceLoading={isBalanceLoading}
         />
       </Grid>
     </Grid>

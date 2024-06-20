@@ -103,6 +103,7 @@ export interface INewPosition {
   initialSlippage: string
   poolKey: string
   onRefresh: () => void
+  isBalanceLoading: boolean
 }
 
 export const NewPosition: React.FC<INewPosition> = ({
@@ -150,7 +151,8 @@ export const NewPosition: React.FC<INewPosition> = ({
   initialSlippage,
   poolKey,
   currentPriceSqrt,
-  onRefresh
+  onRefresh,
+  isBalanceLoading
 }) => {
   const { classes } = useStyles()
   const navigate = useNavigate()
@@ -646,6 +648,7 @@ export const NewPosition: React.FC<INewPosition> = ({
           concentrationIndex={concentrationIndex}
           minimumSliderIndex={minimumSliderIndex}
           positionOpeningMethod={positionOpeningMethod}
+          isBalanceLoading={isBalanceLoading}
         />
         <Hidden mdUp>
           <Grid container justifyContent='end' mb={2}>

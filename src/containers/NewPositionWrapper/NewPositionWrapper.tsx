@@ -40,7 +40,7 @@ import {
   isLoadingPoolKeys
 } from '@store/selectors/pools'
 import { initPosition, plotTicks } from '@store/selectors/positions'
-import { address, status, swapTokens } from '@store/selectors/wallet'
+import { address, balanceLoading, status, swapTokens } from '@store/selectors/wallet'
 import { openWalletSelectorModal } from '@utils/web3/selector'
 import { VariantType } from 'notistack'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
@@ -65,6 +65,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const allPoolKeys = useSelector(poolKeys)
   const poolsData = useSelector(pools)
   const loadingTicksAndTickMaps = useSelector(isLoadingTicksAndTickMaps)
+  const isBalanceLoading = useSelector(balanceLoading)
   const loadingPoolKeys = useSelector(isLoadingPoolKeys)
 
   const { success, inProgress } = useSelector(initPosition)
@@ -501,7 +502,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   }
 
   const onRefresh = () => {
-    if (poolKey !== '' && tokenAIndex !== null && tokenBIndex !== null && poolIndex !== null) {
+    if (tokenAIndex !== null && tokenBIndex !== null) {
       dispatch(
         walletActions.getBalances([
           tokens[tokenAIndex].assetAddress.toString(),
@@ -519,15 +520,17 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         )
       )
 
-      dispatch(
-        positionsActions.getCurrentPlotTicks({
-          poolKey: allPoolKeys[poolKey],
-          isXtoY:
-            allPools[poolIndex].poolKey.tokenX ===
-            tokens[currentPairReversed === true ? tokenBIndex : tokenAIndex].assetAddress,
-          fetchTicksAndTickmap: true
-        })
-      )
+      if (poolKey !== '' && poolIndex !== null) {
+        dispatch(
+          positionsActions.getCurrentPlotTicks({
+            poolKey: allPoolKeys[poolKey],
+            isXtoY:
+              allPools[poolIndex].poolKey.tokenX ===
+              tokens[currentPairReversed === true ? tokenBIndex : tokenAIndex].assetAddress,
+            fetchTicksAndTickmap: true
+          })
+        )
+      }
     }
   }
 
@@ -700,6 +703,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       }}
       poolKey={poolKey}
       onRefresh={onRefresh}
+      isBalanceLoading={isBalanceLoading}
     />
   )
 }
