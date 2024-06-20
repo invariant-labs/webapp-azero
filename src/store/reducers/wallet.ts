@@ -79,9 +79,6 @@ const walletSlice = createSlice({
     getTokens(state) {
       return state
     },
-    getSelectedTokens(state, _action: PayloadAction<string[]>) {
-      return state
-    },
     airdrop() {},
     connect() {},
     disconnect() {}

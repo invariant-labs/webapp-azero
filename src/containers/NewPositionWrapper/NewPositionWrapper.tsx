@@ -342,7 +342,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       getNewTokenOrThrow(address, currentNetwork, rpc, walletAddress)
         .then(data => {
           dispatch(poolsActions.addTokens(data))
-          dispatch(walletActions.getSelectedTokens(Object.keys(data)))
+          dispatch(walletActions.getBalances(Object.keys(data)))
           addNewTokenToLocalStorage(address, currentNetwork)
           dispatch(
             snackbarsActions.add({

@@ -104,7 +104,7 @@ export const WrappedSwap = () => {
       getNewTokenOrThrow(address, network, rpc, walletAddress)
         .then(data => {
           dispatch(poolsActions.addTokens(data))
-          dispatch(walletActions.getSelectedTokens(Object.keys(data)))
+          dispatch(walletActions.getBalances(Object.keys(data)))
           addNewTokenToLocalStorage(address, network)
           dispatch(
             snackbarsActions.add({
