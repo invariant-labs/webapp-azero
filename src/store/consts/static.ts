@@ -269,7 +269,8 @@ export const SWAP_SAFE_TRANSACTION_FEE = BigInt(Math.ceil(0.05 * 10 ** 12))
 export const POOL_SAFE_TRANSACTION_FEE = BigInt(Math.ceil(0.05 * 10 ** 12))
 
 export enum ErrorMessage {
-  TRANSACTION_SIGNING_ERROR = 'Error while signing transaction.'
+  TRANSACTION_SIGNING_ERROR = 'Error while signing transaction.',
+  CANCELLED_TRANSACTION = 'Cancelled transaction.'
 }
 
 export const REFRESHER_INTERVAL = 20

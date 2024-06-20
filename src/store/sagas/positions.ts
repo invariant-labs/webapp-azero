@@ -40,7 +40,19 @@ import psp22Singleton from '@store/services/psp22Singleton'
 import wrappedAZEROSingleton from '@store/services/wrappedAZEROSingleton'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
-import { all, call, fork, join, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
+import {
+  all,
+  call,
+  fork,
+  join,
+  put,
+  race,
+  select,
+  spawn,
+  take,
+  takeEvery,
+  takeLatest
+} from 'typed-redux-saga'
 import { getConnection } from './connection'
 import { fetchTicksAndTickMaps } from './pools'
 import { fetchBalances } from './wallet'
@@ -145,12 +157,23 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     )
 
     let signedBatchedTx: any
+    let cancelled: any
     try {
-      signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
-        signer: adapter.signer as Signer
+      const { signedBatchedTx: successfulSignedTX, cancelled: cancelledTransaction } = yield* race({
+        signedBatchedTx: call([batchedTx, batchedTx.signAsync], walletAddress, {
+          signer: adapter.signer as Signer
+        }),
+        cancelled: take(snackbarsActions.cancel)
       })
+
+      signedBatchedTx = successfulSignedTX
+      cancelled = cancelledTransaction
     } catch (e) {
       throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
+    }
+
+    if (cancelled) {
+      throw new Error(ErrorMessage.CANCELLED_TRANSACTION)
     }
 
     closeSnackbar(loaderSigningTx)
@@ -334,13 +357,23 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     )
 
     let signedBatchedTx: any
-
+    let cancelled: any
     try {
-      signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
-        signer: adapter.signer as Signer
+      const { signedBatchedTx: successfulSignedTX, cancelled: cancelledTransaction } = yield* race({
+        signedBatchedTx: call([batchedTx, batchedTx.signAsync], walletAddress, {
+          signer: adapter.signer as Signer
+        }),
+        cancelled: take(snackbarsActions.cancel)
       })
+
+      signedBatchedTx = successfulSignedTX
+      cancelled = cancelledTransaction
     } catch (e) {
       throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
+    }
+
+    if (cancelled) {
+      throw new Error(ErrorMessage.CANCELLED_TRANSACTION)
     }
 
     closeSnackbar(loaderSigningTx)
@@ -595,12 +628,23 @@ export function* handleClaimFee(action: PayloadAction<HandleClaimFee>) {
     )
 
     let signedTx: any
+    let cancelled: any
     try {
-      signedTx = yield* call([tx, tx.signAsync], walletAddress, {
-        signer: adapter.signer as Signer
+      const { signedBatchedTx: successfulSignedTX, cancelled: cancelledTransaction } = yield* race({
+        signedBatchedTx: call([signedTx, signedTx.signAsync], walletAddress, {
+          signer: adapter.signer as Signer
+        }),
+        cancelled: take(snackbarsActions.cancel)
       })
+
+      signedTx = successfulSignedTX
+      cancelled = cancelledTransaction
     } catch (e) {
       throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
+    }
+
+    if (cancelled) {
+      throw new Error(ErrorMessage.CANCELLED_TRANSACTION)
     }
 
     closeSnackbar(loaderSigningTx)
@@ -719,12 +763,23 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<HandleClaimFee>) 
     )
 
     let signedBatchedTx: any
+    let cancelled: any
     try {
-      signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
-        signer: adapter.signer as Signer
+      const { signedBatchedTx: successfulSignedTX, cancelled: cancelledTransaction } = yield* race({
+        signedBatchedTx: call([batchedTx, batchedTx.signAsync], walletAddress, {
+          signer: adapter.signer as Signer
+        }),
+        cancelled: take(snackbarsActions.cancel)
       })
+
+      signedBatchedTx = successfulSignedTX
+      cancelled = cancelledTransaction
     } catch (e) {
       throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
+    }
+
+    if (cancelled) {
+      throw new Error(ErrorMessage.CANCELLED_TRANSACTION)
     }
 
     closeSnackbar(loaderSigningTx)
@@ -857,14 +912,24 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
     )
 
     let signedTx: any
+    let cancelled: any
     try {
-      signedTx = yield* call([tx, tx.signAsync], walletAddress, {
-        signer: adapter.signer as Signer
+      const { signedBatchedTx: successfulSignedTX, cancelled: cancelledTransaction } = yield* race({
+        signedBatchedTx: call([signedTx, signedTx.signAsync], walletAddress, {
+          signer: adapter.signer as Signer
+        }),
+        cancelled: take(snackbarsActions.cancel)
       })
+
+      signedTx = successfulSignedTX
+      cancelled = cancelledTransaction
     } catch (e) {
       throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
     }
 
+    if (cancelled) {
+      throw new Error(ErrorMessage.CANCELLED_TRANSACTION)
+    }
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
 
@@ -967,12 +1032,23 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
     )
 
     let signedBatchedTx: any
+    let cancelled: any
     try {
-      signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
-        signer: adapter.signer as Signer
+      const { signedBatchedTx: successfulSignedTX, cancelled: cancelledTransaction } = yield* race({
+        signedBatchedTx: call([batchedTx, batchedTx.signAsync], walletAddress, {
+          signer: adapter.signer as Signer
+        }),
+        cancelled: take(snackbarsActions.cancel)
       })
+
+      signedBatchedTx = successfulSignedTX
+      cancelled = cancelledTransaction
     } catch (e) {
       throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
+    }
+
+    if (cancelled) {
+      throw new Error(ErrorMessage.CANCELLED_TRANSACTION)
     }
 
     closeSnackbar(loaderSigningTx)

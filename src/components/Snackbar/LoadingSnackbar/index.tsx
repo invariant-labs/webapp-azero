@@ -1,6 +1,7 @@
 import { CustomContentProps, useSnackbar } from 'notistack'
 import React, { useCallback } from 'react'
 import icons from '@static/icons'
+import { actions } from '@store/reducers/snackbars'
 
 import {
   StyledCircularProgress,
@@ -11,13 +12,16 @@ import {
 } from './style'
 import { Grid } from '@mui/material'
 import { Box } from '@mui/system'
+import { useDispatch } from 'react-redux'
 
 const LoadingSnackbar = React.forwardRef<HTMLDivElement, CustomContentProps>(
   ({ id, message }, ref) => {
     const { closeSnackbar } = useSnackbar()
+    const dispatch = useDispatch()
 
     const handleDismiss = useCallback(() => {
       closeSnackbar(id)
+      dispatch(actions.cancel())
     }, [id, closeSnackbar])
 
     return (

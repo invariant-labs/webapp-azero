@@ -12,6 +12,7 @@ export interface ISnackbar {
   persist?: boolean
   txid?: string
   isAccount?: boolean
+  cancelled?: boolean
 }
 
 export interface ISnackbarStore {
@@ -45,7 +46,8 @@ const snackbarsSlice = createSlice({
     remove(state, action: PayloadAction<string>) {
       state.snackbars = state.snackbars.filter(snack => snack.key !== action.payload)
       return state
-    }
+    },
+    cancel() {}
   }
 })
 

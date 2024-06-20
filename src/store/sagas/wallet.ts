@@ -2,8 +2,8 @@ import { Network, sendTx } from '@invariant-labs/a0-sdk'
 import { NightlyConnectAdapter } from '@nightlylabs/wallet-selector-polkadot'
 import { AddressOrPair, Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { FaucetTokenList, TokenAirdropAmount } from '@store/consts/static'
-import { createLoaderKey, getTokenBalances } from '@store/consts/utils'
+import { ErrorMessage, FaucetTokenList, TokenAirdropAmount } from '@store/consts/static'
+import { createLoaderKey, getTokenBalances, isErrorMessage } from '@store/consts/utils'
 import { actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { ITokenBalance, Status, actions, actions as walletActions } from '@store/reducers/wallet'
@@ -18,8 +18,10 @@ import {
   all,
   call,
   put,
+  race,
   select,
   spawn,
+  take,
   takeLatest,
   takeLeading
 } from 'typed-redux-saga'
@@ -110,17 +112,33 @@ export function* handleAirdrop(): Generator {
       })
     )
 
-    const signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
-      signer: adapter.signer as Signer
-    })
+    let signedBatchedTx: any
+    let cancelled: any
+    try {
+      const { signedBatchedTx: successfulSignedTX, cancelled: cancelledTransaction } = yield* race({
+        signedBatchedTx: call([batchedTx, batchedTx.signAsync], walletAddress, {
+          signer: adapter.signer as Signer
+        }),
+        cancelled: take(snackbarsActions.cancel)
+      })
+
+      signedBatchedTx = successfulSignedTX
+      cancelled = cancelledTransaction
+    } catch (e) {
+      throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
+    }
+
+    if (cancelled) {
+      throw new Error(ErrorMessage.CANCELLED_TRANSACTION)
+    }
 
     closeSnackbar(loaderSigningTx)
-    yield put(snackbarsActions.remove(loaderSigningTx))
+    yield* put(snackbarsActions.remove(loaderSigningTx))
 
     const txResult = yield* call(sendTx, signedBatchedTx as any)
 
     closeSnackbar(loaderAirdrop)
-    yield put(snackbarsActions.remove(loaderAirdrop))
+    yield* put(snackbarsActions.remove(loaderAirdrop))
 
     const tokenNames = Object.keys(FaucetTokenList).join(', ')
 
@@ -134,13 +152,31 @@ export function* handleAirdrop(): Generator {
     )
 
     yield* call(fetchBalances, [...Object.values(FaucetTokenList)])
-  } catch (error) {
+  } catch (error: any) {
     console.log(error)
 
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
     closeSnackbar(loaderAirdrop)
     yield put(snackbarsActions.remove(loaderAirdrop))
+
+    if (isErrorMessage(error.message)) {
+      yield put(
+        snackbarsActions.add({
+          message: error.message,
+          variant: 'error',
+          persist: false
+        })
+      )
+    } else {
+      yield put(
+        snackbarsActions.add({
+          message: 'Failed to airdrop tokens. Please try again.',
+          variant: 'error',
+          persist: false
+        })
+      )
+    }
   }
 }
 

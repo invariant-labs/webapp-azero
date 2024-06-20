@@ -39,7 +39,7 @@ import psp22Singleton from '@store/services/psp22Singleton'
 import wrappedAZEROSingleton from '@store/services/wrappedAZEROSingleton'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
-import { all, call, put, select, spawn, takeEvery } from 'typed-redux-saga'
+import { all, call, put, race, select, spawn, take, takeEvery } from 'typed-redux-saga'
 import { getConnection } from './connection'
 import { fetchBalances } from './wallet'
 
@@ -145,12 +145,23 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
     )
 
     let signedBatchedTx: any
+    let cancelled: any
     try {
-      signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
-        signer: adapter.signer as Signer
+      const { signedBatchedTx: successfulSignedTX, cancelled: cancelledTransaction } = yield* race({
+        signedBatchedTx: call([batchedTx, batchedTx.signAsync], walletAddress, {
+          signer: adapter.signer as Signer
+        }),
+        cancelled: take(snackbarsActions.cancel)
       })
+
+      signedBatchedTx = successfulSignedTX
+      cancelled = cancelledTransaction
     } catch (e) {
       throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
+    }
+
+    if (cancelled) {
+      throw new Error(ErrorMessage.CANCELLED_TRANSACTION)
     }
 
     closeSnackbar(loaderSigningTx)
@@ -349,12 +360,23 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
     )
 
     let signedBatchedTx: any
+    let cancelled: any
     try {
-      signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
-        signer: adapter.signer as Signer
+      const { signedBatchedTx: successfulSignedTX, cancelled: cancelledTransaction } = yield* race({
+        signedBatchedTx: call([batchedTx, batchedTx.signAsync], walletAddress, {
+          signer: adapter.signer as Signer
+        }),
+        cancelled: take(snackbarsActions.cancel)
       })
+
+      signedBatchedTx = successfulSignedTX
+      cancelled = cancelledTransaction
     } catch (e) {
       throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
+    }
+
+    if (cancelled) {
+      throw new Error(ErrorMessage.CANCELLED_TRANSACTION)
     }
 
     closeSnackbar(loaderSigningTx)
