@@ -3,6 +3,7 @@ import { withRouter } from 'storybook-addon-remix-react-router'
 import { ThemeProvider, CssBaseline } from '@mui/material'
 import { withThemeFromJSXProvider } from '@storybook/addon-themes'
 import { theme } from '../src/static/theme'
+import { withStore } from './decorators'
 
 const customViewports = {
   sx375: {
