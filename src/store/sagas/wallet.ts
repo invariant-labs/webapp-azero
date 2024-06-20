@@ -153,15 +153,11 @@ export function* init(): Generator {
     const accounts = yield* call([walletAdapter.accounts, walletAdapter.accounts.get])
 
     yield* put(actions.setAddress(accounts[0].address))
-    yield* put(actions.setIsBalanceLoading(true))
 
-    const balance = yield* call(getBalance, accounts[0].address)
-
-    yield* put(actions.setBalance(BigInt(balance)))
-    yield* put(actions.setStatus(Status.Initialized))
     const allTokens = yield* select(tokens)
     yield* call(fetchBalances, Object.keys(allTokens))
-    yield* put(actions.setIsBalanceLoading(false))
+
+    yield* put(actions.setStatus(Status.Initialized))
   } catch (error) {
     console.log(error)
   }
