@@ -428,7 +428,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
       </Grid>
     )
   }
-  if (!position && walletStatus !== Status.Initialized && isFinishedDelayRender) {
+  if (!position && walletStatus !== Status.Initialized) {
     return <Navigate to='/pool' />
   }
   return (
