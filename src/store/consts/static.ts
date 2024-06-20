@@ -49,6 +49,69 @@ export interface BestTier {
   bestTierIndex: number
 }
 
+export const FAUCET_DEPLOYER_MNEMONIC =
+  'motion ice subject actress spider rare leg fortune brown similar excess amazing'
+
+export const getFaucetDeployer = () => {
+  const keyring = new Keyring({ type: 'sr25519' })
+  return keyring.addFromUri(FAUCET_DEPLOYER_MNEMONIC)
+}
+
+export const FAUCET_TOKEN_AMOUNT = 1000n
+
+export const TokenAirdropAmount = {
+  BTC: 100000n,
+  ETH: 20000000000n,
+  USDC: 50000000n
+}
+
+export const FaucetTokenList = {
+  BTC: TESTNET_BTC_ADDRESS,
+  ETH: TESTNET_ETH_ADDRESS,
+  USDC: TESTNET_USDC_ADDRESS
+}
+
+export const BTC: Token = {
+  symbol: 'BTC',
+  address: TESTNET_BTC_ADDRESS,
+  decimals: 8n,
+  name: 'Bitcoin',
+  logoURI:
+    'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E/logo.png',
+  coingeckoId: 'bitcoin'
+}
+
+export const ETH: Token = {
+  symbol: 'ETH',
+  address: TESTNET_ETH_ADDRESS,
+  decimals: 12n,
+  name: 'Ether',
+  logoURI:
+    'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk/logo.png',
+  coingeckoId: 'ethereum'
+}
+
+export const USDC: Token = {
+  symbol: 'USDC',
+  address: TESTNET_USDC_ADDRESS,
+  decimals: 6n,
+  name: 'USDC',
+  logoURI:
+    'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
+  coingeckoId: 'usd-coin'
+}
+
+export const AZERO: Token = {
+  symbol: 'AZERO',
+  address: TESTNET_WAZERO_ADDRESS,
+  decimals: 12n,
+  name: 'Aleph Zero',
+  logoURI: 'https://assets.coingecko.com/coins/images/17212/standard/azero-logo_coingecko.png',
+  coingeckoId: 'aleph-zero'
+}
+
+export const DEFAULT_TOKENS = [BTC, ETH, USDC, AZERO]
+
 // const mainnetBestTiersCreator = () => {
 //   const stableTokens = {
 //     USDC: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
@@ -118,73 +181,10 @@ export const bestTiers: Record<Network, BestTier[]> = {
 }
 
 export const commonTokensForNetworks: Record<Network, AddressOrPair[]> = {
-  [Network.Testnet]: [],
+  [Network.Testnet]: [BTC.address, ETH.address, USDC.address, AZERO.address],
   [Network.Mainnet]: [],
   [Network.Local]: []
 }
-
-export const FAUCET_DEPLOYER_MNEMONIC =
-  'motion ice subject actress spider rare leg fortune brown similar excess amazing'
-
-export const getFaucetDeployer = () => {
-  const keyring = new Keyring({ type: 'sr25519' })
-  return keyring.addFromUri(FAUCET_DEPLOYER_MNEMONIC)
-}
-
-export const FAUCET_TOKEN_AMOUNT = 1000n
-
-export const TokenAirdropAmount = {
-  BTC: 100000n,
-  ETH: 20000000000n,
-  USDC: 50000000n
-}
-
-export const FaucetTokenList = {
-  BTC: TESTNET_BTC_ADDRESS,
-  ETH: TESTNET_ETH_ADDRESS,
-  USDC: TESTNET_USDC_ADDRESS
-}
-
-export const BTC: Token = {
-  symbol: 'BTC',
-  address: TESTNET_BTC_ADDRESS,
-  decimals: 8n,
-  name: 'Bitcoin',
-  logoURI:
-    'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E/logo.png',
-  coingeckoId: 'bitcoin'
-}
-
-export const ETH: Token = {
-  symbol: 'ETH',
-  address: TESTNET_ETH_ADDRESS,
-  decimals: 12n,
-  name: 'Ether',
-  logoURI:
-    'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk/logo.png',
-  coingeckoId: 'ethereum'
-}
-
-export const USDC: Token = {
-  symbol: 'USDC',
-  address: TESTNET_USDC_ADDRESS,
-  decimals: 6n,
-  name: 'USDC',
-  logoURI:
-    'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
-  coingeckoId: 'usd-coin'
-}
-
-export const AZERO: Token = {
-  symbol: 'AZERO',
-  address: TESTNET_WAZERO_ADDRESS,
-  decimals: 12n,
-  name: 'Aleph Zero',
-  logoURI: 'https://assets.coingecko.com/coins/images/17212/standard/azero-logo_coingecko.png',
-  coingeckoId: 'aleph-zero'
-}
-
-export const DEFAULT_TOKENS = [BTC, ETH, USDC, AZERO]
 
 export const DEFAULT_INVARIANT_OPTIONS = {
   storageDepositLimit: null,
