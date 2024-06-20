@@ -1,4 +1,3 @@
-import { newPoolKey } from '@invariant-labs/a0-sdk'
 import { Status } from '@store/reducers/wallet'
 import type { Meta, StoryObj } from '@storybook/react'
 import { fn } from '@storybook/test'
@@ -77,7 +76,8 @@ export const Primary: Story = {
       priceImpact: 1.23,
       targetSqrtPrice: 1000000000000000000000000 as any,
       errors: []
-    }
+    },
+    simulateSwap: fn()
   },
   render: args => {
     return (
