@@ -11,7 +11,7 @@ import infoIcon from '@static/svg/info.svg'
 import refreshIcon from '@static/svg/refresh.svg'
 import settingIcon from '@static/svg/settings.svg'
 import SwapArrows from '@static/svg/swap-arrows.svg'
-import { REFRESHER_INTERVAL, TokenPriceData } from '@store/consts/static'
+import { DEFAULT_TOKEN_DECIMAL, REFRESHER_INTERVAL, TokenPriceData } from '@store/consts/static'
 import {
   SimulateResult,
   convertBalanceToBigint,
@@ -463,7 +463,9 @@ export const Swap: React.FC<ISwap> = ({
                 ? printBigint(tokens[tokenFromIndex].balance || 0n, tokens[tokenFromIndex].decimals)
                 : '- -'
             }
-            decimal={tokenFromIndex !== null ? tokens[tokenFromIndex].decimals : 12n}
+            decimal={
+              tokenFromIndex !== null ? tokens[tokenFromIndex].decimals : DEFAULT_TOKEN_DECIMAL
+            }
             className={classes.amountInput}
             setValue={value => {
               if (value.match(/^\d*\.?\d*$/)) {
@@ -542,7 +544,7 @@ export const Swap: React.FC<ISwap> = ({
                 : '- -'
             }
             className={classes.amountInput}
-            decimal={tokenToIndex !== null ? tokens[tokenToIndex].decimals : 12n}
+            decimal={tokenToIndex !== null ? tokens[tokenToIndex].decimals : DEFAULT_TOKEN_DECIMAL}
             setValue={value => {
               if (value.match(/^\d*\.?\d*$/)) {
                 setAmountTo(value)
