@@ -21,6 +21,7 @@ interface IProps {
   balanceValue?: string
   disabled?: boolean
   priceLoading?: boolean
+  isBalanceLoading: boolean
 }
 
 export const DepositAmountInput: React.FC<IProps> = ({
@@ -38,7 +39,8 @@ export const DepositAmountInput: React.FC<IProps> = ({
   tokenPrice,
   balanceValue,
   disabled = false,
-  priceLoading = false
+  priceLoading = false,
+  isBalanceLoading
 }) => {
   const { classes } = useStyles()
 
@@ -139,9 +141,12 @@ export const DepositAmountInput: React.FC<IProps> = ({
               <>
                 <Typography className={classes.caption2}>
                   Balance:{' '}
-                  {currency
-                    ? `${balanceValue ? formatNumber(balanceValue) : '0'} ${currency}`
-                    : '- -'}
+                  {isBalanceLoading ? (
+                    <img src={loadingAnimation} className={classes.loadingBalance} />
+                  ) : (
+                    formatNumber(balanceValue || 0)
+                  )}{' '}
+                  {currency}
                 </Typography>
                 <Button
                   className={

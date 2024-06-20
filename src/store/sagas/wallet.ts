@@ -240,6 +240,8 @@ export function* fetchBalances(tokens: string[]): Generator {
   const api = yield* getConnection()
   const network = yield* select(networkType)
 
+  yield* put(walletActions.setIsBalanceLoading(true))
+
   const balance = yield* call(getBalance, walletAddress)
   yield* put(walletActions.setBalance(BigInt(balance)))
 
@@ -254,6 +256,8 @@ export function* fetchBalances(tokens: string[]): Generator {
       })
     )
   )
+
+  yield* put(walletActions.setIsBalanceLoading(false))
 }
 
 export function* handleGetBalances(action: PayloadAction<string[]>): Generator {

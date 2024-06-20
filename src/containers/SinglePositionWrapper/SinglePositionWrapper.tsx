@@ -25,7 +25,7 @@ import {
   plotTicks,
   singlePositionData
 } from '@store/selectors/positions'
-import { status } from '@store/selectors/wallet'
+import { balanceLoading, status } from '@store/selectors/wallet'
 import { VariantType } from 'notistack'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -55,6 +55,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
     loading: currentPositionTicksLoading
   } = useSelector(currentPositionTicks)
   const walletStatus = useSelector(status)
+  const isBalanceLoading = useSelector(balanceLoading)
 
   const [waitingForTicksData, setWaitingForTicksData] = useState<boolean | null>(null)
 
@@ -402,6 +403,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
           )
         }}
         onRefresh={onRefresh}
+        isBalanceLoading={isBalanceLoading}
       />
     )
   }

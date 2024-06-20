@@ -27,7 +27,8 @@ export const Null: Story = {
     blockerInfo: '',
     onBlur: fn(),
     style: {},
-    disabled: false
+    disabled: false,
+    isBalanceLoading: false
   }
 }
 
@@ -47,6 +48,7 @@ export const BTC: Story = {
     blockerInfo: '',
     onBlur: fn(),
     style: {},
-    disabled: false
+    disabled: false,
+    isBalanceLoading: false
   }
 }
