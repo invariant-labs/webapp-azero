@@ -273,3 +273,5 @@ export enum ErrorMessage {
 }
 
 export const REFRESHER_INTERVAL = 20
+
+export const LIQUIDITY_PLOT_DECIMAL = 12n
