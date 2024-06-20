@@ -3,7 +3,7 @@ import ChangeWalletButton from '@components/Header/HeaderButton/ChangeWalletButt
 import ExchangeAmountInput from '@components/Inputs/ExchangeAmountInput/ExchangeAmountInput'
 import Slippage from '@components/Modals/Slippage/Slippage'
 import Refresher from '@components/Refresher/Refresher'
-import { PoolKey, Price, Tick, TokenAmount } from '@invariant-labs/a0-sdk'
+import { PoolKey, Price, TokenAmount } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
 import { Box, Button, CardMedia, Grid, Typography } from '@mui/material'
 import { AddressOrPair } from '@polkadot/api/types'
@@ -72,7 +72,6 @@ export interface ISwap {
   ) => void
   onSetPair: (tokenFrom: AddressOrPair | null, tokenTo: AddressOrPair | null) => void
   progress: ProgressState
-  poolTicks: { [x: string]: Tick[] }
   isWaitingForNewPool: boolean
   onConnectWallet: () => void
   onDisconnectWallet: () => void
@@ -102,7 +101,6 @@ export const Swap: React.FC<ISwap> = ({
   onSwap,
   onSetPair,
   progress,
-  poolTicks,
   isWaitingForNewPool,
   onConnectWallet,
   onDisconnectWallet,
@@ -174,27 +172,13 @@ export const Swap: React.FC<ISwap> = ({
     if (inputRef === inputTarget.FROM && !(amountFrom === '' && amountTo === '')) {
       simulateWithTimeout()
     }
-  }, [
-    amountFrom,
-    tokenToIndex,
-    tokenFromIndex,
-    slippTolerance,
-    Object.keys(poolTicks).length,
-    Object.keys(tickmap).length
-  ])
+  }, [amountFrom, tokenToIndex, tokenFromIndex, slippTolerance, Object.keys(tickmap).length])
 
   useEffect(() => {
     if (inputRef === inputTarget.TO && !(amountFrom === '' && amountTo === '')) {
       simulateWithTimeout()
     }
-  }, [
-    amountTo,
-    tokenToIndex,
-    tokenFromIndex,
-    slippTolerance,
-    Object.keys(poolTicks).length,
-    Object.keys(tickmap).length
-  ])
+  }, [amountTo, tokenToIndex, tokenFromIndex, slippTolerance, Object.keys(tickmap).length])
 
   useEffect(() => {
     if (progress === 'none' && !(amountFrom === '' && amountTo === '')) {
