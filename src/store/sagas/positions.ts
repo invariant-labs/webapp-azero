@@ -630,8 +630,8 @@ export function* handleClaimFee(action: PayloadAction<HandleClaimFee>) {
     let signedTx: any
     let cancelled: any
     try {
-      const { signedBatchedTx: successfulSignedTX, cancelled: cancelledTransaction } = yield* race({
-        signedBatchedTx: call([signedTx, signedTx.signAsync], walletAddress, {
+      const { signedTx: successfulSignedTX, cancelled: cancelledTransaction } = yield* race({
+        signedTx: call([tx, tx.signAsync], walletAddress, {
           signer: adapter.signer as Signer
         }),
         cancelled: take(snackbarsActions.cancel)
@@ -914,8 +914,8 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
     let signedTx: any
     let cancelled: any
     try {
-      const { signedBatchedTx: successfulSignedTX, cancelled: cancelledTransaction } = yield* race({
-        signedBatchedTx: call([signedTx, signedTx.signAsync], walletAddress, {
+      const { signedTx: successfulSignedTX, cancelled: cancelledTransaction } = yield* race({
+        signedTx: call([tx, tx.signAsync], walletAddress, {
           signer: adapter.signer as Signer
         }),
         cancelled: take(snackbarsActions.cancel)
