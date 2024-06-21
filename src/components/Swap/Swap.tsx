@@ -653,11 +653,6 @@ export const Swap: React.FC<ISwap> = ({
               ? Number(tokens[rateReversed ? tokenFromIndex : tokenToIndex].decimals)
               : 0
           }}
-          // minimumReceived={{
-          //   val: simulateResult.minimumReceived,
-          //   symbol: canShowDetails ? tokens[tokenToIndex].symbol : '',
-          //   decimal: canShowDetails ? tokens[tokenToIndex].decimals : 0
-          // }}
           priceImpact={simulateResult.priceImpact}
           slippage={+slippTolerance}
           isLoadingRate={getStateMessage() === 'Loading'}

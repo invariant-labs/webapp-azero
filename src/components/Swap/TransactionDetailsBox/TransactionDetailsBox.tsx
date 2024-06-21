@@ -11,7 +11,6 @@ interface IProps {
   fee: bigint
   exchangeRate: { val: number; symbol: string; decimal: number }
   slippage: number
-  // minimumReceived: { val: BN; symbol: string; decimal: number }
   priceImpact: number
   isLoadingRate?: boolean
 }
@@ -31,7 +30,6 @@ const TransactionDetailsBox: React.FC<IProps> = ({
   fee,
   exchangeRate,
   slippage,
-  // minimumReceived,
   priceImpact,
   isLoadingRate = false
 }) => {
@@ -67,13 +65,6 @@ const TransactionDetailsBox: React.FC<IProps> = ({
             {impact < 0.01 ? '<0.01%' : `${impact.toFixed(2)}%`}
           </Typography>
         </Grid>
-
-        {/* <Grid container justifyContent='space-between' className={classes.row}>
-          <Typography className={classes.label}>Minimum received:</Typography>
-          <Typography className={classes.value}>
-            {printBigint(minimumReceived.val, minimumReceived.decimal)} {minimumReceived.symbol}
-          </Typography>
-        </Grid> */}
 
         <Grid container justifyContent='space-between' className={classes.row}>
           <Typography className={classes.label}>Slippage tolerance:</Typography>
