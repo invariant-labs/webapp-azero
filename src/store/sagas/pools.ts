@@ -66,7 +66,7 @@ export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) 
     walletAddress
   )
 
-  yield* put(walletActions.getSelectedTokens(Object.keys(unknownTokensData)))
+  yield* put(walletActions.getBalances(Object.keys(unknownTokensData)))
   yield* put(actions.addTokens(unknownTokensData))
   yield* put(actions.updateTokenBalances(knownTokenBalances))
 

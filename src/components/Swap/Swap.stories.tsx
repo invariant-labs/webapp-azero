@@ -31,32 +31,6 @@ export const Primary: Story = {
     onSetPair: fn(),
     onSlippageChange: fn(),
     pools: [],
-    poolTicks: {
-      pool1: [
-        {
-          index: 1,
-          sign: true,
-          liquidityChange: 100,
-          liquidityGross: 200,
-          sqrtPrice: 300,
-          feeGrowthOutsideX: 400,
-          feeGrowthOutsideY: 500,
-          secondsOutside: 600
-        }
-      ],
-      pool2: [
-        {
-          index: 2,
-          sign: false,
-          liquidityChange: 700,
-          liquidityGross: 800,
-          sqrtPrice: 900,
-          feeGrowthOutsideX: 1000,
-          feeGrowthOutsideY: 1100,
-          secondsOutside: 1200
-        }
-      ]
-    } as any,
     progress: 'none',
     swapData: {
       slippage: 1 as any,
@@ -83,32 +57,6 @@ export const Primary: Story = {
     return (
       <Swap
         {...args}
-        poolTicks={{
-          pool1: [
-            {
-              index: BigInt(1),
-              sign: true,
-              liquidityChange: BigInt(100),
-              liquidityGross: BigInt(200),
-              sqrtPrice: BigInt(300),
-              feeGrowthOutsideX: BigInt(400),
-              feeGrowthOutsideY: BigInt(500),
-              secondsOutside: BigInt(600)
-            }
-          ],
-          pool2: [
-            {
-              index: BigInt(2),
-              sign: false,
-              liquidityChange: BigInt(700),
-              liquidityGross: BigInt(800),
-              sqrtPrice: BigInt(900),
-              feeGrowthOutsideX: BigInt(1000),
-              feeGrowthOutsideY: BigInt(1100),
-              secondsOutside: BigInt(1200)
-            }
-          ]
-        }}
         swapData={{
           slippage: 1n,
           estimatedPriceAfterSwap: 123n,

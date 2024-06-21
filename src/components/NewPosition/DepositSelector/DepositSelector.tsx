@@ -41,8 +41,6 @@ export interface IDepositSelector {
   onReverseTokens: () => void
   poolIndex: number | null
   bestTierIndex?: number
-  canCreateNewPool: boolean
-  canCreateNewPosition: boolean
   handleAddToken: (address: string) => void
   commonTokens: AddressOrPair[]
   initialHideUnknownTokensValue: boolean
@@ -74,8 +72,6 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
   onReverseTokens,
   poolIndex,
   bestTierIndex,
-  canCreateNewPool,
-  canCreateNewPosition,
   handleAddToken,
   commonTokens,
   initialHideUnknownTokensValue,
@@ -143,13 +139,6 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
       return concentrationArray[minimumSliderIndex]
         ? `Set concentration to at least ${concentrationArray[minimumSliderIndex].toFixed(0)}x`
         : 'Set higher fee tier'
-    }
-
-    if (
-      (poolIndex === null && !canCreateNewPool) ||
-      (poolIndex !== null && !canCreateNewPosition)
-    ) {
-      return 'Insufficient AZERO'
     }
 
     if (
@@ -295,31 +284,6 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
               return
             }
 
-            // if (tokens[tokenAIndex].assetAddress === WRAPPED_ETH_ADDRESS) {
-            //   if (tokenBIndex !== null && poolIndex === null) {
-            //     tokenAInputState.setValue(
-            //       printBigint(
-            //         tokens[tokenAIndex].balance.gt(WETH_POOL_INIT_LAMPORTS)
-            //           ? tokens[tokenAIndex].balance.sub(WETH_POOL_INIT_LAMPORTS)
-            //           : new BN(0),
-            //         tokens[tokenAIndex].decimals
-            //       )
-            //     )
-
-            //     return
-            //   }
-
-            //   tokenAInputState.setValue(
-            //     printBigint(
-            //       tokens[tokenAIndex].balance.gt(WETH_MIN_DEPOSIT_SWAP_FROM_AMOUNT)
-            //         ? tokens[tokenAIndex].balance.sub(WETH_MIN_DEPOSIT_SWAP_FROM_AMOUNT)
-            //         : new BN(0),
-            //       tokens[tokenAIndex].decimals
-            //     )
-            //   )
-
-            //   return
-            // }
             tokenAInputState.setValue(
               printBigint(tokens[tokenAIndex].balance, tokens[tokenAIndex].decimals)
             )
@@ -356,31 +320,6 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
               return
             }
 
-            // if (tokens[tokenBIndex].assetAddress.equals(new PublicKey(WRAPPED_ETH_ADDRESS))) {
-            //   if (tokenAIndex !== null && poolIndex === null) {
-            //     tokenBInputState.setValue(
-            //       printBigint(
-            //         tokens[tokenBIndex].balance.gt(WETH_POOL_INIT_LAMPORTS)
-            //           ? tokens[tokenBIndex].balance.sub(WETH_POOL_INIT_LAMPORTS)
-            //           : new BN(0),
-            //         tokens[tokenBIndex].decimals
-            //       )
-            //     )
-
-            //     return
-            //   }
-
-            //   tokenBInputState.setValue(
-            //     printBigint(
-            //       tokens[tokenBIndex].balance.gt(WETH_MIN_DEPOSIT_SWAP_FROM_AMOUNT)
-            //         ? tokens[tokenBIndex].balance.sub(WETH_MIN_DEPOSIT_SWAP_FROM_AMOUNT)
-            //         : new BN(0),
-            //       tokens[tokenBIndex].decimals
-            //     )
-            //   )
-
-            //   return
-            // }
             tokenBInputState.setValue(
               printBigint(tokens[tokenBIndex].balance, tokens[tokenBIndex].decimals)
             )

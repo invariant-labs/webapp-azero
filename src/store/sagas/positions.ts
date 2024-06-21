@@ -365,7 +365,7 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
       })
     )
 
-    yield put(walletActions.getSelectedTokens([tokenX, tokenY]))
+    yield put(walletActions.getBalances([tokenX, tokenY]))
 
     yield put(actions.getPositionsList())
 

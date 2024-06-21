@@ -26,7 +26,7 @@ export const FeeSwitch: React.FC<IFeeSwitch> = ({
   const { classes: tabsClasses } = useTabsStyles()
   const { classes: singleTabClasses } = useSingleTabStyles()
 
-  const handleChange = (_: React.ChangeEvent<{}>, newValue: number) => {
+  const handleChange = (_: React.SyntheticEvent, newValue: number) => {
     if (!blocked) {
       onSelect(newValue)
       setBlocked(true)

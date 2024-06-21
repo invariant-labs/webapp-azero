@@ -95,35 +95,6 @@ export const swapTokensDict = createSelector(
   }
 )
 
-export const canCreateNewPool = () =>
-  createSelector(balance, () => {
-    // switch (network) {
-    //   case NetworkType.DEVNET:
-    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS)
-    //   case NetworkType.TESTNET:
-    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS_TEST)
-    //   case NetworkType.MAINNET:
-    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS)
-    //   default:
-    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS)
-    // }
-    return true
-  })
-export const canCreateNewPosition = () =>
-  createSelector(balance, () => {
-    // switch (network) {
-    //   case NetworkType.DEVNET:
-    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS)
-    //   case NetworkType.TESTNET:
-    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS_TEST)
-    //   case NetworkType.MAINNET:
-    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS)
-    //   default:
-    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS)
-    // }
-    return true
-  })
-
 export type TokenBalances = ITokenBalance & {
   symbol: string
   usdValue: BN
