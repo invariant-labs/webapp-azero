@@ -34,14 +34,6 @@ const snackbarsSlice = createSlice({
       })
       return state
     },
-    hide(state, action: PayloadAction<string>) {
-      const index = state.snackbars.findIndex(snack => snack.key === action.payload)
-      if (index === -1) {
-        return state
-      }
-      state.snackbars[index].open = false
-      return state
-    },
     remove(state, action: PayloadAction<string>) {
       state.snackbars = state.snackbars.filter(snack => snack.key !== action.payload)
       return state
