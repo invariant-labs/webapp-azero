@@ -10,6 +10,7 @@ import classNames from 'classnames'
 import React, { useCallback, useEffect, useState } from 'react'
 import FeeSwitch from '../FeeSwitch/FeeSwitch'
 import { useStyles } from './style'
+import { AddressOrPair } from '@polkadot/api/types'
 export interface InputState {
   value: string
   setValue: (value: string) => void
@@ -42,7 +43,7 @@ export interface IDepositSelector {
   canCreateNewPool: boolean
   canCreateNewPosition: boolean
   handleAddToken: (address: string) => void
-  commonTokens: any[] // TODO delete any
+  commonTokens: AddressOrPair[]
   initialHideUnknownTokensValue: boolean
   onHideUnknownTokensChange: (val: boolean) => void
   priceALoading?: boolean
