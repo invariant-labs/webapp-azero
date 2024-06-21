@@ -5,7 +5,7 @@ import Refresher from '@components/Refresher/Refresher'
 import { TokenAmount, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
 import { getConcentrationArray } from '@invariant-labs/a0-sdk/src/utils'
 import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
-import { Button, Grid, Hidden, Typography } from '@mui/material'
+import { Box, Button, Grid, Hidden, Typography } from '@mui/material'
 import { AddressOrPair } from '@polkadot/api/types'
 import backIcon from '@static/svg/back-arrow.svg'
 import settingIcon from '@static/svg/settings.svg'
@@ -466,8 +466,12 @@ export const NewPosition: React.FC<INewPosition> = ({
         </Grid>
       </Link>
 
-      <Grid container justifyContent='space-between' alignItems='center'>
-        <Grid className={classes.titleContainer}>
+      <Grid
+        container
+        justifyContent='space-between'
+        alignItems='center'
+        className={classes.headerContainer}>
+        <Box className={classes.titleContainer}>
           <Typography className={classes.title}>Add new liquidity position</Typography>
           {poolKey !== '' && (
             <Refresher
@@ -479,7 +483,7 @@ export const NewPosition: React.FC<INewPosition> = ({
               }}
             />
           )}
-        </Grid>
+        </Box>
         <Grid container item alignItems='center' className={classes.options}>
           {poolKey !== '' ? (
             <MarketIdLabel

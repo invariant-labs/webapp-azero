@@ -6,8 +6,9 @@ const useStyles = makeStyles()(theme => {
     wrapper: {
       borderRadius: 10,
       backgroundColor: colors.invariant.component,
-      padding: '16px 24px 8px 24px',
-      flex: '1 1 0%'
+      padding: '16px 24px 16px 24px',
+      flex: '1 1 0%',
+      position: 'relative'
     },
     headerContainer: {
       marginBottom: 12
@@ -72,21 +73,15 @@ const useStyles = makeStyles()(theme => {
       top: 0,
       right: 0,
       zIndex: 11,
-      width: '49%',
+      width: '100%',
       height: '100%',
       backgroundColor: 'rgba(11, 12, 13, 0.8)',
       borderRadius: 11,
       [theme.breakpoints.down('md')]: {
-        top: 562,
         right: 0,
         zIndex: 11,
         width: '100%',
-        height: 555,
         borderRadius: 9
-      },
-
-      [theme.breakpoints.down('sm')]: {
-        top: 545
       }
     },
 
