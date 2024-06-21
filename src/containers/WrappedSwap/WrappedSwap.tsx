@@ -38,7 +38,6 @@ export const WrappedSwap = () => {
   const walletStatus = useSelector(status)
   const swap = useSelector(swapPool)
   const tickmap = useSelector(tickMaps)
-  // const poolTicksForSimulation = useSelector(nearestPoolTicksForPair)
   const allPools = useSelector(poolsArraySortedByFees)
   const tokensList = useSelector(swapTokens)
   const tokensDict = useSelector(swapTokensDict)
@@ -104,7 +103,7 @@ export const WrappedSwap = () => {
       getNewTokenOrThrow(address, network, rpc, walletAddress)
         .then(data => {
           dispatch(poolsActions.addTokens(data))
-          dispatch(walletActions.getSelectedTokens(Object.keys(data)))
+          dispatch(walletActions.getBalances(Object.keys(data)))
           addNewTokenToLocalStorage(address, network)
           dispatch(
             snackbarsActions.add({
@@ -306,7 +305,6 @@ export const WrappedSwap = () => {
       pools={allPools}
       swapData={swap}
       progress={progress}
-      poolTicks={{}} //TODO add real data
       isWaitingForNewPool={isFetchingNewPool}
       tickmap={tickmap}
       initialTokenFromIndex={initialTokenFromIndex === -1 ? null : initialTokenFromIndex}

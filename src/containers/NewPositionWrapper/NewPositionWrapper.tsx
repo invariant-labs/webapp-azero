@@ -40,14 +40,7 @@ import {
   isLoadingPoolKeys
 } from '@store/selectors/pools'
 import { initPosition, plotTicks } from '@store/selectors/positions'
-import {
-  address,
-  balanceLoading,
-  canCreateNewPool,
-  canCreateNewPosition,
-  status,
-  swapTokens
-} from '@store/selectors/wallet'
+import { address, balanceLoading, status, swapTokens } from '@store/selectors/wallet'
 import { openWalletSelectorModal } from '@utils/web3/selector'
 import { VariantType } from 'notistack'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
@@ -80,9 +73,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const isFetchingNewPool = useSelector(isLoadingLatestPoolsForTransaction)
   const currentNetwork = useSelector(networkType)
   const rpc = useSelector(rpcAddress)
-
-  const canUserCreateNewPool = useSelector(canCreateNewPool())
-  const canUserCreateNewPosition = useSelector(canCreateNewPosition())
 
   const tokensList = useSelector(swapTokens)
 
@@ -344,7 +334,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       getNewTokenOrThrow(address, currentNetwork, rpc, walletAddress)
         .then(data => {
           dispatch(poolsActions.addTokens(data))
-          dispatch(walletActions.getSelectedTokens(Object.keys(data)))
+          dispatch(walletActions.getBalances(Object.keys(data)))
           addNewTokenToLocalStorage(address, currentNetwork)
           dispatch(
             snackbarsActions.add({
@@ -647,8 +637,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       currentPriceSqrt={
         poolsData[poolKey] ? poolsData[poolKey].sqrtPrice : calculateSqrtPrice(midPrice.index)
       }
-      canCreateNewPool={canUserCreateNewPool}
-      canCreateNewPosition={canUserCreateNewPosition}
       handleAddToken={addTokenHandler}
       commonTokens={commonTokensForNetworks[currentNetwork]}
       initialOpeningPositionMethod={initialIsConcentrationOpening ? 'concentration' : 'range'}

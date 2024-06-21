@@ -23,7 +23,7 @@ export const ConcentrationTypeSwitch: React.FC<IProps> = ({
   const { classes: tabsClasses } = useTabsStyles({ value: currentValue })
   const { classes: singleTabClasses } = useSingleTabStyles()
 
-  const handleChange = (_: React.ChangeEvent<{}>, newValue: number) => {
+  const handleChange = (_: React.SyntheticEvent, newValue: number) => {
     onSwitch(!newValue)
   }
 

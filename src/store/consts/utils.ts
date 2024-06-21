@@ -28,6 +28,7 @@ import {
   DEFAULT_TOKENS,
   ETH,
   ErrorMessage,
+  LIQUIDITY_PLOT_DECIMAL,
   Token,
   TokenPriceData,
   USDC,
@@ -793,7 +794,7 @@ export const createLiquidityPlot = (
       const price = calcPrice(tick.index - tickSpacing, isXtoY, tokenXDecimal, tokenYDecimal)
       ticksData.push({
         x: price,
-        y: +printBigint(ticks[i - 1].liqudity, 12n), // TODO use constant
+        y: +printBigint(ticks[i - 1].liqudity, LIQUIDITY_PLOT_DECIMAL),
         index: tick.index - tickSpacing
       })
     }
@@ -801,7 +802,7 @@ export const createLiquidityPlot = (
     const price = calcPrice(tick.index, isXtoY, tokenXDecimal, tokenYDecimal)
     ticksData.push({
       x: price,
-      y: +printBigint(ticks[i].liqudity, 12n), // TODO use constant
+      y: +printBigint(ticks[i].liqudity, LIQUIDITY_PLOT_DECIMAL),
       index: tick.index
     })
   })

@@ -74,7 +74,9 @@ export const WrappedPositionsList: React.FC = () => {
       let x = 0n
       let y = 0n
       if (position.poolData) {
-        ;[x, y] = calculateTokenAmounts(position.poolData, position)
+        const [amountX, amountY] = calculateTokenAmounts(position.poolData, position)
+        x = amountX
+        y = amountY
       }
 
       try {

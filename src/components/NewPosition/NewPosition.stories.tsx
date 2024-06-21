@@ -27,8 +27,6 @@ export const Primary: Story = {
     addLiquidityHandler: fn(),
     midPrice: { x: 1234, index: 23 } as any,
     bestTiers: [],
-    canCreateNewPool: true,
-    canCreateNewPosition: true,
     commonTokens: [],
     copyPoolAddressHandler: fn(),
     currentFeeIndex: 0,
@@ -123,8 +121,6 @@ export const Primary: Story = {
           { feeValue: 0.5 }
         ]}
         addLiquidityHandler={fn()}
-        canCreateNewPool={true}
-        canCreateNewPosition={true}
         calcAmount={() => 1n}
         loadingTicksAndTickMaps={false}
         poolKey={poolKeyToString(
