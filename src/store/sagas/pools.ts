@@ -25,6 +25,7 @@ import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
 import { getConnection } from './connection'
+import { MAX_POOL_KEYS_RETURNED } from '@invariant-labs/a0-sdk/target/consts'
 
 export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) {
   const walletAddress = yield* select(address)
@@ -192,10 +193,22 @@ export function* fetchAllPoolKeys(): Generator {
       invAddress
     )
 
-    //TODO: in the future handle more than 100 pools
-    const pools = yield* call([invariant, invariant.getPoolKeys], 100n, 0n)
+    const [poolKeys, poolKeysCount] = yield* call(
+      [invariant, invariant.getPoolKeys],
+      MAX_POOL_KEYS_RETURNED,
+      0n
+    )
 
-    yield* put(actions.setPoolKeys(pools))
+    const promises: Promise<[PoolKey[], bigint]>[] = []
+    for (let i = 1; i < Math.ceil(Number(poolKeysCount) / 220); i++) {
+      promises.push(invariant.getPoolKeys(MAX_POOL_KEYS_RETURNED, BigInt(i) * 220n))
+    }
+
+    const poolKeysEntries = yield* call(promises => Promise.all(promises), promises)
+
+    yield* put(
+      actions.setPoolKeys([...poolKeys, ...poolKeysEntries.map(([poolKeys]) => poolKeys).flat(1)])
+    )
   } catch (error) {
     yield* put(actions.setPoolKeys([]))
     console.log(error)
