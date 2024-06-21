@@ -11,6 +11,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import FeeSwitch from '../FeeSwitch/FeeSwitch'
 import { useStyles } from './style'
 import { AddressOrPair } from '@polkadot/api/types'
+import { SwapToken } from '@store/selectors/wallet'
 export interface InputState {
   value: string
   setValue: (value: string) => void
@@ -23,7 +24,7 @@ export interface IDepositSelector {
   initialTokenFrom: string
   initialTokenTo: string
   initialFee: string
-  tokens: any[] // TODO delete any
+  tokens: SwapToken[]
   setPositionTokens: (
     tokenAIndex: number | null,
     tokenBindex: number | null,

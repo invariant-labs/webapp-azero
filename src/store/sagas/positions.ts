@@ -18,6 +18,7 @@ import {
   createLoaderKey,
   createPlaceholderLiquidityPlot,
   deserializeTickmap,
+  ensureError,
   isErrorMessage,
   poolKeyToString
 } from '@store/consts/utils'
@@ -44,6 +45,7 @@ import { all, call, fork, join, put, select, spawn, takeEvery, takeLatest } from
 import { getConnection } from './connection'
 import { fetchTicksAndTickMaps } from './pools'
 import { fetchBalances } from './wallet'
+import { SubmittableExtrinsic } from '@polkadot/api/promise/types'
 
 function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator {
   const {
@@ -144,7 +146,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       })
     )
 
-    let signedBatchedTx: any
+    let signedBatchedTx: SubmittableExtrinsic
     try {
       signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
         signer: adapter.signer as Signer
@@ -177,8 +179,9 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     yield* call(fetchBalances, [tokenX, tokenY])
 
     yield* put(poolsActions.getPoolKeys())
-  } catch (e: any) {
-    console.log(e)
+  } catch (e: unknown) {
+    const error = ensureError(e)
+    console.log(error)
 
     yield* put(actions.setInitPositionSuccess(false))
 
@@ -187,10 +190,10 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
 
-    if (isErrorMessage(e.message)) {
+    if (isErrorMessage(error.message)) {
       yield put(
         snackbarsActions.add({
-          message: e.message,
+          message: error.message,
           variant: 'error',
           persist: false
         })
@@ -333,7 +336,7 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
       })
     )
 
-    let signedBatchedTx: any
+    let signedBatchedTx: SubmittableExtrinsic
 
     try {
       signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
@@ -369,8 +372,9 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     yield* call(fetchBalances, [tokenX === TESTNET_WAZERO_ADDRESS ? tokenY : tokenX])
 
     yield* put(poolsActions.getPoolKeys())
-  } catch (e: any) {
-    console.log(e)
+  } catch (e: unknown) {
+    const error = ensureError(e)
+    console.log(error)
 
     yield* put(actions.setInitPositionSuccess(false))
 
@@ -379,10 +383,10 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
 
-    if (isErrorMessage(e.message)) {
+    if (isErrorMessage(error.message)) {
       yield put(
         snackbarsActions.add({
-          message: e.message,
+          message: error.message,
           variant: 'error',
           persist: false
         })
@@ -594,7 +598,7 @@ export function* handleClaimFee(action: PayloadAction<HandleClaimFee>) {
       })
     )
 
-    let signedTx: any
+    let signedTx: SubmittableExtrinsic
     try {
       signedTx = yield* call([tx, tx.signAsync], walletAddress, {
         signer: adapter.signer as Signer
@@ -624,16 +628,19 @@ export function* handleClaimFee(action: PayloadAction<HandleClaimFee>) {
     yield* call(fetchBalances, [
       addressTokenX === TESTNET_WAZERO_ADDRESS ? addressTokenY : addressTokenX
     ])
-  } catch (e: any) {
+  } catch (e: unknown) {
+    const error = ensureError(e)
+    console.log(error)
+
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
     closeSnackbar(loaderKey)
     yield put(snackbarsActions.remove(loaderKey))
 
-    if (isErrorMessage(e.message)) {
+    if (isErrorMessage(error.message)) {
       yield put(
         snackbarsActions.add({
-          message: e.message,
+          message: error.message,
           variant: 'error',
           persist: false
         })
@@ -647,8 +654,6 @@ export function* handleClaimFee(action: PayloadAction<HandleClaimFee>) {
         })
       )
     }
-
-    console.log(e)
   }
 }
 
@@ -718,7 +723,7 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<HandleClaimFee>) 
       })
     )
 
-    let signedBatchedTx: any
+    let signedBatchedTx: SubmittableExtrinsic
     try {
       signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
         signer: adapter.signer as Signer
@@ -746,16 +751,19 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<HandleClaimFee>) 
     yield put(actions.getSinglePosition(index))
 
     yield* call(fetchBalances, [addressTokenX, addressTokenY])
-  } catch (e: any) {
+  } catch (e: unknown) {
+    const error = ensureError(e)
+    console.log(error)
+
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
     closeSnackbar(loaderKey)
     yield put(snackbarsActions.remove(loaderKey))
 
-    if (isErrorMessage(e.message)) {
+    if (isErrorMessage(error.message)) {
       yield put(
         snackbarsActions.add({
-          message: e.message,
+          message: error.message,
           variant: 'error',
           persist: false
         })
@@ -769,8 +777,6 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<HandleClaimFee>) 
         })
       )
     }
-
-    console.log(e)
   }
 }
 
@@ -856,7 +862,7 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
       })
     )
 
-    let signedTx: any
+    let signedTx: SubmittableExtrinsic
     try {
       signedTx = yield* call([tx, tx.signAsync], walletAddress, {
         signer: adapter.signer as Signer
@@ -885,16 +891,19 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
     onSuccess()
 
     yield* call(fetchBalances, [addressTokenX, addressTokenY])
-  } catch (e: any) {
+  } catch (e: unknown) {
+    const error = ensureError(e)
+    console.log(error)
+
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
     closeSnackbar(loaderKey)
     yield put(snackbarsActions.remove(loaderKey))
 
-    if (isErrorMessage(e.message)) {
+    if (isErrorMessage(error.message)) {
       yield put(
         snackbarsActions.add({
-          message: e.message,
+          message: error.message,
           variant: 'error',
           persist: false
         })
@@ -908,8 +917,6 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
         })
       )
     }
-
-    console.log(e)
   }
 }
 
@@ -966,7 +973,7 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
       })
     )
 
-    let signedBatchedTx: any
+    let signedBatchedTx: SubmittableExtrinsic
     try {
       signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
         signer: adapter.signer as Signer
@@ -995,16 +1002,19 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
     onSuccess()
 
     yield* call(fetchBalances, [addressTokenX, addressTokenY])
-  } catch (e: any) {
+  } catch (e: unknown) {
+    const error = ensureError(e)
+    console.log(error)
+
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
     closeSnackbar(loaderKey)
     yield put(snackbarsActions.remove(loaderKey))
 
-    if (isErrorMessage(e.message)) {
+    if (isErrorMessage(error.message)) {
       yield put(
         snackbarsActions.add({
-          message: e.message,
+          message: error.message,
           variant: 'error',
           persist: false
         })
@@ -1018,8 +1028,6 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
         })
       )
     }
-
-    console.log(e)
   }
 }
 
