@@ -13,11 +13,11 @@ import {
   ALL_FEE_TIERS_DATA,
   BestTier,
   PositionOpeningMethod,
+  PositionTokenBlock,
   REFRESHER_INTERVAL,
   TokenPriceData
 } from '@store/consts/static'
 import {
-  PositionTokenBlock,
   calcPrice,
   calculateConcentrationRange,
   convertBalanceToBigint,

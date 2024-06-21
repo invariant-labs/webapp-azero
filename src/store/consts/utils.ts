@@ -18,19 +18,27 @@ import { calculateLiquidityBreakpoints } from '@invariant-labs/a0-sdk/target/uti
 import { ApiPromise } from '@polkadot/api'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
-import { SwapError } from '@store/sagas/swap'
 import apiSingleton from '@store/services/apiSingleton'
 import invariantSingleton from '@store/services/invariantSingleton'
 import psp22Singleton from '@store/services/psp22Singleton'
 import axios from 'axios'
 import {
   BTC,
+  COINGECKO_QUERY_COOLDOWN,
+  CoinGeckoAPIData,
   DEFAULT_TOKENS,
   ETH,
   ErrorMessage,
+  FormatConfig,
+  FormatNumberThreshold,
+  PositionTokenBlock,
+  PrefixConfig,
   Token,
   TokenPriceData,
   USDC,
+  defaultPrefixConfig,
+  defaultThresholds,
+  subNumbers,
   tokensPrices
 } from './static'
 import { sleep } from '@store/sagas/wallet'
@@ -45,18 +53,6 @@ export const getInvariantAddress = (network: Network): string | null => {
     default:
       return null
   }
-}
-
-export interface PrefixConfig {
-  B?: number
-  M?: number
-  K?: number
-}
-
-const defaultPrefixConfig: PrefixConfig = {
-  B: 1000000000,
-  M: 1000000,
-  K: 10000
 }
 
 export const showPrefix = (nr: number, config: PrefixConfig = defaultPrefixConfig): string => {
@@ -76,42 +72,6 @@ export const showPrefix = (nr: number, config: PrefixConfig = defaultPrefixConfi
 
   return ''
 }
-
-export interface FormatNumberThreshold {
-  value: number
-  decimals: number
-  divider?: number
-}
-
-export const defaultThresholds: FormatNumberThreshold[] = [
-  {
-    value: 10,
-    decimals: 4
-  },
-  {
-    value: 1000,
-    decimals: 2
-  },
-  {
-    value: 10000,
-    decimals: 1
-  },
-  {
-    value: 1000000,
-    decimals: 2,
-    divider: 1000
-  },
-  {
-    value: 1000000000,
-    decimals: 2,
-    divider: 1000000
-  },
-  {
-    value: Infinity,
-    decimals: 2,
-    divider: 1000000000
-  }
-]
 
 export const formatNumbers =
   (thresholds: FormatNumberThreshold[] = defaultThresholds) =>
@@ -145,6 +105,7 @@ export const calcYPerXPriceByTickIndex = (
 
   return proportion / 10 ** Number(yDecimal - xDecimal)
 }
+
 export const calcYPerXPriceBySqrtPrice = (
   sqrtPrice: bigint,
   xDecimal: bigint,
@@ -246,15 +207,6 @@ export const createPlaceholderLiquidityPlot = (
   return isXtoY ? ticksData : ticksData.reverse()
 }
 
-export type CoinGeckoAPIData = CoinGeckoAPIPriceData[]
-
-export type CoinGeckoAPIPriceData = {
-  id: string
-  current_price: number
-  price_change_percentage_24h: number
-}
-
-const COINGECKO_QUERY_COOLDOWN = 20 * 60 * 1000
 let isCoinGeckoQueryRunning = false
 
 export const getCoinGeckoTokenPrice = async (id: string): Promise<number | undefined> => {
@@ -360,8 +312,6 @@ export const newPrintBigInt = (amount: bigint, decimals: bigint): string => {
     )
   }
 }
-
-const subNumbers = ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉']
 
 export const printSubNumber = (amount: number): string => {
   return Array.from(String(amount))
@@ -589,12 +539,6 @@ export const convertBalanceToBigint = (amount: string, decimals: bigint | number
   return 0n
 }
 
-export enum PositionTokenBlock {
-  None,
-  A,
-  B
-}
-
 export const determinePositionTokenBlock = (
   currentSqrtPrice: bigint,
   lowerTick: bigint,
@@ -631,14 +575,6 @@ export const findPairsByPoolKeys = (tokenFrom: string, tokenTo: string, poolKeys
       (tokenFrom === poolKey.tokenX && tokenTo === poolKey.tokenY) ||
       (tokenFrom === poolKey.tokenY && tokenTo === poolKey.tokenX)
   )
-}
-
-export type SimulateResult = {
-  poolKey: PoolKey | null
-  amountOut: bigint
-  priceImpact: number
-  targetSqrtPrice: bigint
-  errors: SwapError[]
 }
 
 export const getPools = async (
@@ -836,16 +772,6 @@ export const createLiquidityPlot = (
   return isXtoY ? ticksData : ticksData.reverse()
 }
 
-const B = 1000000000
-const M = 1000000
-const K = 1000
-
-const BDecimals = 9
-const MDecimals = 6
-const KDecimals = 3
-
-const DecimalsAfterDot = 2
-
 export const formatNumber = (number: number | bigint | string): string => {
   const numberAsNumber = Number(number)
   const isNegative = numberAsNumber < 0
@@ -859,23 +785,32 @@ export const formatNumber = (number: number | bigint | string): string => {
 
   let formattedNumber
 
-  if (Math.abs(numberAsNumber) > B) {
+  if (Math.abs(numberAsNumber) > FormatConfig.B) {
     formattedNumber =
-      beforeDot.slice(0, -BDecimals) +
-      (DecimalsAfterDot ? '.' : '') +
-      (beforeDot.slice(-BDecimals) + (afterDot ? afterDot : '')).slice(0, DecimalsAfterDot) +
+      beforeDot.slice(0, -FormatConfig.BDecimals) +
+      (FormatConfig.DecimalsAfterDot ? '.' : '') +
+      (beforeDot.slice(-FormatConfig.BDecimals) + (afterDot ? afterDot : '')).slice(
+        0,
+        FormatConfig.DecimalsAfterDot
+      ) +
       'B'
-  } else if (Math.abs(numberAsNumber) > M) {
+  } else if (Math.abs(numberAsNumber) > FormatConfig.M) {
     formattedNumber =
-      beforeDot.slice(0, -MDecimals) +
-      (DecimalsAfterDot ? '.' : '') +
-      (beforeDot.slice(-MDecimals) + (afterDot ? afterDot : '')).slice(0, DecimalsAfterDot) +
+      beforeDot.slice(0, -FormatConfig.MDecimals) +
+      (FormatConfig.DecimalsAfterDot ? '.' : '') +
+      (beforeDot.slice(-FormatConfig.MDecimals) + (afterDot ? afterDot : '')).slice(
+        0,
+        FormatConfig.DecimalsAfterDot
+      ) +
       'M'
-  } else if (Math.abs(numberAsNumber) > K) {
+  } else if (Math.abs(numberAsNumber) > FormatConfig.K) {
     formattedNumber =
-      beforeDot.slice(0, -KDecimals) +
-      (DecimalsAfterDot ? '.' : '') +
-      (beforeDot.slice(-KDecimals) + (afterDot ? afterDot : '')).slice(0, DecimalsAfterDot) +
+      beforeDot.slice(0, -FormatConfig.KDecimals) +
+      (FormatConfig.DecimalsAfterDot ? '.' : '') +
+      (beforeDot.slice(-FormatConfig.KDecimals) + (afterDot ? afterDot : '')).slice(
+        0,
+        FormatConfig.DecimalsAfterDot
+      ) +
       'K'
   } else {
     const leadingZeros = afterDot ? countLeadingZeros(afterDot) : 0

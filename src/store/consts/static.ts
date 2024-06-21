@@ -1,5 +1,6 @@
 import {
   FEE_TIERS,
+  PoolKey,
   TESTNET_BTC_ADDRESS,
   TESTNET_ETH_ADDRESS,
   TESTNET_USDC_ADDRESS,
@@ -9,6 +10,7 @@ import {
 import { Network } from '@invariant-labs/a0-sdk/src'
 import { Keyring } from '@polkadot/api'
 import { AddressOrPair } from '@polkadot/api/types'
+import { SwapError } from '@store/sagas/swap'
 
 export enum AlephZeroNetworks {
   TEST = 'wss://ws.test.azero.dev',
@@ -273,3 +275,87 @@ export enum ErrorMessage {
 }
 
 export const REFRESHER_INTERVAL = 20
+
+export type SimulateResult = {
+  poolKey: PoolKey | null
+  amountOut: bigint
+  priceImpact: number
+  targetSqrtPrice: bigint
+  errors: SwapError[]
+}
+
+export interface FormatNumberThreshold {
+  value: number
+  decimals: number
+  divider?: number
+}
+
+export const defaultThresholds: FormatNumberThreshold[] = [
+  {
+    value: 10,
+    decimals: 4
+  },
+  {
+    value: 1000,
+    decimals: 2
+  },
+  {
+    value: 10000,
+    decimals: 1
+  },
+  {
+    value: 1000000,
+    decimals: 2,
+    divider: 1000
+  },
+  {
+    value: 1000000000,
+    decimals: 2,
+    divider: 1000000
+  },
+  {
+    value: Infinity,
+    decimals: 2,
+    divider: 1000000000
+  }
+]
+
+export type CoinGeckoAPIData = CoinGeckoAPIPriceData[]
+
+export type CoinGeckoAPIPriceData = {
+  id: string
+  current_price: number
+  price_change_percentage_24h: number
+}
+
+export const COINGECKO_QUERY_COOLDOWN = 20 * 60 * 1000
+
+export const FormatConfig = {
+  B: 1000000000,
+  M: 1000000,
+  K: 1000,
+  BDecimals: 9,
+  MDecimals: 6,
+  KDecimals: 3,
+  DecimalsAfterDot: 2
+}
+
+export enum PositionTokenBlock {
+  None,
+  A,
+  B
+}
+
+export const subNumbers = ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉']
+
+export interface PrefixConfig {
+  B?: number
+  M?: number
+  K?: number
+}
+
+export const defaultPrefixConfig: PrefixConfig = {
+  B: 1000000000,
+  M: 1000000,
+  K: 10000
+}

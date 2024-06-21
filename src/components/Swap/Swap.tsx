@@ -11,9 +11,8 @@ import infoIcon from '@static/svg/info.svg'
 import refreshIcon from '@static/svg/refresh.svg'
 import settingIcon from '@static/svg/settings.svg'
 import SwapArrows from '@static/svg/swap-arrows.svg'
-import { REFRESHER_INTERVAL, TokenPriceData } from '@store/consts/static'
+import { REFRESHER_INTERVAL, SimulateResult, TokenPriceData } from '@store/consts/static'
 import {
-  SimulateResult,
   convertBalanceToBigint,
   printBigint,
   stringToFixed,
