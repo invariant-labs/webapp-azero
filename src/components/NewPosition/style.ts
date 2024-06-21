@@ -95,7 +95,6 @@ const useStyles = makeStyles()(theme => {
       transition: 'opacity 500ms'
     },
     titleContainer: {
-      // width: 'calc(50% - 12px)',
       maxWidth: 464,
       marginBottom: 18,
       display: 'flex',
@@ -103,7 +102,6 @@ const useStyles = makeStyles()(theme => {
       justifyContent: 'space-between',
       alignItems: 'center',
       flexGrow: 1,
-      // marginRight: 24,
       [theme.breakpoints.down('md')]: {
         maxWidth: 'none'
       }
