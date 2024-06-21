@@ -1,8 +1,8 @@
-import { AnyAction, ActionCreator } from 'redux'
 import { Network } from '@invariant-labs/a0-sdk'
+import { ActionCreatorWithPayload } from '@reduxjs/toolkit'
 
 interface ActionsBasicType {
-  [k: string]: ActionCreator<AnyAction>
+  [k: string]: ActionCreatorWithPayload<any>
 }
 
 export type PayloadType<actions extends ActionsBasicType> = {
