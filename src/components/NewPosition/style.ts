@@ -6,6 +6,9 @@ const useStyles = makeStyles()(theme => {
     wrapper: {
       width: 952
     },
+    headerContainer: {
+      columnGap: 24
+    },
     back: {
       height: 24,
       marginBottom: 18,
@@ -92,15 +95,17 @@ const useStyles = makeStyles()(theme => {
       transition: 'opacity 500ms'
     },
     titleContainer: {
-      width: 'calc(50% - 12px)',
+      // width: 'calc(50% - 12px)',
+      maxWidth: 464,
       marginBottom: 18,
       display: 'flex',
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-
-      [theme.breakpoints.down('lg')]: {
-        width: '100%'
+      flexGrow: 1,
+      // marginRight: 24,
+      [theme.breakpoints.down('md')]: {
+        maxWidth: 'none'
       }
     }
   }
