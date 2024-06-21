@@ -9,14 +9,7 @@ import { Button, Grid, Hidden, Typography } from '@mui/material'
 import { AddressOrPair } from '@polkadot/api/types'
 import backIcon from '@static/svg/back-arrow.svg'
 import settingIcon from '@static/svg/settings.svg'
-import {
-  ALL_FEE_TIERS_DATA,
-  BestTier,
-  PositionOpeningMethod,
-  PositionTokenBlock,
-  REFRESHER_INTERVAL,
-  TokenPriceData
-} from '@store/consts/static'
+import { ALL_FEE_TIERS_DATA, PositionTokenBlock, REFRESHER_INTERVAL } from '@store/consts/static'
 import {
   calcPrice,
   calculateConcentrationRange,
@@ -38,6 +31,7 @@ import MarketIdLabel from './MarketIdLabel/MarketIdLabel'
 import PoolInit from './PoolInit/PoolInit'
 import RangeSelector from './RangeSelector/RangeSelector'
 import useStyles from './style'
+import { BestTier, PositionOpeningMethod, TokenPriceData } from '@store/consts/types'
 
 export interface INewPosition {
   initialTokenFrom: string

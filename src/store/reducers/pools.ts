@@ -12,8 +12,8 @@ import {
 } from '@invariant-labs/a0-sdk'
 import { AddressOrPair } from '@polkadot/api/types'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
-import { AZERO, BTC, ETH, Token, USDC } from '@store/consts/static'
-import { PayloadType } from '@store/consts/types'
+import { AZERO, BTC, ETH, USDC } from '@store/consts/static'
+import { PayloadType, Token } from '@store/consts/types'
 import { poolKeyToString } from '@store/consts/utils'
 
 import * as R from 'remeda'

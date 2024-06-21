@@ -5,7 +5,6 @@ import { getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
 import { Button, Grid, Tooltip, Typography } from '@mui/material'
 import loader from '@static/gif/loader.gif'
 import activeLiquidity from '@static/svg/activeLiquidity.svg'
-import { PositionOpeningMethod } from '@store/consts/static'
 import {
   calcPrice,
   calcTicksAmountInRange,
@@ -17,6 +16,7 @@ import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
 import React, { useEffect, useRef, useState } from 'react'
 import ConcentrationSlider from '../ConcentrationSlider/ConcentrationSlider'
 import useStyles from './style'
+import { PositionOpeningMethod } from '@store/consts/types'
 
 export interface IRangeSelector {
   data: PlotTickData[]

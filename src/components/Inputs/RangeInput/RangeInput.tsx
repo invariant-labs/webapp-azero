@@ -5,7 +5,7 @@ import useStyles from './style'
 import { colors } from '@static/theme'
 import { Button, Grid, Input, Typography } from '@mui/material'
 import { formatNumbers, showPrefix } from '@store/consts/utils'
-import { FormatNumberThreshold } from '@store/consts/static'
+import { FormatNumberThreshold } from '@store/consts/types'
 
 export interface IRangeInput {
   label: string

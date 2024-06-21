@@ -1,6 +1,5 @@
 import {
   FEE_TIERS,
-  PoolKey,
   TESTNET_BTC_ADDRESS,
   TESTNET_ETH_ADDRESS,
   TESTNET_USDC_ADDRESS,
@@ -10,7 +9,7 @@ import {
 import { Network } from '@invariant-labs/a0-sdk/src'
 import { Keyring } from '@polkadot/api'
 import { AddressOrPair } from '@polkadot/api/types'
-import { SwapError } from '@store/sagas/swap'
+import { BestTier, FormatNumberThreshold, PrefixConfig, Token, TokenPriceData } from './types'
 
 export enum AlephZeroNetworks {
   TEST = 'wss://ws.test.azero.dev',
@@ -23,32 +22,10 @@ export const STABLECOIN_ADDRESSES: string[] = []
 
 export const DEFAULT_PUBLICKEY = new Keyring({ type: 'ecdsa' })
 
-export type PositionOpeningMethod = 'range' | 'concentration'
-
-export interface TokenPriceData {
-  price: number
-}
-
-export interface Token {
-  symbol: string
-  address: AddressOrPair
-  decimals: bigint
-  name: string
-  logoURI: string
-  balance?: bigint
-  coingeckoId?: string
-  isUnknown?: boolean
-}
-
 export const tokensPrices: Record<Network, Record<string, TokenPriceData>> = {
   [Network.Testnet]: { USDC_TEST: { price: 1 }, BTC_TEST: { price: 64572.0 } },
   [Network.Mainnet]: {},
   [Network.Local]: {}
-}
-export interface BestTier {
-  tokenX: AddressOrPair
-  tokenY: AddressOrPair
-  bestTierIndex: number
 }
 
 // const mainnetBestTiersCreator = () => {
@@ -276,20 +253,6 @@ export enum ErrorMessage {
 
 export const REFRESHER_INTERVAL = 20
 
-export type SimulateResult = {
-  poolKey: PoolKey | null
-  amountOut: bigint
-  priceImpact: number
-  targetSqrtPrice: bigint
-  errors: SwapError[]
-}
-
-export interface FormatNumberThreshold {
-  value: number
-  decimals: number
-  divider?: number
-}
-
 export const defaultThresholds: FormatNumberThreshold[] = [
   {
     value: 10,
@@ -320,14 +283,6 @@ export const defaultThresholds: FormatNumberThreshold[] = [
   }
 ]
 
-export type CoinGeckoAPIData = CoinGeckoAPIPriceData[]
-
-export type CoinGeckoAPIPriceData = {
-  id: string
-  current_price: number
-  price_change_percentage_24h: number
-}
-
 export const COINGECKO_QUERY_COOLDOWN = 20 * 60 * 1000
 
 export const FormatConfig = {
@@ -348,14 +303,19 @@ export enum PositionTokenBlock {
 
 export const subNumbers = ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉']
 
-export interface PrefixConfig {
-  B?: number
-  M?: number
-  K?: number
-}
-
 export const defaultPrefixConfig: PrefixConfig = {
   B: 1000000000,
   M: 1000000,
   K: 10000
 }
+
+export const addressTickerMap: { [key: string]: string } = {
+  BTC: TESTNET_BTC_ADDRESS,
+  ETH: TESTNET_ETH_ADDRESS,
+  USDC: TESTNET_USDC_ADDRESS,
+  AZERO: TESTNET_WAZERO_ADDRESS
+}
+
+export const reversedAddressTickerMap = Object.fromEntries(
+  Object.entries(addressTickerMap).map(([key, value]) => [value, key])
+)

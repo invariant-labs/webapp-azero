@@ -7,15 +7,15 @@ import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { Box, Button, Grid, Typography } from '@mui/material'
 import { AddressOrPair } from '@polkadot/api/types'
 import backIcon from '@static/svg/back-arrow.svg'
-import { REFRESHER_INTERVAL, TokenPriceData } from '@store/consts/static'
-import { addressToTicker, initialXtoY } from '@store/consts/uiUtiils'
-import { parseFeeToPathFee, printBigint } from '@store/consts/utils'
+import { REFRESHER_INTERVAL } from '@store/consts/static'
+import { addressToTicker, initialXtoY, parseFeeToPathFee, printBigint } from '@store/consts/utils'
 import { PlotTickData } from '@store/reducers/positions'
 import { VariantType } from 'notistack'
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ILiquidityToken } from './SinglePositionInfo/consts'
 import { useStyles } from './style'
+import { TokenPriceData } from '@store/consts/types'
 
 interface IProps {
   tokenXAddress: AddressOrPair

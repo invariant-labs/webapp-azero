@@ -1,5 +1,7 @@
-import { Network } from '@invariant-labs/a0-sdk'
+import { Network, PoolKey } from '@invariant-labs/a0-sdk'
+import { AddressOrPair } from '@polkadot/api/types'
 import { ActionCreatorWithPayload } from '@reduxjs/toolkit'
+import { SwapError } from '@store/sagas/swap'
 
 interface ActionsBasicType {
   [k: string]: ActionCreatorWithPayload<any>
@@ -13,4 +15,55 @@ export interface ISelectNetwork {
   networkType: Network
   rpc: string
   rpcName?: string
+}
+
+export interface PrefixConfig {
+  B?: number
+  M?: number
+  K?: number
+}
+
+export type CoinGeckoAPIData = CoinGeckoAPIPriceData[]
+
+export type CoinGeckoAPIPriceData = {
+  id: string
+  current_price: number
+  price_change_percentage_24h: number
+}
+
+export type SimulateResult = {
+  poolKey: PoolKey | null
+  amountOut: bigint
+  priceImpact: number
+  targetSqrtPrice: bigint
+  errors: SwapError[]
+}
+
+export interface FormatNumberThreshold {
+  value: number
+  decimals: number
+  divider?: number
+}
+
+export type PositionOpeningMethod = 'range' | 'concentration'
+
+export interface TokenPriceData {
+  price: number
+}
+
+export interface Token {
+  symbol: string
+  address: AddressOrPair
+  decimals: bigint
+  name: string
+  logoURI: string
+  balance?: bigint
+  coingeckoId?: string
+  isUnknown?: boolean
+}
+
+export interface BestTier {
+  tokenX: AddressOrPair
+  tokenY: AddressOrPair
+  bestTierIndex: number
 }

@@ -25,24 +25,29 @@ import axios from 'axios'
 import {
   BTC,
   COINGECKO_QUERY_COOLDOWN,
-  CoinGeckoAPIData,
   DEFAULT_TOKENS,
   ETH,
   ErrorMessage,
   FormatConfig,
-  FormatNumberThreshold,
   PositionTokenBlock,
-  PrefixConfig,
-  Token,
-  TokenPriceData,
+  STABLECOIN_ADDRESSES,
   USDC,
+  addressTickerMap,
   defaultPrefixConfig,
   defaultThresholds,
+  reversedAddressTickerMap,
   subNumbers,
   tokensPrices
 } from './static'
 import { sleep } from '@store/sagas/wallet'
-import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/src/consts'
+import { PERCENTAGE_DENOMINATOR, PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/src/consts'
+import {
+  CoinGeckoAPIData,
+  FormatNumberThreshold,
+  PrefixConfig,
+  Token,
+  TokenPriceData
+} from './types'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -885,4 +890,27 @@ export const containsOnlyZeroes = (string: string): boolean => {
 
 export const stringToFixed = (string: string, numbersAfterDot: number): string => {
   return string.includes('.') ? string.slice(0, string.indexOf('.') + 1 + numbersAfterDot) : string
+}
+
+export const tickerToAddress = (ticker: string): string => {
+  return addressTickerMap[ticker] || ticker
+}
+
+export const addressToTicker = (address: string): string => {
+  return reversedAddressTickerMap[address] || address
+}
+
+export const initialXtoY = (tokenXAddress?: string, tokenYAddress?: string) => {
+  if (!tokenXAddress || !tokenYAddress) {
+    return true
+  }
+
+  const isTokeXStablecoin = STABLECOIN_ADDRESSES.includes(tokenXAddress)
+  const isTokenYStablecoin = STABLECOIN_ADDRESSES.includes(tokenYAddress)
+
+  return isTokeXStablecoin === isTokenYStablecoin || (!isTokeXStablecoin && !isTokenYStablecoin)
+}
+
+export const parsePathFeeToFeeString = (pathFee: string): string => {
+  return (+pathFee.replace('_', '') * Math.pow(10, Number(PERCENTAGE_SCALE) - 4)).toString()
 }

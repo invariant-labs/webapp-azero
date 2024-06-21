@@ -9,13 +9,8 @@ import {
 } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/src/consts'
 import { AddressOrPair } from '@polkadot/api/types'
-import {
-  ALL_FEE_TIERS_DATA,
-  PositionOpeningMethod,
-  TokenPriceData,
-  bestTiers,
-  commonTokensForNetworks
-} from '@store/consts/static'
+import { ALL_FEE_TIERS_DATA, bestTiers, commonTokensForNetworks } from '@store/consts/static'
+import { PositionOpeningMethod, TokenPriceData } from '@store/consts/types'
 import {
   addNewTokenToLocalStorage,
   calcPrice,

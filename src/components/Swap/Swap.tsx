@@ -11,7 +11,7 @@ import infoIcon from '@static/svg/info.svg'
 import refreshIcon from '@static/svg/refresh.svg'
 import settingIcon from '@static/svg/settings.svg'
 import SwapArrows from '@static/svg/swap-arrows.svg'
-import { REFRESHER_INTERVAL, SimulateResult, TokenPriceData } from '@store/consts/static'
+import { REFRESHER_INTERVAL } from '@store/consts/static'
 import {
   convertBalanceToBigint,
   printBigint,
@@ -30,6 +30,7 @@ import { useDispatch } from 'react-redux'
 import ExchangeRate from './ExchangeRate/ExchangeRate'
 import TransactionDetailsBox from './TransactionDetailsBox/TransactionDetailsBox'
 import useStyles from './style'
+import { SimulateResult, TokenPriceData } from '@store/consts/types'
 
 export interface Pools {
   tokenX: AddressOrPair

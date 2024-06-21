@@ -1,7 +1,8 @@
 import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import { Swap } from '@components/Swap/Swap'
 import { AddressOrPair } from '@polkadot/api/types'
-import { TokenPriceData, commonTokensForNetworks } from '@store/consts/static'
+import { commonTokensForNetworks } from '@store/consts/static'
+import { TokenPriceData } from '@store/consts/types'
 import {
   addNewTokenToLocalStorage,
   getCoinGeckoTokenPrice,

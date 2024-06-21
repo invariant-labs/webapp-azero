@@ -3,13 +3,19 @@ import DepositAmountInput from '@components/Inputs/DepositAmountInput/DepositAmo
 import Select from '@components/Inputs/Select/Select'
 import { Grid, Typography } from '@mui/material'
 import SwapList from '@static/svg/swap-list.svg'
-import { ALL_FEE_TIERS_DATA, PositionOpeningMethod } from '@store/consts/static'
-import { parsePathFeeToFeeString, tickerToAddress } from '@store/consts/uiUtiils'
-import { convertBalanceToBigint, getScaleFromString, printBigint } from '@store/consts/utils'
+import { ALL_FEE_TIERS_DATA } from '@store/consts/static'
+import {
+  convertBalanceToBigint,
+  getScaleFromString,
+  parsePathFeeToFeeString,
+  printBigint,
+  tickerToAddress
+} from '@store/consts/utils'
 import classNames from 'classnames'
 import React, { useCallback, useEffect, useState } from 'react'
 import FeeSwitch from '../FeeSwitch/FeeSwitch'
 import { useStyles } from './style'
+import { PositionOpeningMethod } from '@store/consts/types'
 export interface InputState {
   value: string
   setValue: (value: string) => void

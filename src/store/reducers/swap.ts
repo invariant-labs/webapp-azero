@@ -1,8 +1,7 @@
 import { PoolKey } from '@invariant-labs/a0-sdk'
 import { AddressOrPair } from '@polkadot/api/types'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
-import { SimulateResult } from '@store/consts/static'
-import { PayloadType } from '@store/consts/types'
+import { PayloadType, SimulateResult } from '@store/consts/types'
 
 export interface Swap {
   poolKey: PoolKey | null
