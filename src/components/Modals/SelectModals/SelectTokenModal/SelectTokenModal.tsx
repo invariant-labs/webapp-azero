@@ -18,14 +18,13 @@ import {
   Typography,
   useMediaQuery
 } from '@mui/material'
-import { AddressOrPair } from '@polkadot/api/types'
 import { formatNumber, printBigint } from '@store/consts/utils'
 import { SwapToken } from '@store/selectors/wallet'
 import Scrollbars from 'rc-scrollbars'
 
 export interface ISelectTokenModal {
   tokens: SwapToken[]
-  commonTokens: AddressOrPair[]
+  commonTokens: string[]
   open: boolean
   handleClose: () => void
   anchorEl: HTMLButtonElement | null

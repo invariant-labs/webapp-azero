@@ -1,5 +1,4 @@
 import { PoolKey } from '@invariant-labs/a0-sdk'
-import { AddressOrPair } from '@polkadot/api/types'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { PayloadType, SimulateResult } from '@store/consts/types'
 
@@ -7,8 +6,8 @@ export interface Swap {
   poolKey: PoolKey | null
   slippage: bigint
   estimatedPriceAfterSwap: bigint
-  tokenFrom: AddressOrPair
-  tokenTo: AddressOrPair
+  tokenFrom: string
+  tokenTo: string
   amountIn: bigint
   byAmountIn: boolean
   txid?: string
@@ -18,8 +17,8 @@ export interface Swap {
 }
 
 export interface Simulate {
-  fromToken: AddressOrPair
-  toToken: AddressOrPair
+  fromToken: string
+  toToken: string
   amount: bigint
   byAmountIn: boolean
 }
@@ -66,7 +65,7 @@ const swapSlice = createSlice({
       state.swap.success = action.payload
       return state
     },
-    setPair(state, action: PayloadAction<{ tokenFrom: AddressOrPair; tokenTo: AddressOrPair }>) {
+    setPair(state, action: PayloadAction<{ tokenFrom: string; tokenTo: string }>) {
       state.swap.tokenFrom = action.payload.tokenFrom
       state.swap.tokenTo = action.payload.tokenTo
       return state

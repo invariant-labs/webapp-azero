@@ -1,5 +1,4 @@
 import { Network, PoolKey } from '@invariant-labs/a0-sdk'
-import { AddressOrPair } from '@polkadot/api/types'
 import { ActionCreatorWithPayload } from '@reduxjs/toolkit'
 import { SwapError } from '@store/sagas/swap'
 
@@ -53,7 +52,7 @@ export interface TokenPriceData {
 
 export interface Token {
   symbol: string
-  address: AddressOrPair
+  address: string
   decimals: bigint
   name: string
   logoURI: string
@@ -63,7 +62,7 @@ export interface Token {
 }
 
 export interface BestTier {
-  tokenX: AddressOrPair
-  tokenY: AddressOrPair
+  tokenX: string
+  tokenY: string
   bestTierIndex: number
 }

@@ -10,7 +10,6 @@ import {
   Tick,
   Tickmap
 } from '@invariant-labs/a0-sdk'
-import { AddressOrPair } from '@polkadot/api/types'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { AZERO, BTC, ETH, USDC } from '@store/consts/static'
 import { PayloadType, Token } from '@store/consts/types'
@@ -67,8 +66,8 @@ export interface UpdateTickmap {
 }
 
 export interface FetchTicksAndTickMaps {
-  tokenFrom: AddressOrPair
-  tokenTo: AddressOrPair
+  tokenFrom: string
+  tokenTo: string
   allPools: PoolWithPoolKey[]
 }
 
@@ -90,8 +89,8 @@ export const defaultState: IPoolsStore = {
 }
 
 export interface PairTokens {
-  first: AddressOrPair
-  second: AddressOrPair
+  first: string
+  second: string
 }
 
 export enum ListType {

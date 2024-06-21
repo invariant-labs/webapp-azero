@@ -1,6 +1,5 @@
 import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import { Swap } from '@components/Swap/Swap'
-import { AddressOrPair } from '@polkadot/api/types'
 import { commonTokensForNetworks } from '@store/consts/static'
 import { TokenPriceData } from '@store/consts/types'
 import {
@@ -51,8 +50,8 @@ export const WrappedSwap = () => {
   const swapSimulateResult = useSelector(simulateResult)
   const api = apiSingleton.loadInstance(network, rpc)
   const [progress, setProgress] = useState<ProgressState>('none')
-  const [tokenFrom, setTokenFrom] = useState<AddressOrPair | null>(null)
-  const [tokenTo, setTokenTo] = useState<AddressOrPair | null>(null)
+  const [tokenFrom, setTokenFrom] = useState<string | null>(null)
+  const [tokenTo, setTokenTo] = useState<string | null>(null)
 
   useEffect(() => {
     let timeoutId1: NodeJS.Timeout

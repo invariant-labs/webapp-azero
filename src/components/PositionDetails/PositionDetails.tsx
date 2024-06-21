@@ -5,7 +5,6 @@ import { TickPlotPositionData } from '@components/PriceRangePlot/PriceRangePlot'
 import Refresher from '@components/Refresher/Refresher'
 import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { Box, Button, Grid, Typography } from '@mui/material'
-import { AddressOrPair } from '@polkadot/api/types'
 import backIcon from '@static/svg/back-arrow.svg'
 import { REFRESHER_INTERVAL } from '@store/consts/static'
 import { addressToTicker, initialXtoY, parseFeeToPathFee, printBigint } from '@store/consts/utils'
@@ -18,9 +17,9 @@ import { useStyles } from './style'
 import { TokenPriceData } from '@store/consts/types'
 
 interface IProps {
-  tokenXAddress: AddressOrPair
-  tokenYAddress: AddressOrPair
-  poolAddress: AddressOrPair
+  tokenXAddress: string
+  tokenYAddress: string
+  poolAddress: string
   copyPoolAddressHandler: (message: string, variant: VariantType) => void
   detailsData: PlotTickData[]
   leftRange: TickPlotPositionData

@@ -1,14 +1,12 @@
 import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import NewPosition from '@components/NewPosition/NewPosition'
 import {
-  TokenAmount,
   calculateSqrtPrice,
   getLiquidityByX,
   getLiquidityByY,
   newPoolKey
 } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/src/consts'
-import { AddressOrPair } from '@polkadot/api/types'
 import { ALL_FEE_TIERS_DATA, bestTiers, commonTokensForNetworks } from '@store/consts/static'
 import { PositionOpeningMethod, TokenPriceData } from '@store/consts/types'
 import {
@@ -444,12 +442,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     localStorage.setItem('INVARIANT_NEW_POSITION_SLIPPAGE', slippage)
   }
 
-  const calcAmount = (
-    amount: TokenAmount,
-    left: number,
-    right: number,
-    tokenAddress: AddressOrPair
-  ) => {
+  const calcAmount = (amount: bigint, left: number, right: number, tokenAddress: string) => {
     if (tokenAIndex === null || tokenBIndex === null || isNaN(left) || isNaN(right)) {
       return BigInt(0)
     }

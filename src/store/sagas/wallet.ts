@@ -1,6 +1,5 @@
 import { Network, sendTx } from '@invariant-labs/a0-sdk'
 import { NightlyConnectAdapter } from '@nightlylabs/wallet-selector-polkadot'
-import { AddressOrPair, Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { FaucetTokenList, TokenAirdropAmount } from '@store/consts/static'
 import { createLoaderKey, getTokenBalances } from '@store/consts/utils'
@@ -24,6 +23,7 @@ import {
   takeLeading
 } from 'typed-redux-saga'
 import { getConnection } from './connection'
+import { Signer } from '@polkadot/api/types'
 
 export function* getWallet(): SagaGenerator<NightlyConnectAdapter> {
   const wallet = yield* call(getAlephZeroWallet)
@@ -42,7 +42,7 @@ type FrameSystemAccountInfo = {
   providers: number
   sufficients: number
 }
-export function* getBalance(walletAddress: AddressOrPair): SagaGenerator<string> {
+export function* getBalance(walletAddress: string): SagaGenerator<string> {
   const connection = yield* call(getConnection)
   const accountInfoResponse = yield* call(
     [connection.query.system.account, connection.query.system.account],

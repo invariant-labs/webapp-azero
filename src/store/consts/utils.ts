@@ -5,7 +5,6 @@ import {
   PoolKey,
   Tick,
   Tickmap,
-  TokenAmount,
   calculateSqrtPrice,
   calculateTickDelta,
   getMaxTick,
@@ -266,7 +265,7 @@ export const getMockedTokenPrice = (symbol: string, network: Network): TokenPric
   }
 }
 
-export const printBigint = (amount: TokenAmount, decimals: bigint): string => {
+export const printBigint = (amount: bigint, decimals: bigint): string => {
   const parsedDecimals = Number(decimals)
   const amountString = amount.toString()
   const isNegative = amountString.length > 0 && amountString[0] === '-'

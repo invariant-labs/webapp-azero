@@ -4,7 +4,6 @@ import NavbarButton from '@components/Navbar/Button'
 import { Network } from '@invariant-labs/a0-sdk/src'
 import DotIcon from '@mui/icons-material/FiberManualRecordRounded'
 import { Box, Button, CardMedia, Grid, IconButton, useMediaQuery } from '@mui/material'
-import { AddressOrPair } from '@polkadot/api-base/types'
 import icons from '@static/icons'
 import Hamburger from '@static/svg/Hamburger.svg'
 import { theme } from '@static/theme'
@@ -19,7 +18,7 @@ import useButtonStyles from './HeaderButton/style'
 import useStyles from './style'
 
 export interface IHeader {
-  address: AddressOrPair
+  address: string
   onNetworkSelect: (networkType: Network, rpcAddress: string, rpcName?: string) => void
   onConnectWallet: () => void
   walletConnected: boolean

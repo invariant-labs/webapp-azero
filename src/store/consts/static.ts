@@ -8,7 +8,6 @@ import {
 
 import { Network } from '@invariant-labs/a0-sdk/src'
 import { Keyring } from '@polkadot/api'
-import { AddressOrPair } from '@polkadot/api/types'
 import { BestTier, FormatNumberThreshold, PrefixConfig, Token, TokenPriceData } from './types'
 
 export enum AlephZeroNetworks {
@@ -96,7 +95,7 @@ export const bestTiers: Record<Network, BestTier[]> = {
   [Network.Local]: []
 }
 
-export const commonTokensForNetworks: Record<Network, AddressOrPair[]> = {
+export const commonTokensForNetworks: Record<Network, string[]> = {
   [Network.Testnet]: [],
   [Network.Mainnet]: [],
   [Network.Local]: []
