@@ -1,5 +1,3 @@
-import { newPoolKey } from '@invariant-labs/a0-sdk'
-import { poolKeyToString } from '@store/consts/utils'
 import type { Meta, StoryObj } from '@storybook/react'
 import { fn } from '@storybook/test'
 import { MemoryRouter } from 'react-router-dom'
@@ -59,16 +57,14 @@ export const Primary: Story = {
     reloadHandler: fn(),
     setMidPrice: fn(),
     ticksLoading: false,
-    tickSpacing: 0 as any,
+    tickSpacing: 1 as any,
     tokens: [],
     xDecimal: 9 as any,
     yDecimal: 12 as any,
     hasTicksError: false,
     calcAmount: fn(),
     loadingTicksAndTickMaps: false,
-    poolKey: poolKeyToString(
-      newPoolKey('0x123132423423', '0x123132423423', { fee: 1n, tickSpacing: 1n })
-    ),
+    poolKey: '',
     noConnectedBlockerProps: {
       onConnect: fn(),
       descCustomText: 'Cannot add any liquidity.'
@@ -81,7 +77,7 @@ export const Primary: Story = {
       <NewPosition
         midPrice={{ x: 1234, index: 23n }}
         currentPriceSqrt={123n}
-        tickSpacing={0n}
+        tickSpacing={1n}
         xDecimal={9n}
         yDecimal={12n}
         commonTokens={[]}
@@ -123,9 +119,7 @@ export const Primary: Story = {
         addLiquidityHandler={fn()}
         calcAmount={() => 1n}
         loadingTicksAndTickMaps={false}
-        poolKey={poolKeyToString(
-          newPoolKey('0x123132423423', '0x123132423423', { fee: 1n, tickSpacing: 1n })
-        )}
+        poolKey=''
         noConnectedBlockerProps={{
           onConnect: fn(),
           descCustomText: 'Cannot add any liquidity.'
