@@ -211,7 +211,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   }, [isWaitingForNewPool])
 
   useEffect(() => {
-    if (tokenAIndex !== null && tokenBIndex !== null) {
+    if (tokenAIndex !== null && tokenBIndex !== null && tokenAIndex !== tokenBIndex) {
       const tokenA = tokens[tokenAIndex].assetAddress.toString()
       const tokenB = tokens[tokenBIndex].assetAddress.toString()
 
