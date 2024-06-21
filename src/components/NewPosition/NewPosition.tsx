@@ -5,7 +5,7 @@ import Refresher from '@components/Refresher/Refresher'
 import { getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
 import { getConcentrationArray } from '@invariant-labs/a0-sdk/src/utils'
 import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
-import { Button, Grid, Hidden, Typography } from '@mui/material'
+import { Box, Button, Grid, Hidden, Typography } from '@mui/material'
 import backIcon from '@static/svg/back-arrow.svg'
 import settingIcon from '@static/svg/settings.svg'
 import { ALL_FEE_TIERS_DATA, PositionTokenBlock, REFRESHER_INTERVAL } from '@store/consts/static'
@@ -79,10 +79,8 @@ export interface INewPosition {
   initialIsDiscreteValue: boolean
   onDiscreteChange: (val: boolean) => void
   currentPriceSqrt: bigint
-  canCreateNewPool: boolean
-  canCreateNewPosition: boolean
   handleAddToken: (address: string) => void
-  commonTokens: any[] // TODO delete any
+  commonTokens: string[]
   initialOpeningPositionMethod: PositionOpeningMethod
   onPositionOpeningMethodChange: (val: PositionOpeningMethod) => void
   initialHideUnknownTokensValue: boolean
@@ -129,8 +127,6 @@ export const NewPosition: React.FC<INewPosition> = ({
   bestTiers,
   initialIsDiscreteValue,
   onDiscreteChange,
-  canCreateNewPool,
-  canCreateNewPosition,
   handleAddToken,
   commonTokens,
   initialOpeningPositionMethod,
@@ -458,8 +454,12 @@ export const NewPosition: React.FC<INewPosition> = ({
         </Grid>
       </Link>
 
-      <Grid container justifyContent='space-between' alignItems='center'>
-        <Grid className={classes.titleContainer}>
+      <Grid
+        container
+        justifyContent='space-between'
+        alignItems='center'
+        className={classes.headerContainer}>
+        <Box className={classes.titleContainer}>
           <Typography className={classes.title}>Add new liquidity position</Typography>
           {poolKey !== '' && (
             <Refresher
@@ -471,7 +471,7 @@ export const NewPosition: React.FC<INewPosition> = ({
               }}
             />
           )}
-        </Grid>
+        </Box>
         <Grid container item alignItems='center' className={classes.options}>
           {poolKey !== '' ? (
             <MarketIdLabel
@@ -627,8 +627,6 @@ export const NewPosition: React.FC<INewPosition> = ({
           }}
           poolIndex={poolIndex}
           bestTierIndex={bestTierIndex}
-          canCreateNewPool={canCreateNewPool}
-          canCreateNewPosition={canCreateNewPosition}
           handleAddToken={handleAddToken}
           commonTokens={commonTokens}
           initialHideUnknownTokensValue={initialHideUnknownTokensValue}

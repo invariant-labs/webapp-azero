@@ -8,7 +8,7 @@ import { Fade, Grid, Tooltip } from '@mui/material'
 
 export const FooterTransition: React.FC<
   TransitionProps & {
-    children?: React.ReactElement<any, any> | undefined
+    children?: React.ReactNode
   }
 > = ({ children, ...props }) => {
   const [translate, setTranslate] = useState('translateY(50px)')

@@ -9,6 +9,7 @@ import {
 import { Network } from '@invariant-labs/a0-sdk/src'
 import { Keyring } from '@polkadot/api'
 import { BestTier, FormatNumberThreshold, PrefixConfig, Token, TokenPriceData } from './types'
+import { testnetBestTiersCreator } from './utils'
 
 export enum AlephZeroNetworks {
   TEST = 'wss://ws.test.azero.dev',
@@ -27,91 +28,8 @@ export const tokensPrices: Record<Network, Record<string, TokenPriceData>> = {
   [Network.Local]: {}
 }
 
-const testnetBestTiersCreator = () => {
-  const stableTokens = {
-    USDC: TESTNET_USDC_ADDRESS
-  }
-
-  const unstableTokens = {
-    BTC: TESTNET_BTC_ADDRESS,
-    ETH: TESTNET_ETH_ADDRESS,
-    AZERO: TESTNET_WAZERO_ADDRESS
-  }
-
-  const bestTiers: BestTier[] = []
-
-  const stableTokensValues = Object.values(stableTokens)
-  for (let i = 0; i < stableTokensValues.length; i++) {
-    const tokenX = stableTokensValues[i]
-    for (let j = i + 1; j < stableTokensValues.length; j++) {
-      const tokenY = stableTokensValues[j]
-
-      bestTiers.push({
-        tokenX,
-        tokenY,
-        bestTierIndex: 0
-      })
-    }
-  }
-
-  const unstableTokensEntries = Object.entries(unstableTokens)
-  for (let i = 0; i < unstableTokensEntries.length; i++) {
-    const [symbolX, tokenX] = unstableTokensEntries[i]
-    for (let j = i + 1; j < unstableTokensEntries.length; j++) {
-      const [symbolY, tokenY] = unstableTokensEntries[j]
-
-      if (symbolX.slice(-5) === 'AZERO' && symbolY.slice(-5) === 'AZERO') {
-        bestTiers.push({
-          tokenX,
-          tokenY,
-          bestTierIndex: 0
-        })
-      } else {
-        bestTiers.push({
-          tokenX,
-          tokenY,
-          bestTierIndex: 2
-        })
-      }
-    }
-  }
-
-  const unstableTokensValues = Object.values(unstableTokens)
-  for (let i = 0; i < stableTokensValues.length; i++) {
-    const tokenX = stableTokensValues[i]
-    for (let j = 0; j < unstableTokensValues.length; j++) {
-      const tokenY = unstableTokensValues[j]
-
-      bestTiers.push({
-        tokenX,
-        tokenY,
-        bestTierIndex: 2
-      })
-    }
-  }
-
-  return bestTiers
-}
-
-export const bestTiers: Record<Network, BestTier[]> = {
-  [Network.Testnet]: testnetBestTiersCreator(),
-  [Network.Mainnet]: [],
-  [Network.Local]: []
-}
-
-export const commonTokensForNetworks: Record<Network, string[]> = {
-  [Network.Testnet]: [],
-  [Network.Mainnet]: [],
-  [Network.Local]: []
-}
-
 export const FAUCET_DEPLOYER_MNEMONIC =
   'motion ice subject actress spider rare leg fortune brown similar excess amazing'
-
-export const getFaucetDeployer = () => {
-  const keyring = new Keyring({ type: 'sr25519' })
-  return keyring.addFromUri(FAUCET_DEPLOYER_MNEMONIC)
-}
 
 export const FAUCET_TOKEN_AMOUNT = 1000n
 
@@ -167,6 +85,18 @@ export const AZERO: Token = {
 }
 
 export const DEFAULT_TOKENS = [BTC, ETH, USDC, AZERO]
+
+export const bestTiers: Record<Network, BestTier[]> = {
+  [Network.Testnet]: testnetBestTiersCreator(),
+  [Network.Mainnet]: [],
+  [Network.Local]: []
+}
+
+export const commonTokensForNetworks: Record<Network, string[]> = {
+  [Network.Testnet]: [BTC.address, ETH.address, USDC.address, AZERO.address],
+  [Network.Mainnet]: [],
+  [Network.Local]: []
+}
 
 export const DEFAULT_INVARIANT_OPTIONS = {
   storageDepositLimit: null,
@@ -322,3 +252,7 @@ export const addressTickerMap: { [key: string]: string } = {
 export const reversedAddressTickerMap = Object.fromEntries(
   Object.entries(addressTickerMap).map(([key, value]) => [value, key])
 )
+
+export const LIQUIDITY_PLOT_DECIMAL = 12n
+
+export const DEFAULT_TOKEN_DECIMAL = 12n

@@ -5,13 +5,14 @@ import { configureStore, isPlain } from '@reduxjs/toolkit'
 import combinedReducers from './reducers'
 import rootSaga from './sagas'
 
-const isSerializable = (value: any) => {
+const isSerializable = (value: unknown) => {
   return typeof value === 'bigint' || isPlain(value)
 }
-const getEntries = (value: any) => {
+
+const getEntries = (value: unknown) => {
   return typeof value === 'bigint'
-    ? [['bigint', value.toString()] as [string, any]]
-    : Object.entries(value)
+    ? [['bigint', value.toString()] as [string, unknown]]
+    : Object.entries(value as Record<string, unknown>)
 }
 
 const configureAppStore = (initialState = {}) => {
@@ -35,11 +36,11 @@ const configureAppStore = (initialState = {}) => {
       process.env.NODE_ENV === 'production'
         ? false
         : {
-          serialize: {
-            replacer: (_key, value) => (typeof value === 'bigint' ? value.toString() : value),
-            options: true
+            serialize: {
+              replacer: (_key, value) => (typeof value === 'bigint' ? value.toString() : value),
+              options: true
+            }
           }
-        }
   })
 
   sagaMiddleware.run(rootSaga)

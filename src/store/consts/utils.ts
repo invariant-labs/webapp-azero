@@ -12,9 +12,16 @@ import {
   positionToTick,
   sqrtPriceToPrice
 } from '@invariant-labs/a0-sdk'
-import { CHUNK_SIZE, PRICE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
+import {
+  CHUNK_SIZE,
+  PRICE_SCALE,
+  TESTNET_BTC_ADDRESS,
+  TESTNET_ETH_ADDRESS,
+  TESTNET_USDC_ADDRESS,
+  TESTNET_WAZERO_ADDRESS
+} from '@invariant-labs/a0-sdk/target/consts'
 import { calculateLiquidityBreakpoints } from '@invariant-labs/a0-sdk/target/utils'
-import { ApiPromise } from '@polkadot/api'
+import { ApiPromise, Keyring } from '@polkadot/api'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
 import apiSingleton from '@store/services/apiSingleton'
@@ -27,7 +34,9 @@ import {
   DEFAULT_TOKENS,
   ETH,
   ErrorMessage,
+  FAUCET_DEPLOYER_MNEMONIC,
   FormatConfig,
+  LIQUIDITY_PLOT_DECIMAL,
   PositionTokenBlock,
   STABLECOIN_ADDRESSES,
   USDC,
@@ -41,6 +50,7 @@ import {
 import { sleep } from '@store/sagas/wallet'
 import { PERCENTAGE_DENOMINATOR, PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/src/consts'
 import {
+  BestTier,
   CoinGeckoAPIData,
   FormatNumberThreshold,
   PrefixConfig,
@@ -370,7 +380,7 @@ export const getTokenBalances = async (
 ): Promise<[string, bigint][]> => {
   const psp22 = await psp22Singleton.loadInstance(api, network)
 
-  const promises: Promise<any>[] = [] // TODO delete any
+  const promises: Promise<bigint>[] = []
   tokens.map(token => {
     promises.push(psp22.balanceOf(address, token))
   })
@@ -733,7 +743,7 @@ export const createLiquidityPlot = (
       const price = calcPrice(tick.index - tickSpacing, isXtoY, tokenXDecimal, tokenYDecimal)
       ticksData.push({
         x: price,
-        y: +printBigint(ticks[i - 1].liqudity, 12n), // TODO use constant
+        y: +printBigint(ticks[i - 1].liqudity, LIQUIDITY_PLOT_DECIMAL),
         index: tick.index - tickSpacing
       })
     }
@@ -741,7 +751,7 @@ export const createLiquidityPlot = (
     const price = calcPrice(tick.index, isXtoY, tokenXDecimal, tokenYDecimal)
     ticksData.push({
       x: price,
-      y: +printBigint(ticks[i].liqudity, 12n), // TODO use constant
+      y: +printBigint(ticks[i].liqudity, LIQUIDITY_PLOT_DECIMAL),
       index: tick.index
     })
   })
@@ -846,8 +856,13 @@ export const countLeadingZeros = (str: string): number => {
   return (str.match(/^0+/) || [''])[0].length
 }
 
-export const isErrorMessage = (value: any): boolean => {
-  return Object.values(ErrorMessage).includes(value)
+export const isErrorMessage = (message: string): boolean => {
+  for (const value of Object.values(ErrorMessage)) {
+    if (message === value) {
+      return true
+    }
+  }
+  return false
 }
 
 export const getNewTokenOrThrow = async (
@@ -912,4 +927,86 @@ export const initialXtoY = (tokenXAddress?: string, tokenYAddress?: string) => {
 
 export const parsePathFeeToFeeString = (pathFee: string): string => {
   return (+pathFee.replace('_', '') * Math.pow(10, Number(PERCENTAGE_SCALE) - 4)).toString()
+}
+
+export const ensureError = (value: unknown): Error => {
+  if (value instanceof Error) return value
+
+  let stringified = '[Unable to stringify the thrown value]'
+
+  stringified = JSON.stringify(value)
+
+  const error = new Error(stringified)
+  return error
+}
+
+export const getFaucetDeployer = () => {
+  const keyring = new Keyring({ type: 'sr25519' })
+  return keyring.addFromUri(FAUCET_DEPLOYER_MNEMONIC)
+}
+
+export const testnetBestTiersCreator = () => {
+  const stableTokens = {
+    USDC: TESTNET_USDC_ADDRESS
+  }
+
+  const unstableTokens = {
+    BTC: TESTNET_BTC_ADDRESS,
+    ETH: TESTNET_ETH_ADDRESS,
+    AZERO: TESTNET_WAZERO_ADDRESS
+  }
+
+  const bestTiers: BestTier[] = []
+
+  const stableTokensValues = Object.values(stableTokens)
+  for (let i = 0; i < stableTokensValues.length; i++) {
+    const tokenX = stableTokensValues[i]
+    for (let j = i + 1; j < stableTokensValues.length; j++) {
+      const tokenY = stableTokensValues[j]
+
+      bestTiers.push({
+        tokenX,
+        tokenY,
+        bestTierIndex: 0
+      })
+    }
+  }
+
+  const unstableTokensEntries = Object.entries(unstableTokens)
+  for (let i = 0; i < unstableTokensEntries.length; i++) {
+    const [symbolX, tokenX] = unstableTokensEntries[i]
+    for (let j = i + 1; j < unstableTokensEntries.length; j++) {
+      const [symbolY, tokenY] = unstableTokensEntries[j]
+
+      if (symbolX.slice(-5) === 'AZERO' && symbolY.slice(-5) === 'AZERO') {
+        bestTiers.push({
+          tokenX,
+          tokenY,
+          bestTierIndex: 0
+        })
+      } else {
+        bestTiers.push({
+          tokenX,
+          tokenY,
+          bestTierIndex: 2
+        })
+      }
+    }
+  }
+
+  const unstableTokensValues = Object.values(unstableTokens)
+  for (let i = 0; i < stableTokensValues.length; i++) {
+    const tokenX = stableTokensValues[i]
+    for (let j = 0; j < unstableTokensValues.length; j++) {
+      const tokenY = unstableTokensValues[j]
+
+      bestTiers.push({
+        tokenX,
+        tokenY,
+        bestTierIndex: 2
+      })
+    }
+  }
+
+  return bestTiers
 }

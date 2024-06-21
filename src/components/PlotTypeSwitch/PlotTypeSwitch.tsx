@@ -16,7 +16,7 @@ export const PlotTypeSwitch: React.FC<IPlotTypeSwitch> = ({ onSwitch, initialVal
   const { classes: tabsClasses } = useTabsStyles()
   const { classes: singleTabClasses } = useSingleTabStyles()
 
-  const handleChange = (_: React.ChangeEvent<{}>, newValue: number) => {
+  const handleChange = (_: React.SyntheticEvent, newValue: number) => {
     setCurrent(newValue)
     onSwitch(!!newValue)
   }

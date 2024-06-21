@@ -63,10 +63,10 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
 
   const [isFinishedDelayRender, setIsFinishedDelayRender] = useState(false)
 
-  const poolKey = position ? poolKeyToString(position?.poolKey) || '' : ''
+  const poolKey = position?.poolKey ? poolKeyToString(position?.poolKey) : ''
 
   useEffect(() => {
-    if (position && position.tokenX && position.tokenY) {
+    if (position?.tokenX && position?.tokenY) {
       dispatch(
         poolsActions.getTicksAndTickMaps({
           tokenFrom: position.tokenX.address,
@@ -78,12 +78,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   }, [waitingForTicksData, position?.tokenX, position?.tokenY])
 
   useEffect(() => {
-    if (
-      position &&
-      position.poolKey &&
-      waitingForTicksData === null &&
-      allTickMaps[poolKey] !== undefined
-    ) {
+    if (position?.poolKey && waitingForTicksData === null && allTickMaps[poolKey] !== undefined) {
       setWaitingForTicksData(true)
 
       dispatch(
@@ -428,7 +423,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
       </Grid>
     )
   }
-  if (!position && walletStatus === Status.Uninitialized && isFinishedDelayRender) {
+  if (!position && walletStatus !== Status.Initialized) {
     return <Navigate to='/pool' />
   }
   return (

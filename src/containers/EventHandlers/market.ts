@@ -42,7 +42,7 @@ const MarketEvents = () => {
           dispatch(actions.addTokens(tokens))
         })
 
-      dispatch(walletActions.getSelectedTokens(currentList))
+      dispatch(walletActions.getBalances(currentList))
     }
 
     connectEvents()
