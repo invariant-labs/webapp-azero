@@ -7,6 +7,7 @@ import {
   getLiquidityByY,
   newPoolKey
 } from '@invariant-labs/a0-sdk'
+import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/src/consts'
 import { AddressOrPair } from '@polkadot/api/types'
 import {
   ALL_FEE_TIERS_DATA,
@@ -629,7 +630,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       calcAmount={calcAmount}
       feeTiers={ALL_FEE_TIERS_DATA.map(tier => {
         return {
-          feeValue: +printBigint(tier.tier.fee, 10n) //TODO replace 10n with DECIMAL - n
+          feeValue: +printBigint(tier.tier.fee, PERCENTAGE_SCALE - 2n)
         }
       })}
       ticksLoading={ticksLoading}
