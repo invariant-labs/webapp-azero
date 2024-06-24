@@ -3,7 +3,6 @@ import { MemoryRouter } from 'react-router-dom'
 import TokensList from './TokensList'
 import { store } from '@store/index'
 import { Provider } from 'react-redux'
-import { fn } from '@storybook/test'
 
 const meta = {
   title: 'Stats/TokensList',
