@@ -14,7 +14,7 @@ export const Primary: Story = {
     exchangeRate: { val: 123, symbol: 'ABC', decimal: 12 },
     slippage: 0.5,
     priceImpact: 1 as any,
-    fee: 2n,
+    fee: 2 as any,
     open: true,
     isLoadingRate: false
   },

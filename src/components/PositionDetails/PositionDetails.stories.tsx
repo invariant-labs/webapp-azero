@@ -39,7 +39,7 @@ export const Primary: Story = {
     onDiscreteChange: fn(),
     reloadHandler: fn(),
     ticksLoading: false,
-    tickSpacing: 0n,
+    tickSpacing: 1 as any,
     closePosition: fn(),
     tokenX: {
       name: 'BTC',
@@ -129,6 +129,7 @@ export const Primary: Story = {
           }
         ]}
         fee={1n}
+        tickSpacing={1n}
       />
     )
   }
