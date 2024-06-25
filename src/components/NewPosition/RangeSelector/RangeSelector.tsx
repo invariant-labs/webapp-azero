@@ -161,7 +161,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
     let leftRange: bigint
     let rightRange: bigint
 
-    if (positionOpeningMethod === 'range') {
+    if (true) {
       const { leftInRange, rightInRange } = getTicksInsideRange(left, right, isXtoY)
       leftRange = leftInRange
       rightRange = rightInRange
@@ -192,17 +192,13 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
             yDecimal
           )
       )
-
       const higherTick = BigInt(
         Math.max(Number(getMinTick(tickSpacing)), Number(midPrice.index) - Number(tickSpacing) * 10)
       )
-
       const lowerTick = BigInt(
         Math.min(Number(getMaxTick(tickSpacing)), Number(midPrice.index) + Number(tickSpacing) * 10)
       )
-
       changeRangeHandler(isXtoY ? higherTick : lowerTick, isXtoY ? lowerTick : higherTick)
-
       setPlotMin(midPrice.x - initSideDist)
       setPlotMax(midPrice.x + initSideDist)
     } else {
@@ -214,8 +210,10 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
         midPrice.index,
         isXtoY
       )
-      changeRangeHandler(leftRange, rightRange)
-      autoZoomHandler(leftRange, rightRange, true)
+      const { leftInRange, rightInRange } = getTicksInsideRange(leftRange, rightRange, isXtoY)
+
+      changeRangeHandler(leftInRange, rightInRange)
+      autoZoomHandler(leftInRange, rightInRange, true)
     }
   }
 
@@ -322,8 +320,10 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
         midPrice.index,
         isXtoY
       )
-      changeRangeHandler(leftRange, rightRange)
-      autoZoomHandler(leftRange, rightRange, true)
+      const { leftInRange, rightInRange } = getTicksInsideRange(leftRange, rightRange, isXtoY)
+
+      changeRangeHandler(leftInRange, rightInRange)
+      autoZoomHandler(leftInRange, rightInRange, true)
     } else {
       changeRangeHandler(leftRange, rightRange)
     }
@@ -343,8 +343,10 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
         midPrice.index,
         isXtoY
       )
-      changeRangeHandler(leftRange, rightRange)
-      autoZoomHandler(leftRange, rightRange, true)
+      const { leftInRange, rightInRange } = getTicksInsideRange(leftRange, rightRange, isXtoY)
+
+      changeRangeHandler(leftInRange, rightInRange)
+      autoZoomHandler(leftInRange, rightInRange, true)
     }
   }, [midPrice.index, concentrationArray])
 
@@ -525,8 +527,15 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
                   midPrice.index,
                   isXtoY
                 )
-                changeRangeHandler(leftRange, rightRange)
-                autoZoomHandler(leftRange, rightRange, true)
+
+                const { leftInRange, rightInRange } = getTicksInsideRange(
+                  leftRange,
+                  rightRange,
+                  isXtoY
+                )
+
+                changeRangeHandler(leftInRange, rightInRange)
+                autoZoomHandler(leftInRange, rightInRange, true)
               }}
               dragHandler={value => {
                 setConcentrationIndex(value)

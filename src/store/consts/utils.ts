@@ -213,7 +213,7 @@ export const calcPrice = (
 ): number => {
   const price = calcYPerXPriceByTickIndex(amountTickIndex, xDecimal, yDecimal)
 
-  return isXtoY ? price : 1 / price
+  return isXtoY ? price : price !== 0 ? 1 / price : Number.MAX_SAFE_INTEGER
 }
 
 export const createPlaceholderLiquidityPlot = (
