@@ -6,7 +6,7 @@ import {
   getLiquidityByY,
   newPoolKey
 } from '@invariant-labs/a0-sdk'
-import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/src/consts'
+import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { ALL_FEE_TIERS_DATA, bestTiers, commonTokensForNetworks } from '@store/consts/static'
 import { PositionOpeningMethod, TokenPriceData } from '@store/consts/types'
 import {
@@ -205,7 +205,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   }, [isWaitingForNewPool])
 
   useEffect(() => {
-    if (tokenAIndex !== null && tokenBIndex !== null) {
+    if (tokenAIndex !== null && tokenBIndex !== null && tokenAIndex !== tokenBIndex) {
       const tokenA = tokens[tokenAIndex].assetAddress.toString()
       const tokenB = tokens[tokenBIndex].assetAddress.toString()
 

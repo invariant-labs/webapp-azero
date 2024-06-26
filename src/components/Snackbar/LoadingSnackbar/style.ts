@@ -36,6 +36,7 @@ export const StyledContainer = styled('div')({
   justifyContent: 'space-between',
   alignItems: 'center',
   width: 'auto',
+  minHeight: 30,
   '& div > div': {
     margin: 0
   }
