@@ -158,23 +158,13 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   }
 
   const changeRangeHandler = (left: bigint, right: bigint) => {
-    let leftRange: bigint
-    let rightRange: bigint
+    const { leftInRange, rightInRange } = getTicksInsideRange(left, right, isXtoY)
 
-    if (true) {
-      const { leftInRange, rightInRange } = getTicksInsideRange(left, right, isXtoY)
-      leftRange = leftInRange
-      rightRange = rightInRange
-    } else {
-      leftRange = left
-      rightRange = right
-    }
+    setLeftRange(leftInRange)
+    setRightRange(rightInRange)
 
-    setLeftRange(leftRange)
-    setRightRange(rightRange)
-
-    setLeftInputValues(calcPrice(leftRange, isXtoY, xDecimal, yDecimal).toString())
-    setRightInputValues(calcPrice(rightRange, isXtoY, xDecimal, yDecimal).toString())
+    setLeftInputValues(calcPrice(leftInRange, isXtoY, xDecimal, yDecimal).toString())
+    setRightInputValues(calcPrice(rightInRange, isXtoY, xDecimal, yDecimal).toString())
 
     onChangeRange(left, right)
   }
