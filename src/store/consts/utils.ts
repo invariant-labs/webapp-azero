@@ -945,7 +945,7 @@ export const getFaucetDeployer = () => {
   return keyring.addFromUri(FAUCET_DEPLOYER_MNEMONIC)
 }
 
-export const testnetBestTiersCreator = () => {
+export function testnetBestTiersCreator() {
   const stableTokens = {
     USDC: TESTNET_USDC_ADDRESS
   }
