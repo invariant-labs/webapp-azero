@@ -358,7 +358,7 @@ export const PriceRangePlot: React.FC<IPriceRangePlot> = ({
     disabled
   )
 
-  const isNoPositions = currentRange.every(tick => !(tick.y > 0))
+  const isNoPositions = data.every(tick => !(tick.y > 0))
 
   return (
     <Grid

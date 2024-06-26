@@ -158,25 +158,13 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   }
 
   const changeRangeHandler = (left: bigint, right: bigint) => {
-    let leftRange: bigint
-    let rightRange: bigint
+    const { leftInRange, rightInRange } = getTicksInsideRange(left, right, isXtoY)
 
-    if (positionOpeningMethod === 'range') {
-      const { leftInRange, rightInRange } = getTicksInsideRange(left, right, isXtoY)
-      leftRange = leftInRange
-      rightRange = rightInRange
-    } else {
-      leftRange = left
-      rightRange = right
-    }
-
-    setLeftRange(leftRange)
-    setRightRange(rightRange)
-
-    setLeftInputValues(calcPrice(leftRange, isXtoY, xDecimal, yDecimal).toString())
-    setRightInputValues(calcPrice(rightRange, isXtoY, xDecimal, yDecimal).toString())
-
-    onChangeRange(left, right)
+    setLeftRange(leftInRange)
+    setRightRange(rightInRange)
+    setLeftInputValues(calcPrice(leftInRange, isXtoY, xDecimal, yDecimal).toString())
+    setRightInputValues(calcPrice(rightInRange, isXtoY, xDecimal, yDecimal).toString())
+    onChangeRange(leftInRange, rightInRange)
   }
 
   const resetPlot = () => {
@@ -192,17 +180,13 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
             yDecimal
           )
       )
-
       const higherTick = BigInt(
         Math.max(Number(getMinTick(tickSpacing)), Number(midPrice.index) - Number(tickSpacing) * 10)
       )
-
       const lowerTick = BigInt(
         Math.min(Number(getMaxTick(tickSpacing)), Number(midPrice.index) + Number(tickSpacing) * 10)
       )
-
       changeRangeHandler(isXtoY ? higherTick : lowerTick, isXtoY ? lowerTick : higherTick)
-
       setPlotMin(midPrice.x - initSideDist)
       setPlotMax(midPrice.x + initSideDist)
     } else {
@@ -214,6 +198,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
         midPrice.index,
         isXtoY
       )
+
       changeRangeHandler(leftRange, rightRange)
       autoZoomHandler(leftRange, rightRange, true)
     }
@@ -270,23 +255,25 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   }, [ticksLoading, isMountedRef, midPrice.index])
 
   const autoZoomHandler = (left: bigint, right: bigint, canZoomCloser: boolean = false) => {
-    const leftX = calcPrice(left, isXtoY, xDecimal, yDecimal)
-    const rightX = calcPrice(right, isXtoY, xDecimal, yDecimal)
+    const { leftInRange, rightInRange } = getTicksInsideRange(left, right, isXtoY)
+
+    const leftX = calcPrice(leftInRange, isXtoY, xDecimal, yDecimal)
+    const rightX = calcPrice(rightInRange, isXtoY, xDecimal, yDecimal)
 
     const higherLeftIndex = BigInt(
-      Math.max(Number(getMinTick(tickSpacing)), Number(left - tickSpacing * 15n))
+      Math.max(Number(getMinTick(tickSpacing)), Number(leftInRange - tickSpacing * 15n))
     )
 
     const lowerLeftIndex = BigInt(
-      Math.min(Number(getMaxTick(tickSpacing)), Number(left + tickSpacing * 15n))
+      Math.min(Number(getMaxTick(tickSpacing)), Number(leftInRange + tickSpacing * 15n))
     )
 
     const lowerRightIndex = BigInt(
-      Math.min(Number(getMaxTick(tickSpacing)), Number(right + tickSpacing * 15n))
+      Math.min(Number(getMaxTick(tickSpacing)), Number(rightInRange + tickSpacing * 15n))
     )
 
     const higherRightIndex = BigInt(
-      Math.max(Number(getMinTick(tickSpacing)), Number(right - tickSpacing * 15n))
+      Math.max(Number(getMinTick(tickSpacing)), Number(rightInRange - tickSpacing * 15n))
     )
 
     if (leftX < plotMin || rightX > plotMax || canZoomCloser) {
@@ -322,6 +309,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
         midPrice.index,
         isXtoY
       )
+
       changeRangeHandler(leftRange, rightRange)
       autoZoomHandler(leftRange, rightRange, true)
     } else {
@@ -343,6 +331,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
         midPrice.index,
         isXtoY
       )
+
       changeRangeHandler(leftRange, rightRange)
       autoZoomHandler(leftRange, rightRange, true)
     }
@@ -525,6 +514,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
                   midPrice.index,
                   isXtoY
                 )
+
                 changeRangeHandler(leftRange, rightRange)
                 autoZoomHandler(leftRange, rightRange, true)
               }}
