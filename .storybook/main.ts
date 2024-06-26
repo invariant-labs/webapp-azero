@@ -15,7 +15,9 @@ const config: StorybookConfig = {
     'storybook-addon-remix-react-router',
     '@storybook/addon-actions'
   ],
-
+  typescript: {
+    reactDocgen: 'react-docgen-typescript'
+  },
   framework: {
     name: '@storybook/react-vite',
     options: {}
