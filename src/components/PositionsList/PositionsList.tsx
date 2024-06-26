@@ -102,7 +102,6 @@ export const PositionsList: React.FC<IProps> = ({
               }
               onChange={handleChangeInput}
               value={searchValue}
-              inputMode='decimal'
             />
             <Grid rowGap={1} justifyContent='space-between'>
               <Button
