@@ -11,7 +11,7 @@ import { theme } from '@static/theme'
 import { AlephZeroNetworks } from '@store/consts/static'
 import { blurContent, unblurContent } from '@utils/uiUtils'
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import ChangeWalletButton from './HeaderButton/ChangeWalletButton'
 import SelectNetworkButton from './HeaderButton/SelectNetworkButton'
 import SelectRPCButton from './HeaderButton/SelectRPCButton'
@@ -45,6 +45,7 @@ export const Header: React.FC<IHeader> = ({
 }) => {
   const { classes } = useStyles()
   const buttonStyles = useButtonStyles()
+  const navigate = useNavigate()
 
   const isXsDown = useMediaQuery(theme.breakpoints.down('sm'))
 
@@ -82,7 +83,11 @@ export const Header: React.FC<IHeader> = ({
           justifyContent='flex-start'
           sx={{ display: { xs: 'none', md: 'block' } }}>
           <Grid container>
-            <CardMedia className={classes.logo} image={icons.LogoTitle} />
+            <CardMedia
+              className={classes.logo}
+              image={icons.LogoTitle}
+              onClick={() => navigate('/swap')}
+            />
           </Grid>
         </Grid>
         <Box>
