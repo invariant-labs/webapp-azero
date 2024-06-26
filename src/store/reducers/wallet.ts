@@ -1,4 +1,3 @@
-import { TokenAmount } from '@invariant-labs/a0-sdk'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/consts/types'
 
@@ -17,7 +16,7 @@ export interface ITokenBalance {
 export interface IAlephZeroWallet {
   status: Status
   address: string
-  balance: TokenAmount
+  balance: bigint
   tokensBalances: { [key in string]: ITokenBalance }
   balanceLoading: boolean
 }
@@ -48,7 +47,7 @@ const walletSlice = createSlice({
       state.status = action.payload
       return state
     },
-    setBalance(state, action: PayloadAction<TokenAmount>) {
+    setBalance(state, action: PayloadAction<bigint>) {
       state.balance = action.payload
       return state
     },

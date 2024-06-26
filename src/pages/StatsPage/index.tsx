@@ -1,6 +1,7 @@
 import { Grid } from '@mui/material'
-import workInProgress from '../../static/png/work-in-progress.png'
 import { useStyles } from './styles'
+import workInProgress from '../../static/png/work-in-progress.png'
+// import WrappedStats from '@containers/WrappedStats/WrappedStats'
 
 export const StatsPage: React.FC = () => {
   const { classes } = useStyles()
@@ -8,6 +9,7 @@ export const StatsPage: React.FC = () => {
   return (
     <Grid container className={classes.container}>
       <img src={workInProgress} alt='Work in progress icon' />
+      {/* <WrappedStats /> */}
     </Grid>
   )
 }

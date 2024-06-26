@@ -2,22 +2,14 @@ import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import Slippage from '@components/Modals/Slippage/Slippage'
 import { INoConnected, NoConnected } from '@components/NoConnected/NoConnected'
 import Refresher from '@components/Refresher/Refresher'
-import { TokenAmount, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
+import { getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
 import { getConcentrationArray } from '@invariant-labs/a0-sdk/src/utils'
 import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
 import { Box, Button, Grid, Hidden, Typography } from '@mui/material'
-import { AddressOrPair } from '@polkadot/api/types'
 import backIcon from '@static/svg/back-arrow.svg'
 import settingIcon from '@static/svg/settings.svg'
+import { ALL_FEE_TIERS_DATA, PositionTokenBlock, REFRESHER_INTERVAL } from '@store/consts/static'
 import {
-  ALL_FEE_TIERS_DATA,
-  BestTier,
-  PositionOpeningMethod,
-  REFRESHER_INTERVAL,
-  TokenPriceData
-} from '@store/consts/static'
-import {
-  PositionTokenBlock,
   calcPrice,
   calculateConcentrationRange,
   convertBalanceToBigint,
@@ -38,6 +30,7 @@ import MarketIdLabel from './MarketIdLabel/MarketIdLabel'
 import PoolInit from './PoolInit/PoolInit'
 import RangeSelector from './RangeSelector/RangeSelector'
 import useStyles from './style'
+import { BestTier, PositionOpeningMethod, TokenPriceData } from '@store/consts/types'
 
 export interface INewPosition {
   initialTokenFrom: string
@@ -51,8 +44,8 @@ export interface INewPosition {
   addLiquidityHandler: (
     leftTickIndex: bigint,
     rightTickIndex: bigint,
-    xAmount: TokenAmount,
-    yAmount: TokenAmount,
+    xAmount: bigint,
+    yAmount: bigint,
     slippage: bigint
   ) => void
   onChangePositionTokens: (
@@ -62,11 +55,11 @@ export interface INewPosition {
   ) => void
   isCurrentPoolExisting: boolean
   calcAmount: (
-    amount: TokenAmount,
+    amount: bigint,
     leftRangeTickIndex: number,
     rightRangeTickIndex: number,
-    tokenAddress: AddressOrPair
-  ) => TokenAmount
+    tokenAddress: string
+  ) => bigint
   feeTiers: Array<{
     feeValue: number
   }>
@@ -85,9 +78,9 @@ export interface INewPosition {
   bestTiers: BestTier[]
   initialIsDiscreteValue: boolean
   onDiscreteChange: (val: boolean) => void
-  currentPriceSqrt: TokenAmount
+  currentPriceSqrt: bigint
   handleAddToken: (address: string) => void
-  commonTokens: AddressOrPair[]
+  commonTokens: string[]
   initialOpeningPositionMethod: PositionOpeningMethod
   onPositionOpeningMethodChange: (val: PositionOpeningMethod) => void
   initialHideUnknownTokensValue: boolean
@@ -215,12 +208,7 @@ export const NewPosition: React.FC<INewPosition> = ({
     tokenBSymbol: 'XYZ'
   }
 
-  const getOtherTokenAmount = (
-    amount: TokenAmount,
-    left: number,
-    right: number,
-    byFirst: boolean
-  ) => {
+  const getOtherTokenAmount = (amount: bigint, left: number, right: number, byFirst: boolean) => {
     const [printIndex, calcIndex] = byFirst
       ? [tokenBIndex, tokenAIndex]
       : [tokenAIndex, tokenBIndex]

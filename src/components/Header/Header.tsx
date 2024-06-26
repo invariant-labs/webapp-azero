@@ -4,14 +4,13 @@ import NavbarButton from '@components/Navbar/Button'
 import { Network } from '@invariant-labs/a0-sdk/src'
 import DotIcon from '@mui/icons-material/FiberManualRecordRounded'
 import { Box, Button, CardMedia, Grid, IconButton, useMediaQuery } from '@mui/material'
-import { AddressOrPair } from '@polkadot/api-base/types'
 import icons from '@static/icons'
 import Hamburger from '@static/svg/Hamburger.svg'
 import { theme } from '@static/theme'
 import { AlephZeroNetworks } from '@store/consts/static'
 import { blurContent, unblurContent } from '@utils/uiUtils'
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import ChangeWalletButton from './HeaderButton/ChangeWalletButton'
 import SelectNetworkButton from './HeaderButton/SelectNetworkButton'
 import SelectRPCButton from './HeaderButton/SelectRPCButton'
@@ -19,7 +18,7 @@ import useButtonStyles from './HeaderButton/style'
 import useStyles from './style'
 
 export interface IHeader {
-  address: AddressOrPair
+  address: string
   onNetworkSelect: (networkType: Network, rpcAddress: string, rpcName?: string) => void
   onConnectWallet: () => void
   walletConnected: boolean
@@ -45,6 +44,7 @@ export const Header: React.FC<IHeader> = ({
 }) => {
   const { classes } = useStyles()
   const buttonStyles = useButtonStyles()
+  const navigate = useNavigate()
 
   const isXsDown = useMediaQuery(theme.breakpoints.down('sm'))
 
@@ -82,7 +82,11 @@ export const Header: React.FC<IHeader> = ({
           justifyContent='flex-start'
           sx={{ display: { xs: 'none', md: 'block' } }}>
           <Grid container>
-            <CardMedia className={classes.logo} image={icons.LogoTitle} />
+            <CardMedia
+              className={classes.logo}
+              image={icons.LogoTitle}
+              onClick={() => navigate('/swap')}
+            />
           </Grid>
         </Grid>
         <Box>

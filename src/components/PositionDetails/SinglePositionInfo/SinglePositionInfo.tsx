@@ -1,15 +1,15 @@
 import ClosePositionWarning from '@components/Modals/ClosePositionWarning/ClosePositionWarning'
 import { Button, Grid, Hidden, Typography } from '@mui/material'
 import icons from '@static/icons'
-import { TokenPriceData } from '@store/consts/static'
 import { blurContent, unblurContent } from '@utils/uiUtils'
 import classNames from 'classnames'
 import React, { useState } from 'react'
 import { BoxInfo } from './BoxInfo'
 import { ILiquidityToken } from './consts'
 import useStyles from './style'
-import { addressToTicker } from '@store/consts/uiUtiils'
 import { useNavigate } from 'react-router-dom'
+import { TokenPriceData } from '@store/consts/types'
+import { addressToTicker } from '@store/consts/utils'
 
 interface IProp {
   fee: number

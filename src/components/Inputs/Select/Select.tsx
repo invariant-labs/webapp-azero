@@ -6,7 +6,6 @@ import { blurContent, unblurContent } from '@utils/uiUtils'
 import { Button } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import SelectTokenModal from '@components/Modals/SelectModals/SelectTokenModal/SelectTokenModal'
-import { AddressOrPair } from '@polkadot/api/types'
 import { SwapToken } from '@store/selectors/wallet'
 
 export interface ISelectModal {
@@ -19,7 +18,7 @@ export interface ISelectModal {
   hideBalancesInModal?: boolean
   handleAddToken: (address: string) => void
   sliceName?: boolean
-  commonTokens: AddressOrPair[]
+  commonTokens: string[]
   initialHideUnknownTokensValue: boolean
   onHideUnknownTokensChange: (val: boolean) => void
 }

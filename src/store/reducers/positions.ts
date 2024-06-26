@@ -1,4 +1,4 @@
-import { PoolKey, Position, SqrtPrice, Tick, TokenAmount } from '@invariant-labs/a0-sdk'
+import { PoolKey, Position, Tick } from '@invariant-labs/a0-sdk'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/consts/types'
 
@@ -41,10 +41,10 @@ export interface InitPositionData {
   lowerTick: bigint
   upperTick: bigint
   liquidityDelta: bigint
-  spotSqrtPrice: SqrtPrice
+  spotSqrtPrice: bigint
   slippageTolerance: bigint
-  tokenXAmount: TokenAmount
-  tokenYAmount: TokenAmount
+  tokenXAmount: bigint
+  tokenYAmount: bigint
   initPool?: boolean
 }
 export interface GetCurrentTicksData {

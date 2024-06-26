@@ -17,10 +17,11 @@
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
-    "@invariant-labs/a0-sdk": "^0.2.4",
+    "@invariant-labs/a0-sdk": "^0.2.6",
     "@mui/icons-material": "^5.15.15",
     "@mui/material": "^5.15.15",
     "@nightlylabs/wallet-selector-polkadot": "^0.2.5",
+    "@nivo/bar": "^0.87.0",
     "@nivo/line": "^0.86.0",
     "@polkadot/api": "^10.11.2",
     "@polkadot/api-contract": "^10.11.2",
