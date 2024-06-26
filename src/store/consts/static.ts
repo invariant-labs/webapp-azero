@@ -8,7 +8,8 @@ import {
 
 import { Network } from '@invariant-labs/a0-sdk/src'
 import { Keyring } from '@polkadot/api'
-import { AddressOrPair } from '@polkadot/api/types'
+import { BestTier, FormatNumberThreshold, PrefixConfig, Token, TokenPriceData } from './types'
+import { testnetBestTiersCreator } from './utils'
 
 export enum AlephZeroNetworks {
   TEST = 'wss://ws.test.azero.dev',
@@ -21,41 +22,14 @@ export const STABLECOIN_ADDRESSES: string[] = []
 
 export const DEFAULT_PUBLICKEY = new Keyring({ type: 'ecdsa' })
 
-export type PositionOpeningMethod = 'range' | 'concentration'
-
-export interface TokenPriceData {
-  price: number
-}
-
-export interface Token {
-  symbol: string
-  address: AddressOrPair
-  decimals: bigint
-  name: string
-  logoURI: string
-  balance?: bigint
-  coingeckoId?: string
-  isUnknown?: boolean
-}
-
 export const tokensPrices: Record<Network, Record<string, TokenPriceData>> = {
   [Network.Testnet]: { USDC_TEST: { price: 1 }, BTC_TEST: { price: 64572.0 } },
   [Network.Mainnet]: {},
   [Network.Local]: {}
 }
-export interface BestTier {
-  tokenX: AddressOrPair
-  tokenY: AddressOrPair
-  bestTierIndex: number
-}
 
 export const FAUCET_DEPLOYER_MNEMONIC =
   'motion ice subject actress spider rare leg fortune brown similar excess amazing'
-
-export const getFaucetDeployer = () => {
-  const keyring = new Keyring({ type: 'sr25519' })
-  return keyring.addFromUri(FAUCET_DEPLOYER_MNEMONIC)
-}
 
 export const FAUCET_TOKEN_AMOUNT = 1000n
 
@@ -112,75 +86,13 @@ export const AZERO: Token = {
 
 export const DEFAULT_TOKENS = [BTC, ETH, USDC, AZERO]
 
-// const mainnetBestTiersCreator = () => {
-//   const stableTokens = {
-//     USDC: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
-//   }
-
-//   const unstableTokens = {
-//     BTC: '9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E'
-//   }
-
-//   const bestTiers: BestTier[] = []
-
-//   for (let i = 0; i < 4; i++) {
-//     const tokenX = Object.values(stableTokens)[i]
-//     for (let j = i + 1; j < 4; j++) {
-//       const tokenY = Object.values(stableTokens)[j]
-
-//       bestTiers.push({
-//         tokenX,
-//         tokenY,
-//         bestTierIndex: 0
-//       })
-//     }
-//   }
-
-//   for (let i = 0; i < 5; i++) {
-//     const [symbolX, tokenX] = Object.entries(unstableTokens)[i]
-//     for (let j = i + 1; j < 5; j++) {
-//       const [symbolY, tokenY] = Object.entries(unstableTokens)[j]
-
-//       if (symbolX.slice(-3) === 'SOL' && symbolY.slice(-3) === 'SOL') {
-//         bestTiers.push({
-//           tokenX,
-//           tokenY,
-//           bestTierIndex: 0
-//         })
-//       } else {
-//         bestTiers.push({
-//           tokenX,
-//           tokenY,
-//           bestTierIndex: 2
-//         })
-//       }
-//     }
-//   }
-
-//   for (let i = 0; i < 4; i++) {
-//     const tokenX = Object.values(stableTokens)[i]
-//     for (let j = 0; j < 5; j++) {
-//       const tokenY = Object.values(unstableTokens)[j]
-
-//       bestTiers.push({
-//         tokenX,
-//         tokenY,
-//         bestTierIndex: 2
-//       })
-//     }
-//   }
-
-//   return bestTiers
-// }
-
 export const bestTiers: Record<Network, BestTier[]> = {
-  //TODO add best Tiers
-  [Network.Testnet]: [],
+  [Network.Testnet]: testnetBestTiersCreator(),
   [Network.Mainnet]: [],
   [Network.Local]: []
 }
 
-export const commonTokensForNetworks: Record<Network, AddressOrPair[]> = {
+export const commonTokensForNetworks: Record<Network, string[]> = {
   [Network.Testnet]: [BTC.address, ETH.address, USDC.address, AZERO.address],
   [Network.Mainnet]: [],
   [Network.Local]: []
@@ -273,6 +185,73 @@ export enum ErrorMessage {
 }
 
 export const REFRESHER_INTERVAL = 20
+
+export const defaultThresholds: FormatNumberThreshold[] = [
+  {
+    value: 10,
+    decimals: 4
+  },
+  {
+    value: 1000,
+    decimals: 2
+  },
+  {
+    value: 10000,
+    decimals: 1
+  },
+  {
+    value: 1000000,
+    decimals: 2,
+    divider: 1000
+  },
+  {
+    value: 1000000000,
+    decimals: 2,
+    divider: 1000000
+  },
+  {
+    value: Infinity,
+    decimals: 2,
+    divider: 1000000000
+  }
+]
+
+export const COINGECKO_QUERY_COOLDOWN = 20 * 60 * 1000
+
+export const FormatConfig = {
+  B: 1000000000,
+  M: 1000000,
+  K: 1000,
+  BDecimals: 9,
+  MDecimals: 6,
+  KDecimals: 3,
+  DecimalsAfterDot: 2
+}
+
+export enum PositionTokenBlock {
+  None,
+  A,
+  B
+}
+
+export const subNumbers = ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉']
+
+export const defaultPrefixConfig: PrefixConfig = {
+  B: 1000000000,
+  M: 1000000,
+  K: 10000
+}
+
+export const addressTickerMap: { [key: string]: string } = {
+  BTC: TESTNET_BTC_ADDRESS,
+  ETH: TESTNET_ETH_ADDRESS,
+  USDC: TESTNET_USDC_ADDRESS,
+  AZERO: TESTNET_WAZERO_ADDRESS
+}
+
+export const reversedAddressTickerMap = Object.fromEntries(
+  Object.entries(addressTickerMap).map(([key, value]) => [value, key])
+)
 
 export const LIQUIDITY_PLOT_DECIMAL = 12n
 

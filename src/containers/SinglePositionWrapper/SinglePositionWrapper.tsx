@@ -3,7 +3,6 @@ import PositionDetails from '@components/PositionDetails/PositionDetails'
 import { calculateFee, calculateTokenAmounts } from '@invariant-labs/a0-sdk'
 import { Grid } from '@mui/material'
 import loader from '@static/gif/loader.gif'
-import { TokenPriceData } from '@store/consts/static'
 import {
   calcPrice,
   calcYPerXPriceByTickIndex,
@@ -31,6 +30,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Navigate, useNavigate } from 'react-router-dom'
 import useStyles from './style'
+import { TokenPriceData } from '@store/consts/types'
 
 export interface IProps {
   address: string

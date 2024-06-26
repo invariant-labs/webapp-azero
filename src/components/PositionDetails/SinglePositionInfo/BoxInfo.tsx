@@ -1,17 +1,12 @@
 import { Button, Grid, Typography } from '@mui/material'
 import loader from '@static/gif/loading2.gif'
 import SwapPosition from '@static/svg/swap-position.svg'
-import {
-  FormatNumberThreshold,
-  PrefixConfig,
-  formatNumber,
-  formatNumbers,
-  showPrefix
-} from '@store/consts/utils'
+import { formatNumber, formatNumbers, showPrefix } from '@store/consts/utils'
 import React from 'react'
 import loadingAnimation from '@static/gif/loading.gif'
 import { ILiquidityToken } from './consts'
 import useStyles from './style'
+import { FormatNumberThreshold, PrefixConfig } from '@store/consts/types'
 
 export interface BoxInfoToken extends Omit<ILiquidityToken, 'claimValue' | 'liqValue'> {
   value: number

@@ -3,17 +3,15 @@ import ChangeWalletButton from '@components/Header/HeaderButton/ChangeWalletButt
 import ExchangeAmountInput from '@components/Inputs/ExchangeAmountInput/ExchangeAmountInput'
 import Slippage from '@components/Modals/Slippage/Slippage'
 import Refresher from '@components/Refresher/Refresher'
-import { PoolKey, Price, TokenAmount } from '@invariant-labs/a0-sdk'
+import { PoolKey, Price } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
 import { Box, Button, CardMedia, Grid, Typography } from '@mui/material'
-import { AddressOrPair } from '@polkadot/api/types'
 import infoIcon from '@static/svg/info.svg'
 import refreshIcon from '@static/svg/refresh.svg'
 import settingIcon from '@static/svg/settings.svg'
 import SwapArrows from '@static/svg/swap-arrows.svg'
-import { DEFAULT_TOKEN_DECIMAL, REFRESHER_INTERVAL, TokenPriceData } from '@store/consts/static'
+import { DEFAULT_TOKEN_DECIMAL, REFRESHER_INTERVAL } from '@store/consts/static'
 import {
-  SimulateResult,
   convertBalanceToBigint,
   printBigint,
   stringToFixed,
@@ -31,23 +29,24 @@ import { Simulate } from '@store/reducers/swap'
 import ExchangeRate from './ExchangeRate/ExchangeRate'
 import TransactionDetailsBox from './TransactionDetailsBox/TransactionDetailsBox'
 import useStyles from './style'
+import { SimulateResult, TokenPriceData } from '@store/consts/types'
 
 export interface Pools {
-  tokenX: AddressOrPair
-  tokenY: AddressOrPair
-  tokenXReserve: AddressOrPair
-  tokenYReserve: AddressOrPair
+  tokenX: string
+  tokenY: string
+  tokenXReserve: string
+  tokenYReserve: string
   tickSpacing: number
   sqrtPrice: {
-    v: TokenAmount
+    v: bigint
     scale: number
   }
   fee: {
-    val: TokenAmount
+    val: bigint
     scale: number
   }
   exchangeRate: {
-    val: TokenAmount
+    val: bigint
     scale: number
   }
 }
@@ -64,13 +63,13 @@ export interface ISwap {
     poolKey: PoolKey,
     slippage: bigint,
     knownPrice: Price,
-    tokenFrom: AddressOrPair,
-    tokenTo: AddressOrPair,
-    amountIn: TokenAmount,
-    amountOut: TokenAmount,
+    tokenFrom: string,
+    tokenTo: string,
+    amountIn: bigint,
+    amountOut: bigint,
     byAmountIn: boolean
   ) => void
-  onSetPair: (tokenFrom: AddressOrPair | null, tokenTo: AddressOrPair | null) => void
+  onSetPair: (tokenFrom: string | null, tokenTo: string | null) => void
   progress: ProgressState
   isWaitingForNewPool: boolean
   onConnectWallet: () => void
@@ -78,7 +77,7 @@ export interface ISwap {
   initialTokenFromIndex: number | null
   initialTokenToIndex: number | null
   handleAddToken: (address: string) => void
-  commonTokens: AddressOrPair[]
+  commonTokens: string[]
   initialHideUnknownTokensValue: boolean
   onHideUnknownTokensChange: (val: boolean) => void
   tokenFromPriceData?: TokenPriceData
@@ -269,7 +268,7 @@ export const Swap: React.FC<ISwap> = ({
     }
   }
 
-  const getIsXToY = (fromToken: AddressOrPair, toToken: AddressOrPair) => {
+  const getIsXToY = (fromToken: string, toToken: string) => {
     const swapPool = pools.find(
       pool =>
         (fromToken === pool.poolKey.tokenX && toToken === pool.poolKey.tokenY) ||
