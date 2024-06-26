@@ -86,7 +86,7 @@ export const Header: React.FC<IHeader> = ({
             <CardMedia
               className={classes.logo}
               image={icons.LogoTitle}
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/swap')}
             />
           </Grid>
         </Grid>

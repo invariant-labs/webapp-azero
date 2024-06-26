@@ -21,15 +21,12 @@ const RootPage: React.FC = () => {
   const location = useLocation()
 
   useEffect(() => {
-    // dispatch(providerActions.initProvider())
-    dispatch(alephZeroConnectionActions.initAlephZeroConnection())
-  }, [dispatch])
-
-  useEffect(() => {
     if (location.pathname === '/') {
       navigate('/swap')
     }
-  }, [location.pathname])
+    // dispatch(providerActions.initProvider())
+    dispatch(alephZeroConnectionActions.initAlephZeroConnection())
+  }, [dispatch])
 
   useEffect(() => {
     if (
