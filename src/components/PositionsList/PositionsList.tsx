@@ -1,7 +1,7 @@
 import { EmptyPlaceholder } from '@components/EmptyPlaceholder/EmptyPlaceholder'
 import { INoConnected, NoConnected } from '@components/NoConnected/NoConnected'
 import { PaginationList } from '@components/PaginationList/PaginationList'
-import { Button, Grid, InputAdornment, InputBase, Typography } from '@mui/material'
+import { Button, Grid, InputAdornment, InputBase, Typography, useMediaQuery } from '@mui/material'
 import loader from '@static/gif/loader.gif'
 import SearchIcon from '@static/svg/lupaDark.svg'
 import refreshIcon from '@static/svg/refresh.svg'
@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IPositionItem, PositionItem } from './PositionItem/PositionItem'
 import { useStyles } from './style'
+import { theme } from '@static/theme'
 
 interface IProps {
   initialPage: number
@@ -41,6 +42,8 @@ export const PositionsList: React.FC<IProps> = ({
   const navigate = useNavigate()
   const [defaultPage] = useState(initialPage)
   const [page, setPage] = useState(initialPage)
+
+  const isXsDown = useMediaQuery(theme.breakpoints.down('sm'))
 
   const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     searchSetValue(e.target.value.toLowerCase())
@@ -102,6 +105,7 @@ export const PositionsList: React.FC<IProps> = ({
               }
               onChange={handleChangeInput}
               value={searchValue}
+              inputMode='decimal'
             />
             <Grid rowGap={1} justifyContent='space-between'>
               <Button
