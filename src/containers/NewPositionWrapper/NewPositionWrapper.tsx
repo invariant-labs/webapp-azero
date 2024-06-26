@@ -1,20 +1,14 @@
 import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import NewPosition from '@components/NewPosition/NewPosition'
 import {
-  TokenAmount,
   calculateSqrtPrice,
   getLiquidityByX,
   getLiquidityByY,
   newPoolKey
 } from '@invariant-labs/a0-sdk'
-import { AddressOrPair } from '@polkadot/api/types'
-import {
-  ALL_FEE_TIERS_DATA,
-  PositionOpeningMethod,
-  TokenPriceData,
-  bestTiers,
-  commonTokensForNetworks
-} from '@store/consts/static'
+import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
+import { ALL_FEE_TIERS_DATA, bestTiers, commonTokensForNetworks } from '@store/consts/static'
+import { PositionOpeningMethod, TokenPriceData } from '@store/consts/types'
 import {
   addNewTokenToLocalStorage,
   calcPrice,
@@ -40,14 +34,7 @@ import {
   isLoadingPoolKeys
 } from '@store/selectors/pools'
 import { initPosition, plotTicks } from '@store/selectors/positions'
-import {
-  address,
-  balanceLoading,
-  canCreateNewPool,
-  canCreateNewPosition,
-  status,
-  swapTokens
-} from '@store/selectors/wallet'
+import { address, balanceLoading, status, swapTokens } from '@store/selectors/wallet'
 import { openWalletSelectorModal } from '@utils/web3/selector'
 import { VariantType } from 'notistack'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
@@ -81,9 +68,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const currentNetwork = useSelector(networkType)
   const rpc = useSelector(rpcAddress)
 
-  const canUserCreateNewPool = useSelector(canCreateNewPool())
-  const canUserCreateNewPosition = useSelector(canCreateNewPosition())
-
   const tokensList = useSelector(swapTokens)
 
   const [poolIndex, setPoolIndex] = useState<number | null>(null)
@@ -111,7 +95,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     }
   }, [])
 
-  const liquidityRef = useRef<any>(0n) // TODO delete any
+  const liquidityRef = useRef<bigint>(0n)
 
   useEffect(() => {
     setProgress('none')
@@ -221,7 +205,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   }, [isWaitingForNewPool])
 
   useEffect(() => {
-    if (tokenAIndex !== null && tokenBIndex !== null) {
+    if (tokenAIndex !== null && tokenBIndex !== null && tokenAIndex !== tokenBIndex) {
       const tokenA = tokens[tokenAIndex].assetAddress.toString()
       const tokenB = tokens[tokenBIndex].assetAddress.toString()
 
@@ -344,7 +328,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       getNewTokenOrThrow(address, currentNetwork, rpc, walletAddress)
         .then(data => {
           dispatch(poolsActions.addTokens(data))
-          dispatch(walletActions.getSelectedTokens(Object.keys(data)))
+          dispatch(walletActions.getBalances(Object.keys(data)))
           addNewTokenToLocalStorage(address, currentNetwork)
           dispatch(
             snackbarsActions.add({
@@ -448,12 +432,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     localStorage.setItem('INVARIANT_NEW_POSITION_SLIPPAGE', slippage)
   }
 
-  const calcAmount = (
-    amount: TokenAmount,
-    left: number,
-    right: number,
-    tokenAddress: AddressOrPair
-  ) => {
+  const calcAmount = (amount: bigint, left: number, right: number, tokenAddress: string) => {
     if (tokenAIndex === null || tokenBIndex === null || isNaN(left) || isNaN(right)) {
       return BigInt(0)
     }
@@ -629,7 +608,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       calcAmount={calcAmount}
       feeTiers={ALL_FEE_TIERS_DATA.map(tier => {
         return {
-          feeValue: +printBigint(tier.tier.fee, 10n) //TODO replace 10n with DECIMAL - n
+          feeValue: +printBigint(tier.tier.fee, PERCENTAGE_SCALE - 2n)
         }
       })}
       ticksLoading={ticksLoading}
@@ -647,8 +626,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       currentPriceSqrt={
         poolsData[poolKey] ? poolsData[poolKey].sqrtPrice : calculateSqrtPrice(midPrice.index)
       }
-      canCreateNewPool={canUserCreateNewPool}
-      canCreateNewPosition={canUserCreateNewPosition}
       handleAddToken={addTokenHandler}
       commonTokens={commonTokensForNetworks[currentNetwork]}
       initialOpeningPositionMethod={initialIsConcentrationOpening ? 'concentration' : 'range'}

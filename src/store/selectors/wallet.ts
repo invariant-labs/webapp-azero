@@ -1,5 +1,4 @@
-import { TESTNET_WAZERO_ADDRESS, TokenAmount } from '@invariant-labs/a0-sdk'
-import { AddressOrPair } from '@polkadot/api/types'
+import { TESTNET_WAZERO_ADDRESS } from '@invariant-labs/a0-sdk'
 import { BN } from '@polkadot/util'
 import { createSelector } from '@reduxjs/toolkit'
 import { POOL_SAFE_TRANSACTION_FEE, SWAP_SAFE_TRANSACTION_FEE } from '@store/consts/static'
@@ -17,7 +16,7 @@ export const { address, balance, tokensBalances, status, balanceLoading } = keyS
   'balanceLoading'
 ])
 
-export const tokenBalance = (tokenAddress: AddressOrPair) =>
+export const tokenBalance = (tokenAddress: string) =>
   createSelector(tokensBalances, tokensAccounts => {
     if (tokensAccounts[tokenAddress.toString()]) {
       return tokensAccounts[tokenAddress.toString()]
@@ -32,10 +31,10 @@ export const tokenBalanceAddress = () =>
   })
 
 export interface SwapToken {
-  balance: TokenAmount
+  balance: bigint
   decimals: bigint
   symbol: string
-  assetAddress: AddressOrPair
+  assetAddress: string
   name: string
   logoURI: string
   isUnknown?: boolean
@@ -94,35 +93,6 @@ export const swapTokensDict = createSelector(
     return swapTokens
   }
 )
-
-export const canCreateNewPool = () =>
-  createSelector(balance, () => {
-    // switch (network) {
-    //   case NetworkType.DEVNET:
-    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS)
-    //   case NetworkType.TESTNET:
-    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS_TEST)
-    //   case NetworkType.MAINNET:
-    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS)
-    //   default:
-    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS)
-    // }
-    return true
-  })
-export const canCreateNewPosition = () =>
-  createSelector(balance, () => {
-    // switch (network) {
-    //   case NetworkType.DEVNET:
-    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS)
-    //   case NetworkType.TESTNET:
-    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS_TEST)
-    //   case NetworkType.MAINNET:
-    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS)
-    //   default:
-    //     return ethBalance.gte(WETH_POOL_INIT_LAMPORTS)
-    // }
-    return true
-  })
 
 export type TokenBalances = ITokenBalance & {
   symbol: string

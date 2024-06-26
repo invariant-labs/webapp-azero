@@ -4,7 +4,8 @@ import RemoveIcon from '@mui/icons-material/Remove'
 import useStyles from './style'
 import { colors } from '@static/theme'
 import { Button, Grid, Input, Typography } from '@mui/material'
-import { FormatNumberThreshold, formatNumbers, showPrefix } from '@store/consts/utils'
+import { formatNumbers, showPrefix } from '@store/consts/utils'
+import { FormatNumberThreshold } from '@store/consts/types'
 
 export interface IRangeInput {
   label: string

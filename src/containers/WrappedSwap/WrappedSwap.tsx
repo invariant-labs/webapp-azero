@@ -1,7 +1,7 @@
 import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import { Swap } from '@components/Swap/Swap'
-import { AddressOrPair } from '@polkadot/api/types'
-import { TokenPriceData, commonTokensForNetworks } from '@store/consts/static'
+import { commonTokensForNetworks } from '@store/consts/static'
+import { TokenPriceData } from '@store/consts/types'
 import {
   addNewTokenToLocalStorage,
   getCoinGeckoTokenPrice,
@@ -10,7 +10,7 @@ import {
 } from '@store/consts/utils'
 import { actions as poolsActions } from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import { actions } from '@store/reducers/swap'
+import { Simulate, actions } from '@store/reducers/swap'
 import { actions as walletActions } from '@store/reducers/wallet'
 import { networkType, rpcAddress } from '@store/selectors/connection'
 import {
@@ -38,7 +38,6 @@ export const WrappedSwap = () => {
   const walletStatus = useSelector(status)
   const swap = useSelector(swapPool)
   const tickmap = useSelector(tickMaps)
-  // const poolTicksForSimulation = useSelector(nearestPoolTicksForPair)
   const allPools = useSelector(poolsArraySortedByFees)
   const tokensList = useSelector(swapTokens)
   const tokensDict = useSelector(swapTokensDict)
@@ -50,8 +49,8 @@ export const WrappedSwap = () => {
   const swapSimulateResult = useSelector(simulateResult)
   const api = apiSingleton.loadInstance(network, rpc)
   const [progress, setProgress] = useState<ProgressState>('none')
-  const [tokenFrom, setTokenFrom] = useState<AddressOrPair | null>(null)
-  const [tokenTo, setTokenTo] = useState<AddressOrPair | null>(null)
+  const [tokenFrom, setTokenFrom] = useState<string | null>(null)
+  const [tokenTo, setTokenTo] = useState<string | null>(null)
 
   useEffect(() => {
     let timeoutId1: NodeJS.Timeout
@@ -104,7 +103,7 @@ export const WrappedSwap = () => {
       getNewTokenOrThrow(address, network, rpc, walletAddress)
         .then(data => {
           dispatch(poolsActions.addTokens(data))
-          dispatch(walletActions.getSelectedTokens(Object.keys(data)))
+          dispatch(walletActions.getBalances(Object.keys(data)))
           addNewTokenToLocalStorage(address, network)
           dispatch(
             snackbarsActions.add({
@@ -249,6 +248,10 @@ export const WrappedSwap = () => {
     }
   }
 
+  const simulateSwap = (simulate: Simulate) => {
+    dispatch(actions.getSimulateResult(simulate))
+  }
+
   return (
     <Swap
       isFetchingNewPool={isFetchingNewPool}
@@ -306,7 +309,6 @@ export const WrappedSwap = () => {
       pools={allPools}
       swapData={swap}
       progress={progress}
-      poolTicks={{}} //TODO add real data
       isWaitingForNewPool={isFetchingNewPool}
       tickmap={tickmap}
       initialTokenFromIndex={initialTokenFromIndex === -1 ? null : initialTokenFromIndex}
@@ -323,6 +325,7 @@ export const WrappedSwap = () => {
       initialSlippage={initialSlippage}
       isBalanceLoading={isBalanceLoading}
       simulateResult={swapSimulateResult}
+      simulateSwap={simulateSwap}
     />
   )
 }

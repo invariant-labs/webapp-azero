@@ -3,7 +3,6 @@ import PositionDetails from '@components/PositionDetails/PositionDetails'
 import { calculateFee, calculateTokenAmounts } from '@invariant-labs/a0-sdk'
 import { Grid } from '@mui/material'
 import loader from '@static/gif/loader.gif'
-import { TokenPriceData } from '@store/consts/static'
 import {
   calcPrice,
   calcYPerXPriceByTickIndex,
@@ -31,6 +30,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Navigate, useNavigate } from 'react-router-dom'
 import useStyles from './style'
+import { TokenPriceData } from '@store/consts/types'
 
 export interface IProps {
   address: string
@@ -63,10 +63,10 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
 
   const [isFinishedDelayRender, setIsFinishedDelayRender] = useState(false)
 
-  const poolKey =position?  poolKeyToString(position?.poolKey) || '' : ''
+  const poolKey = position?.poolKey ? poolKeyToString(position?.poolKey) : ''
 
-  useEffect(() => { 
-    if (position && position.tokenX && position.tokenY ) {
+  useEffect(() => {
+    if (position?.tokenX && position?.tokenY) {
       dispatch(
         poolsActions.getTicksAndTickMaps({
           tokenFrom: position.tokenX.address,
@@ -75,10 +75,10 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
         })
       )
     }
-}, [waitingForTicksData, position?.tokenX , position?.tokenY])
+  }, [waitingForTicksData, position?.tokenX, position?.tokenY])
 
   useEffect(() => {
-    if (position &&  position.poolKey &&  (waitingForTicksData === null && allTickMaps[poolKey] !== undefined)) {
+    if (position?.poolKey && waitingForTicksData === null && allTickMaps[poolKey] !== undefined) {
       setWaitingForTicksData(true)
 
       dispatch(
@@ -357,7 +357,9 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
             })
           )
         }
-        ticksLoading={ticksLoading || !!waitingForTicksData || !position || allTickMaps[poolKey] === undefined}
+        ticksLoading={
+          ticksLoading || !!waitingForTicksData || !position || allTickMaps[poolKey] === undefined
+        }
         tickSpacing={position.poolKey.feeTier.tickSpacing}
         tokenX={{
           name: position.tokenX.symbol,
@@ -421,7 +423,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
       </Grid>
     )
   }
-  if (!position && walletStatus === Status.Uninitialized && isFinishedDelayRender) {
+  if (!position && walletStatus !== Status.Initialized) {
     return <Navigate to='/pool' />
   }
   return (

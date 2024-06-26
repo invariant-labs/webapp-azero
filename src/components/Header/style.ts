@@ -24,12 +24,20 @@ const useStyles = makeStyles()((theme: Theme) => {
     },
     logo: {
       minWidth: 150,
-      height: 40
+      height: 40,
+
+      '&:hover': {
+        cursor: 'pointer'
+      }
     },
     logoShort: {
       minWidth: 40,
       height: 30,
-      marginRight: 8
+      marginRight: 8,
+
+      '&:hover': {
+        cursor: 'pointer'
+      }
     },
     routers: {
       backgroundColor: colors.invariant.black,

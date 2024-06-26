@@ -358,6 +358,8 @@ export const PriceRangePlot: React.FC<IPriceRangePlot> = ({
     disabled
   )
 
+  const isNoPositions = data.every(tick => !(tick.y > 0))
+
   return (
     <Grid
       container
@@ -445,7 +447,7 @@ export const PriceRangePlot: React.FC<IPriceRangePlot> = ({
         yScale={{
           type: 'linear',
           min: 0,
-          max: maxVal
+          max: isNoPositions ? 1 : maxVal
         }}
         enableGridX={false}
         enableGridY={false}

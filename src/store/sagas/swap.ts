@@ -22,6 +22,7 @@ import {
   calculateAmountInWithSlippage,
   createLoaderKey,
   deserializeTickmap,
+  ensureError,
   findPairs,
   isErrorMessage,
   poolKeyToString,
@@ -42,6 +43,7 @@ import { closeSnackbar } from 'notistack'
 import { all, call, put, select, spawn, takeEvery } from 'typed-redux-saga'
 import { getConnection } from './connection'
 import { fetchBalances } from './wallet'
+import { SubmittableExtrinsic } from '@polkadot/api/promise/types'
 
 export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generator {
   const {
@@ -142,7 +144,7 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
       })
     )
 
-    let signedBatchedTx: any
+    let signedBatchedTx: SubmittableExtrinsic
     try {
       signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
         signer: adapter.signer as Signer
@@ -178,9 +180,9 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
         second: tokenTo
       })
     )
-  } catch (e: any) {
-    console.log(e.message)
-    console.log(e)
+  } catch (e: unknown) {
+    const error = ensureError(e)
+    console.log(error)
 
     yield put(actions.setSwapSuccess(false))
 
@@ -189,10 +191,10 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
 
-    if (isErrorMessage(e.message)) {
+    if (isErrorMessage(error.message)) {
       yield put(
         snackbarsActions.add({
-          message: e.message,
+          message: error.message,
           variant: 'error',
           persist: false
         })
@@ -350,7 +352,7 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
       })
     )
 
-    let signedBatchedTx: any
+    let signedBatchedTx: SubmittableExtrinsic
     try {
       signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
         signer: adapter.signer as Signer
@@ -388,8 +390,9 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
         second: tokenTo
       })
     )
-  } catch (e: any) {
-    console.log(e)
+  } catch (e: unknown) {
+    const error = ensureError(e)
+    console.log(error)
 
     yield put(actions.setSwapSuccess(false))
 
@@ -398,10 +401,10 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
 
-    if (isErrorMessage(e.message)) {
+    if (isErrorMessage(error.message)) {
       yield put(
         snackbarsActions.add({
-          message: e.message,
+          message: error.message,
           variant: 'error',
           persist: false
         })
