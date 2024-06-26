@@ -18,7 +18,7 @@ export const ConcentrationTypeSwitch: React.FC<IProps> = ({
   disabled = false,
   currentValue
 }) => {
-  const isXs = useMediaQuery(theme.breakpoints.down('xs'))
+  const isXs = useMediaQuery(theme.breakpoints.down('sm'))
 
   const { classes: tabsClasses } = useTabsStyles({ value: currentValue })
   const { classes: singleTabClasses } = useSingleTabStyles()

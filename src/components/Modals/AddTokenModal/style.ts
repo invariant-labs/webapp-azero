@@ -40,6 +40,7 @@ const useStyles = makeStyles()((theme: Theme) => {
       maxWidth: 16,
       fontSize: 20,
       background: 'none',
+      color: colors.white.main,
       '&:hover': {
         background: 'none !important'
       }

@@ -43,7 +43,8 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    flexWrap: 'nowrap'
+    flexWrap: 'wrap',
+    rowGap: '8px'
   },
   searchBar: {
     width: 221,

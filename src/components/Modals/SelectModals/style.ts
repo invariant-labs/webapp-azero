@@ -68,6 +68,11 @@ const useStyles = makeStyles()((theme: Theme) => {
       borderColor: colors.invariant.newDark,
       borderRadius: 15,
       padding: '18px 10px 17px 10px',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      paddingRight: 32,
+
       '&::placeholder': {
         color: colors.invariant.light,
         ...typography.body1
