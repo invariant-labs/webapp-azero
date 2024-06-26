@@ -26,8 +26,7 @@ export const RoutesModal: React.FC<IRoutesModal> = ({
   const { classes } = useStyles()
 
   const otherRoutesToHighlight: Record<string, RegExp[]> = {
-    pool: [/^newPosition$/, /^position\/*/],
-    farms: [/^farms$/, /^farm\/*/]
+    pool: [/^newPosition\/*/, /^position\/*/]
   }
 
   return (
