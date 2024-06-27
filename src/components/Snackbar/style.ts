@@ -11,7 +11,7 @@ export const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ them
     borderColor: colors.invariant.component,
     borderRadius: 10,
     ...typography.body2,
-    maxWidth: 330,
+    maxWidth: '100vw',
     width: 330,
     padding: '4px 16px',
     minWidth: 100,
@@ -29,7 +29,7 @@ export const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ them
       }
     },
     [theme.breakpoints.down('sm')]: {
-      maxWidth: 'none',
+      maxWidth: 'calc(100vw - 64px)',
       width: 'auto'
     }
   },
@@ -40,7 +40,7 @@ export const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ them
     borderColor: colors.invariant.component,
     borderRadius: 10,
     ...typography.body2,
-    maxWidth: 330,
+    maxWidth: '100vw',
     width: 330,
     padding: '4px 16px',
     minWidth: 100,
@@ -58,7 +58,7 @@ export const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ them
       }
     },
     [theme.breakpoints.down('sm')]: {
-      maxWidth: 'none',
+      maxWidth: 'calc(100vw - 64px)',
       width: 'auto'
     }
   },
@@ -69,7 +69,7 @@ export const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ them
     borderColor: colors.invariant.component,
     borderRadius: 10,
     ...typography.body2,
-    maxWidth: 330,
+    maxWidth: '100vw',
     width: 330,
     padding: '6px 16px',
     minWidth: 100,
@@ -87,7 +87,7 @@ export const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ them
       }
     },
     [theme.breakpoints.down('sm')]: {
-      maxWidth: 'none',
+      maxWidth: 'calc(100vw - 64px)',
       width: 'auto'
     }
   },
@@ -98,7 +98,7 @@ export const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ them
     borderColor: colors.invariant.component,
     borderRadius: 10,
     ...typography.body2,
-    maxWidth: 330,
+    maxWidth: '100vw',
     width: 330,
     padding: '6px 16px',
     minWidth: 100,
@@ -116,7 +116,7 @@ export const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ them
       }
     },
     [theme.breakpoints.down('sm')]: {
-      maxWidth: 'none',
+      maxWidth: 'calc(100vw - 64px)',
       width: 'auto'
     }
   }

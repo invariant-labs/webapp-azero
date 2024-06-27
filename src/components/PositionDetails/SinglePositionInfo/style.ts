@@ -103,7 +103,8 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   bottomGrid: {
     background: colors.invariant.component,
     marginTop: 20,
-    padding: 24,
+    padding: 8,
+    paddingTop: 16,
     borderRadius: 24,
     flexGrow: 1,
     display: 'flex',

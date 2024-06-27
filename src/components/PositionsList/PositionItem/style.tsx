@@ -20,6 +20,9 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     [theme.breakpoints.down('lg')]: {
       padding: 16,
       flexWrap: 'wrap'
+    },
+    [theme.breakpoints.down('sm')]: {
+      padding: 8
     }
   },
   icons: {
@@ -82,7 +85,8 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     textOverflow: 'ellipsis',
     overflow: 'hidden',
     [theme.breakpoints.down('sm')]: {
-      ...typography.caption1
+      ...typography.caption1,
+      padding: '0 4px'
     }
   },
   activeInfoText: {
