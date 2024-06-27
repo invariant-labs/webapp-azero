@@ -152,7 +152,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
         <Grid container className={classes.container}>
           <Grid className={classes.selectTokenHeader}>
             <Typography component='h1'>Select a token</Typography>
-            <Button className={classes.selectTokenClose} onClick={handleClose}></Button>
+            <Button className={classes.selectTokenClose} onClick={handleClose} aria-label='Close' />
           </Grid>
           <Grid
             className={classes.topRow}
