@@ -14,6 +14,8 @@ import {
 } from '@invariant-labs/a0-sdk'
 import {
   CHUNK_SIZE,
+  PERCENTAGE_DENOMINATOR,
+  PERCENTAGE_SCALE,
   PRICE_SCALE,
   TESTNET_BTC_ADDRESS,
   TESTNET_ETH_ADDRESS,
@@ -48,7 +50,6 @@ import {
   tokensPrices
 } from './static'
 import { sleep } from '@store/sagas/wallet'
-import { PERCENTAGE_DENOMINATOR, PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/src/consts'
 import {
   BestTier,
   CoinGeckoAPIData,

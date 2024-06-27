@@ -1,12 +1,11 @@
 import {
   FEE_TIERS,
+  Network,
   TESTNET_BTC_ADDRESS,
   TESTNET_ETH_ADDRESS,
   TESTNET_USDC_ADDRESS,
   TESTNET_WAZERO_ADDRESS
 } from '@invariant-labs/a0-sdk'
-
-import { Network } from '@invariant-labs/a0-sdk/src'
 import { Keyring } from '@polkadot/api'
 import { BestTier, FormatNumberThreshold, PrefixConfig, Token, TokenPriceData } from './types'
 import { testnetBestTiersCreator } from './utils'

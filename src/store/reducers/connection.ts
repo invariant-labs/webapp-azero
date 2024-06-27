@@ -1,5 +1,4 @@
-import { TESTNET_INVARIANT_ADDRESS } from '@invariant-labs/a0-sdk'
-import { Network } from '@invariant-labs/a0-sdk/src'
+import { Network, TESTNET_INVARIANT_ADDRESS } from '@invariant-labs/a0-sdk'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { AlephZeroNetworks } from '@store/consts/static'
 import { PayloadType } from '@store/consts/types'

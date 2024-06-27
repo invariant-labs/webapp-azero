@@ -1,7 +1,6 @@
 import RoutesModal from '@components/Modals/RoutesModal'
 import SelectTestnetRPC from '@components/Modals/SelectTestnetRPC/SelectTestnetRPC'
 import NavbarButton from '@components/Navbar/Button'
-import { Network } from '@invariant-labs/a0-sdk/src'
 import DotIcon from '@mui/icons-material/FiberManualRecordRounded'
 import { Box, Button, CardMedia, Grid, IconButton, useMediaQuery } from '@mui/material'
 import icons from '@static/icons'
@@ -16,6 +15,7 @@ import SelectNetworkButton from './HeaderButton/SelectNetworkButton'
 import SelectRPCButton from './HeaderButton/SelectRPCButton'
 import useButtonStyles from './HeaderButton/style'
 import useStyles from './style'
+import { Network } from '@invariant-labs/a0-sdk'
 
 export interface IHeader {
   address: string
