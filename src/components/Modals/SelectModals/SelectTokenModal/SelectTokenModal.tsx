@@ -67,7 +67,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
   onHideUnknownTokensChange
 }) => {
   const { classes } = useStyles()
-  const isXs = useMediaQuery(theme.breakpoints.down('xs'))
+  const isXs = useMediaQuery(theme.breakpoints.down('sm'))
 
   const [value, setValue] = useState<string>('')
 

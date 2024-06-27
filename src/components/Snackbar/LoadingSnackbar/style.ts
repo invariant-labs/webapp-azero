@@ -26,7 +26,7 @@ export const StyledSnackbarContent = styled(SnackbarContent)(({ theme }) => ({
   },
 
   [theme.breakpoints.down('sm')]: {
-    maxWidth: 'none',
+    maxWidth: 'calc(100vw - 64px)',
     width: 'auto'
   }
 }))

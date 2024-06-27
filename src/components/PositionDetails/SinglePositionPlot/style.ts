@@ -8,7 +8,11 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     backgroundColor: colors.invariant.component,
     padding: 24,
     paddingTop: 18,
-    borderRadius: 24
+    borderRadius: 24,
+    [theme.breakpoints.down('sm')]: {
+      padding: 8,
+      paddingTop: 16
+    }
   },
   headerContainer: {
     ...typography.heading4,

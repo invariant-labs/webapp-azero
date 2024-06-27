@@ -7,7 +7,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     display: 'flex',
     flexDirection: 'column',
     [theme.breakpoints.down('sm')]: {
-      padding: '0 16px'
+      padding: '0 8px'
     }
   },
   header: {
@@ -45,6 +45,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     border: 'none',
     minWidth: 'auto',
     color: colors.invariant.lightHover,
+    padding: 'none',
     '&:hover': {
       filter: 'brightness(1.15)',
       cursor: 'pointer'
@@ -93,7 +94,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     paddingInline: 24,
     paddingBottom: 22,
     paddingTop: 16,
-    width: 500
+    width: 500,
+    [theme.breakpoints.down('sm')]: {
+      padding: '16px 8px'
+    }
   },
 
   connectWalletButton: {

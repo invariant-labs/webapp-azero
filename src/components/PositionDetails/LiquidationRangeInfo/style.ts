@@ -39,7 +39,8 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     display: 'flex',
     justifyContent: 'center',
     fontSize: 16,
-    width: '100%'
+    width: '100%',
+    padding: '0 4px'
   },
   infoAmount: {
     color: colors.invariant.text,

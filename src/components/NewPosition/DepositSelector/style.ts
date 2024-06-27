@@ -1,14 +1,18 @@
 import { colors, typography } from '@static/theme'
 import { makeStyles } from 'tss-react/mui'
 
-export const useStyles = makeStyles()(() => {
+export const useStyles = makeStyles()(theme => {
   return {
     wrapper: {
       borderRadius: 10,
       backgroundColor: colors.invariant.component,
       padding: 24,
       paddingTop: 16,
-      flex: '1 1 0%'
+      flex: '1 1 0%',
+
+      [theme.breakpoints.down('sm')]: {
+        padding: '16px 8px  16px 8px '
+      }
     },
     sectionTitle: {
       ...typography.heading4,
