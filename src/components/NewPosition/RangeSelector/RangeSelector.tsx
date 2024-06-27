@@ -370,7 +370,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
                     liquidity chart. Active liquidity is determined by the maximum price range
                     resulting from the statistical volume of swaps for the last 7 days.
                   </Typography>
-                  <img className={classes.liquidityImg} src={activeLiquidity} />
+                  <img className={classes.liquidityImg} src={activeLiquidity} alt='Liquidity' />
                 </Grid>
                 <Typography className={classes.liquidityNote}>
                   Note: active liquidity borders are always aligned to the nearest initialized
@@ -547,7 +547,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
         <Grid className={classes.blocker}>
           {blockerInfo === 'Loading pool info...' ? (
             <Grid container style={{ height: '100%' }}>
-              <img src={loader} className={classes.loader} />
+              <img src={loader} className={classes.loader} alt='Loader' />
             </Grid>
           ) : (
             <Typography className={classes.blockedInfo}>{blockerInfo}</Typography>

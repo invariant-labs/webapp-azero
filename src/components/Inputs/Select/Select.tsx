@@ -62,7 +62,13 @@ export const Select: React.FC<ISelectModal> = ({
         variant='contained'
         onClick={handleClick}
         startIcon={
-          !current ? null : <img className={classes.icon} src={current.logoURI ?? icons.SNY} />
+          !current ? null : (
+            <img
+              className={classes.icon}
+              src={current.logoURI ?? icons.SNY}
+              alt={current.name + 'logo'}
+            />
+          )
         }
         endIcon={<ExpandMoreIcon className={classes.endIcon} />}
         classes={{

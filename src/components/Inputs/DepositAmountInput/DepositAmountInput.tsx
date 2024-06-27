@@ -105,7 +105,7 @@ export const DepositAmountInput: React.FC<IProps> = ({
             wrap='nowrap'>
             {currency !== null ? (
               <>
-                <img alt='' src={currencyIconSrc} className={classes.currencyIcon} />
+                <img alt='currency icon' src={currencyIconSrc} className={classes.currencyIcon} />
                 <Typography className={classes.currencySymbol}>{currency}</Typography>
               </>
             ) : (
@@ -142,7 +142,7 @@ export const DepositAmountInput: React.FC<IProps> = ({
                 <Typography className={classes.caption2}>
                   Balance:{' '}
                   {isBalanceLoading ? (
-                    <img src={loadingAnimation} className={classes.loadingBalance} />
+                    <img src={loadingAnimation} className={classes.loadingBalance} alt='loading' />
                   ) : (
                     formatNumber(balanceValue || 0)
                   )}{' '}
@@ -163,7 +163,7 @@ export const DepositAmountInput: React.FC<IProps> = ({
           <Grid className={classes.percentages} container alignItems='center' wrap='nowrap'>
             {currency ? (
               priceLoading ? (
-                <img src={loadingAnimation} className={classes.loading} />
+                <img src={loadingAnimation} className={classes.loading} alt='loading' />
               ) : tokenPrice ? (
                 <Typography className={classes.caption2}>
                   ~${formatNumber(usdBalance.toFixed(2))}

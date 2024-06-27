@@ -43,7 +43,7 @@ const Notifier = () => {
               <span>Details</span>
             </button>
             <button className={classes.closeButton} onClick={() => closeSnackbar(key)}>
-              <img src={icons.closeIcon}></img>
+              <img src={icons.closeIcon} alt='Close'></img>
             </button>
           </div>
         )

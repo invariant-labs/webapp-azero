@@ -25,7 +25,7 @@ const ExchangeRate: React.FC<iProps> = ({
   const setLoading = () => {
     return loading ? (
       <Box className={classes.loadingContainer}>
-        <img src={loadingAnimation} className={classes.loading}></img>
+        <img src={loadingAnimation} className={classes.loading} alt='Loading'></img>
       </Box>
     ) : (
       <Typography className={classes.rateText}>
