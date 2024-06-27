@@ -16,7 +16,10 @@ export const useStyles = makeStyles()(() => ({
     justifyContent: 'center',
     paddingBottom: 25,
     width: '100%',
-    height: '100%'
+    height: '100%',
+    p: {
+      textAlign: 'center'
+    }
   },
   img: {
     paddingBottom: 25

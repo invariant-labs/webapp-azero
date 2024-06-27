@@ -43,7 +43,12 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    flexWrap: 'nowrap'
+    flexWrap: 'wrap',
+    rowGap: '8px',
+    [theme.breakpoints.down('sm')]: {
+      flexDirection: 'column-reverse',
+      alignItems: 'flex-end'
+    }
   },
   searchBar: {
     width: 221,
@@ -55,7 +60,8 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     color: colors.invariant.lightGrey,
     ...typography.body2,
     [theme.breakpoints.down('sm')]: {
-      maxWidth: 200
+      width: '100%',
+      height: 48
     }
   },
   button: {

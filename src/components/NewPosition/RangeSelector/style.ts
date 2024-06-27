@@ -8,7 +8,10 @@ const useStyles = makeStyles()(theme => {
       backgroundColor: colors.invariant.component,
       padding: '16px 24px 16px 24px',
       flex: '1 1 0%',
-      position: 'relative'
+      position: 'relative',
+      [theme.breakpoints.down('sm')]: {
+        padding: '16px 8px  16px 8px '
+      }
     },
     headerContainer: {
       marginBottom: 12
@@ -81,7 +84,8 @@ const useStyles = makeStyles()(theme => {
         right: 0,
         zIndex: 11,
         width: '100%',
-        borderRadius: 9
+        borderRadius: 9,
+        textAlign: 'center'
       }
     },
 

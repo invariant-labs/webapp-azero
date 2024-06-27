@@ -103,7 +103,7 @@ export const PositionsList: React.FC<IProps> = ({
               onChange={handleChangeInput}
               value={searchValue}
             />
-            <Grid>
+            <Grid rowGap={1} justifyContent='space-between'>
               <Button
                 disabled={showNoConnected}
                 onClick={showNoConnected ? () => {} : handleRefresh}

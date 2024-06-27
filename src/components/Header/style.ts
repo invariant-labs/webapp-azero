@@ -19,7 +19,7 @@ const useStyles = makeStyles()((theme: Theme) => {
       },
 
       [theme.breakpoints.down('sm')]: {
-        paddingInline: 16
+        paddingInline: 8
       }
     },
     logo: {
@@ -58,6 +58,7 @@ const useStyles = makeStyles()((theme: Theme) => {
     buttons: {
       justifyContent: 'flex-end',
       flex: '1 1 0%',
+      gap: 12,
 
       [theme.breakpoints.up('lg')]: {
         minWidth: 350
@@ -68,11 +69,12 @@ const useStyles = makeStyles()((theme: Theme) => {
       },
 
       [theme.breakpoints.down('md')]: {
-        marginLeft: 0
+        marginLeft: 0,
+        justifyContent: 'center'
       },
 
-      [theme.breakpoints.down('md')]: {
-        justifyContent: 'center'
+      [theme.breakpoints.down('sm')]: {
+        gap: 4
       }
     },
     buttonsLgConnected: {

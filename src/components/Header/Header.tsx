@@ -97,7 +97,11 @@ export const Header: React.FC<IHeader> = ({
             justifyContent='flex-start'
             sx={{ display: { xs: 'block', md: 'none' } }}>
             <Grid container>
-              <CardMedia className={classes.logoShort} image={icons.LogoShort} />
+              <CardMedia
+                className={classes.logoShort}
+                image={icons.LogoShort}
+                onClick={() => navigate('/swap')}
+              />
             </Grid>
           </Grid>
         </Box>
@@ -124,7 +128,7 @@ export const Header: React.FC<IHeader> = ({
           ))}
         </Grid>
 
-        <Grid container item className={classes.buttons} wrap='nowrap' gap={1.5}>
+        <Grid container item className={classes.buttons} wrap='nowrap'>
           {typeOfNetwork === Network.Testnet ? (
             <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
               <Button
