@@ -137,7 +137,9 @@ export const RangeInput: React.FC<IRangeInput> = ({
           onBlur={onBlur}
           disableUnderline={true}
           disabled={disabled}
-          type='number'
+          inputProps={{
+            inputMode: 'decimal'
+          }}
         />
         {disabled ? null : (
           <Button className={classes.button} onClick={increaseValue} disableRipple>

@@ -1,6 +1,7 @@
 import EventsHandlers from '@containers/EventHandlers/index'
 import FooterWrapper from '@containers/FooterWrapper'
 import HeaderWrapper from '@containers/HeaderWrapper/HeaderWrapper'
+import { Grid } from '@mui/material'
 import { Status, actions as alephZeroConnectionActions } from '@store/reducers/connection'
 import { actions } from '@store/reducers/positions'
 import { Status as WalletStatus } from '@store/reducers/wallet'
@@ -10,6 +11,7 @@ import { toBlur } from '@utils/uiUtils'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import useStyles from './style'
 
 const RootPage: React.FC = () => {
   const dispatch = useDispatch()
@@ -19,6 +21,8 @@ const RootPage: React.FC = () => {
 
   const navigate = useNavigate()
   const location = useLocation()
+
+  const { classes } = useStyles()
 
   useEffect(() => {
     if (location.pathname === '/') {
@@ -42,9 +46,13 @@ const RootPage: React.FC = () => {
     <>
       {signerStatus === Status.Initialized && <EventsHandlers />}
       <div id={toBlur}>
-        <HeaderWrapper />
-        <Outlet />
-        <FooterWrapper />
+        <Grid className={classes.root}>
+          <HeaderWrapper />
+          <Grid className={classes.body}>
+            <Outlet />
+          </Grid>
+          <FooterWrapper />
+        </Grid>
       </div>
     </>
   )

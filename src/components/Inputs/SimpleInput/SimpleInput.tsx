@@ -72,12 +72,14 @@ export const SimpleInput: React.FC<IProps> = ({
       className={classNames(classes.amountInput, className)}
       classes={{ input: classes.input }}
       style={style}
-      type='number'
       value={value}
       disableUnderline={true}
       placeholder={placeholder}
       onChange={allowOnlyDigitsAndTrimUnnecessaryZeros}
       onBlur={onBlur}
+      inputProps={{
+        inputMode: 'decimal'
+      }}
     />
   )
 }
