@@ -32,8 +32,11 @@ const RootPage: React.FC = React.memo(() => {
     if (location.pathname === '/') {
       navigate('/swap')
     }
+  }, [location.pathname, navigate])
+
+  useEffect(() => {
     initConnection()
-  }, [location.pathname, navigate, initConnection])
+  }, [initConnection])
 
   const fetchPositionsList = useCallback(() => {
     if (
