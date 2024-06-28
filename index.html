@@ -4,10 +4,8 @@
     <script>
       window.global = window
     </script>
-    <!-- <script type="module" src="/src/shims.ts"></script> -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta charset="utf-8" />
     <link rel="apple-touch-icon" sizes="192x192" href="/favicon-192x192.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
@@ -20,9 +18,9 @@
       content="Invariant is the most efficient AMM DEX with concentrated liquidity on Aleph Zero blockchain, providing the highest capital efficiency and risk management." />
     <meta
       name="keywords"
-      conent="crypto, crypto exchange, Aleph Zero crypto, concentrated liquidity, defi crypto, Aleph Zero exchange" />
+      content="crypto, crypto exchange, Aleph Zero crypto, concentrated liquidity, defi crypto, Aleph Zero exchange" />
 
-    <!-- Open Graph  -->
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://invariant.app/" />
     <meta property="og:title" content="Invariant - AMM DEX provided concentrated liquidity" />
@@ -31,7 +29,7 @@
       content="Invariant is the most efficient AMM DEX with concentrated liquidity on Aleph Zero blockchain, providing the highest capital efficiency and risk management." />
     <meta property="og:image" content="https://invariant.app/favicon-192x192.png" />
 
-    <!-- Twitter Card  -->
+    <!-- Twitter Card -->
     <meta property="twitter:card" content="summary" />
     <meta property="twitter:url" content="https://twitter.com/invariant_labs" />
     <meta property="twitter:title" content="Invariant - AMM DEX provided concentrated liquidity" />
@@ -52,12 +50,8 @@
     <meta name="DC.format" content="text/html" />
     <meta name="DC.type" content="Text" />
 
-    <!-- Global Site Tag (gtag.js) - Google Analytics -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-TEFDYYTWP3"
-      type="module"></script>
-
+    <!-- Global Site Tag (gtag.js) - Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TEFDYYTWP3"></script>
     <script>
       window.dataLayer = window.dataLayer || []
       function gtag() {
@@ -69,6 +63,10 @@
 
     <link rel="canonical" href="https://invariant.app/" />
     <link rel="manifest" href="/manifest.json" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' 'wasm-unsafe-eval' https://www.googletagmanager.com; object-src 'none';" />
+
     <style>
       html {
         scrollbar-width: none;
