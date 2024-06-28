@@ -67,6 +67,8 @@ export const Select: React.FC<ISelectModal> = ({
               className={classes.icon}
               src={current.logoURI ?? icons.SNY}
               alt={current.name + 'logo'}
+              width='20'
+              height='20'
             />
           )
         }

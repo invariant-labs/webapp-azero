@@ -1,9 +1,9 @@
 import createSagaMiddleware from 'redux-saga'
-
 import { configureStore, isPlain } from '@reduxjs/toolkit'
-
 import combinedReducers from './reducers'
 import rootSaga from './sagas'
+
+const isLocalhost = window.location.hostname === 'localhost'
 
 const isSerializable = (value: unknown) => {
   return typeof value === 'bigint' || isPlain(value)
@@ -32,15 +32,14 @@ const configureAppStore = (initialState = {}) => {
         }
       }).concat(middleware),
     preloadedState: initialState,
-    devTools:
-      process.env.NODE_ENV === 'production'
-        ? false
-        : {
-            serialize: {
-              replacer: (_key, value) => (typeof value === 'bigint' ? value.toString() : value),
-              options: true
-            }
+    devTools: isLocalhost
+      ? false
+      : {
+          serialize: {
+            replacer: (_key, value) => (typeof value === 'bigint' ? value.toString() : value),
+            options: true
           }
+        }
   })
 
   sagaMiddleware.run(rootSaga)
