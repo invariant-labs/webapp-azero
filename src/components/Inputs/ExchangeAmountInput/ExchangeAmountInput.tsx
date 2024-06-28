@@ -125,11 +125,13 @@ export const AmountInput: React.FC<IProps> = ({
           className={classNames(classes.amountInput, className)}
           classes={{ input: classes.input }}
           style={style}
-          type='number'
           value={value}
           disableUnderline={true}
           placeholder={placeholder}
           onChange={allowOnlyDigitsAndTrimUnnecessaryZeros}
+          inputProps={{
+            inputMode: 'decimal'
+          }}
         />
       </Grid>
       {!hideBalances && (

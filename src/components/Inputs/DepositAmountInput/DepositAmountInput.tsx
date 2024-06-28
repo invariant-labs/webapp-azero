@@ -116,13 +116,15 @@ export const DepositAmountInput: React.FC<IProps> = ({
             className={classes.input}
             classes={{ input: classes.innerInput }}
             inputRef={inputRef}
-            type='number'
             value={value}
             disableUnderline={true}
             placeholder={placeholder}
             onChange={allowOnlyDigitsAndTrimUnnecessaryZeros}
             onBlur={onBlur}
             disabled={disabled}
+            inputProps={{
+              inputMode: 'decimal'
+            }}
           />
         </Grid>
         <Grid

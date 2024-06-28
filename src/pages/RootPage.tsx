@@ -4,12 +4,14 @@ import { useNavigate, useLocation, Outlet } from 'react-router-dom'
 import EventsHandlers from '@containers/EventHandlers/index'
 import FooterWrapper from '@containers/FooterWrapper'
 import HeaderWrapper from '@containers/HeaderWrapper/HeaderWrapper'
+import { Grid } from '@mui/material'
 import { Status, actions as alephZeroConnectionActions } from '@store/reducers/connection'
 import { actions } from '@store/reducers/positions'
 import { Status as WalletStatus } from '@store/reducers/wallet'
 import { status as connectionStatus } from '@store/selectors/connection'
 import { address, status } from '@store/selectors/wallet'
 import { toBlur } from '@utils/uiUtils'
+import useStyles from './style'
 
 const RootPage: React.FC = React.memo(() => {
   const dispatch = useDispatch()
@@ -19,6 +21,8 @@ const RootPage: React.FC = React.memo(() => {
 
   const navigate = useNavigate()
   const location = useLocation()
+
+  const { classes } = useStyles()
 
   const initConnection = useCallback(() => {
     dispatch(alephZeroConnectionActions.initAlephZeroConnection())
@@ -49,9 +53,13 @@ const RootPage: React.FC = React.memo(() => {
     <>
       {signerStatus === Status.Initialized && <EventsHandlers />}
       <div id={toBlur}>
-        <HeaderWrapper />
-        <Outlet />
-        <FooterWrapper />
+        <Grid className={classes.root}>
+          <HeaderWrapper />
+          <Grid className={classes.body}>
+            <Outlet />
+          </Grid>
+          <FooterWrapper />
+        </Grid>
       </div>
     </>
   )

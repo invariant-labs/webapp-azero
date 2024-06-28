@@ -1,5 +1,4 @@
 import { PoolKey, TESTNET_WAZERO_ADDRESS, sendTx } from '@invariant-labs/a0-sdk'
-import { calculateTokenAmountsWithSlippage } from '@invariant-labs/a0-sdk/src/utils'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
 import {
@@ -46,6 +45,7 @@ import { getConnection } from './connection'
 import { fetchTicksAndTickMaps } from './pools'
 import { fetchBalances } from './wallet'
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types'
+import { calculateTokenAmountsWithSlippage } from '@invariant-labs/a0-sdk/target/utils'
 
 function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator {
   const {
@@ -416,7 +416,7 @@ export function* handleGetPositionsList() {
     )
     const walletAddress = yield* select(address)
 
-    const positions = yield* call([invariant, invariant.getPositions], walletAddress)
+    const positions = yield* call([invariant, invariant.getAllPositions], walletAddress)
 
     const pools: PoolKey[] = []
     const poolSet: Set<string> = new Set()

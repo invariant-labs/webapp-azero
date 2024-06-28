@@ -1,6 +1,6 @@
 import { PositionsList } from '@components/PositionsList/PositionsList'
 import { calculateTokenAmounts } from '@invariant-labs/a0-sdk'
-import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/src/consts'
+import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { POSITIONS_PER_PAGE } from '@store/consts/static'
 import { calcYPerXPriceByTickIndex, printBigint } from '@store/consts/utils'
 import { actions } from '@store/reducers/positions'

@@ -3,7 +3,6 @@ import Slippage from '@components/Modals/Slippage/Slippage'
 import { INoConnected, NoConnected } from '@components/NoConnected/NoConnected'
 import Refresher from '@components/Refresher/Refresher'
 import { getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
-import { getConcentrationArray } from '@invariant-labs/a0-sdk/src/utils'
 import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
 import { Box, Button, Grid, Hidden, Typography } from '@mui/material'
 import backIcon from '@static/svg/back-arrow.svg'
@@ -31,6 +30,7 @@ import PoolInit from './PoolInit/PoolInit'
 import RangeSelector from './RangeSelector/RangeSelector'
 import useStyles from './style'
 import { BestTier, PositionOpeningMethod, TokenPriceData } from '@store/consts/types'
+import { getConcentrationArray } from '@invariant-labs/a0-sdk/target/utils'
 
 export interface INewPosition {
   initialTokenFrom: string
