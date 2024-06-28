@@ -1,5 +1,4 @@
-import { PSP22 } from '@invariant-labs/a0-sdk'
-import { Network } from '@invariant-labs/a0-sdk/src'
+import { Network, PSP22 } from '@invariant-labs/a0-sdk'
 import { ApiPromise } from '@polkadot/api'
 import { DEFAULT_PSP22_OPTIONS } from '@store/consts/static'
 
