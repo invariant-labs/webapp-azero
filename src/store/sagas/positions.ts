@@ -1,4 +1,12 @@
-import { PoolKey, TESTNET_WAZERO_ADDRESS, sendTx } from '@invariant-labs/a0-sdk'
+import {
+  Pool,
+  Position,
+  TESTNET_BTC_ADDRESS,
+  TESTNET_ETH_ADDRESS,
+  TESTNET_WAZERO_ADDRESS,
+  Tick,
+  sendTx
+} from '@invariant-labs/a0-sdk'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
 import {
@@ -8,6 +16,7 @@ import {
   INVARIANT_CREATE_POSITION_OPTIONS,
   INVARIANT_REMOVE_POSITION_OPTIONS,
   INVARIANT_WITHDRAW_ALL_WAZERO,
+  POSITIONS_PER_PAGE,
   PSP22_APPROVE_OPTIONS,
   U128MAX,
   WAZERO_DEPOSIT_OPTIONS
@@ -46,6 +55,7 @@ import { fetchTicksAndTickMaps } from './pools'
 import { fetchBalances } from './wallet'
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types'
 import { calculateTokenAmountsWithSlippage } from '@invariant-labs/a0-sdk/target/utils'
+import { positionsList } from '@store/selectors/positions'
 
 function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator {
   const {
@@ -174,7 +184,9 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       })
     )
 
-    yield put(actions.getPositionsList())
+    const { length } = yield* select(positionsList)
+    const position = yield* call([invariant, invariant.getPosition], walletAddress, length)
+    yield* put(actions.addPosition(position))
 
     yield* call(fetchBalances, [tokenX, tokenY])
 
@@ -367,7 +379,9 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
 
     yield put(walletActions.getBalances([tokenX, tokenY]))
 
-    yield put(actions.getPositionsList())
+    const { length } = yield* select(positionsList)
+    const position = yield* call([invariant, invariant.getPosition], walletAddress, length)
+    yield* put(actions.addPosition(position))
 
     yield* call(fetchBalances, [tokenX === TESTNET_WAZERO_ADDRESS ? tokenY : tokenX])
 
@@ -400,45 +414,6 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
         })
       )
     }
-  }
-}
-
-export function* handleGetPositionsList() {
-  try {
-    const api = yield* getConnection()
-    const network = yield* select(networkType)
-    const invAddress = yield* select(invariantAddress)
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
-    const walletAddress = yield* select(address)
-
-    const positions = yield* call([invariant, invariant.getAllPositions], walletAddress)
-
-    const pools: PoolKey[] = []
-    const poolSet: Set<string> = new Set()
-    for (let i = 0; i < positions.length; i++) {
-      const poolKeyString = poolKeyToString(positions[i].poolKey)
-
-      if (!poolSet.has(poolKeyString)) {
-        poolSet.add(poolKeyString)
-        pools.push(positions[i].poolKey)
-      }
-    }
-
-    yield* put(
-      poolsActions.getPoolsDataForList({
-        poolKeys: Array.from(pools),
-        listType: ListType.POSITIONS
-      })
-    )
-
-    yield* put(actions.setPositionsList(positions))
-  } catch (e) {
-    yield* put(actions.setPositionsList([]))
   }
 }
 
@@ -887,7 +862,7 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
       })
     )
 
-    yield* put(actions.getPositionsList())
+    yield* put(actions.removePosition(positionIndex))
     onSuccess()
 
     yield* call(fetchBalances, [addressTokenX, addressTokenY])
@@ -998,7 +973,7 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
       })
     )
 
-    yield* put(actions.getPositionsList())
+    yield* put(actions.removePosition(positionIndex))
     onSuccess()
 
     yield* call(fetchBalances, [addressTokenX, addressTokenY])
@@ -1031,12 +1006,98 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
   }
 }
 
-export function* initPositionHandler(): Generator {
-  yield* takeEvery(actions.initPosition, handleInitPosition)
+export const POSITIONS_PER_QUERY = 32 - (32 % POSITIONS_PER_PAGE)
+
+export function* handleGetPositionsListPage(
+  action: PayloadAction<{ index: number; refresh: boolean }>
+) {
+  const { index, refresh } = action.payload
+
+  const api = yield* getConnection()
+  const network = yield* select(networkType)
+  const invAddress = yield* select(invariantAddress)
+  const walletAddress = yield* select(address)
+  const { length, list, loadedPages } = yield* select(positionsList)
+
+  const invariant = yield* call(
+    [invariantSingleton, invariantSingleton.loadInstance],
+    api,
+    network,
+    invAddress
+  )
+
+  let entries: [Position, Pool, Tick, Tick][] = []
+  let positionsLength = 0n
+
+  if (refresh) {
+    yield* put(
+      actions.setPositionsListLoadedStatus({
+        indexes: Object.keys(loadedPages)
+          .map(key => Number(key))
+          .filter(keyIndex => keyIndex !== index),
+        isLoaded: false
+      })
+    )
+  }
+
+  if (!length || refresh) {
+    console.log('call', index)
+    const result = yield* call(
+      [invariant, invariant.getPositions],
+      walletAddress,
+      BigInt(POSITIONS_PER_QUERY),
+      BigInt(index * POSITIONS_PER_QUERY)
+    )
+    entries = result[0]
+    positionsLength = result[1]
+
+    yield* put(actions.setPositionsListLength(positionsLength))
+  }
+
+  const emptyPosition: Position = {
+    poolKey: {
+      tokenX: TESTNET_BTC_ADDRESS,
+      tokenY: TESTNET_ETH_ADDRESS,
+      feeTier: { fee: 0n, tickSpacing: 0n }
+    },
+    liquidity: 0n,
+    lowerTickIndex: 0n,
+    upperTickIndex: 0n,
+    feeGrowthInsideX: 0n,
+    feeGrowthInsideY: 0n,
+    lastBlockNumber: 0n,
+    tokensOwedX: 0n,
+    tokensOwedY: 0n
+  }
+
+  const allList = length ? [...list] : Array(Number(positionsLength)).fill(emptyPosition)
+
+  const isPageLoaded = loadedPages[index]
+
+  if (!isPageLoaded || refresh) {
+    if (length && !refresh) {
+      console.log('call', index)
+      const result = yield* call(
+        [invariant, invariant.getPositions],
+        walletAddress,
+        BigInt(POSITIONS_PER_QUERY),
+        BigInt(index * POSITIONS_PER_QUERY)
+      )
+      entries = result[0]
+      positionsLength = result[1]
+    }
+
+    for (let i = 0; i < entries.length; i++) {
+      allList[i + index * POSITIONS_PER_QUERY] = entries[i][0]
+    }
+  }
+
+  yield* put(actions.setPositionsList(allList))
+  yield* put(actions.setPositionsListLoadedStatus({ indexes: [index], isLoaded: true }))
 }
 
-export function* getPositionsListHandler(): Generator {
-  yield* takeLatest(actions.getPositionsList, handleGetPositionsList)
+export function* initPositionHandler(): Generator {
+  yield* takeEvery(actions.initPosition, handleInitPosition)
 }
 
 export function* getCurrentPositionTicksHandler(): Generator {
@@ -1058,16 +1119,20 @@ export function* closePositionHandler(): Generator {
   yield* takeEvery(actions.closePosition, handleClosePosition)
 }
 
+export function* getPositionsListPage(): Generator {
+  yield* takeLatest(actions.getPositionsListPage, handleGetPositionsListPage)
+}
+
 export function* positionsSaga(): Generator {
   yield all(
     [
       initPositionHandler,
-      getPositionsListHandler,
       getCurrentPositionTicksHandler,
       getCurrentPlotTicksHandler,
       claimFeeHandler,
       getSinglePositionHandler,
-      closePositionHandler
+      closePositionHandler,
+      getPositionsListPage
     ].map(spawn)
   )
 }

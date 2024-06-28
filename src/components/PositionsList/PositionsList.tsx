@@ -22,6 +22,7 @@ interface IProps {
   searchValue: string
   searchSetValue: (value: string) => void
   handleRefresh: () => void
+  pageChanged: (page: number) => void
 }
 
 export const PositionsList: React.FC<IProps> = ({
@@ -35,7 +36,8 @@ export const PositionsList: React.FC<IProps> = ({
   itemsPerPage,
   searchValue,
   searchSetValue,
-  handleRefresh
+  handleRefresh,
+  pageChanged
 }) => {
   const { classes } = useStyles()
   const navigate = useNavigate()
@@ -76,6 +78,10 @@ export const PositionsList: React.FC<IProps> = ({
   useEffect(() => {
     handleChangePagination(initialPage)
   }, [initialPage])
+
+  useEffect(() => {
+    pageChanged(page)
+  }, [page])
 
   return (
     <Grid container direction='column' className={classes.root}>

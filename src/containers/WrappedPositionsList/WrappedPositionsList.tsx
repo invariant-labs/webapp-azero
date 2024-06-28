@@ -2,12 +2,17 @@ import { PositionsList } from '@components/PositionsList/PositionsList'
 import { calculateTokenAmounts } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { POSITIONS_PER_PAGE } from '@store/consts/static'
-import { calcYPerXPriceByTickIndex, printBigint } from '@store/consts/utils'
+import {
+  calcYPerXPriceByTickIndex,
+  positionListPageToQueryPage,
+  printBigint
+} from '@store/consts/utils'
 import { actions } from '@store/reducers/positions'
 import { Status } from '@store/reducers/wallet'
 import {
   isLoadingPositionsList,
   lastPageSelector,
+  positionsList,
   positionsWithPoolsData
 } from '@store/selectors/positions'
 import { address, status } from '@store/selectors/wallet'
@@ -24,6 +29,7 @@ export const WrappedPositionsList: React.FC = () => {
   const walletStatus = useSelector(status)
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const { loadedPages, length } = useSelector(positionsList)
 
   const [value, setValue] = useState<string>('')
 
@@ -46,7 +52,9 @@ export const WrappedPositionsList: React.FC = () => {
   }, [list])
 
   const handleRefresh = () => {
-    dispatch(actions.getPositionsList())
+    dispatch(
+      actions.getPositionsListPage({ index: positionListPageToQueryPage(lastPage), refresh: true })
+    )
   }
 
   const data = list
@@ -124,6 +132,12 @@ export const WrappedPositionsList: React.FC = () => {
       )
     })
 
+  useEffect(() => {
+    if (walletStatus === Status.Initialized && walletAddress && !loadedPages[0] && !length) {
+      dispatch(actions.getPositionsListPage({ index: 0, refresh: false }))
+    }
+  }, [walletStatus, loadedPages])
+
   return (
     <PositionsList
       initialPage={lastPage}
@@ -141,6 +155,13 @@ export const WrappedPositionsList: React.FC = () => {
       noConnectedBlockerProps={{
         onConnect: openWalletSelectorModal,
         descCustomText: 'You have no positions.'
+      }}
+      pageChanged={page => {
+        const index = positionListPageToQueryPage(page)
+
+        if (walletStatus === Status.Initialized && walletAddress && !loadedPages[index] && length) {
+          dispatch(actions.getPositionsListPage({ index: index, refresh: false }))
+        }
       }}
     />
   )
