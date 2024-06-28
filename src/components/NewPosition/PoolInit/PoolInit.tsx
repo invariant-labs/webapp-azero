@@ -1,7 +1,6 @@
 import AnimatedNumber from '@components/AnimatedNumber'
 import RangeInput from '@components/Inputs/RangeInput/RangeInput'
 import SimpleInput from '@components/Inputs/SimpleInput/SimpleInput'
-import { Price, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk/src'
 import { Button, Grid, Typography } from '@mui/material'
 import {
   calcPrice,
@@ -13,6 +12,7 @@ import {
 } from '@store/consts/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import useStyles from './style'
+import { Price, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
 
 export interface IPoolInit {
   tokenASymbol: string

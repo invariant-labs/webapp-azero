@@ -1,5 +1,4 @@
-import { Invariant } from '@invariant-labs/a0-sdk'
-import { Network } from '@invariant-labs/a0-sdk/src'
+import { Invariant, Network } from '@invariant-labs/a0-sdk'
 import { ApiPromise } from '@polkadot/api'
 import { DEFAULT_INVARIANT_OPTIONS } from '@store/consts/static'
 

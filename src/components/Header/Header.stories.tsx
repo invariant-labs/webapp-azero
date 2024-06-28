@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { fn } from '@storybook/test'
 import Header from './Header'
 import { MemoryRouter } from 'react-router-dom'
-import { Network } from '@invariant-labs/a0-sdk/src'
+import { Network } from '@invariant-labs/a0-sdk'
 
 const meta = {
   title: 'Layout/Header',

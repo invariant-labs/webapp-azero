@@ -5,8 +5,11 @@ import {
   sendTx,
   simulateInvariantSwap
 } from '@invariant-labs/a0-sdk'
-import { MIN_SQRT_PRICE } from '@invariant-labs/a0-sdk/src/consts'
-import { MAX_SQRT_PRICE, PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
+import {
+  MAX_SQRT_PRICE,
+  MIN_SQRT_PRICE,
+  PERCENTAGE_SCALE
+} from '@invariant-labs/a0-sdk/target/consts'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
 import {
