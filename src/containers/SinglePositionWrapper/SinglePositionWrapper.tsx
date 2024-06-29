@@ -419,7 +419,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
         justifyContent='center'
         alignItems='center'
         className={classes.fullHeightContainer}>
-        <img src={loader} className={classes.loading} />
+        <img src={loader} className={classes.loading} alt='Loading' />
       </Grid>
     )
   }

@@ -138,7 +138,8 @@ export const RangeInput: React.FC<IRangeInput> = ({
           disableUnderline={true}
           disabled={disabled}
           inputProps={{
-            inputMode: 'decimal'
+            inputMode: 'decimal',
+            'aria-label': 'price range'
           }}
         />
         {disabled ? null : (

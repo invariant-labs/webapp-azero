@@ -152,7 +152,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
         <Grid container className={classes.container}>
           <Grid className={classes.selectTokenHeader}>
             <Typography component='h1'>Select a token</Typography>
-            <Button className={classes.selectTokenClose} onClick={handleClose}></Button>
+            <Button className={classes.selectTokenClose} onClick={handleClose} aria-label='Close' />
           </Grid>
           <Grid
             className={classes.topRow}
@@ -182,7 +182,11 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
                     setValue('')
                     handleClose()
                   }}>
-                  <img className={classes.commonTokenIcon} src={token.logoURI} />
+                  <img
+                    className={classes.commonTokenIcon}
+                    src={token.logoURI}
+                    alt={token.name + 'logo'}
+                  />
                   <Typography component='p'>{token.symbol}</Typography>
                 </Box>
               ))}
@@ -231,7 +235,12 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
                       setValue('')
                       handleClose()
                     }}>
-                    <img className={classes.tokenIcon} src={token.logoURI} loading='lazy' />{' '}
+                    <img
+                      className={classes.tokenIcon}
+                      src={token.logoURI}
+                      loading='lazy'
+                      alt={token.name + 'logo'}
+                    />{' '}
                     <Grid container className={classes.tokenContainer}>
                       <Typography className={classes.tokenName}>{token.symbol}</Typography>
                       <Typography className={classes.tokenDescrpiption}>

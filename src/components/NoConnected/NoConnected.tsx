@@ -16,7 +16,7 @@ export const NoConnected: React.FC<INoConnected> = ({ onConnect, descCustomText 
       <Grid className={classNames(classes.blur, 'noConnectedLayer')} />
       <Grid className={classNames(classes.container, 'noConnectedLayer')}>
         <Grid className={classNames(classes.root, 'noConnectedInfo')}>
-          <img className={classes.img} src={icons.NoConnected} />
+          <img className={classes.img} src={icons.NoConnected} alt='Not connected' />
           <Typography className={classes.desc}>Wallet is not connected.</Typography>
           {descCustomText?.length && (
             <Typography className={classes.desc}>{descCustomText}</Typography>

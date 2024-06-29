@@ -368,7 +368,7 @@ export const PriceRangePlot: React.FC<IPriceRangePlot> = ({
       ref={containerRef}>
       {loading && coverOnLoading ? (
         <Grid container className={classes.cover}>
-          <img src={loader} className={classes.loader} />
+          <img src={loader} className={classes.loader} alt='Loader' />
         </Grid>
       ) : null}
       {!loading && hasError ? (
@@ -387,10 +387,10 @@ export const PriceRangePlot: React.FC<IPriceRangePlot> = ({
         className={classNames(classes.zoomButtonsWrapper, 'zoomBtns')}
         justifyContent='space-between'>
         <Button className={classes.zoomButton} onClick={zoomPlus} disableRipple>
-          <img src={ZoomInIcon} className={classes.zoomIcon} />
+          <img src={ZoomInIcon} className={classes.zoomIcon} alt='Zoom in' />
         </Button>
         <Button className={classes.zoomButton} onClick={zoomMinus} disableRipple>
-          <img src={ZoomOutIcon} className={classes.zoomIcon} />
+          <img src={ZoomOutIcon} className={classes.zoomIcon} alt='Zoom out' />
         </Button>
       </Grid>
       <ResponsiveLine

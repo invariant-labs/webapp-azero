@@ -76,7 +76,7 @@ export const colors = {
     lightHover: '#A9B6BF',
     black: '#010514',
     textGrey: '#A9B6BF',
-    lightGrey: '#A9B6BF',
+    lightGrey: '#bac7d1',
     text: '#FFFFFF',
     Error: '#FB555F',
     greenLinearGradient: 'linear-gradient(180deg, #2EE09A 0%, #21A47C 100%)',

@@ -97,7 +97,7 @@ export const PositionsList: React.FC<IProps> = ({
               placeholder='Search position'
               endAdornment={
                 <InputAdornment position='end'>
-                  <img src={SearchIcon} className={classes.searchIcon} />
+                  <img src={SearchIcon} className={classes.searchIcon} alt='Search' />
                 </InputAdornment>
               }
               onChange={handleChangeInput}
@@ -108,7 +108,7 @@ export const PositionsList: React.FC<IProps> = ({
                 disabled={showNoConnected}
                 onClick={showNoConnected ? () => {} : handleRefresh}
                 className={classes.refreshIconBtn}>
-                <img src={refreshIcon} className={classes.refreshIcon} />
+                <img src={refreshIcon} className={classes.refreshIcon} alt='Refresh' />
               </Button>
               <Button
                 className={showNoConnected ? classes.buttonSelectDisabled : classes.button}
@@ -136,7 +136,7 @@ export const PositionsList: React.FC<IProps> = ({
           <NoConnected {...noConnectedBlockerProps} />
         ) : loading ? (
           <Grid container style={{ flex: 1 }}>
-            <img src={loader} className={classes.loading} />
+            <img src={loader} className={classes.loading} alt='Loader' />
           </Grid>
         ) : (
           <EmptyPlaceholder

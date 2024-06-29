@@ -95,7 +95,7 @@ export const BoxInfo: React.FC<{
       <Grid className={classes.tokenGrid} container direction='column'>
         {showLoader ? (
           <Grid container className={classes.cover}>
-            <img src={loader} className={classes.loader} />
+            <img src={loader} className={classes.loader} alt='Loader' />
           </Grid>
         ) : null}
         <Grid className={classes.tokenArea}>
@@ -116,7 +116,7 @@ export const BoxInfo: React.FC<{
               <Typography className={classes.tokenBalance}>
                 Balance:{' '}
                 {isBalanceLoading ? (
-                  <img src={loadingAnimation} className={classes.loadingBalance} />
+                  <img src={loadingAnimation} className={classes.loadingBalance} alt='Loading' />
                 ) : (
                   formatNumber(tokenA.balance)
                 )}{' '}
@@ -133,7 +133,7 @@ export const BoxInfo: React.FC<{
         </Grid>
 
         {typeof swapHandler !== 'undefined' ? (
-          <img src={SwapPosition} className={classes.arrowsIcon} onClick={swapHandler} />
+          <img src={SwapPosition} className={classes.arrowsIcon} onClick={swapHandler} alt='Swap' />
         ) : null}
 
         <Grid className={classes.tokenArea}>
@@ -154,7 +154,7 @@ export const BoxInfo: React.FC<{
               <Typography className={classes.tokenBalance}>
                 Balance:{' '}
                 {isBalanceLoading ? (
-                  <img src={loadingAnimation} className={classes.loadingBalance} />
+                  <img src={loadingAnimation} className={classes.loadingBalance} alt='Loading' />
                 ) : (
                   formatNumber(tokenB.balance)
                 )}{' '}
