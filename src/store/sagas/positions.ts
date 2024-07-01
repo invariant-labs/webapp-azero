@@ -285,7 +285,6 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
       invAddress
     )
 
-    console.log(xAmountWithSlippage, yAmountWithSlippage)
     if (initPool) {
       const createPoolTx = invariant.createPoolTx(
         poolKeyData,
@@ -295,7 +294,6 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
       txs.push(createPoolTx)
     }
 
-    console.log(poolKeyData, lowerTick, upperTick, liquidityDelta, spotSqrtPrice, slippageTolerance)
     const tx = invariant.createPositionTx(
       poolKeyData,
       lowerTick,
