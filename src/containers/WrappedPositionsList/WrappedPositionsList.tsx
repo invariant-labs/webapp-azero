@@ -52,7 +52,9 @@ export const WrappedPositionsList: React.FC = () => {
   }, [list])
 
   const handleRefresh = () => {
-    dispatch(actions.ListPage({ index: positionListPageToQueryPage(lastPage), refresh: true }))
+    dispatch(
+      actions.getPositionsListPage({ index: positionListPageToQueryPage(lastPage), refresh: true })
+    )
   }
 
   const data = list
