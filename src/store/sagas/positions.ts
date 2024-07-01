@@ -43,7 +43,7 @@ import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { actions as walletActions } from '@store/reducers/wallet'
 import { invariantAddress, networkType } from '@store/selectors/connection'
 import { poolsArraySortedByFees, tickMaps, tokens } from '@store/selectors/pools'
-import { address } from '@store/selectors/wallet'
+import { address, balance } from '@store/selectors/wallet'
 import invariantSingleton from '@store/services/invariantSingleton'
 import psp22Singleton from '@store/services/psp22Singleton'
 import wrappedAZEROSingleton from '@store/services/wrappedAZEROSingleton'
@@ -231,8 +231,6 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     lowerTick,
     upperTick,
     spotSqrtPrice,
-    tokenXAmount,
-    tokenYAmount,
     liquidityDelta,
     initPool,
     slippageTolerance
@@ -255,6 +253,7 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
     const invAddress = yield* select(invariantAddress)
+    const azeroBalance = yield* select(balance)
 
     const txs = []
 
@@ -263,12 +262,6 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
       api,
       network
     )
-
-    const depositTx = wazero.depositTx(
-      tokenX === TESTNET_WAZERO_ADDRESS ? tokenXAmount : tokenYAmount,
-      WAZERO_DEPOSIT_OPTIONS
-    )
-    txs.push(depositTx)
 
     const psp22 = yield* call([psp22Singleton, psp22Singleton.loadInstance], api, network)
 
@@ -281,6 +274,15 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
       slippageTolerance,
       true
     )
+
+    let azeroAmount = 0n
+    if (tokenX === TESTNET_WAZERO_ADDRESS) {
+      azeroAmount = azeroBalance > xAmountWithSlippage ? xAmountWithSlippage : azeroBalance
+    } else {
+      azeroAmount = azeroBalance > yAmountWithSlippage ? yAmountWithSlippage : azeroBalance
+    }
+    const depositTx = wazero.depositTx(azeroAmount, WAZERO_DEPOSIT_OPTIONS)
+    txs.push(depositTx)
 
     const XTokenTx = psp22.approveTx(invAddress, xAmountWithSlippage, tokenX, PSP22_APPROVE_OPTIONS)
     txs.push(XTokenTx)
