@@ -200,7 +200,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     ...typography.caption2,
     whiteSpace: 'nowrap',
     pointerEvents: 'none',
-
+    color: colors.invariant.lightGrey,
     [theme.breakpoints.down('sm')]: {
       ...typography.tiny2
     }

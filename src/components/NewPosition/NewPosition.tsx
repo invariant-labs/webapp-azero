@@ -449,7 +449,7 @@ export const NewPosition: React.FC<INewPosition> = ({
     <Grid container className={classes.wrapper} direction='column'>
       <Link to='/pool' style={{ textDecoration: 'none', maxWidth: 'fit-content' }}>
         <Grid className={classes.back} container item alignItems='center'>
-          <img className={classes.backIcon} src={backIcon} />
+          <img className={classes.backIcon} src={backIcon} alt='back' />
           <Typography className={classes.backText}>Back to Liquidity Positions List</Typography>
         </Grid>
       </Link>
@@ -502,7 +502,7 @@ export const NewPosition: React.FC<INewPosition> = ({
             </Hidden>
           )}
           <Button onClick={handleClickSettings} className={classes.settingsIconBtn} disableRipple>
-            <img src={settingIcon} className={classes.settingsIcon} />
+            <img src={settingIcon} className={classes.settingsIcon} alt='settings' />
           </Button>
         </Grid>
       </Grid>

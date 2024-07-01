@@ -59,7 +59,7 @@ export const WrappedStats: React.FC = () => {
           <EmptyPlaceholder desc={'We have not started collecting statistics yet'} />
         </Grid>
       ) : isLoadingStats ? (
-        <img src={loader} className={classes.loading} />
+        <img src={loader} className={classes.loading} alt='Loading' />
       ) : liquidityPlotData.length === 0 ? (
         <Grid container direction='column' alignItems='center'>
           <EmptyPlaceholder desc={'We have not started collecting statistics yet'} />

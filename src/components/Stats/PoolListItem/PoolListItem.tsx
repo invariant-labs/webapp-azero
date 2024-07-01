@@ -75,8 +75,8 @@ const PoolListItem: React.FC<IProps> = ({
           <Grid className={classes.imageContainer}>
             {!isXs && (
               <Box className={classes.iconsWrapper}>
-                <img src={iconFrom} />
-                <img src={iconTo} />
+                <img src={iconFrom} alt='Token from' />
+                <img src={iconTo} alt='Token to' />
               </Box>
             )}
             <Grid className={classes.symbolsContainer}>

@@ -150,7 +150,7 @@ export const AmountInput: React.FC<IProps> = ({
             <Typography className={classes.BalanceTypography}>
               Balance:{' '}
               {isBalanceLoading ? (
-                <img src={loadingAnimation} className={classes.loadingBalance} />
+                <img src={loadingAnimation} className={classes.loadingBalance} alt='loading' />
               ) : (
                 formatNumber(balance || 0)
               )}{' '}
@@ -175,7 +175,7 @@ export const AmountInput: React.FC<IProps> = ({
           <Grid className={classes.percentages} container alignItems='center' wrap='nowrap'>
             {current ? (
               priceLoading ? (
-                <img src={loadingAnimation} className={classes.loading} />
+                <img src={loadingAnimation} className={classes.loading} alt='loading' />
               ) : tokenPrice ? (
                 <>
                   <Typography className={classes.caption2}>
