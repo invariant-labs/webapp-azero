@@ -95,8 +95,9 @@ export interface INewPosition {
   onSlippageChange: (slippage: string) => void
   initialSlippage: string
   poolKey: string
-  onRefresh: () => void
+  onRefresh: (val?: boolean) => void
   isBalanceLoading: boolean
+  shouldNotUpdatePriceRange: boolean
 }
 
 export const NewPosition: React.FC<INewPosition> = ({
@@ -145,7 +146,8 @@ export const NewPosition: React.FC<INewPosition> = ({
   poolKey,
   currentPriceSqrt,
   onRefresh,
-  isBalanceLoading
+  isBalanceLoading,
+  shouldNotUpdatePriceRange
 }) => {
   const { classes } = useStyles()
   const navigate = useNavigate()
@@ -428,7 +430,7 @@ export const NewPosition: React.FC<INewPosition> = ({
       if (refresherTime > 0 && poolKey !== '') {
         setRefresherTime(refresherTime - 1)
       } else {
-        onRefresh()
+        onRefresh(true)
         setRefresherTime(REFRESHER_INTERVAL)
       }
     }, 1000)
@@ -466,7 +468,7 @@ export const NewPosition: React.FC<INewPosition> = ({
               currentIndex={refresherTime}
               maxIndex={REFRESHER_INTERVAL}
               onClick={() => {
-                onRefresh()
+                onRefresh(true)
                 setRefresherTime(REFRESHER_INTERVAL)
               }}
             />
@@ -710,6 +712,7 @@ export const NewPosition: React.FC<INewPosition> = ({
             poolKey={poolKey}
             shouldReversePlot={shouldReversePlot}
             setShouldReversePlot={setShouldReversePlot}
+            shouldNotUpdatePriceRange={shouldNotUpdatePriceRange}
           />
         ) : (
           <PoolInit

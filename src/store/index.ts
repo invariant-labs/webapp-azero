@@ -33,13 +33,13 @@ const configureAppStore = (initialState = {}) => {
       }).concat(middleware),
     preloadedState: initialState,
     devTools: isLocalhost
-      ? false
-      : {
+      ? {
           serialize: {
             replacer: (_key, value) => (typeof value === 'bigint' ? value.toString() : value),
             options: true
           }
         }
+      : false
   })
 
   sagaMiddleware.run(rootSaga)

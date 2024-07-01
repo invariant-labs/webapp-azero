@@ -12,12 +12,16 @@ import {
   nearestTickIndex,
   toMaxNumericPlaces
 } from '@store/consts/utils'
-import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
+import {
+  PlotTickData,
+  TickPlotPositionData,
+  actions as positionsActions
+} from '@store/reducers/positions'
 import React, { useEffect, useRef, useState } from 'react'
 import ConcentrationSlider from '../ConcentrationSlider/ConcentrationSlider'
 import useStyles from './style'
 import { PositionOpeningMethod } from '@store/consts/types'
-
+import { useDispatch } from 'react-redux'
 export interface IRangeSelector {
   data: PlotTickData[]
   midPrice: TickPlotPositionData
@@ -53,6 +57,7 @@ export interface IRangeSelector {
   poolKey: string
   shouldReversePlot: boolean
   setShouldReversePlot: (val: boolean) => void
+  shouldNotUpdatePriceRange: boolean
 }
 
 export const RangeSelector: React.FC<IRangeSelector> = ({
@@ -81,8 +86,11 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   getTicksInsideRange,
   poolKey,
   shouldReversePlot,
-  setShouldReversePlot
+  setShouldReversePlot,
+  shouldNotUpdatePriceRange
 }) => {
+  const dispatch = useDispatch()
+
   const { classes } = useStyles()
 
   const [leftRange, setLeftRange] = useState(getMinTick(tickSpacing))
@@ -240,6 +248,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
       }
     }
   }, [shouldReversePlot])
+  const [triggerReset, setTriggerReset] = useState(false)
 
   useEffect(() => {
     if (
@@ -249,10 +258,28 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
       currentMidPrice !== midPrice &&
       !shouldReversePlot
     ) {
-      resetPlot()
-      setCurrentMidPrice(midPrice)
+      if (!shouldNotUpdatePriceRange) {
+        resetPlot()
+        setCurrentMidPrice(midPrice)
+      }
     }
-  }, [ticksLoading, isMountedRef, midPrice.index])
+  }, [triggerReset])
+
+  useEffect(() => {
+    if (
+      !ticksLoading &&
+      isMountedRef.current &&
+      poolKey !== '' &&
+      currentMidPrice !== midPrice &&
+      !shouldReversePlot
+    ) {
+      if (!shouldNotUpdatePriceRange) {
+        setTriggerReset(prev => !prev)
+      }
+
+      dispatch(positionsActions.setShouldNotUpdateRange(false))
+    }
+  }, [ticksLoading, isMountedRef, midPrice.index, poolKey])
 
   const autoZoomHandler = (left: bigint, right: bigint, canZoomCloser: boolean = false) => {
     const { leftInRange, rightInRange } = getTicksInsideRange(left, right, isXtoY)
