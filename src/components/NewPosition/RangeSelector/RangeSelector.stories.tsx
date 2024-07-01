@@ -35,7 +35,8 @@ export const Primary: Story = {
     yDecimal: 12 as any,
     poolKey: '',
     setShouldReversePlot: fn(),
-    shouldReversePlot: false
+    shouldReversePlot: false,
+    shouldNotUpdatePriceRange: false
   },
   render: args => {
     const [concentrationIndex, setConcentrationIndex] = useState(2)

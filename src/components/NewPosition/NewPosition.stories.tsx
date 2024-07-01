@@ -70,7 +70,8 @@ export const Primary: Story = {
       descCustomText: 'Cannot add any liquidity.'
     },
     onRefresh: fn(),
-    isBalanceLoading: false
+    isBalanceLoading: false,
+    shouldNotUpdatePriceRange: false
   },
   render: () => {
     return (
@@ -126,6 +127,7 @@ export const Primary: Story = {
         }}
         onRefresh={fn()}
         isBalanceLoading={false}
+        shouldNotUpdatePriceRange={false}
       />
     )
   }
