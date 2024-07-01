@@ -51,7 +51,7 @@ import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
 import { all, call, fork, join, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
 import { getConnection } from './connection'
-import { fetchTicksAndTickMaps } from './pools'
+import { fetchTicksAndTickMaps, fetchTokens } from './pools'
 import { fetchBalances } from './wallet'
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types'
 import { calculateTokenAmountsWithSlippage } from '@invariant-labs/a0-sdk/target/utils'
@@ -1051,6 +1051,16 @@ export function* handleGetPositionsListPage(
     entries = result[0]
     positionsLength = result[1]
 
+    const poolsWithPoolKeys = entries.map(entry => ({
+      poolKey: entry[0].poolKey,
+      ...entry[1]
+    }))
+
+    yield* put(
+      poolsActions.addPoolsForList({ data: poolsWithPoolKeys, listType: ListType.POSITIONS })
+    )
+    yield* call(fetchTokens, poolsWithPoolKeys)
+
     yield* put(actions.setPositionsListLength(positionsLength))
   }
 
@@ -1085,6 +1095,16 @@ export function* handleGetPositionsListPage(
       )
       entries = result[0]
       positionsLength = result[1]
+
+      const poolsWithPoolKeys = entries.map(entry => ({
+        poolKey: entry[0].poolKey,
+        ...entry[1]
+      }))
+
+      yield* put(
+        poolsActions.addPoolsForList({ data: poolsWithPoolKeys, listType: ListType.POSITIONS })
+      )
+      yield* call(fetchTokens, poolsWithPoolKeys)
     }
 
     for (let i = 0; i < entries.length; i++) {
