@@ -108,6 +108,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   const [isPlotDiscrete, setIsPlotDiscrete] = useState(initialIsDiscreteValue)
 
   const [currentMidPrice, setCurrentMidPrice] = useState(midPrice)
+  const [triggerReset, setTriggerReset] = useState(false)
 
   const isMountedRef = useRef(false)
 
@@ -242,13 +243,14 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   }, [currentPairReversed])
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setShouldReversePlot(false)
+    }, 600)
+
     return () => {
-      if (shouldReversePlot) {
-        setShouldReversePlot(false)
-      }
+      clearTimeout(timer)
     }
   }, [shouldReversePlot])
-  const [triggerReset, setTriggerReset] = useState(false)
 
   useEffect(() => {
     if (
