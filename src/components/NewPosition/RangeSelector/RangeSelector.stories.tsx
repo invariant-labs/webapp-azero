@@ -36,7 +36,8 @@ export const Primary: Story = {
     poolKey: '',
     setShouldReversePlot: fn(),
     shouldReversePlot: false,
-    shouldNotUpdatePriceRange: false
+    shouldNotUpdatePriceRange: false,
+    unblockUpdatePriceRange: fn()
   },
   render: args => {
     const [concentrationIndex, setConcentrationIndex] = useState(2)
