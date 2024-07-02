@@ -34,7 +34,7 @@ const TransactionDetailsBox: React.FC<IProps> = ({
         <Grid container justifyContent='space-between' className={classes.row}>
           <Typography className={classes.label}>Exchange rate:</Typography>
           {isLoadingRate ? (
-            <img src={loadingAnimation} className={classes.loading} />
+            <img src={loadingAnimation} className={classes.loading} alt='Loading' />
           ) : (
             <Typography className={classes.value}>
               {exchangeRate.val === Infinity

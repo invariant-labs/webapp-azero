@@ -63,7 +63,7 @@ const TokenListItem: React.FC<IProps> = ({
           style={hideBottomLine ? { border: 'none' } : undefined}>
           {!hideName && <Typography component='p'>{itemNumber}</Typography>}
           <Grid className={classes.tokenName}>
-            {!isXDown && <img src={icon}></img>}
+            {!isXDown && <img src={icon} alt='Token icon'></img>}
             <Typography>
               {hideName ? symbol : name}
               {!hideName && <span className={classes.tokenSymbol}>{` (${symbol})`}</span>}

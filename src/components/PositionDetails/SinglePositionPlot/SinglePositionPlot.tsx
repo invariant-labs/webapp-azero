@@ -147,7 +147,7 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
                     liquidity chart. Active liquidity is determined by the maximum price range
                     resulting from the statistical volume of swaps for the last 7 days.
                   </Typography>
-                  <img className={classes.liquidityImg} src={activeLiquidity} />
+                  <img className={classes.liquidityImg} src={activeLiquidity} alt='Liquidity' />
                 </Grid>
                 <Typography className={classes.liquidityNote}>
                   Note: active liquidity borders are always aligned to the nearest initialized

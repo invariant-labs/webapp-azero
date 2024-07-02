@@ -103,13 +103,15 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   bottomGrid: {
     background: colors.invariant.component,
     marginTop: 20,
-    padding: 8,
-    paddingTop: 16,
+    padding: 24,
     borderRadius: 24,
     flexGrow: 1,
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    [theme.breakpoints.down('sm')]: {
+      padding: '16px 8px  16px 8px '
+    }
   },
   iconSmall: {
     width: 20,

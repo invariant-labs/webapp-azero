@@ -429,10 +429,10 @@ export const Swap: React.FC<ISwap> = ({
               tokenFromIndex === null ||
               tokenToIndex === null
             }>
-            <img src={refreshIcon} className={classes.refreshIcon} />
+            <img src={refreshIcon} className={classes.refreshIcon} alt='Refresh' />
           </Button>
           <Button onClick={handleClickSettings} className={classes.settingsIconBtn}>
-            <img src={settingIcon} className={classes.settingsIcon} />
+            <img src={settingIcon} className={classes.settingsIcon} alt='Settings' />
           </Button>
         </Box>
         <Grid className={classes.slippage}>
@@ -522,6 +522,7 @@ export const Swap: React.FC<ISwap> = ({
                   transform: `rotate(${-rotates * 180}deg)`
                 }}
                 className={classes.swapArrows}
+                alt='Invert tokens'
               />
             </Box>
           </Box>

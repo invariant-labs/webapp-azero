@@ -17,7 +17,6 @@ import React, { useEffect, useRef, useState } from 'react'
 import ConcentrationSlider from '../ConcentrationSlider/ConcentrationSlider'
 import useStyles from './style'
 import { PositionOpeningMethod } from '@store/consts/types'
-
 export interface IRangeSelector {
   data: PlotTickData[]
   midPrice: TickPlotPositionData
@@ -53,6 +52,8 @@ export interface IRangeSelector {
   poolKey: string
   shouldReversePlot: boolean
   setShouldReversePlot: (val: boolean) => void
+  shouldNotUpdatePriceRange: boolean
+  unblockUpdatePriceRange: () => void
 }
 
 export const RangeSelector: React.FC<IRangeSelector> = ({
@@ -81,7 +82,9 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   getTicksInsideRange,
   poolKey,
   shouldReversePlot,
-  setShouldReversePlot
+  setShouldReversePlot,
+  shouldNotUpdatePriceRange,
+  unblockUpdatePriceRange
 }) => {
   const { classes } = useStyles()
 
@@ -100,6 +103,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   const [isPlotDiscrete, setIsPlotDiscrete] = useState(initialIsDiscreteValue)
 
   const [currentMidPrice, setCurrentMidPrice] = useState(midPrice)
+  const [triggerReset, setTriggerReset] = useState(false)
 
   const isMountedRef = useRef(false)
 
@@ -234,10 +238,12 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   }, [currentPairReversed])
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setShouldReversePlot(false)
+    }, 600)
+
     return () => {
-      if (shouldReversePlot) {
-        setShouldReversePlot(false)
-      }
+      clearTimeout(timer)
     }
   }, [shouldReversePlot])
 
@@ -249,10 +255,28 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
       currentMidPrice !== midPrice &&
       !shouldReversePlot
     ) {
-      resetPlot()
-      setCurrentMidPrice(midPrice)
+      if (!shouldNotUpdatePriceRange) {
+        resetPlot()
+        setCurrentMidPrice(midPrice)
+      }
     }
-  }, [ticksLoading, isMountedRef, midPrice.index])
+  }, [triggerReset])
+
+  useEffect(() => {
+    if (
+      !ticksLoading &&
+      isMountedRef.current &&
+      poolKey !== '' &&
+      currentMidPrice !== midPrice &&
+      !shouldReversePlot
+    ) {
+      if (!shouldNotUpdatePriceRange) {
+        setTriggerReset(prev => !prev)
+      }
+
+      unblockUpdatePriceRange()
+    }
+  }, [ticksLoading, isMountedRef, midPrice.index, poolKey])
 
   const autoZoomHandler = (left: bigint, right: bigint, canZoomCloser: boolean = false) => {
     const { leftInRange, rightInRange } = getTicksInsideRange(left, right, isXtoY)
@@ -370,7 +394,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
                     liquidity chart. Active liquidity is determined by the maximum price range
                     resulting from the statistical volume of swaps for the last 7 days.
                   </Typography>
-                  <img className={classes.liquidityImg} src={activeLiquidity} />
+                  <img className={classes.liquidityImg} src={activeLiquidity} alt='Liquidity' />
                 </Grid>
                 <Typography className={classes.liquidityNote}>
                   Note: active liquidity borders are always aligned to the nearest initialized
@@ -547,7 +571,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
         <Grid className={classes.blocker}>
           {blockerInfo === 'Loading pool info...' ? (
             <Grid container style={{ height: '100%' }}>
-              <img src={loader} className={classes.loader} />
+              <img src={loader} className={classes.loader} alt='Loader' />
             </Grid>
           ) : (
             <Typography className={classes.blockedInfo}>{blockerInfo}</Typography>
