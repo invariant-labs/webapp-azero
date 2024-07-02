@@ -97,6 +97,8 @@ export interface INewPosition {
   poolKey: string
   onRefresh: () => void
   isBalanceLoading: boolean
+  shouldNotUpdatePriceRange: boolean
+  unblockUpdatePriceRange: () => void
 }
 
 export const NewPosition: React.FC<INewPosition> = ({
@@ -145,7 +147,9 @@ export const NewPosition: React.FC<INewPosition> = ({
   poolKey,
   currentPriceSqrt,
   onRefresh,
-  isBalanceLoading
+  isBalanceLoading,
+  shouldNotUpdatePriceRange,
+  unblockUpdatePriceRange
 }) => {
   const { classes } = useStyles()
   const navigate = useNavigate()
@@ -710,6 +714,8 @@ export const NewPosition: React.FC<INewPosition> = ({
             poolKey={poolKey}
             shouldReversePlot={shouldReversePlot}
             setShouldReversePlot={setShouldReversePlot}
+            shouldNotUpdatePriceRange={shouldNotUpdatePriceRange}
+            unblockUpdatePriceRange={unblockUpdatePriceRange}
           />
         ) : (
           <PoolInit
