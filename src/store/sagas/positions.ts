@@ -828,6 +828,17 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
     )
     const adapter = yield* call(getAlephZeroWallet)
 
+    const allPositions = yield* select(positionsList)
+    const getPositionsListPagePayload: PayloadAction<{ index: number; refresh: boolean }> = {
+      type: actions.getPositionsListPage.type,
+      payload: {
+        index: Math.floor(Number(allPositions.length) / POSITIONS_PER_QUERY),
+        refresh: false
+      }
+    }
+    const fetchTask = yield* fork(handleGetPositionsListPage, getPositionsListPagePayload)
+    yield* join(fetchTask)
+
     const tx = invariant.removePositionTx(positionIndex, INVARIANT_REMOVE_POSITION_OPTIONS)
 
     yield put(
@@ -924,6 +935,17 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
     )
     const psp22 = yield* call([psp22Singleton, psp22Singleton.loadInstance], api, network)
     const adapter = yield* call(getAlephZeroWallet)
+
+    const allPositions = yield* select(positionsList)
+    const getPositionsListPagePayload: PayloadAction<{ index: number; refresh: boolean }> = {
+      type: actions.getPositionsListPage.type,
+      payload: {
+        index: Math.floor(Number(allPositions.length) / POSITIONS_PER_QUERY),
+        refresh: false
+      }
+    }
+    const fetchTask = yield* fork(handleGetPositionsListPage, getPositionsListPagePayload)
+    yield* join(fetchTask)
 
     const txs = []
 
@@ -1070,7 +1092,7 @@ export function* handleGetPositionsListPage(
     poolKey: {
       tokenX: TESTNET_BTC_ADDRESS,
       tokenY: TESTNET_ETH_ADDRESS,
-      feeTier: { fee: 0n, tickSpacing: 0n }
+      feeTier: { fee: 0n, tickSpacing: 1n }
     },
     liquidity: 0n,
     lowerTickIndex: 0n,
