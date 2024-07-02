@@ -33,7 +33,7 @@ import {
   poolsArraySortedByFees,
   isLoadingPoolKeys
 } from '@store/selectors/pools'
-import { initPosition, plotTicks } from '@store/selectors/positions'
+import { initPosition, plotTicks, shouldNotUpdateRange } from '@store/selectors/positions'
 import { address, balanceLoading, status, swapTokens } from '@store/selectors/wallet'
 import { openWalletSelectorModal } from '@utils/web3/selector'
 import { VariantType } from 'notistack'
@@ -61,6 +61,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const loadingTicksAndTickMaps = useSelector(isLoadingTicksAndTickMaps)
   const isBalanceLoading = useSelector(balanceLoading)
   const loadingPoolKeys = useSelector(isLoadingPoolKeys)
+  const shouldNotUpdatePriceRange = useSelector(shouldNotUpdateRange)
 
   const { success, inProgress } = useSelector(initPosition)
   const { data: ticksData, loading: ticksLoading, hasError: hasTicksError } = useSelector(plotTicks)
@@ -490,7 +491,12 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     return BigInt(0)
   }
 
+  const unblockUpdatePriceRange = () => {
+    dispatch(positionsActions.setShouldNotUpdateRange(false))
+  }
   const onRefresh = () => {
+    dispatch(positionsActions.setShouldNotUpdateRange(true))
+
     if (tokenAIndex !== null && tokenBIndex !== null) {
       dispatch(
         walletActions.getBalances([
@@ -657,7 +663,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         if (tokenAIndex === null || tokenBIndex === null) {
           return
         }
-
+        dispatch(positionsActions.setShouldNotUpdateRange(true))
         if (progress === 'none') {
           setProgress('progress')
         }
@@ -693,6 +699,8 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       poolKey={poolKey}
       onRefresh={onRefresh}
       isBalanceLoading={isBalanceLoading}
+      shouldNotUpdatePriceRange={shouldNotUpdatePriceRange}
+      unblockUpdatePriceRange={unblockUpdatePriceRange}
     />
   )
 }

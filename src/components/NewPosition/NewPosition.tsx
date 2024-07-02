@@ -97,6 +97,8 @@ export interface INewPosition {
   poolKey: string
   onRefresh: () => void
   isBalanceLoading: boolean
+  shouldNotUpdatePriceRange: boolean
+  unblockUpdatePriceRange: () => void
 }
 
 export const NewPosition: React.FC<INewPosition> = ({
@@ -145,7 +147,9 @@ export const NewPosition: React.FC<INewPosition> = ({
   poolKey,
   currentPriceSqrt,
   onRefresh,
-  isBalanceLoading
+  isBalanceLoading,
+  shouldNotUpdatePriceRange,
+  unblockUpdatePriceRange
 }) => {
   const { classes } = useStyles()
   const navigate = useNavigate()
@@ -449,7 +453,7 @@ export const NewPosition: React.FC<INewPosition> = ({
     <Grid container className={classes.wrapper} direction='column'>
       <Link to='/pool' style={{ textDecoration: 'none', maxWidth: 'fit-content' }}>
         <Grid className={classes.back} container item alignItems='center'>
-          <img className={classes.backIcon} src={backIcon} />
+          <img className={classes.backIcon} src={backIcon} alt='back' />
           <Typography className={classes.backText}>Back to Liquidity Positions List</Typography>
         </Grid>
       </Link>
@@ -502,7 +506,7 @@ export const NewPosition: React.FC<INewPosition> = ({
             </Hidden>
           )}
           <Button onClick={handleClickSettings} className={classes.settingsIconBtn} disableRipple>
-            <img src={settingIcon} className={classes.settingsIcon} />
+            <img src={settingIcon} className={classes.settingsIcon} alt='settings' />
           </Button>
         </Grid>
       </Grid>
@@ -710,6 +714,8 @@ export const NewPosition: React.FC<INewPosition> = ({
             poolKey={poolKey}
             shouldReversePlot={shouldReversePlot}
             setShouldReversePlot={setShouldReversePlot}
+            shouldNotUpdatePriceRange={shouldNotUpdatePriceRange}
+            unblockUpdatePriceRange={unblockUpdatePriceRange}
           />
         ) : (
           <PoolInit

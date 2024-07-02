@@ -35,6 +35,7 @@ export interface IPositionsStore {
   positionsList: PositionsListStore
   currentPositionTicks: CurrentPositionTicksStore
   initPosition: InitPositionStore
+  shouldNotUpdateRange: boolean
 }
 export interface InitPositionData {
   poolKeyData: PoolKey
@@ -97,7 +98,8 @@ export const defaultState: IPositionsStore = {
   initPosition: {
     inProgress: false,
     success: false
-  }
+  },
+  shouldNotUpdateRange: false
 }
 
 export const positionsSliceName = 'positions'
@@ -170,6 +172,10 @@ const positionsSlice = createSlice({
     },
     resetState(state) {
       state = defaultState
+      return state
+    },
+    setShouldNotUpdateRange(state, action: PayloadAction<boolean>) {
+      state.shouldNotUpdateRange = action.payload
       return state
     }
   }

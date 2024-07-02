@@ -45,10 +45,10 @@ const AnimatedButton: React.FC<Props> = ({
     }
 
     if (progress === 'success') {
-      return <img className={classes.gifContent} src={successGif} />
+      return <img className={classes.gifContent} src={successGif} alt='success' />
     }
 
-    return <img className={classes.gifContent} src={errorGif} />
+    return <img className={classes.gifContent} src={errorGif} alt='error' />
   }
 
   const getClasses = () => {
@@ -84,7 +84,10 @@ const AnimatedButton: React.FC<Props> = ({
       progress === 'approvedWithSuccess' ||
       progress === 'approvedWithFail' ||
       content === 'Loading' ? (
-        <img src={loadingAnimation} style={{ height: 25, width: 25, zIndex: 10 }}></img>
+        <img
+          src={loadingAnimation}
+          style={{ height: 25, width: 25, zIndex: 10 }}
+          alt='loading'></img>
       ) : (
         getMessage()
       )}

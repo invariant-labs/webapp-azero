@@ -20,7 +20,7 @@ export const EmptyPlaceholder: React.FC<IEmptyPlaceholder> = ({ desc, className,
       alignItems='center'
       className={classNames(classes.wrapper, className)}
       style={style}>
-      <img src={empty} className={classes.image} />
+      <img src={empty} className={classes.image} alt='empty' />
       <Typography className={classes.title}>It's empty here...</Typography>
       <Typography className={classes.desc}>{desc}</Typography>
     </Grid>

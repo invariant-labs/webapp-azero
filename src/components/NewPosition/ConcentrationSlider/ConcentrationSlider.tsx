@@ -16,7 +16,7 @@ function ThumbComponent(props: ThumbComponentProps) {
   const { classes } = useThumbStyles()
   const { children, ...other } = props
   return (
-    <SliderThumb {...other}>
+    <SliderThumb {...other} aria-label='slider thumb'>
       {children}
       <Grid className={classes.outerCircle}>
         <Grid className={classes.innerCircle} />

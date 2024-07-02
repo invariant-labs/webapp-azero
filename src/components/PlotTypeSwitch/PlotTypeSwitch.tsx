@@ -33,7 +33,7 @@ export const PlotTypeSwitch: React.FC<IPlotTypeSwitch> = ({ onSwitch, initialVal
         disableRipple
         label={
           <div>
-            <img src={Continuous} className={classes.continuous} />
+            <img src={Continuous} className={classes.continuous} alt='Continuous' />
           </div>
         }
         classes={singleTabClasses}
@@ -42,7 +42,7 @@ export const PlotTypeSwitch: React.FC<IPlotTypeSwitch> = ({ onSwitch, initialVal
         disableRipple
         label={
           <div>
-            <img src={Discrete} className={classes.discrete} />
+            <img src={Discrete} className={classes.discrete} alt='Discrete' />
           </div>
         }
         classes={singleTabClasses}

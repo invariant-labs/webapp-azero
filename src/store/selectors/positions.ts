@@ -10,14 +10,21 @@ import { Token } from '@store/consts/types'
 
 const store = (s: AnyProps) => s[positionsSliceName] as IPositionsStore
 
-export const { lastPage, positionsList, plotTicks, currentPositionTicks, initPosition } =
-  keySelectors(store, [
-    'lastPage',
-    'positionsList',
-    'plotTicks',
-    'currentPositionTicks',
-    'initPosition'
-  ])
+export const {
+  lastPage,
+  positionsList,
+  plotTicks,
+  currentPositionTicks,
+  initPosition,
+  shouldNotUpdateRange
+} = keySelectors(store, [
+  'lastPage',
+  'positionsList',
+  'plotTicks',
+  'currentPositionTicks',
+  'initPosition',
+  'shouldNotUpdateRange'
+])
 
 export const lastPageSelector = createSelector(lastPage, s => s)
 
@@ -75,7 +82,8 @@ export const positionsSelectors = {
   positionsList,
   plotTicks,
   currentPositionTicks,
-  initPosition
+  initPosition,
+  shouldNotUpdateRange
 }
 
 export default positionsSelectors
