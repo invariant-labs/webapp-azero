@@ -491,10 +491,11 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     return BigInt(0)
   }
 
-  const onRefresh = (shouldNotResetRange?: boolean) => {
-    if (shouldNotResetRange) {
-      dispatch(positionsActions.setShouldNotUpdateRange(true))
-    }
+  const unblockUpdatePriceRange = () => {
+    dispatch(positionsActions.setShouldNotUpdateRange(false))
+  }
+  const onRefresh = () => {
+    dispatch(positionsActions.setShouldNotUpdateRange(true))
 
     if (tokenAIndex !== null && tokenBIndex !== null) {
       dispatch(
@@ -662,7 +663,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         if (tokenAIndex === null || tokenBIndex === null) {
           return
         }
-
+        dispatch(positionsActions.setShouldNotUpdateRange(true))
         if (progress === 'none') {
           setProgress('progress')
         }
@@ -699,6 +700,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       onRefresh={onRefresh}
       isBalanceLoading={isBalanceLoading}
       shouldNotUpdatePriceRange={shouldNotUpdatePriceRange}
+      unblockUpdatePriceRange={unblockUpdatePriceRange}
     />
   )
 }
