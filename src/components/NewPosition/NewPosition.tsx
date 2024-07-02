@@ -429,9 +429,9 @@ export const NewPosition: React.FC<INewPosition> = ({
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      if (refresherTime > 0 && poolKey !== '') {
+      if (refresherTime > 0 && isCurrentPoolExisting) {
         setRefresherTime(refresherTime - 1)
-      } else {
+      } else if (isCurrentPoolExisting) {
         onRefresh()
         setRefresherTime(REFRESHER_INTERVAL)
       }
