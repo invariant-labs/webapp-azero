@@ -530,7 +530,7 @@ export const calculateSqrtPriceFromBalance = (
     Number(yDecimal)
   )
 
-  const price = convertBalanceToBigint(primaryUnitsPrice.toFixed(20), SQRT_PRICE_SCALE)
+  const price = convertBalanceToBigint(primaryUnitsPrice.toFixed(24), SQRT_PRICE_SCALE)
   const sqrtPrice = priceToSqrtPrice(price)
 
   const minSqrtPrice = calculateSqrtPrice(minTick)

@@ -13,7 +13,7 @@ import {
 } from '@store/consts/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import useStyles from './style'
-import { Price, calculateSqrtPrice, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
+import { getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
 export interface IPoolInit {
   tokenASymbol: string
   tokenBSymbol: string
@@ -23,7 +23,7 @@ export interface IPoolInit {
   yDecimal: bigint
   tickSpacing: bigint
   midPrice: bigint
-  onChangeMidPrice: (tickIndex: Price, sqrtPrice: bigint) => void
+  onChangeMidPrice: (tickIndex: bigint, sqrtPrice: bigint) => void
   currentPairReversed: boolean | null
 }
 
