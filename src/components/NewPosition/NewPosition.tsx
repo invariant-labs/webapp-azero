@@ -484,30 +484,26 @@ export const NewPosition: React.FC<INewPosition> = ({
               copyPoolAddressHandler={copyPoolAddressHandler}
             />
           ) : null}
+          <Hidden mdDown>
+            <ConcentrationTypeSwitch
+              onSwitch={val => {
+                if (val) {
+                  setPositionOpeningMethod('concentration')
+                  onPositionOpeningMethodChange('concentration')
+                } else {
+                  setPositionOpeningMethod('range')
+                  onPositionOpeningMethodChange('range')
+                }
+              }}
+              className={classes.switch}
+              currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
+            />
+          </Hidden>
           {poolKey !== '' && (
-            <Hidden mdDown>
-              <ConcentrationTypeSwitch
-                onSwitch={val => {
-                  if (val) {
-                    setPositionOpeningMethod('concentration')
-                    onPositionOpeningMethodChange('concentration')
-                  } else {
-                    setPositionOpeningMethod('range')
-                    onPositionOpeningMethodChange('range')
-                  }
-                }}
-                className={classes.switch}
-                style={{
-                  opacity: poolKey ? 1 : 0
-                }}
-                disabled={poolKey === ''}
-                currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
-              />
-            </Hidden>
+            <Button onClick={handleClickSettings} className={classes.settingsIconBtn} disableRipple>
+              <img src={settingIcon} className={classes.settingsIcon} alt='settings' />
+            </Button>
           )}
-          <Button onClick={handleClickSettings} className={classes.settingsIconBtn} disableRipple>
-            <img src={settingIcon} className={classes.settingsIcon} alt='settings' />
-          </Button>
         </Grid>
       </Grid>
 
@@ -659,10 +655,6 @@ export const NewPosition: React.FC<INewPosition> = ({
                 }
               }}
               className={classes.switch}
-              style={{
-                opacity: poolKey ? 1 : 0
-              }}
-              disabled={poolKey === ''}
               currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
             />
           </Grid>
@@ -733,6 +725,11 @@ export const NewPosition: React.FC<INewPosition> = ({
             midPrice={midPrice.index}
             onChangeMidPrice={onChangeMidPrice}
             currentPairReversed={currentPairReversed}
+            positionOpeningMethod={positionOpeningMethod}
+            concentrationArray={concentrationArray}
+            concentrationIndex={concentrationIndex}
+            setConcentrationIndex={setConcentrationIndex}
+            minimumSliderIndex={minimumSliderIndex}
           />
         )}
       </Grid>
