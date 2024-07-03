@@ -13,7 +13,7 @@ import {
 } from '@store/consts/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import useStyles from './style'
-import { Price, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
+import { Price, calculateSqrtPrice, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
 export interface IPoolInit {
   tokenASymbol: string
   tokenBSymbol: string
@@ -62,7 +62,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
   )
 
   useEffect(() => {
-    const midSqrtPrice = calculateSqrtPriceFromBalance(
+    const sqrtPrice = calculateSqrtPriceFromBalance(
       +midPriceInput,
       tickSpacing,
       isXtoY,
@@ -78,7 +78,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
       yDecimal
     )
 
-    onChangeMidPrice(BigInt(tickIndex), midSqrtPrice)
+    onChangeMidPrice(BigInt(tickIndex), sqrtPrice)
   }, [midPriceInput])
 
   const setLeftInputValues = (val: string) => {

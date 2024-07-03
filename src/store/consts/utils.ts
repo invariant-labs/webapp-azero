@@ -533,7 +533,17 @@ export const calculateSqrtPriceFromBalance = (
   const price = convertBalanceToBigint(primaryUnitsPrice.toFixed(20), SQRT_PRICE_SCALE)
   const sqrtPrice = priceToSqrtPrice(price)
 
-  return sqrtPrice
+  const minSqrtPrice = calculateSqrtPrice(minTick)
+  const maxSqrtPrice = calculateSqrtPrice(maxTick)
+
+  let validatedSqrtPrice = sqrtPrice
+  if (sqrtPrice < minSqrtPrice) {
+    validatedSqrtPrice = minSqrtPrice
+  } else if (sqrtPrice > maxSqrtPrice) {
+    validatedSqrtPrice = maxSqrtPrice
+  }
+
+  return validatedSqrtPrice
 }
 
 export const calculateTickFromBalance = (
