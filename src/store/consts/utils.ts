@@ -17,12 +17,16 @@ import {
   PERCENTAGE_DENOMINATOR,
   PERCENTAGE_SCALE,
   PRICE_SCALE,
+  SQRT_PRICE_SCALE,
   TESTNET_BTC_ADDRESS,
   TESTNET_ETH_ADDRESS,
   TESTNET_USDC_ADDRESS,
   TESTNET_WAZERO_ADDRESS
 } from '@invariant-labs/a0-sdk/target/consts'
-import { calculateLiquidityBreakpoints } from '@invariant-labs/a0-sdk/target/utils'
+import {
+  calculateLiquidityBreakpoints,
+  priceToSqrtPrice
+} from '@invariant-labs/a0-sdk/target/utils'
 import { ApiPromise, Keyring } from '@polkadot/api'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
@@ -502,6 +506,34 @@ export const nearestSpacingMultiplicity = (centerTick: number, spacing: number) 
     Math.min(nearestTick, Number(getMaxTick(BigInt(spacing)))),
     Number(getMinTick(BigInt(spacing)))
   )
+}
+
+export const calculateSqrtPriceFromBalance = (
+  balance: number,
+  spacing: bigint,
+  isXtoY: boolean,
+  xDecimal: bigint,
+  yDecimal: bigint
+) => {
+  const minTick = getMinTick(spacing)
+  const maxTick = getMaxTick(spacing)
+
+  const basePrice = Math.max(
+    balance,
+    Number(calcPrice(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
+  )
+
+  const primaryUnitsPrice = getPrimaryUnitsPrice(
+    basePrice,
+    isXtoY,
+    Number(xDecimal),
+    Number(yDecimal)
+  )
+
+  const price = convertBalanceToBigint(primaryUnitsPrice.toFixed(20), SQRT_PRICE_SCALE)
+  const sqrtPrice = priceToSqrtPrice(price)
+
+  return sqrtPrice
 }
 
 export const calculateTickFromBalance = (

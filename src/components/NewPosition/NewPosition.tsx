@@ -17,7 +17,7 @@ import {
   printBigint,
   trimLeadingZeros
 } from '@store/consts/utils'
-import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
+import { PlotTickData, InitMidPrice } from '@store/reducers/positions'
 import { SwapToken } from '@store/selectors/wallet'
 import { blurContent, unblurContent } from '@utils/uiUtils'
 import { VariantType } from 'notistack'
@@ -39,8 +39,8 @@ export interface INewPosition {
   copyPoolAddressHandler: (message: string, variant: VariantType) => void
   tokens: SwapToken[]
   data: PlotTickData[]
-  midPrice: TickPlotPositionData
-  setMidPrice: (mid: TickPlotPositionData) => void
+  midPrice: InitMidPrice
+  setMidPrice: (mid: InitMidPrice) => void
   addLiquidityHandler: (
     leftTickIndex: bigint,
     rightTickIndex: bigint,
@@ -299,12 +299,14 @@ export const NewPosition: React.FC<INewPosition> = ({
     }
   }
 
-  const onChangeMidPrice = (mid: bigint) => {
+  const onChangeMidPrice = (tickIndex: bigint, sqrtPrice: bigint) => {
     setMidPrice({
-      index: mid,
-      x: calcPrice(mid, isXtoY, xDecimal, yDecimal)
+      index: tickIndex,
+      x: calcPrice(tickIndex, isXtoY, xDecimal, yDecimal),
+      sqrtPrice: sqrtPrice
     })
-    if (tokenAIndex !== null && (isXtoY ? rightRange > mid : rightRange < mid)) {
+
+    if (tokenAIndex !== null && (isXtoY ? rightRange > tickIndex : rightRange < tickIndex)) {
       const deposit = tokenADeposit
       const amount = getOtherTokenAmount(
         convertBalanceToBigint(deposit, Number(tokens[tokenAIndex].decimals)),
@@ -318,7 +320,7 @@ export const NewPosition: React.FC<INewPosition> = ({
         return
       }
     }
-    if (tokenBIndex !== null && (isXtoY ? leftRange < mid : leftRange > mid)) {
+    if (tokenBIndex !== null && (isXtoY ? leftRange < tickIndex : leftRange > tickIndex)) {
       const deposit = tokenBDeposit
       const amount = getOtherTokenAmount(
         convertBalanceToBigint(deposit, Number(tokens[tokenBIndex].decimals)),

@@ -21,7 +21,7 @@ import {
   printBigint
 } from '@store/consts/utils'
 import { actions as poolsActions } from '@store/reducers/pools'
-import { TickPlotPositionData, actions as positionsActions } from '@store/reducers/positions'
+import { InitMidPrice, actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Status, actions as walletActions } from '@store/reducers/wallet'
 import { networkType, rpcAddress } from '@store/selectors/connection'
@@ -184,9 +184,10 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     [feeIndex]
   )
 
-  const [midPrice, setMidPrice] = useState<TickPlotPositionData>({
+  const [midPrice, setMidPrice] = useState<InitMidPrice>({
     index: 0n,
-    x: 1
+    x: 1,
+    sqrtPrice: 0n
   })
 
   const isWaitingForNewPool = useMemo(() => {
@@ -259,7 +260,8 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         index: poolsData[poolKey].currentTickIndex,
         x:
           calcYPerXPriceBySqrtPrice(poolsData[poolKey].sqrtPrice, xDecimal, yDecimal) **
-          (isXtoY ? 1 : -1)
+          (isXtoY ? 1 : -1),
+        sqrtPrice: poolsData[poolKey].sqrtPrice
       })
     }
   }, [poolKey, isXtoY, xDecimal, yDecimal, poolsData])
@@ -268,7 +270,8 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     if (poolKey === '') {
       setMidPrice({
         index: 0n,
-        x: calcPrice(0n, isXtoY, xDecimal, yDecimal)
+        x: calcPrice(0n, isXtoY, xDecimal, yDecimal),
+        sqrtPrice: 0n
       })
     }
   }, [poolIndex, isXtoY, xDecimal, yDecimal, poolKey])
@@ -449,7 +452,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
           amount,
           lowerTick,
           upperTick,
-          poolsData[poolKey] ? poolsData[poolKey].sqrtPrice : calculateSqrtPrice(midPrice.index),
+          poolsData[poolKey] ? poolsData[poolKey].sqrtPrice : midPrice.sqrtPrice,
           true
         )
 
@@ -464,7 +467,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         amount,
         lowerTick,
         upperTick,
-        poolsData[poolKey] ? poolsData[poolKey].sqrtPrice : calculateSqrtPrice(midPrice.index),
+        poolsData[poolKey] ? poolsData[poolKey].sqrtPrice : midPrice.sqrtPrice,
         true
       )
 
@@ -478,7 +481,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         amount,
         lowerTick,
         upperTick,
-        poolsData[poolKey] ? poolsData[poolKey].sqrtPrice : calculateSqrtPrice(midPrice.index),
+        poolsData[poolKey] ? poolsData[poolKey].sqrtPrice : midPrice.sqrtPrice,
         true
       )
       if (isMountedRef.current) {

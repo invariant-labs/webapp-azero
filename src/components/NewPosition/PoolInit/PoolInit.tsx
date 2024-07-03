@@ -4,6 +4,7 @@ import SimpleInput from '@components/Inputs/SimpleInput/SimpleInput'
 import { Button, Grid, Typography } from '@mui/material'
 import {
   calcPrice,
+  calculateSqrtPriceFromBalance,
   calculateTickFromBalance,
   formatNumbers,
   nearestTickIndex,
@@ -13,7 +14,6 @@ import {
 import React, { useEffect, useMemo, useState } from 'react'
 import useStyles from './style'
 import { Price, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
-
 export interface IPoolInit {
   tokenASymbol: string
   tokenBSymbol: string
@@ -23,7 +23,7 @@ export interface IPoolInit {
   yDecimal: bigint
   tickSpacing: bigint
   midPrice: bigint
-  onChangeMidPrice: (mid: Price) => void
+  onChangeMidPrice: (tickIndex: Price, sqrtPrice: bigint) => void
   currentPairReversed: boolean | null
 }
 
@@ -40,6 +40,9 @@ export const PoolInit: React.FC<IPoolInit> = ({
   currentPairReversed
 }) => {
   const { classes } = useStyles()
+
+  const minTick = getMinTick(tickSpacing)
+  const maxTick = getMaxTick(tickSpacing)
 
   const [leftRange, setLeftRange] = useState(tickSpacing * 10n * (isXtoY ? -1n : 1n))
   const [rightRange, setRightRange] = useState(tickSpacing * 10n * (isXtoY ? 1n : -1n))
@@ -59,6 +62,14 @@ export const PoolInit: React.FC<IPoolInit> = ({
   )
 
   useEffect(() => {
+    const midSqrtPrice = calculateSqrtPriceFromBalance(
+      +midPriceInput,
+      tickSpacing,
+      isXtoY,
+      xDecimal,
+      yDecimal
+    )
+
     const tickIndex = calculateTickFromBalance(
       +midPriceInput,
       tickSpacing,
@@ -67,7 +78,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
       yDecimal
     )
 
-    onChangeMidPrice(BigInt(tickIndex))
+    onChangeMidPrice(BigInt(tickIndex), midSqrtPrice)
   }, [midPriceInput])
 
   const setLeftInputValues = (val: string) => {
@@ -122,7 +133,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
       : calcPrice(minTick, isXtoY, xDecimal, yDecimal)
     const numericMidPriceInput = parseFloat(midPriceInput)
     const validatedMidPrice = Math.min(Math.max(numericMidPriceInput, minPrice), maxPrice)
-    return toMaxNumericPlaces(validatedMidPrice, 5)
+    return toMaxNumericPlaces(validatedMidPrice, 9)
   }
 
   useEffect(() => {
@@ -135,7 +146,11 @@ export const PoolInit: React.FC<IPoolInit> = ({
   }, [currentPairReversed])
 
   const price = useMemo(
-    () => calcPrice(midPrice, isXtoY, xDecimal, yDecimal),
+    () =>
+      Math.max(
+        +midPriceInput,
+        Number(calcPrice(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
+      ),
     [midPrice, isXtoY, xDecimal, yDecimal]
   )
 

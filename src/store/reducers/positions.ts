@@ -13,6 +13,9 @@ export interface PlotTickData {
 }
 
 export type TickPlotPositionData = Omit<PlotTickData, 'y'>
+
+export type InitMidPrice = TickPlotPositionData & { sqrtPrice: bigint }
+
 export interface PlotTicks {
   data: PlotTickData[]
   loading: boolean
