@@ -7,13 +7,15 @@ export interface IPaginationList {
   defaultPage: number
   handleChangePage: (page: number) => void
   variant: string
+  page?: number
 }
 
 export const PaginationList: React.FC<IPaginationList> = ({
   pages,
   defaultPage,
   handleChangePage,
-  variant
+  variant,
+  page
 }) => {
   const { classes } = useStyles()
   const position = useMediaQuery(theme.breakpoints.down('sm'))
@@ -27,6 +29,7 @@ export const PaginationList: React.FC<IPaginationList> = ({
         defaultPage={defaultPage}
         onChange={(_e, page) => handleChangePage(page)}
         siblingCount={matches ? 0 : 1}
+        page={page}
       />
     </div>
   )

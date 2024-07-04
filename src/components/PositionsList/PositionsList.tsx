@@ -157,6 +157,7 @@ export const PositionsList: React.FC<IProps> = ({
           defaultPage={defaultPage}
           handleChangePage={handleChangePagination}
           variant='end'
+          page={page}
         />
       ) : null}
     </Grid>
