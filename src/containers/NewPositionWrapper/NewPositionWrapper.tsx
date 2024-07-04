@@ -30,8 +30,7 @@ import {
   isLoadingTicksAndTickMaps,
   poolKeys,
   pools,
-  poolsArraySortedByFees,
-  isLoadingPoolKeys
+  poolsArraySortedByFees
 } from '@store/selectors/pools'
 import { initPosition, plotTicks, shouldNotUpdateRange } from '@store/selectors/positions'
 import { address, balanceLoading, status, swapTokens } from '@store/selectors/wallet'
@@ -60,7 +59,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const poolsData = useSelector(pools)
   const loadingTicksAndTickMaps = useSelector(isLoadingTicksAndTickMaps)
   const isBalanceLoading = useSelector(balanceLoading)
-  const loadingPoolKeys = useSelector(isLoadingPoolKeys)
   const shouldNotUpdatePriceRange = useSelector(shouldNotUpdateRange)
 
   const { success, inProgress } = useSelector(initPosition)
@@ -196,8 +194,8 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       return false
     }
 
-    return isFetchingNewPool || loadingPoolKeys
-  }, [isFetchingNewPool, poolKey, loadingPoolKeys])
+    return isFetchingNewPool
+  }, [isFetchingNewPool, poolKey])
 
   useEffect(() => {
     if (initialLoader && !isWaitingForNewPool) {

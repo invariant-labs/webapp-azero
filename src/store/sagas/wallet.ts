@@ -24,6 +24,7 @@ import {
 } from 'typed-redux-saga'
 import { getConnection } from './connection'
 import { Signer } from '@polkadot/api/types'
+import { positionsList } from '@store/selectors/positions'
 
 export function* getWallet(): SagaGenerator<NightlyConnectAdapter> {
   const wallet = yield* call(getAlephZeroWallet)
@@ -184,10 +185,20 @@ export function* handleConnect(): Generator {
 
 export function* handleDisconnect(): Generator {
   try {
+    const { loadedPages } = yield* select(positionsList)
+
     yield* call(disconnectWallet)
     yield* put(actions.resetState())
 
     yield* put(positionsActions.setPositionsList([]))
+    yield* put(positionsActions.setPositionsListLength(0n))
+    yield* put(
+      positionsActions.setPositionsListLoadedStatus({
+        indexes: Object.keys(loadedPages).map(key => Number(key)),
+        isLoaded: false
+      })
+    )
+
     yield* put(
       positionsActions.setCurrentPositionTicks({
         lowerTick: undefined,
