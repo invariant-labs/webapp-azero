@@ -835,8 +835,13 @@ export const formatNumber = (number: number | bigint | string): string => {
       'K'
   } else {
     const leadingZeros = afterDot ? countLeadingZeros(afterDot) : 0
-    const parsedAfterDot =
-      String(parseInt(afterDot)).length > 3 ? String(parseInt(afterDot)).slice(0, 3) : afterDot
+
+    let parsedAfterDot = ''
+    if (afterDot) {
+      const afterDotStr = String(afterDot)
+      parsedAfterDot = afterDotStr.length > 3 ? afterDotStr.slice(0, 3) : afterDotStr
+    }
+
     formattedNumber = trimZeros(
       beforeDot +
         '.' +
