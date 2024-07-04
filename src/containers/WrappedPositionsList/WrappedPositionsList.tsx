@@ -53,7 +53,10 @@ export const WrappedPositionsList: React.FC = () => {
 
   const handleRefresh = () => {
     dispatch(
-      actions.getPositionsListPage({ index: positionListPageToQueryPage(lastPage), refresh: true })
+      actions.getPositionsListPage({
+        index: positionListPageToQueryPage(lastPage),
+        refresh: true
+      })
     )
   }
 
@@ -159,14 +162,13 @@ export const WrappedPositionsList: React.FC = () => {
       pageChanged={page => {
         const index = positionListPageToQueryPage(page)
 
-        if (
-          walletStatus === Status.Initialized &&
-          walletAddress &&
-          !loadedPages[index] &&
-          length &&
-          index != -1
-        ) {
-          dispatch(actions.getPositionsListPage({ index, refresh: false }))
+        if (walletStatus === Status.Initialized && walletAddress && !loadedPages[index] && length) {
+          dispatch(
+            actions.getPositionsListPage({
+              index,
+              refresh: false
+            })
+          )
         }
       }}
     />
