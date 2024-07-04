@@ -1,14 +1,13 @@
 import { Pagination, useMediaQuery } from '@mui/material'
 import { theme } from '@static/theme'
 import { useStyles } from './style'
-import { useEffect, useState } from 'react'
 
 export interface IPaginationList {
   pages: number
   defaultPage: number
   handleChangePage: (page: number) => void
   variant: string
-  changePage: number
+  page: number
 }
 
 export const PaginationList: React.FC<IPaginationList> = ({
@@ -16,7 +15,7 @@ export const PaginationList: React.FC<IPaginationList> = ({
   defaultPage,
   handleChangePage,
   variant,
-  changePage
+  page
 }) => {
   const { classes } = useStyles()
   const position = useMediaQuery(theme.breakpoints.down('sm'))
@@ -30,7 +29,7 @@ export const PaginationList: React.FC<IPaginationList> = ({
         defaultPage={defaultPage}
         onChange={(_e, page) => handleChangePage(page)}
         siblingCount={matches ? 0 : 1}
-        page={changePage}
+        page={page}
       />
     </div>
   )
