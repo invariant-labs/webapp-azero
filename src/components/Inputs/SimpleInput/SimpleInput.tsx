@@ -59,7 +59,7 @@ export const SimpleInput: React.FC<IProps> = ({
         }, 0)
       }
     } else if (!onlyNumbersRegex.test(e.target.value)) {
-      setValue('')
+      return
     } else if (!regex.test(e.target.value)) {
       setValue(e.target.value.slice(0, e.target.value.length - 1))
     }

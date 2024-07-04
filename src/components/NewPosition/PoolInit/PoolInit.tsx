@@ -6,10 +6,11 @@ import {
   calcPrice,
   calculateSqrtPriceFromBalance,
   calculateTickFromBalance,
-  formatNumbers,
+  formatNumber,
   nearestTickIndex,
   showPrefix,
-  toMaxNumericPlaces
+  toMaxNumericPlaces,
+  trimZeros
 } from '@store/consts/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import useStyles from './style'
@@ -132,7 +133,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
     const numericMidPriceInput = parseFloat(midPriceInput)
     const validatedMidPrice = Math.min(Math.max(numericMidPriceInput, minPrice), maxPrice)
 
-    return parseFloat(validatedMidPrice.toFixed(8).toString()).toString()
+    return trimZeros(validatedMidPrice.toFixed(8).toString())
   }
 
   useEffect(() => {
@@ -191,7 +192,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
               <AnimatedNumber
                 value={price.toFixed(isXtoY ? Number(xDecimal) : Number(yDecimal))}
                 duration={300}
-                formatValue={formatNumbers()}
+                formatValue={(e: any) => formatNumber(e)}
               />
               {showPrefix(price)} {tokenBSymbol}
             </Typography>
