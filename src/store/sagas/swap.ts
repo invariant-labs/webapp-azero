@@ -454,6 +454,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
           amountOut: 0n,
           priceImpact: 0,
           targetSqrtPrice: 0n,
+          fee: 0n,
           errors: [SwapError.AmountIsZero]
         })
       )
@@ -472,6 +473,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
           amountOut: 0n,
           priceImpact: 0,
           targetSqrtPrice: 0n,
+          fee: 0n,
           errors: [SwapError.NoRouteFound]
         })
       )
@@ -483,6 +485,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
     let insufficientLiquidityAmountOut = byAmountIn ? 0n : U128MAX
     let priceImpact = 0
     let targetSqrtPrice = 0n
+    let fee = 0n
     const errors = []
 
     for (const pool of filteredPools) {
@@ -508,7 +511,8 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
           ) {
             insufficientLiquidityAmountOut = byAmountIn ? result.amountOut : result.amountIn
           }
-
+          fee = pool.poolKey.feeTier.fee
+          priceImpact = 1
           errors.push(SwapError.InsufficientLiquidity)
           continue
         }
@@ -548,6 +552,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
         amountOut: amountOut ? amountOut : insufficientLiquidityAmountOut,
         priceImpact,
         targetSqrtPrice,
+        fee,
         errors
       })
     )

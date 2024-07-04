@@ -626,7 +626,11 @@ export const Swap: React.FC<ISwap> = ({
         </Box>
         <TransactionDetailsBox
           open={getStateMessage() !== 'Loading' ? detailsOpen && canShowDetails : prevOpenState}
-          fee={simulateResult.poolKey?.feeTier.fee ?? 0n}
+          fee={
+            getStateMessage() === 'Insufficient liquidity'
+              ? simulateResult.fee
+              : simulateResult.poolKey?.feeTier.fee ?? 0n
+          }
           exchangeRate={{
             val: rateReversed ? 1 / swapRate : swapRate,
             symbol: canShowDetails
