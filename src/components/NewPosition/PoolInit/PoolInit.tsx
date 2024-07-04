@@ -123,8 +123,6 @@ export const PoolInit: React.FC<IPoolInit> = ({
   }, [midPrice])
 
   const validateMidPriceInput = (midPriceInput: string) => {
-    const minTick = getMinTick(tickSpacing)
-    const maxTick = getMaxTick(tickSpacing)
     const minPrice = isXtoY
       ? calcPrice(minTick, isXtoY, xDecimal, yDecimal)
       : calcPrice(maxTick, isXtoY, xDecimal, yDecimal)
@@ -133,7 +131,8 @@ export const PoolInit: React.FC<IPoolInit> = ({
       : calcPrice(minTick, isXtoY, xDecimal, yDecimal)
     const numericMidPriceInput = parseFloat(midPriceInput)
     const validatedMidPrice = Math.min(Math.max(numericMidPriceInput, minPrice), maxPrice)
-    return toMaxNumericPlaces(validatedMidPrice, 9)
+
+    return parseFloat(validatedMidPrice.toFixed(8).toString()).toString()
   }
 
   useEffect(() => {
@@ -188,6 +187,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
             alignItems='center'>
             <Typography className={classes.priceLabel}>{tokenASymbol} starting price: </Typography>
             <Typography className={classes.priceValue}>
+              <span>~</span>
               <AnimatedNumber
                 value={price.toFixed(isXtoY ? Number(xDecimal) : Number(yDecimal))}
                 duration={300}
