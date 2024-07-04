@@ -151,7 +151,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
         +midPriceInput,
         Number(calcPrice(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
       ),
-    [midPrice, isXtoY, xDecimal, yDecimal]
+    [midPriceInput, isXtoY, xDecimal, yDecimal]
   )
 
   return (
