@@ -18,7 +18,6 @@ export const Primary: Story = {
     pages: 10,
     defaultPage: 5,
     handleChangePage: handleChange,
-    variant: 'end',
-    page: 1
+    variant: 'end'
   }
 }

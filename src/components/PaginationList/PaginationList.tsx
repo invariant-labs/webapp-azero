@@ -7,7 +7,7 @@ export interface IPaginationList {
   defaultPage: number
   handleChangePage: (page: number) => void
   variant: string
-  page: number
+  page?: number
 }
 
 export const PaginationList: React.FC<IPaginationList> = ({
