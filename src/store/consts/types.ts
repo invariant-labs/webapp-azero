@@ -35,6 +35,7 @@ export type SimulateResult = {
   amountOut: bigint
   priceImpact: number
   targetSqrtPrice: bigint
+  fee: bigint
   errors: SwapError[]
 }
 

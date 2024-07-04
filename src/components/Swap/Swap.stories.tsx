@@ -49,6 +49,7 @@ export const Primary: Story = {
       amountOut: 1000000000000 as any,
       priceImpact: 1.23,
       targetSqrtPrice: 1000000000000000000000000 as any,
+      fee: 200000000n,
       errors: []
     },
     simulateSwap: fn()
@@ -72,6 +73,7 @@ export const Primary: Story = {
           amountOut: 1000000000000n,
           priceImpact: 1.23,
           targetSqrtPrice: 1000000000000000000000000n,
+          fee: 200000000n,
           errors: []
         }}
       />
