@@ -1019,5 +1019,5 @@ export function testnetBestTiersCreator() {
 }
 
 export const positionListPageToQueryPage = (page: number): number => {
-  return Math.ceil((page * POSITIONS_PER_PAGE) / POSITIONS_PER_QUERY) - 1
+  return Math.max(Math.ceil((page * POSITIONS_PER_PAGE) / POSITIONS_PER_QUERY) - 1, 0)
 }
