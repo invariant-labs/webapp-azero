@@ -833,15 +833,14 @@ export const formatNumber = (number: number | bigint | string): string => {
         FormatConfig.DecimalsAfterDot
       ) +
       'K'
+  } else if (afterDot && countLeadingZeros(afterDot) <= 3) {
+    const roundedNumber = numberAsNumber.toFixed(countLeadingZeros(afterDot) + 4).slice(0, -1)
+    formattedNumber = trimZeros(roundedNumber)
   } else {
     const leadingZeros = afterDot ? countLeadingZeros(afterDot) : 0
 
-    let parsedAfterDot = ''
-    if (afterDot) {
-      const afterDotStr = String(afterDot)
-      parsedAfterDot = afterDotStr.length > 3 ? afterDotStr.slice(0, 3) : afterDotStr
-    }
-
+    const parsedAfterDot =
+      String(parseInt(afterDot)).length > 3 ? String(parseInt(afterDot)).slice(0, 3) : afterDot
     formattedNumber = trimZeros(
       beforeDot +
         '.' +
