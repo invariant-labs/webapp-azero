@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import useStyles from './style'
 import { Box, Button, Grid, Input, Popover, Typography } from '@mui/material'
 
@@ -30,12 +30,14 @@ const Slippage: React.FC<Props> = ({
   const allowOnlyDigitsAndTrimUnnecessaryZeros: React.ChangeEventHandler<
     HTMLInputElement | HTMLTextAreaElement
   > = e => {
+    const value = e.target.value.split('%')[0]
+
     const regex = /^\d*\.?\d*$/
-    if (e.target.value === '' || regex.test(e.target.value)) {
-      const startValue = e.target.value
+    if (value === '' || regex.test(value)) {
+      const startValue = value
       const caretPosition = e.target.selectionStart
 
-      let parsed = e.target.value
+      let parsed = value
       const zerosRegex = /^0+\d+\.?\d*$/
       if (zerosRegex.test(parsed)) {
         parsed = parsed.replace(/^0+/, '')
@@ -56,23 +58,25 @@ const Slippage: React.FC<Props> = ({
           }
         }, 0)
       }
-    } else if (!regex.test(e.target.value)) {
+    } else if (!regex.test(value)) {
       setSlippTolerance('')
     }
   }
 
   const checkSlippage: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = e => {
-    if (Number(e.target.value) > 50) {
+    const value = e.target.value.split('%')[0]
+
+    if (Number(value) > 50) {
       setSlippTolerance('50.00')
-    } else if (Number(e.target.value) < 0 || isNaN(Number(e.target.value))) {
+    } else if (Number(value) < 0 || isNaN(Number(value))) {
       setSlippTolerance('00.00')
     } else {
       const onlyTwoDigits = '^\\d*\\.?\\d{0,2}$'
       const regex = new RegExp(onlyTwoDigits, 'g')
-      if (regex.test(e.target.value)) {
-        setSlippTolerance(e.target.value)
+      if (regex.test(value)) {
+        setSlippTolerance(value)
       } else {
-        setSlippTolerance(Number(e.target.value).toFixed(2))
+        setSlippTolerance(Number(value).toFixed(2))
       }
     }
   }
@@ -96,10 +100,10 @@ const Slippage: React.FC<Props> = ({
         <Box>
           <Input
             disableUnderline
-            placeholder='1%'
+            placeholder='1.00'
             className={classes.detailsInfoForm}
             type={'text'}
-            value={slippTolerance}
+            value={slippTolerance + '%'}
             onChange={e => {
               allowOnlyDigitsAndTrimUnnecessaryZeros(e)
               checkSlippage(e)

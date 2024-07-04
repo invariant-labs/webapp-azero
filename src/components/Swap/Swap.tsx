@@ -445,7 +445,7 @@ export const Swap: React.FC<ISwap> = ({
             setSlippage={setSlippage}
             handleClose={handleCloseSettings}
             anchorEl={anchorEl}
-            defaultSlippage={'1'}
+            defaultSlippage={'1.00'}
             initialSlippage={initialSlippage}
           />
         </Grid>
