@@ -15,7 +15,7 @@ export const Primary: Story = {
   args: {
     currentPairReversed: false,
     isXtoY: true,
-    midPrice: 0 as any, //Storybook doesn't support bigint correctly
+    midPriceIndex: 0 as any, //Storybook doesn't support bigint correctly
     onChangeMidPrice: fn(),
     onChangeRange: fn(),
     tickSpacing: 1 as any,
@@ -29,7 +29,7 @@ export const Primary: Story = {
     return (
       <PoolInit
         {...args}
-        midPrice={midPrice}
+        midPriceIndex={midPrice}
         onChangeMidPrice={setMidPrice}
         tickSpacing={1n}
         xDecimal={9n}
