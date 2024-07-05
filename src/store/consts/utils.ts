@@ -43,6 +43,7 @@ import {
   FAUCET_DEPLOYER_MNEMONIC,
   FormatConfig,
   LIQUIDITY_PLOT_DECIMAL,
+  POSITIONS_PER_PAGE,
   PositionTokenBlock,
   STABLECOIN_ADDRESSES,
   USDC,
@@ -62,6 +63,7 @@ import {
   Token,
   TokenPriceData
 } from './types'
+import { POSITIONS_PER_QUERY } from '@store/sagas/positions'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -1086,4 +1088,8 @@ export function testnetBestTiersCreator() {
   }
 
   return bestTiers
+}
+
+export const positionListPageToQueryPage = (page: number): number => {
+  return Math.max(Math.ceil((page * POSITIONS_PER_PAGE) / POSITIONS_PER_QUERY) - 1, 0)
 }

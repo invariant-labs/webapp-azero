@@ -281,6 +281,43 @@ export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMa
   }
 }
 
+export function* fetchTokens(poolsWithPoolKeys: PoolWithPoolKey[]) {
+  const walletAddress = yield* select(address)
+  const connection = yield* call(getConnection)
+  const network = yield* select(networkType)
+  const allTokens = yield* select(tokens)
+
+  const unknownTokens = new Set(
+    poolsWithPoolKeys.flatMap(({ poolKey: { tokenX, tokenY } }) =>
+      [tokenX, tokenY].filter(token => !allTokens[token])
+    )
+  )
+  const knownTokens = new Set(
+    poolsWithPoolKeys.flatMap(({ poolKey: { tokenX, tokenY } }) =>
+      [tokenX, tokenY].filter(token => allTokens[token])
+    )
+  )
+
+  const unknownTokensData = yield* call(
+    getTokenDataByAddresses,
+    [...unknownTokens],
+    connection,
+    network,
+    walletAddress
+  )
+  const knownTokenBalances = yield* call(
+    getTokenBalances,
+    [...knownTokens],
+    connection,
+    network,
+    walletAddress
+  )
+
+  yield* put(walletActions.getBalances(Object.keys(unknownTokensData)))
+  yield* put(actions.addTokens(unknownTokensData))
+  yield* put(actions.updateTokenBalances(knownTokenBalances))
+}
+
 export function* getPoolsDataForListHandler(): Generator {
   yield* takeEvery(actions.getPoolsDataForList, fetchPoolsDataForList)
 }
