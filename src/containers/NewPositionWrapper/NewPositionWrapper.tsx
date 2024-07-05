@@ -682,9 +682,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
             lowerTick: lowerTickIndex,
             upperTick: upperTickIndex,
             liquidityDelta: liquidityRef.current,
-            spotSqrtPrice: poolsData[poolKey]
-              ? poolsData[poolKey].sqrtPrice
-              : calculateSqrtPrice(midPrice.index),
+            spotSqrtPrice: poolsData[poolKey] ? poolsData[poolKey].sqrtPrice : midPrice.sqrtPrice,
             slippageTolerance: slippage,
             tokenXAmount: xAmount,
             tokenYAmount: yAmount,

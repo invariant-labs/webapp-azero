@@ -5,16 +5,14 @@ import { Button, Grid, Typography } from '@mui/material'
 import {
   calcPrice,
   calculateSqrtPriceFromBalance,
-  calculateTickFromBalance,
   formatNumber,
   nearestTickIndex,
-  showPrefix,
   toMaxNumericPlaces,
   trimZeros
 } from '@store/consts/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import useStyles from './style'
-import { getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
+import { calculateTick, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
 export interface IPoolInit {
   tokenASymbol: string
   tokenBSymbol: string
@@ -71,15 +69,9 @@ export const PoolInit: React.FC<IPoolInit> = ({
       yDecimal
     )
 
-    const tickIndex = calculateTickFromBalance(
-      +midPriceInput,
-      tickSpacing,
-      isXtoY,
-      xDecimal,
-      yDecimal
-    )
+    const priceTickIndex = calculateTick(sqrtPrice, tickSpacing)
 
-    onChangeMidPrice(BigInt(tickIndex), sqrtPrice)
+    onChangeMidPrice(BigInt(priceTickIndex), sqrtPrice)
   }, [midPriceInput])
 
   const setLeftInputValues = (val: string) => {
@@ -194,7 +186,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
                 duration={300}
                 formatValue={(e: any) => formatNumber(e)}
               />
-              {showPrefix(price)} {tokenBSymbol}
+              <span> </span> {tokenBSymbol}
             </Typography>
           </Grid>
         </Grid>
