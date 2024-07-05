@@ -184,7 +184,7 @@ export const toMaxNumericPlaces = (num: number, places: number): string => {
   return num.toFixed(places + Math.abs(log) - 1)
 }
 
-export const calcPrice = (
+export const calcPriceByTickIndex = (
   amountTickIndex: bigint,
   isXtoY: boolean,
   xDecimal: bigint,
@@ -199,6 +199,16 @@ export const calcPrice = (
   return price === 0 ? Number.MAX_SAFE_INTEGER : 1 / price
 }
 
+export const calcPriceBySqrtPrice = (
+  sqrtPrice: bigint,
+  isXtoY: boolean,
+  xDecimal: bigint,
+  yDecimal: bigint
+): number => {
+  const price = calcYPerXPriceBySqrtPrice(sqrtPrice, xDecimal, yDecimal) ** (isXtoY ? 1 : -1)
+
+  return price
+}
 export const createPlaceholderLiquidityPlot = (
   isXtoY: boolean,
   yValueToFill: number,
@@ -211,7 +221,7 @@ export const createPlaceholderLiquidityPlot = (
   const min = getMinTick(tickSpacing)
   const max = getMaxTick(tickSpacing)
 
-  const minPrice = calcPrice(min, isXtoY, tokenXDecimal, tokenYDecimal)
+  const minPrice = calcPriceByTickIndex(min, isXtoY, tokenXDecimal, tokenYDecimal)
 
   ticksData.push({
     x: minPrice,
@@ -219,7 +229,7 @@ export const createPlaceholderLiquidityPlot = (
     index: min
   })
 
-  const maxPrice = calcPrice(max, isXtoY, tokenXDecimal, tokenYDecimal)
+  const maxPrice = calcPriceByTickIndex(max, isXtoY, tokenXDecimal, tokenYDecimal)
 
   ticksData.push({
     x: maxPrice,
@@ -520,7 +530,7 @@ export const calculateSqrtPriceFromBalance = (
 
   const basePrice = Math.max(
     balance,
-    Number(calcPrice(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
+    Number(calcPriceByTickIndex(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
   )
 
   const primaryUnitsPrice = getPrimaryUnitsPrice(
@@ -530,7 +540,12 @@ export const calculateSqrtPriceFromBalance = (
     Number(yDecimal)
   )
 
-  const price = convertBalanceToBigint(primaryUnitsPrice.toFixed(24), SQRT_PRICE_SCALE)
+  const parsedPrimaryUnits =
+    primaryUnitsPrice > 1 && Number.isInteger(primaryUnitsPrice)
+      ? BigInt(primaryUnitsPrice).toString()
+      : primaryUnitsPrice.toFixed(24)
+
+  const price = convertBalanceToBigint(parsedPrimaryUnits, SQRT_PRICE_SCALE)
   const sqrtPrice = priceToSqrtPrice(price)
 
   const minSqrtPrice = calculateSqrtPrice(minTick)
@@ -558,7 +573,7 @@ export const calculateTickFromBalance = (
 
   const basePrice = Math.max(
     price,
-    Number(calcPrice(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
+    Number(calcPriceByTickIndex(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
   )
   const primaryUnitsPrice = getPrimaryUnitsPrice(
     basePrice,
@@ -769,7 +784,7 @@ export const createLiquidityPlot = (
   const max = getMaxTick(tickSpacing)
 
   if (!ticks.length || ticks[0].index > min) {
-    const minPrice = calcPrice(min, isXtoY, tokenXDecimal, tokenYDecimal)
+    const minPrice = calcPriceByTickIndex(min, isXtoY, tokenXDecimal, tokenYDecimal)
 
     ticksData.push({
       x: minPrice,
@@ -780,14 +795,24 @@ export const createLiquidityPlot = (
 
   ticks.forEach((tick, i) => {
     if (i === 0 && tick.index - tickSpacing > min) {
-      const price = calcPrice(tick.index - tickSpacing, isXtoY, tokenXDecimal, tokenYDecimal)
+      const price = calcPriceByTickIndex(
+        tick.index - tickSpacing,
+        isXtoY,
+        tokenXDecimal,
+        tokenYDecimal
+      )
       ticksData.push({
         x: price,
         y: 0,
         index: tick.index - tickSpacing
       })
     } else if (i > 0 && tick.index - tickSpacing > ticks[i - 1].index) {
-      const price = calcPrice(tick.index - tickSpacing, isXtoY, tokenXDecimal, tokenYDecimal)
+      const price = calcPriceByTickIndex(
+        tick.index - tickSpacing,
+        isXtoY,
+        tokenXDecimal,
+        tokenYDecimal
+      )
       ticksData.push({
         x: price,
         y: +printBigint(ticks[i - 1].liqudity, LIQUIDITY_PLOT_DECIMAL),
@@ -795,7 +820,7 @@ export const createLiquidityPlot = (
       })
     }
 
-    const price = calcPrice(tick.index, isXtoY, tokenXDecimal, tokenYDecimal)
+    const price = calcPriceByTickIndex(tick.index, isXtoY, tokenXDecimal, tokenYDecimal)
     ticksData.push({
       x: price,
       y: +printBigint(ticks[i].liqudity, LIQUIDITY_PLOT_DECIMAL),
@@ -804,7 +829,7 @@ export const createLiquidityPlot = (
   })
   const lastTick = ticks[ticks.length - 1].index
   if (!ticks.length) {
-    const maxPrice = calcPrice(max, isXtoY, tokenXDecimal, tokenYDecimal)
+    const maxPrice = calcPriceByTickIndex(max, isXtoY, tokenXDecimal, tokenYDecimal)
 
     ticksData.push({
       x: maxPrice,
@@ -813,7 +838,12 @@ export const createLiquidityPlot = (
     })
   } else if (lastTick < max) {
     if (max - lastTick > tickSpacing) {
-      const price = calcPrice(lastTick + tickSpacing, isXtoY, tokenXDecimal, tokenYDecimal)
+      const price = calcPriceByTickIndex(
+        lastTick + tickSpacing,
+        isXtoY,
+        tokenXDecimal,
+        tokenYDecimal
+      )
       ticksData.push({
         x: price,
         y: 0,
@@ -821,7 +851,7 @@ export const createLiquidityPlot = (
       })
     }
 
-    const maxPrice = calcPrice(max, isXtoY, tokenXDecimal, tokenYDecimal)
+    const maxPrice = calcPriceByTickIndex(max, isXtoY, tokenXDecimal, tokenYDecimal)
 
     ticksData.push({
       x: maxPrice,

@@ -3,7 +3,7 @@ import RangeInput from '@components/Inputs/RangeInput/RangeInput'
 import SimpleInput from '@components/Inputs/SimpleInput/SimpleInput'
 import { Button, Grid, Typography } from '@mui/material'
 import {
-  calcPrice,
+  calcPriceByTickIndex,
   calculateSqrtPriceFromBalance,
   formatNumber,
   nearestTickIndex,
@@ -13,6 +13,8 @@ import {
 import React, { useEffect, useMemo, useState } from 'react'
 import useStyles from './style'
 import { calculateTick, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
+import { MINIMAL_POOL_INIT_PRICE } from '@store/consts/static'
+
 export interface IPoolInit {
   tokenASymbol: string
   tokenBSymbol: string
@@ -21,7 +23,7 @@ export interface IPoolInit {
   xDecimal: bigint
   yDecimal: bigint
   tickSpacing: bigint
-  midPrice: bigint
+  midPriceIndex: bigint
   onChangeMidPrice: (tickIndex: bigint, sqrtPrice: bigint) => void
   currentPairReversed: boolean | null
 }
@@ -34,7 +36,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
   xDecimal,
   yDecimal,
   tickSpacing,
-  midPrice,
+  midPriceIndex,
   onChangeMidPrice,
   currentPairReversed
 }) => {
@@ -47,17 +49,17 @@ export const PoolInit: React.FC<IPoolInit> = ({
   const [rightRange, setRightRange] = useState(tickSpacing * 10n * (isXtoY ? 1n : -1n))
 
   const [leftInput, setLeftInput] = useState(
-    calcPrice(leftRange, isXtoY, xDecimal, yDecimal).toString()
+    calcPriceByTickIndex(leftRange, isXtoY, xDecimal, yDecimal).toString()
   )
   const [rightInput, setRightInput] = useState(
-    calcPrice(rightRange, isXtoY, xDecimal, yDecimal).toString()
+    calcPriceByTickIndex(rightRange, isXtoY, xDecimal, yDecimal).toString()
   )
 
   const [leftInputRounded, setLeftInputRounded] = useState((+leftInput).toFixed(12))
   const [rightInputRounded, setRightInputRounded] = useState((+rightInput).toFixed(12))
 
   const [midPriceInput, setMidPriceInput] = useState(
-    calcPrice(midPrice, isXtoY, xDecimal, yDecimal).toString()
+    calcPriceByTickIndex(midPriceIndex, isXtoY, xDecimal, yDecimal).toFixed(8)
   )
 
   useEffect(() => {
@@ -98,8 +100,8 @@ export const PoolInit: React.FC<IPoolInit> = ({
     setLeftRange(left)
     setRightRange(right)
 
-    setLeftInputValues(calcPrice(left, isXtoY, xDecimal, yDecimal).toString())
-    setRightInputValues(calcPrice(right, isXtoY, xDecimal, yDecimal).toString())
+    setLeftInputValues(calcPriceByTickIndex(left, isXtoY, xDecimal, yDecimal).toString())
+    setRightInputValues(calcPriceByTickIndex(right, isXtoY, xDecimal, yDecimal).toString())
 
     onChangeRange(left, right)
   }
@@ -113,17 +115,25 @@ export const PoolInit: React.FC<IPoolInit> = ({
 
   useEffect(() => {
     changeRangeHandler(leftRange, rightRange)
-  }, [midPrice])
+  }, [midPriceIndex])
 
   const validateMidPriceInput = (midPriceInput: string) => {
-    const minPrice = isXtoY
-      ? calcPrice(minTick, isXtoY, xDecimal, yDecimal)
-      : calcPrice(maxTick, isXtoY, xDecimal, yDecimal)
+    const minPriceFromTick = isXtoY
+      ? calcPriceByTickIndex(minTick, isXtoY, xDecimal, yDecimal)
+      : calcPriceByTickIndex(maxTick, isXtoY, xDecimal, yDecimal)
+
+    const minimalAllowedInput =
+      minPriceFromTick < MINIMAL_POOL_INIT_PRICE ? MINIMAL_POOL_INIT_PRICE : minPriceFromTick
     const maxPrice = isXtoY
-      ? calcPrice(maxTick, isXtoY, xDecimal, yDecimal)
-      : calcPrice(minTick, isXtoY, xDecimal, yDecimal)
+      ? calcPriceByTickIndex(maxTick, isXtoY, xDecimal, yDecimal)
+      : calcPriceByTickIndex(minTick, isXtoY, xDecimal, yDecimal)
+
     const numericMidPriceInput = parseFloat(midPriceInput)
-    const validatedMidPrice = Math.min(Math.max(numericMidPriceInput, minPrice), maxPrice)
+
+    const validatedMidPrice = Math.min(
+      Math.max(numericMidPriceInput, minimalAllowedInput),
+      maxPrice
+    )
 
     return trimZeros(validatedMidPrice.toFixed(8).toString())
   }
@@ -141,7 +151,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
     () =>
       Math.max(
         +midPriceInput,
-        Number(calcPrice(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
+        Number(calcPriceByTickIndex(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
       ),
     [midPriceInput, isXtoY, xDecimal, yDecimal]
   )

@@ -2,7 +2,7 @@ import { PositionsList } from '@components/PositionsList/PositionsList'
 import { calculateTokenAmounts } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { POSITIONS_PER_PAGE } from '@store/consts/static'
-import { calcYPerXPriceByTickIndex, printBigint } from '@store/consts/utils'
+import { calcPriceBySqrtPrice, calcYPerXPriceByTickIndex, printBigint } from '@store/consts/utils'
 import { actions } from '@store/reducers/positions'
 import { Status } from '@store/reducers/wallet'
 import {
@@ -91,8 +91,9 @@ export const WrappedPositionsList: React.FC = () => {
         tokenYLiq = 0
       }
 
-      const currentPrice = calcYPerXPriceByTickIndex(
-        position.poolData?.currentTickIndex ?? 0n,
+      const currentPrice = calcPriceBySqrtPrice(
+        position.poolData?.sqrtPrice ?? 0n,
+        true,
         position.tokenX.decimals,
         position.tokenY.decimals
       )

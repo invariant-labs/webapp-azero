@@ -11,8 +11,8 @@ import { ALL_FEE_TIERS_DATA, bestTiers, commonTokensForNetworks } from '@store/c
 import { PositionOpeningMethod, TokenPriceData } from '@store/consts/types'
 import {
   addNewTokenToLocalStorage,
-  calcPrice,
-  calcYPerXPriceBySqrtPrice,
+  calcPriceBySqrtPrice,
+  calcPriceByTickIndex,
   createPlaceholderLiquidityPlot,
   getCoinGeckoTokenPrice,
   getMockedTokenPrice,
@@ -258,9 +258,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     if (poolsData[poolKey]) {
       setMidPrice({
         index: poolsData[poolKey].currentTickIndex,
-        x:
-          calcYPerXPriceBySqrtPrice(poolsData[poolKey].sqrtPrice, xDecimal, yDecimal) **
-          (isXtoY ? 1 : -1),
+        x: calcPriceBySqrtPrice(poolsData[poolKey].sqrtPrice, isXtoY, xDecimal, yDecimal),
         sqrtPrice: poolsData[poolKey].sqrtPrice
       })
     }
@@ -270,7 +268,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     if (poolKey === '') {
       setMidPrice({
         index: 0n,
-        x: calcPrice(0n, isXtoY, xDecimal, yDecimal),
+        x: calcPriceByTickIndex(0n, isXtoY, xDecimal, yDecimal),
         sqrtPrice: 0n
       })
     }

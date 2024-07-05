@@ -5,7 +5,7 @@ import { getMinTick } from '@invariant-labs/a0-sdk'
 import { Card, Grid, Hidden, Tooltip, Typography } from '@mui/material'
 import activeLiquidity from '@static/svg/activeLiquidity.svg'
 import {
-  calcPrice,
+  calcPriceByTickIndex,
   calcTicksAmountInRange,
   numberToString,
   spacingMultiplicityGte
@@ -64,7 +64,7 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
   useEffect(() => {
     const initSideDist = Math.abs(
       leftRange.x -
-        calcPrice(
+        calcPriceByTickIndex(
           BigInt(
             Math.max(
               spacingMultiplicityGte(Number(getMinTick(tickSpacing)), Number(tickSpacing)),
