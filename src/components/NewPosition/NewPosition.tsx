@@ -390,7 +390,9 @@ export const NewPosition: React.FC<INewPosition> = ({
   }, [midPrice.index, leftRange, rightRange])
 
   useEffect(() => {
-    onChangeRange(leftRange, rightRange)
+    if (positionOpeningMethod === 'range') {
+      onChangeRange(leftRange, rightRange)
+    }
   }, [currentPriceSqrt])
 
   const handleClickSettings = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -448,6 +450,17 @@ export const NewPosition: React.FC<INewPosition> = ({
       setRefresherTime(REFRESHER_INTERVAL)
     }
   }, [poolKey])
+
+  const blockedToken = useMemo(
+    () =>
+      determinePositionTokenBlock(
+        currentPriceSqrt,
+        BigInt(Math.min(Number(leftRange), Number(rightRange))),
+        BigInt(Math.max(Number(leftRange), Number(rightRange))),
+        isXtoY
+      ),
+    [leftRange, rightRange]
+  )
 
   return (
     <Grid container className={classes.wrapper} direction='column'>
@@ -572,12 +585,7 @@ export const NewPosition: React.FC<INewPosition> = ({
               tokenAIndex !== null &&
               tokenBIndex !== null &&
               !isWaitingForNewPool &&
-              determinePositionTokenBlock(
-                currentPriceSqrt,
-                BigInt(Math.min(Number(leftRange), Number(rightRange))),
-                BigInt(Math.max(Number(leftRange), Number(rightRange))),
-                isXtoY
-              ) === PositionTokenBlock.A,
+              blockedToken === PositionTokenBlock.A,
 
             blockerInfo: 'Range only for single-asset deposit.',
             decimalsLimit: tokenAIndex !== null ? Number(tokens[tokenAIndex].decimals) : 0
@@ -602,12 +610,7 @@ export const NewPosition: React.FC<INewPosition> = ({
               tokenAIndex !== null &&
               tokenBIndex !== null &&
               !isWaitingForNewPool &&
-              determinePositionTokenBlock(
-                currentPriceSqrt,
-                BigInt(Math.min(Number(leftRange), Number(rightRange))),
-                BigInt(Math.max(Number(leftRange), Number(rightRange))),
-                isXtoY
-              ) === PositionTokenBlock.B,
+              blockedToken === PositionTokenBlock.B,
             blockerInfo: 'Range only for single-asset deposit.',
             decimalsLimit: tokenBIndex !== null ? Number(tokens[tokenBIndex].decimals) : 0
           }}

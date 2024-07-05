@@ -190,7 +190,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
 
       changeRangeHandler(leftRange, rightRange)
     }
-  }, [midPrice, concentrationArray])
+  }, [midPriceInput, concentrationArray, validConcentrationMidPriceTick])
 
   const validateMidPriceInput = (midPriceInput: string) => {
     const minPrice = isXtoY
