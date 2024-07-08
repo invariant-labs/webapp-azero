@@ -60,6 +60,7 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
   const [isPlotDiscrete, setIsPlotDiscrete] = useState(initialIsDiscreteValue)
 
   const [isInitialLoad, setIsInitialLoad] = useState(true)
+  const [currentXtoY, setCurrentXtoY] = useState(xToY)
 
   useEffect(() => {
     const initSideDist = Math.abs(
@@ -76,6 +77,12 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
           tokenY.decimal
         )
     )
+
+    if (currentXtoY !== xToY) {
+      setPlotMin(1 / plotMax)
+      setPlotMax(1 / plotMin)
+      setCurrentXtoY(xToY)
+    }
 
     if (isInitialLoad) {
       setIsInitialLoad(false)
