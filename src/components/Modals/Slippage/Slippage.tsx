@@ -26,6 +26,7 @@ const Slippage: React.FC<Props> = ({
   const { classes } = useStyles()
   const [slippTolerance, setSlippTolerance] = React.useState<string>(initialSlippage)
   const inputRef = React.useRef<HTMLInputElement>(null)
+  const dummyDivRef = React.useRef<HTMLInputElement>(null)
 
   const allowOnlyDigitsAndTrimUnnecessaryZeros: React.ChangeEventHandler<
     HTMLInputElement | HTMLTextAreaElement
@@ -63,20 +64,22 @@ const Slippage: React.FC<Props> = ({
     }
   }
 
-  const checkSlippage: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = e => {
-    const value = e.target.value
-
+  const checkSlippage = (value: string): string => {
     if (Number(value) > 50) {
       setSlippTolerance('50.00')
+      return '50.00'
     } else if (Number(value) < 0 || isNaN(Number(value))) {
       setSlippTolerance('00.00')
+      return '00.00'
     } else {
       const onlyTwoDigits = '^\\d*\\.?\\d{0,2}$'
       const regex = new RegExp(onlyTwoDigits, 'g')
       if (regex.test(value)) {
         setSlippTolerance(value)
+        return value
       } else {
         setSlippTolerance(Number(value).toFixed(2))
+        return Number(value).toFixed(2)
       }
     }
   }
@@ -98,6 +101,9 @@ const Slippage: React.FC<Props> = ({
         </Grid>
         <Typography className={classes.label}>Slippage tolerance:</Typography>
         <Box>
+          <div className={classes.dummyDiv} ref={dummyDivRef}>
+            00.00
+          </div>
           <Input
             disableUnderline
             placeholder='1.00'
@@ -106,7 +112,16 @@ const Slippage: React.FC<Props> = ({
             value={slippTolerance}
             onChange={e => {
               allowOnlyDigitsAndTrimUnnecessaryZeros(e)
-              checkSlippage(e)
+              const result = checkSlippage(e.target.value)
+
+              if (dummyDivRef.current && inputRef.current) {
+                dummyDivRef.current.textContent = result
+
+                const input = inputRef.current.querySelector('input')
+                if (input) {
+                  input.style.width = `${dummyDivRef.current.offsetWidth}px`
+                }
+              }
             }}
             ref={inputRef}
             onBlur={() => {
@@ -121,6 +136,15 @@ const Slippage: React.FC<Props> = ({
                   onClick={() => {
                     setSlippTolerance(defaultSlippage)
                     setSlippage(defaultSlippage)
+
+                    if (dummyDivRef.current && inputRef.current) {
+                      dummyDivRef.current.textContent = defaultSlippage
+
+                      const input = inputRef.current.querySelector('input')
+                      if (input) {
+                        input.style.width = `${dummyDivRef.current.offsetWidth}px`
+                      }
+                    }
                   }}>
                   Auto
                 </button>
