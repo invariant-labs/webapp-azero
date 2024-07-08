@@ -102,6 +102,12 @@ const useStyles = makeStyles()(theme => {
     priceValue: {
       ...typography.body1,
       color: colors.white.main
+    },
+    sliderWrapper: {
+      paddingTop: 24,
+      paddingInline: 8,
+      height: 77,
+      position: 'relative'
     }
   }
 })
