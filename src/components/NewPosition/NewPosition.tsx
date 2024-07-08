@@ -398,7 +398,9 @@ export const NewPosition: React.FC<INewPosition> = ({
   }, [midPrice.index, leftRange, rightRange])
 
   useEffect(() => {
-    onChangeRange(leftRange, rightRange)
+    if (positionOpeningMethod === 'range') {
+      onChangeRange(leftRange, rightRange)
+    }
   }, [currentPriceSqrt])
 
   const handleClickSettings = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -457,6 +459,17 @@ export const NewPosition: React.FC<INewPosition> = ({
     }
   }, [poolKey])
 
+  const blockedToken = useMemo(
+    () =>
+      determinePositionTokenBlock(
+        currentPriceSqrt,
+        BigInt(Math.min(Number(leftRange), Number(rightRange))),
+        BigInt(Math.max(Number(leftRange), Number(rightRange))),
+        isXtoY
+      ),
+    [leftRange, rightRange]
+  )
+
   return (
     <Grid container className={classes.wrapper} direction='column'>
       <Link to='/pool' style={{ textDecoration: 'none', maxWidth: 'fit-content' }}>
@@ -492,30 +505,26 @@ export const NewPosition: React.FC<INewPosition> = ({
               copyPoolAddressHandler={copyPoolAddressHandler}
             />
           ) : null}
+          <Hidden mdDown>
+            <ConcentrationTypeSwitch
+              onSwitch={val => {
+                if (val) {
+                  setPositionOpeningMethod('concentration')
+                  onPositionOpeningMethodChange('concentration')
+                } else {
+                  setPositionOpeningMethod('range')
+                  onPositionOpeningMethodChange('range')
+                }
+              }}
+              className={classes.switch}
+              currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
+            />
+          </Hidden>
           {poolKey !== '' && (
-            <Hidden mdDown>
-              <ConcentrationTypeSwitch
-                onSwitch={val => {
-                  if (val) {
-                    setPositionOpeningMethod('concentration')
-                    onPositionOpeningMethodChange('concentration')
-                  } else {
-                    setPositionOpeningMethod('range')
-                    onPositionOpeningMethodChange('range')
-                  }
-                }}
-                className={classes.switch}
-                style={{
-                  opacity: poolKey ? 1 : 0
-                }}
-                disabled={poolKey === ''}
-                currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
-              />
-            </Hidden>
+            <Button onClick={handleClickSettings} className={classes.settingsIconBtn} disableRipple>
+              <img src={settingIcon} className={classes.settingsIcon} alt='settings' />
+            </Button>
           )}
-          <Button onClick={handleClickSettings} className={classes.settingsIconBtn} disableRipple>
-            <img src={settingIcon} className={classes.settingsIcon} alt='settings' />
-          </Button>
         </Grid>
       </Grid>
 
@@ -584,12 +593,7 @@ export const NewPosition: React.FC<INewPosition> = ({
               tokenAIndex !== null &&
               tokenBIndex !== null &&
               !isWaitingForNewPool &&
-              determinePositionTokenBlock(
-                currentPriceSqrt,
-                BigInt(Math.min(Number(leftRange), Number(rightRange))),
-                BigInt(Math.max(Number(leftRange), Number(rightRange))),
-                isXtoY
-              ) === PositionTokenBlock.A,
+              blockedToken === PositionTokenBlock.A,
 
             blockerInfo: 'Range only for single-asset deposit.',
             decimalsLimit: tokenAIndex !== null ? Number(tokens[tokenAIndex].decimals) : 0
@@ -614,12 +618,7 @@ export const NewPosition: React.FC<INewPosition> = ({
               tokenAIndex !== null &&
               tokenBIndex !== null &&
               !isWaitingForNewPool &&
-              determinePositionTokenBlock(
-                currentPriceSqrt,
-                BigInt(Math.min(Number(leftRange), Number(rightRange))),
-                BigInt(Math.max(Number(leftRange), Number(rightRange))),
-                isXtoY
-              ) === PositionTokenBlock.B,
+              blockedToken === PositionTokenBlock.B,
             blockerInfo: 'Range only for single-asset deposit.',
             decimalsLimit: tokenBIndex !== null ? Number(tokens[tokenBIndex].decimals) : 0
           }}
@@ -667,10 +666,6 @@ export const NewPosition: React.FC<INewPosition> = ({
                 }
               }}
               className={classes.switch}
-              style={{
-                opacity: poolKey ? 1 : 0
-              }}
-              disabled={poolKey === ''}
               currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
             />
           </Grid>
@@ -741,6 +736,11 @@ export const NewPosition: React.FC<INewPosition> = ({
             midPriceIndex={midPrice.index}
             onChangeMidPrice={onChangeMidPrice}
             currentPairReversed={currentPairReversed}
+            positionOpeningMethod={positionOpeningMethod}
+            concentrationArray={concentrationArray}
+            concentrationIndex={concentrationIndex}
+            setConcentrationIndex={setConcentrationIndex}
+            minimumSliderIndex={minimumSliderIndex}
           />
         )}
       </Grid>

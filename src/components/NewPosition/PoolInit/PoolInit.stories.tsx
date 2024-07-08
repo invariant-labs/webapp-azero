@@ -22,7 +22,12 @@ export const Primary: Story = {
     tokenASymbol: 'BTC',
     tokenBSymbol: 'ETH',
     xDecimal: 9 as any,
-    yDecimal: 12 as any
+    yDecimal: 12 as any,
+    concentrationArray: [0.1, 0.2, 0.3, 0.4, 0.5],
+    concentrationIndex: 2,
+    minimumSliderIndex: 0,
+    setConcentrationIndex: fn(),
+    positionOpeningMethod: 'range'
   },
   render: args => {
     const [midPrice, setMidPrice] = useState(0n)
