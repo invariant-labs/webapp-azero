@@ -76,7 +76,7 @@ export const useStyles = makeStyles()(() => {
       width: 49,
       height: 28,
       cursor: 'pointer',
-      marginLeft: 'auto',
+      marginLeft: 8,
       ...typography.body2,
       '&:hover': {
         filter: 'brightness(1.15)',
@@ -90,12 +90,6 @@ export const useStyles = makeStyles()(() => {
       color: colors.white.main,
       marginTop: 10,
       textAlign: 'justify'
-    },
-    dummyDiv: {
-      width: 'fit-content',
-      fontSize: 20,
-      position: 'absolute',
-      visibility: 'hidden'
     }
   }
 })
