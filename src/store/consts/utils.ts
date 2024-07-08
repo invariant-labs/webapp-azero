@@ -40,6 +40,7 @@ import {
   FormatConfig,
   LIQUIDITY_PLOT_DECIMAL,
   POSITIONS_PER_PAGE,
+  POSITIONS_PER_QUERY,
   PositionTokenBlock,
   STABLECOIN_ADDRESSES,
   USDC,
@@ -59,7 +60,6 @@ import {
   Token,
   TokenPriceData
 } from './types'
-import { POSITIONS_PER_QUERY } from '@store/sagas/positions'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 

@@ -9,6 +9,10 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IPositionItem, PositionItem } from './PositionItem/PositionItem'
 import { useStyles } from './style'
+import { useDispatch, useSelector } from 'react-redux'
+import { actions } from '@store/reducers/positions'
+import { positionsList } from '@store/selectors/positions'
+import { POSITIONS_PER_QUERY } from '@store/consts/static'
 
 interface IProps {
   initialPage: number
@@ -43,8 +47,14 @@ export const PositionsList: React.FC<IProps> = ({
   const navigate = useNavigate()
   const [defaultPage] = useState(initialPage)
   const [page, setPage] = useState(initialPage)
+  const dispatch = useDispatch()
+  const { length, loadedPages } = useSelector(positionsList)
 
   const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (Object.keys(loadedPages).length * POSITIONS_PER_QUERY < Number(length)) {
+      dispatch(actions.getRemainingPositions())
+    }
+
     searchSetValue(e.target.value.toLowerCase())
   }
 

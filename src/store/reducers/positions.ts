@@ -150,6 +150,10 @@ const positionsSlice = createSlice({
       state.positionsList.loading = true
       return state
     },
+    getRemainingPositions(state, _action: PayloadAction<void>) {
+      state.positionsList.loading = true
+      return state
+    },
     setPositionsListLength(state, action: PayloadAction<bigint>) {
       state.positionsList.length = action.payload
       return state
