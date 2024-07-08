@@ -521,7 +521,7 @@ export const nearestSpacingMultiplicity = (centerTick: number, spacing: number) 
 }
 
 export const calculateSqrtPriceFromBalance = (
-  balance: number,
+  price: number,
   spacing: bigint,
   isXtoY: boolean,
   xDecimal: bigint,
@@ -530,9 +530,12 @@ export const calculateSqrtPriceFromBalance = (
   const minTick = getMinTick(spacing)
   const maxTick = getMaxTick(spacing)
 
-  const basePrice = Math.max(
-    balance,
-    Number(calcPriceByTickIndex(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
+  const basePrice = Math.min(
+    Math.max(
+      price,
+      Number(calcPriceByTickIndex(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
+    ),
+    Number(calcPriceByTickIndex(isXtoY ? maxTick : minTick, isXtoY, xDecimal, yDecimal))
   )
 
   const primaryUnitsPrice = getPrimaryUnitsPrice(
@@ -547,8 +550,8 @@ export const calculateSqrtPriceFromBalance = (
       ? BigInt(primaryUnitsPrice).toString()
       : primaryUnitsPrice.toFixed(24)
 
-  const price = convertBalanceToBigint(parsedPrimaryUnits, SQRT_PRICE_SCALE)
-  const sqrtPrice = priceToSqrtPrice(price)
+  const bigintPrice = convertBalanceToBigint(parsedPrimaryUnits, SQRT_PRICE_SCALE)
+  const sqrtPrice = priceToSqrtPrice(bigintPrice)
 
   const minSqrtPrice = calculateSqrtPrice(minTick)
   const maxSqrtPrice = calculateSqrtPrice(maxTick)

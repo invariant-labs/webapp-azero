@@ -149,9 +149,12 @@ export const PoolInit: React.FC<IPoolInit> = ({
 
   const price = useMemo(
     () =>
-      Math.max(
-        +midPriceInput,
-        Number(calcPriceByTickIndex(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
+      Math.min(
+        Math.max(
+          +midPriceInput,
+          Number(calcPriceByTickIndex(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
+        ),
+        Number(calcPriceByTickIndex(isXtoY ? maxTick : minTick, isXtoY, xDecimal, yDecimal))
       ),
     [midPriceInput, isXtoY, xDecimal, yDecimal]
   )
