@@ -1,6 +1,7 @@
 import React from 'react'
 import useStyles from './style'
 import { Box, Button, Grid, Input, Popover, Typography } from '@mui/material'
+import classNames from 'classnames'
 
 interface Props {
   open: boolean
@@ -30,7 +31,7 @@ const Slippage: React.FC<Props> = ({
   const allowOnlyDigitsAndTrimUnnecessaryZeros: React.ChangeEventHandler<
     HTMLInputElement | HTMLTextAreaElement
   > = e => {
-    const value = e.target.value.split('%')[0]
+    const value = e.target.value
 
     const regex = /^\d*\.?\d*$/
     if (value === '' || regex.test(value)) {
@@ -64,7 +65,7 @@ const Slippage: React.FC<Props> = ({
   }
 
   const checkSlippage: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = e => {
-    const value = e.target.value.split('%')[0]
+    const value = e.target.value
 
     if (Number(value) > 50) {
       setSlippTolerance('50.00')
@@ -103,7 +104,7 @@ const Slippage: React.FC<Props> = ({
             placeholder='1.00'
             className={classes.detailsInfoForm}
             type={'text'}
-            value={slippTolerance + '%'}
+            value={slippTolerance}
             onChange={e => {
               allowOnlyDigitsAndTrimUnnecessaryZeros(e)
               checkSlippage(e)
@@ -114,14 +115,17 @@ const Slippage: React.FC<Props> = ({
               setSlippage(slippTolerance)
             }}
             endAdornment={
-              <button
-                className={classes.detailsInfoBtn}
-                onClick={() => {
-                  setSlippTolerance(defaultSlippage)
-                  setSlippage(defaultSlippage)
-                }}>
-                Auto
-              </button>
+              <>
+                %
+                <button
+                  className={classes.detailsInfoBtn}
+                  onClick={() => {
+                    setSlippTolerance(defaultSlippage)
+                    setSlippage(defaultSlippage)
+                  }}>
+                  Auto
+                </button>
+              </>
             }
             classes={{
               input: classes.innerInput
