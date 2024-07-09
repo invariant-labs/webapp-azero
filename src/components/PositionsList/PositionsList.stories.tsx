@@ -97,6 +97,9 @@ export const Primary: Story = {
     handleRefresh: () => {},
     initialPage: 1,
     setLastPage: () => {},
-    pageChanged: () => {}
+    pageChanged: () => {},
+    length: 0 as any,
+    loadedPages: {},
+    getRemainingPositions: () => {}
   }
 }

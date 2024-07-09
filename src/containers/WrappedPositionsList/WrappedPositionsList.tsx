@@ -171,6 +171,11 @@ export const WrappedPositionsList: React.FC = () => {
           )
         }
       }}
+      length={length}
+      loadedPages={loadedPages}
+      getRemainingPositions={() => {
+        dispatch(actions.getRemainingPositions())
+      }}
     />
   )
 }
