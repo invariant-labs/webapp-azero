@@ -1,5 +1,5 @@
 import { Position } from '@invariant-labs/a0-sdk'
-import { poolKeyToString } from '@store/consts/utils'
+import { poolKeyToString, stringifyWithBigInt } from '@store/consts/utils'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { createSelector } from 'reselect'
 import { IPositionsStore, positionsSliceName } from '../reducers/positions'
@@ -54,22 +54,27 @@ export const positionsWithPoolsData = createSelector(
       }
     })
 
-    return list.map((position, index) => {
-      const tokenX = tokens.find(token => token.assetAddress === position.poolKey.tokenX)
-      const tokenY = tokens.find(token => token.assetAddress === position.poolKey.tokenY)
-
-      if (!tokenX || !tokenY) {
-        throw new Error(`Token not found for position: ${position}`)
-      }
-
-      return {
-        ...position,
-        poolData: poolsByKey[poolKeyToString(position.poolKey)],
-        tokenX,
-        tokenY,
-        positionIndex: index
-      }
-    })
+    return list
+      .filter(position => {
+        const tokenX = tokens.find(token => token.assetAddress === position.poolKey.tokenX)
+        const tokenY = tokens.find(token => token.assetAddress === position.poolKey.tokenY)
+        if (!tokenX || !tokenY) {
+          console.log('Token not found for position: ', stringifyWithBigInt(position))
+          return false
+        }
+        return true
+      })
+      .map((position, index) => {
+        const tokenX = tokens.find(token => token.assetAddress === position.poolKey.tokenX)
+        const tokenY = tokens.find(token => token.assetAddress === position.poolKey.tokenY)
+        return {
+          ...position,
+          poolData: poolsByKey[poolKeyToString(position.poolKey)],
+          tokenX,
+          tokenY,
+          positionIndex: index
+        }
+      })
   }
 )
 
