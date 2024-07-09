@@ -453,12 +453,14 @@ export const NewPosition: React.FC<INewPosition> = ({
 
   const blockedToken = useMemo(
     () =>
-      determinePositionTokenBlock(
-        currentPriceSqrt,
-        BigInt(Math.min(Number(leftRange), Number(rightRange))),
-        BigInt(Math.max(Number(leftRange), Number(rightRange))),
-        isXtoY
-      ),
+      positionOpeningMethod === 'range'
+        ? determinePositionTokenBlock(
+            currentPriceSqrt,
+            BigInt(Math.min(Number(leftRange), Number(rightRange))),
+            BigInt(Math.max(Number(leftRange), Number(rightRange))),
+            isXtoY
+          )
+        : false,
     [leftRange, rightRange, currentPriceSqrt]
   )
 
