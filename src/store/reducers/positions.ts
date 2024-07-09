@@ -177,11 +177,13 @@ const positionsSlice = createSlice({
       }
 
       state.positionsList.list.pop()
+      state.positionsList.length -= 1n
 
       return state
     },
     addPosition(state, action: PayloadAction<Position>) {
       state.positionsList.list.push(action.payload)
+      state.positionsList.length += 1n
       return state
     },
     getSinglePosition(state, _action: PayloadAction<bigint>) {

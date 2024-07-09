@@ -49,7 +49,6 @@ import { fetchBalances } from './wallet'
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types'
 import { calculateTokenAmountsWithSlippage } from '@invariant-labs/a0-sdk/target/utils'
 import { positionsList } from '@store/selectors/positions'
-import { POSITIONS_ENTRIES_LIMIT } from '@invariant-labs/a0-sdk/target/consts'
 
 function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator {
   const {
@@ -1044,20 +1043,21 @@ export function* handleGetRemainingPositions(): Generator {
     length,
     Object.entries(loadedPages)
       .filter(([_, isLoaded]) => isLoaded)
-      .map(([index]) => Number(index + 1))
+      .map(([index]) => Number(index)),
+    BigInt(POSITIONS_PER_QUERY)
   )
 
   const allList = [...list]
   for (const { index, entries } of pages) {
     for (let i = 0; i < entries.length; i++) {
-      allList[i + (index - 1) * Number(POSITIONS_ENTRIES_LIMIT)] = entries[i][0]
+      allList[i + index * Number(POSITIONS_PER_QUERY)] = entries[i][0]
     }
   }
 
   yield* put(actions.setPositionsList(allList))
   yield* put(
     actions.setPositionsListLoadedStatus({
-      indexes: pages.map(({ index }) => index - 1),
+      indexes: pages.map(({ index }) => index),
       isLoaded: true
     })
   )
