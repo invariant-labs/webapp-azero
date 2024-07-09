@@ -459,7 +459,7 @@ export const NewPosition: React.FC<INewPosition> = ({
         BigInt(Math.max(Number(leftRange), Number(rightRange))),
         isXtoY
       ),
-    [leftRange, rightRange]
+    [leftRange, rightRange, currentPriceSqrt]
   )
 
   return (
