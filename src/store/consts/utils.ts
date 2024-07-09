@@ -1025,9 +1025,3 @@ export function testnetBestTiersCreator() {
 export const positionListPageToQueryPage = (page: number): number => {
   return Math.max(Math.ceil((page * POSITIONS_PER_PAGE) / POSITIONS_PER_QUERY) - 1, 0)
 }
-
-export const stringifyWithBigInt = (obj: Object) => {
-  return JSON.stringify(obj, (_key, value) =>
-    typeof value === 'bigint' ? value.toString() : value
-  )
-}

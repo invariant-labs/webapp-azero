@@ -60,8 +60,11 @@ export const positionsWithPoolsData = createSelector(
       const tokenX = tokens.find(token => token.assetAddress === position.poolKey.tokenX)
       const tokenY = tokens.find(token => token.assetAddress === position.poolKey.tokenY)
 
-      if (!tokenX || !tokenY) {
-        console.log('Token not found for position: ', stringifyWithBigInt(position))
+      if (!tokenX) {
+        console.log(`Token ${position.poolKey.tokenX} not found for position`)
+        continue
+      } else if (!tokenY) {
+        console.log(`Token ${position.poolKey.tokenY} not found for position`)
         continue
       }
 
