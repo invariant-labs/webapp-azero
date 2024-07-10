@@ -547,7 +547,7 @@ export const calculateSqrtPriceFromBalance = (
 
   const parsedPrimaryUnits =
     primaryUnitsPrice > 1 && Number.isInteger(primaryUnitsPrice)
-      ? BigInt(primaryUnitsPrice).toString()
+      ? primaryUnitsPrice.toString()
       : primaryUnitsPrice.toFixed(24)
 
   const bigintPrice = convertBalanceToBigint(parsedPrimaryUnits, SQRT_PRICE_SCALE)
