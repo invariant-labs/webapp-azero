@@ -1121,8 +1121,8 @@ export const validConcentrationMidPrice = (
   const minTickLimit = minTick + (2n + tickDelta) * tickSpacing
   const maxTickLimit = maxTick - (2n + tickDelta) * tickSpacing
 
-  const minPrice = calcPrice(minTickLimit, isXtoY, xDecimal, yDecimal).toString()
-  const maxPrice = calcPrice(maxTickLimit, isXtoY, xDecimal, yDecimal).toString()
+  const minPrice = calcPriceByTickIndex(minTickLimit, isXtoY, xDecimal, yDecimal)
+  const maxPrice = calcPriceByTickIndex(maxTickLimit, isXtoY, xDecimal, yDecimal)
 
   if (isXtoY) {
     if (midPriceTick < minTickLimit) {
@@ -1138,7 +1138,7 @@ export const validConcentrationMidPrice = (
     }
   }
 
-  return calcPrice(midPriceTick, isXtoY, xDecimal, yDecimal).toString()
+  return calcPriceByTickIndex(midPriceTick, isXtoY, xDecimal, yDecimal)
 }
 
 export const validConcentrationMidPriceTick = (

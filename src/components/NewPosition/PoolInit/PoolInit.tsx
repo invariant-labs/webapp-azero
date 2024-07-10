@@ -15,7 +15,7 @@ import {
 } from '@store/consts/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import useStyles from './style'
-import { calculateTick, calculateTickDelta, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
+import { calculateTick, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
 import { PositionOpeningMethod } from '@store/consts/types'
 import ConcentrationSlider from '../ConcentrationSlider/ConcentrationSlider'
 import { MINIMAL_POOL_INIT_PRICE } from '@store/consts/static'
@@ -77,40 +77,23 @@ export const PoolInit: React.FC<IPoolInit> = ({
     calcPriceByTickIndex(midPriceIndex, isXtoY, xDecimal, yDecimal).toFixed(8)
   )
 
-  // const validConcentrationMidPriceTick = useMemo(() => {
-  //   const parsedTickSpacing = Number(tickSpacing)
-  //   const tickDelta = BigInt(calculateTickDelta(parsedTickSpacing, 2, 2))
-
-  //   const minLimit = minTick + (2n + tickDelta) * tickSpacing
-  //   const maxLimit = maxTick - (2n + tickDelta) * tickSpacing
-
-  //   if (isXtoY) {
-  //     if (midPriceIndex < minLimit) {
-  //       return minLimit
-  //     } else if (midPriceIndex > maxLimit) {
-  //       return maxLimit
-  //     }
-  //   } else {
-  //     if (midPriceIndex > maxLimit) {
-  //       return maxLimit
-  //     } else if (midPriceIndex < minLimit) {
-  //       return minLimit
-  //     }
-  //   }
-
-  //   return midPriceIndex
-  // }, [midPriceIndex])
-
   useEffect(() => {
-    const sqrtPrice = calculateSqrtPriceFromBalance(
-      +midPriceInput,
+    const midPriceInConcentrationMode = validConcentrationMidPrice(
+      midPriceInput,
       tickSpacing,
       isXtoY,
       xDecimal,
       yDecimal
     )
 
-    //TODO add validation for sqrtPrice with concentration mode
+    const sqrtPrice = calculateSqrtPriceFromBalance(
+      positionOpeningMethod === 'range' ? +midPriceInput : midPriceInConcentrationMode,
+      tickSpacing,
+      isXtoY,
+      xDecimal,
+      yDecimal
+    )
+
     const priceTickIndex = calculateTick(sqrtPrice, tickSpacing)
 
     onChangeMidPrice(BigInt(priceTickIndex), sqrtPrice)
@@ -160,7 +143,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
 
   useEffect(() => {
     changeRangeHandler(leftRange, rightRange)
-  }, [midPriceIndex])
+  }, [midPriceInput])
 
   useEffect(() => {
     if (positionOpeningMethod === 'concentration') {
@@ -199,26 +182,38 @@ export const PoolInit: React.FC<IPoolInit> = ({
 
   const validateMidPriceInput = (midPriceInput: string) => {
     if (positionOpeningMethod === 'concentration') {
-      return validConcentrationMidPrice(midPriceInput, tickSpacing, isXtoY, xDecimal, yDecimal)
+      const validatedMidPrice = validConcentrationMidPrice(
+        midPriceInput,
+        tickSpacing,
+        isXtoY,
+        xDecimal,
+        yDecimal
+      )
+
+      const validatedPrice =
+        validatedMidPrice < MINIMAL_POOL_INIT_PRICE ? MINIMAL_POOL_INIT_PRICE : validatedMidPrice
+
+      return trimZeros(validatedPrice.toFixed(8))
     } else {
       const minPriceFromTick = isXtoY
         ? calcPriceByTickIndex(minTick, isXtoY, xDecimal, yDecimal)
         : calcPriceByTickIndex(maxTick, isXtoY, xDecimal, yDecimal)
 
-      const minimalAllowedInput =
-        minPriceFromTick < MINIMAL_POOL_INIT_PRICE ? MINIMAL_POOL_INIT_PRICE : minPriceFromTick
-      const maxPrice = isXtoY
+      const maxPriceFromTick = isXtoY
         ? calcPriceByTickIndex(maxTick, isXtoY, xDecimal, yDecimal)
         : calcPriceByTickIndex(minTick, isXtoY, xDecimal, yDecimal)
+
+      const minimalAllowedInput =
+        minPriceFromTick < MINIMAL_POOL_INIT_PRICE ? MINIMAL_POOL_INIT_PRICE : minPriceFromTick
 
       const numericMidPriceInput = parseFloat(midPriceInput)
 
       const validatedMidPrice = Math.min(
         Math.max(numericMidPriceInput, minimalAllowedInput),
-        maxPrice
+        maxPriceFromTick
       )
 
-      return trimZeros(validatedMidPrice.toFixed(8).toString())
+      return trimZeros(validatedMidPrice.toFixed(8))
     }
   }
 
@@ -230,6 +225,12 @@ export const PoolInit: React.FC<IPoolInit> = ({
       changeRangeHandler(rightRange, leftRange)
     }
   }, [currentPairReversed])
+
+  useEffect(() => {
+    const validatedMidPrice = validateMidPriceInput(midPriceInput)
+
+    setMidPriceInput(validatedMidPrice)
+  }, [positionOpeningMethod])
 
   const price = useMemo(
     () =>
