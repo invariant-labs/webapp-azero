@@ -461,13 +461,15 @@ export const NewPosition: React.FC<INewPosition> = ({
 
   const blockedToken = useMemo(
     () =>
-      determinePositionTokenBlock(
-        currentPriceSqrt,
-        BigInt(Math.min(Number(leftRange), Number(rightRange))),
-        BigInt(Math.max(Number(leftRange), Number(rightRange))),
-        isXtoY
-      ),
-    [leftRange, rightRange]
+      positionOpeningMethod === 'range'
+        ? determinePositionTokenBlock(
+            currentPriceSqrt,
+            BigInt(Math.min(Number(leftRange), Number(rightRange))),
+            BigInt(Math.max(Number(leftRange), Number(rightRange))),
+            isXtoY
+          )
+        : false,
+    [leftRange, rightRange, currentPriceSqrt]
   )
 
   return (
@@ -533,7 +535,7 @@ export const NewPosition: React.FC<INewPosition> = ({
         setSlippage={setSlippage}
         handleClose={handleCloseSettings}
         anchorEl={anchorEl}
-        defaultSlippage={'1'}
+        defaultSlippage={'1.00'}
         initialSlippage={initialSlippage}
         infoText='Slippage tolerance is a pricing difference between the price at the confirmation time and the actual price of the transaction users are willing to accept when initializing position.'
         headerText='Position Transaction Settings'

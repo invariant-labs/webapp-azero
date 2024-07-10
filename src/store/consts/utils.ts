@@ -1100,3 +1100,74 @@ export function testnetBestTiersCreator() {
 export const positionListPageToQueryPage = (page: number): number => {
   return Math.max(Math.ceil((page * POSITIONS_PER_PAGE) / POSITIONS_PER_QUERY) - 1, 0)
 }
+
+export const validConcentrationMidPrice = (
+  midPrice: string,
+  tickSpacing: bigint,
+  isXtoY: boolean,
+  xDecimal: bigint,
+  yDecimal: bigint
+) => {
+  const minTick = getMinTick(tickSpacing)
+  const maxTick = getMaxTick(tickSpacing)
+
+  const midPriceTick = BigInt(
+    calculateTickFromBalance(+midPrice, tickSpacing, isXtoY, xDecimal, yDecimal)
+  )
+
+  const parsedTickSpacing = Number(tickSpacing)
+  const tickDelta = BigInt(calculateTickDelta(parsedTickSpacing, 2, 2))
+
+  const minTickLimit = minTick + (2n + tickDelta) * tickSpacing
+  const maxTickLimit = maxTick - (2n + tickDelta) * tickSpacing
+
+  const minPrice = calcPrice(minTickLimit, isXtoY, xDecimal, yDecimal).toString()
+  const maxPrice = calcPrice(maxTickLimit, isXtoY, xDecimal, yDecimal).toString()
+
+  if (isXtoY) {
+    if (midPriceTick < minTickLimit) {
+      return minPrice
+    } else if (midPriceTick > maxTickLimit) {
+      return maxPrice
+    }
+  } else {
+    if (midPriceTick > maxTickLimit) {
+      return maxPrice
+    } else if (midPriceTick < minTickLimit) {
+      return minPrice
+    }
+  }
+
+  return calcPrice(midPriceTick, isXtoY, xDecimal, yDecimal).toString()
+}
+
+export const validConcentrationMidPriceTick = (
+  midPriceTick: bigint,
+  tickSpacing: bigint,
+  isXtoY: boolean
+) => {
+  const minTick = getMinTick(tickSpacing)
+  const maxTick = getMaxTick(tickSpacing)
+
+  const parsedTickSpacing = Number(tickSpacing)
+  const tickDelta = BigInt(calculateTickDelta(parsedTickSpacing, 2, 2))
+
+  const minTickLimit = minTick + (2n + tickDelta) * tickSpacing
+  const maxTickLimit = maxTick - (2n + tickDelta) * tickSpacing
+
+  if (isXtoY) {
+    if (midPriceTick < minTickLimit) {
+      return minTickLimit
+    } else if (midPriceTick > maxTickLimit) {
+      return maxTickLimit
+    }
+  } else {
+    if (midPriceTick > maxTickLimit) {
+      return maxTickLimit
+    } else if (midPriceTick < minTickLimit) {
+      return minTickLimit
+    }
+  }
+
+  return midPriceTick
+}

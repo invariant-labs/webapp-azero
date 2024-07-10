@@ -9,8 +9,12 @@ const useStyles = makeStyles()(theme => {
       padding: '16px 24px 16px 24px',
       flex: '1 1 0%',
       position: 'relative',
+      [theme.breakpoints.down('lg')]: {
+        paddingBottom: 24
+      },
+
       [theme.breakpoints.down('sm')]: {
-        padding: '16px 8px  16px 8px '
+        padding: '16px 8px  24px 8px '
       }
     },
     headerContainer: {

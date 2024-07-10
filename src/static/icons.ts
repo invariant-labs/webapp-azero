@@ -11,7 +11,6 @@ import devnetIcon from './svg/devNet.svg'
 import testnetIcon from './svg/testNet.svg'
 import githubIcon from './svg/githubCircle.svg'
 import telegramIcon from './svg/telegramCircle.svg'
-import twitterIcon from './svg/twitterCircle.svg'
 import mediumIcon from './svg/mediumCircle.svg'
 import discordIcon from './svg/discordCircle.svg'
 import closeIcon from './svg/closeIcon.svg'
@@ -21,6 +20,7 @@ import allIcon from './svg/all.svg'
 import docsIcon from './svg/docsCircle.svg'
 import closeSmallIcon from './svg/closeSmall.svg'
 import successIcon from './svg/successIcon.svg'
+import xIcon from './svg/xCircle.svg'
 
 const icons: { [key: string]: string } = {
   clear: clearIcon,
@@ -36,7 +36,6 @@ const icons: { [key: string]: string } = {
   TestnetIcon: testnetIcon,
   GithubIcon: githubIcon,
   TelegramIcon: telegramIcon,
-  TwitterIcon: twitterIcon,
   DiscordIcon: discordIcon,
   mediumIcon: mediumIcon,
   closeIcon: closeIcon,
@@ -45,7 +44,8 @@ const icons: { [key: string]: string } = {
   allIcon: allIcon,
   closeSmallIcon: closeSmallIcon,
   docsIcon: docsIcon,
-  successIcon: successIcon
+  successIcon: successIcon,
+  XIcon: xIcon
 }
 
 export default icons

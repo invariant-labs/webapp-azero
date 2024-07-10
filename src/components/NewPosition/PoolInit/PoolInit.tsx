@@ -9,6 +9,8 @@ import {
   formatNumber,
   nearestTickIndex,
   toMaxNumericPlaces,
+  validConcentrationMidPrice,
+  validConcentrationMidPriceTick,
   trimZeros
 } from '@store/consts/utils'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -75,29 +77,29 @@ export const PoolInit: React.FC<IPoolInit> = ({
     calcPriceByTickIndex(midPriceIndex, isXtoY, xDecimal, yDecimal).toFixed(8)
   )
 
-  const validConcentrationMidPriceTick = useMemo(() => {
-    const parsedTickSpacing = Number(tickSpacing)
-    const tickDelta = BigInt(calculateTickDelta(parsedTickSpacing, 2, 2))
+  // const validConcentrationMidPriceTick = useMemo(() => {
+  //   const parsedTickSpacing = Number(tickSpacing)
+  //   const tickDelta = BigInt(calculateTickDelta(parsedTickSpacing, 2, 2))
 
-    const minLimit = minTick + (2n + tickDelta) * tickSpacing
-    const maxLimit = maxTick - (2n + tickDelta) * tickSpacing
+  //   const minLimit = minTick + (2n + tickDelta) * tickSpacing
+  //   const maxLimit = maxTick - (2n + tickDelta) * tickSpacing
 
-    if (isXtoY) {
-      if (midPriceIndex < minLimit) {
-        return minLimit
-      } else if (midPriceIndex > maxLimit) {
-        return maxLimit
-      }
-    } else {
-      if (midPriceIndex > maxLimit) {
-        return maxLimit
-      } else if (midPriceIndex < minLimit) {
-        return minLimit
-      }
-    }
+  //   if (isXtoY) {
+  //     if (midPriceIndex < minLimit) {
+  //       return minLimit
+  //     } else if (midPriceIndex > maxLimit) {
+  //       return maxLimit
+  //     }
+  //   } else {
+  //     if (midPriceIndex > maxLimit) {
+  //       return maxLimit
+  //     } else if (midPriceIndex < minLimit) {
+  //       return minLimit
+  //     }
+  //   }
 
-    return midPriceIndex
-  }, [midPriceIndex])
+  //   return midPriceIndex
+  // }, [midPriceIndex])
 
   useEffect(() => {
     const sqrtPrice = calculateSqrtPriceFromBalance(
@@ -108,6 +110,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
       yDecimal
     )
 
+    //TODO add validation for sqrtPrice with concentration mode
     const priceTickIndex = calculateTick(sqrtPrice, tickSpacing)
 
     onChangeMidPrice(BigInt(priceTickIndex), sqrtPrice)
@@ -166,7 +169,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
         tickSpacing,
         concentrationArray[0],
         2,
-        validConcentrationMidPriceTick,
+        validConcentrationMidPriceTick(midPriceIndex, tickSpacing, isXtoY),
         isXtoY
       )
 
@@ -187,33 +190,36 @@ export const PoolInit: React.FC<IPoolInit> = ({
         tickSpacing,
         concentrationArray[index],
         2,
-        validConcentrationMidPriceTick,
+        validConcentrationMidPriceTick(midPriceIndex, tickSpacing, isXtoY),
         isXtoY
       )
-
       changeRangeHandler(leftRange, rightRange)
     }
   }, [midPriceInput, concentrationArray, validConcentrationMidPriceTick])
 
   const validateMidPriceInput = (midPriceInput: string) => {
-    const minPriceFromTick = isXtoY
-      ? calcPriceByTickIndex(minTick, isXtoY, xDecimal, yDecimal)
-      : calcPriceByTickIndex(maxTick, isXtoY, xDecimal, yDecimal)
+    if (positionOpeningMethod === 'concentration') {
+      return validConcentrationMidPrice(midPriceInput, tickSpacing, isXtoY, xDecimal, yDecimal)
+    } else {
+      const minPriceFromTick = isXtoY
+        ? calcPriceByTickIndex(minTick, isXtoY, xDecimal, yDecimal)
+        : calcPriceByTickIndex(maxTick, isXtoY, xDecimal, yDecimal)
 
-    const minimalAllowedInput =
-      minPriceFromTick < MINIMAL_POOL_INIT_PRICE ? MINIMAL_POOL_INIT_PRICE : minPriceFromTick
-    const maxPrice = isXtoY
-      ? calcPriceByTickIndex(maxTick, isXtoY, xDecimal, yDecimal)
-      : calcPriceByTickIndex(minTick, isXtoY, xDecimal, yDecimal)
+      const minimalAllowedInput =
+        minPriceFromTick < MINIMAL_POOL_INIT_PRICE ? MINIMAL_POOL_INIT_PRICE : minPriceFromTick
+      const maxPrice = isXtoY
+        ? calcPriceByTickIndex(maxTick, isXtoY, xDecimal, yDecimal)
+        : calcPriceByTickIndex(minTick, isXtoY, xDecimal, yDecimal)
 
-    const numericMidPriceInput = parseFloat(midPriceInput)
+      const numericMidPriceInput = parseFloat(midPriceInput)
 
-    const validatedMidPrice = Math.min(
-      Math.max(numericMidPriceInput, minimalAllowedInput),
-      maxPrice
-    )
+      const validatedMidPrice = Math.min(
+        Math.max(numericMidPriceInput, minimalAllowedInput),
+        maxPrice
+      )
 
-    return trimZeros(validatedMidPrice.toFixed(8).toString())
+      return trimZeros(validatedMidPrice.toFixed(8).toString())
+    }
   }
 
   useEffect(() => {
@@ -366,7 +372,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
                   tickSpacing,
                   concentrationArray[value],
                   2,
-                  validConcentrationMidPriceTick,
+                  validConcentrationMidPriceTick(midPriceIndex, tickSpacing, isXtoY),
                   isXtoY
                 )
 
