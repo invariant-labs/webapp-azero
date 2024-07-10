@@ -445,7 +445,7 @@ export const Swap: React.FC<ISwap> = ({
             setSlippage={setSlippage}
             handleClose={handleCloseSettings}
             anchorEl={anchorEl}
-            defaultSlippage={'1'}
+            defaultSlippage={'1.00'}
             initialSlippage={initialSlippage}
           />
         </Grid>
@@ -602,7 +602,7 @@ export const Swap: React.FC<ISwap> = ({
               }>
               <Grid className={classes.transactionDetailsWrapper}>
                 <Typography className={classes.transactionDetailsHeader}>
-                  See transaction details
+                  {detailsOpen && canShowDetails ? 'Hide' : 'Show'} transaction details
                 </Typography>
                 <CardMedia image={infoIcon} className={classes.infoIcon} />
               </Grid>

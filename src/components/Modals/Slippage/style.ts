@@ -64,7 +64,8 @@ export const useStyles = makeStyles()(() => {
       }
     },
     innerInput: {
-      paddingBlock: 0
+      paddingBlock: 0,
+      textAlign: 'right'
     },
     detailsInfoBtn: {
       minWidth: 49,
@@ -75,6 +76,7 @@ export const useStyles = makeStyles()(() => {
       width: 49,
       height: 28,
       cursor: 'pointer',
+      marginLeft: 8,
       ...typography.body2,
       '&:hover': {
         filter: 'brightness(1.15)',
