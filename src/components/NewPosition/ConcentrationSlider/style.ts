@@ -21,10 +21,13 @@ export const useThumbStyles = makeStyles()(() => {
 })
 
 export const useSliderStyles = makeStyles<{ valuesLength: number; disabledRange: number }>()(
-  (_theme, { disabledRange, valuesLength }) => ({
+  (theme, { disabledRange, valuesLength }) => ({
     root: {
       width: '100%',
-      paddingBlock: 13
+      paddingBlock: 13,
+      [theme.breakpoints.down('sm')]: {
+        margin: '0 16px'
+      }
     },
     thumb: {
       width: 'auto',
@@ -82,7 +85,6 @@ export const useSliderStyles = makeStyles<{ valuesLength: number; disabledRange:
     },
 
     valueLabel: {
-      // padding: '2px 30px',
       padding: '2px 15px',
       width: 300,
       height: 17,
