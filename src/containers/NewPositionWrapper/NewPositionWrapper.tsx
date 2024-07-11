@@ -494,7 +494,9 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     dispatch(positionsActions.setShouldNotUpdateRange(false))
   }
   const onRefresh = () => {
-    dispatch(positionsActions.setShouldNotUpdateRange(true))
+    if (!success) {
+      dispatch(positionsActions.setShouldNotUpdateRange(true))
+    }
 
     if (tokenAIndex !== null && tokenBIndex !== null) {
       dispatch(
@@ -662,7 +664,9 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         if (tokenAIndex === null || tokenBIndex === null) {
           return
         }
-        dispatch(positionsActions.setShouldNotUpdateRange(true))
+        if (poolKey !== '') {
+          dispatch(positionsActions.setShouldNotUpdateRange(true))
+        }
         if (progress === 'none') {
           setProgress('progress')
         }
