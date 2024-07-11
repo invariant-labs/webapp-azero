@@ -10,7 +10,8 @@ import {
   nearestTickIndex,
   toMaxNumericPlaces,
   trimZeros,
-  calculateTickFromBalance
+  calculateTickFromBalance,
+  validConcentrationMidPriceTick
 } from '@store/consts/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import useStyles from './style'
@@ -110,33 +111,6 @@ export const PoolInit: React.FC<IPoolInit> = ({
     return calcPriceByTickIndex(midPriceTick, isXtoY, xDecimal, yDecimal)
   }
 
-  const validConcentrationMidPriceTick = (midPriceTick: bigint) => {
-    const minTick = getMinTick(tickSpacing)
-    const maxTick = getMaxTick(tickSpacing)
-
-    const parsedTickSpacing = Number(tickSpacing)
-    const tickDelta = BigInt(calculateTickDelta(parsedTickSpacing, 2, 2))
-
-    const minTickLimit = minTick + (2n + tickDelta) * tickSpacing
-    const maxTickLimit = maxTick - (2n + tickDelta) * tickSpacing
-
-    if (isXtoY) {
-      if (midPriceTick < minTickLimit) {
-        return minTickLimit
-      } else if (midPriceTick > maxTickLimit) {
-        return maxTickLimit
-      }
-    } else {
-      if (midPriceTick > maxTickLimit) {
-        return maxTickLimit
-      } else if (midPriceTick < minTickLimit) {
-        return minTickLimit
-      }
-    }
-
-    return midPriceTick
-  }
-
   useEffect(() => {
     const midPriceInConcentrationMode = validConcentrationMidPrice(midPriceInput)
 
@@ -202,7 +176,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
         tickSpacing,
         concentrationArray[0],
         2,
-        validConcentrationMidPriceTick(midPriceIndex),
+        validConcentrationMidPriceTick(midPriceIndex, isXtoY, tickSpacing),
         isXtoY
       )
 
@@ -223,7 +197,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
         tickSpacing,
         concentrationArray[index],
         2,
-        validConcentrationMidPriceTick(midPriceIndex),
+        validConcentrationMidPriceTick(midPriceIndex, isXtoY, tickSpacing),
         isXtoY
       )
       changeRangeHandler(leftRange, rightRange)
@@ -419,7 +393,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
                   tickSpacing,
                   concentrationArray[value],
                   2,
-                  validConcentrationMidPriceTick(midPriceIndex),
+                  validConcentrationMidPriceTick(midPriceIndex, isXtoY, tickSpacing),
                   isXtoY
                 )
 
