@@ -72,7 +72,8 @@ export const Primary: Story = {
     onRefresh: fn(),
     isBalanceLoading: false,
     shouldNotUpdatePriceRange: false,
-    unblockUpdatePriceRange: fn()
+    unblockUpdatePriceRange: fn(),
+    isGetLiquidityError: false
   },
   render: () => {
     return (
@@ -130,6 +131,7 @@ export const Primary: Story = {
         isBalanceLoading={false}
         shouldNotUpdatePriceRange={false}
         unblockUpdatePriceRange={fn()}
+        isGetLiquidityError={false}
       />
     )
   }
