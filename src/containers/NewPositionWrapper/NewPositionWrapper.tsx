@@ -7,7 +7,12 @@ import {
   newPoolKey
 } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
-import { ALL_FEE_TIERS_DATA, bestTiers, commonTokensForNetworks } from '@store/consts/static'
+import {
+  ALL_FEE_TIERS_DATA,
+  U128MAX,
+  bestTiers,
+  commonTokensForNetworks
+} from '@store/consts/static'
 import { PositionOpeningMethod, TokenPriceData } from '@store/consts/types'
 import {
   addNewTokenToLocalStorage,
@@ -80,6 +85,8 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const [currentPairReversed, setCurrentPairReversed] = useState<boolean | null>(null)
 
   const [initialLoader, setInitialLoader] = useState(true)
+
+  const [isGetLiquidityError, setIsGetLiquidityError] = useState(false)
 
   const isMountedRef = useRef(false)
 
@@ -457,10 +464,15 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         if (isMountedRef.current) {
           liquidityRef.current = positionLiquidity
         }
-
+        setIsGetLiquidityError(false)
         return tokenYAmount
       }
+    } catch (error) {
+      setIsGetLiquidityError(true)
+      return printBigint(U128MAX, tokens[tokenAIndex].decimals)
+    }
 
+    try {
       const { amount: tokenXAmount, l: positionLiquidity } = getLiquidityByY(
         amount,
         lowerTick,
@@ -472,19 +484,11 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       if (isMountedRef.current) {
         liquidityRef.current = positionLiquidity
       }
-
+      setIsGetLiquidityError(false)
       return tokenXAmount
     } catch (error) {
-      const result = (byX ? getLiquidityByY : getLiquidityByX)(
-        amount,
-        lowerTick,
-        upperTick,
-        poolsData[poolKey] ? poolsData[poolKey].sqrtPrice : midPrice.sqrtPrice,
-        true
-      )
-      if (isMountedRef.current) {
-        liquidityRef.current = result.liquidity
-      }
+      setIsGetLiquidityError(true)
+      return printBigint(U128MAX, tokens[tokenBIndex].decimals)
     }
 
     return BigInt(0)
@@ -702,6 +706,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       isBalanceLoading={isBalanceLoading}
       shouldNotUpdatePriceRange={shouldNotUpdatePriceRange}
       unblockUpdatePriceRange={unblockUpdatePriceRange}
+      isGetLiquidityError={isGetLiquidityError}
     />
   )
 }
