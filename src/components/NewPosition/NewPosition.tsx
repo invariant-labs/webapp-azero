@@ -2,7 +2,7 @@ import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import Slippage from '@components/Modals/Slippage/Slippage'
 import { INoConnected, NoConnected } from '@components/NoConnected/NoConnected'
 import Refresher from '@components/Refresher/Refresher'
-import { getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
+import { calculateSqrtPrice, calculateTick, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
 import { Box, Button, Grid, Hidden, Typography } from '@mui/material'
 import backIcon from '@static/svg/back-arrow.svg'
@@ -307,7 +307,7 @@ export const NewPosition: React.FC<INewPosition> = ({
 
   const onChangeMidPrice = (tickIndex: bigint, sqrtPrice: bigint) => {
     setMidPrice({
-      index: tickIndex,
+      index: calculateTick(calculateSqrtPrice(tickIndex), tickSpacing),
       x: calcPriceBySqrtPrice(sqrtPrice, isXtoY, xDecimal, yDecimal),
       sqrtPrice: sqrtPrice
     })
