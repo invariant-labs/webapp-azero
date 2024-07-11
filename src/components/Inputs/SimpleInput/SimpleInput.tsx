@@ -37,9 +37,9 @@ export const SimpleInput: React.FC<IProps> = ({
       const caretPosition = e.target.selectionStart
 
       let parsed = e.target.value
-      const zerosRegex = /^0+\d+\.?\d*$/
+      const zerosRegex = /^0+\d*\.?\d*$/
       if (zerosRegex.test(parsed)) {
-        parsed = parsed.replace(/^0+/, '')
+        parsed = parsed.replace(/^0+(?!$)/, '')
       }
 
       const dotRegex = /^\.\d*$/
@@ -59,12 +59,11 @@ export const SimpleInput: React.FC<IProps> = ({
         }, 0)
       }
     } else if (!onlyNumbersRegex.test(e.target.value)) {
-      setValue('')
+      return
     } else if (!regex.test(e.target.value)) {
       setValue(e.target.value.slice(0, e.target.value.length - 1))
     }
   }
-
   return (
     <Input
       inputRef={inputRef}

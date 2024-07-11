@@ -4,7 +4,8 @@ import { calculateFee, calculateTokenAmounts } from '@invariant-labs/a0-sdk'
 import { Grid } from '@mui/material'
 import loader from '@static/gif/loader.gif'
 import {
-  calcPrice,
+  calcPriceBySqrtPrice,
+  calcPriceByTickIndex,
   calcYPerXPriceByTickIndex,
   createPlaceholderLiquidityPlot,
   getCoinGeckoTokenPrice,
@@ -107,8 +108,9 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
     if (position?.poolData) {
       return {
         index: position.poolData.currentTickIndex,
-        x: calcYPerXPriceByTickIndex(
-          position.poolData.currentTickIndex,
+        x: calcPriceBySqrtPrice(
+          position.poolData.sqrtPrice,
+          true,
           position.tokenX.decimals,
           position.tokenY.decimals
         )
@@ -125,7 +127,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
     if (position) {
       return {
         index: position.lowerTickIndex,
-        x: calcPrice(
+        x: calcPriceByTickIndex(
           position.lowerTickIndex,
           true,
           position.tokenX.decimals,
@@ -144,7 +146,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
     if (position) {
       return {
         index: position.upperTickIndex,
-        x: calcPrice(
+        x: calcPriceByTickIndex(
           position.upperTickIndex,
           true,
           position.tokenX.decimals,
@@ -184,8 +186,9 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   const current = useMemo(
     () =>
       position?.poolData
-        ? calcYPerXPriceByTickIndex(
-            position.poolData.currentTickIndex,
+        ? calcPriceBySqrtPrice(
+            position.poolData.sqrtPrice,
+            true,
             position.tokenX.decimals,
             position.tokenY.decimals
           )
