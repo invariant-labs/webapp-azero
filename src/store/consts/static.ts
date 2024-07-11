@@ -255,3 +255,5 @@ export const reversedAddressTickerMap = Object.fromEntries(
 export const LIQUIDITY_PLOT_DECIMAL = 12n
 
 export const DEFAULT_TOKEN_DECIMAL = 12n
+
+export const MINIMAL_POOL_INIT_PRICE = 0.00000001

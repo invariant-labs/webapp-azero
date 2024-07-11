@@ -9,7 +9,7 @@ import backIcon from '@static/svg/back-arrow.svg'
 import settingIcon from '@static/svg/settings.svg'
 import { ALL_FEE_TIERS_DATA, PositionTokenBlock, REFRESHER_INTERVAL } from '@store/consts/static'
 import {
-  calcPrice,
+  calcPriceBySqrtPrice,
   calculateConcentrationRange,
   convertBalanceToBigint,
   determinePositionTokenBlock,
@@ -17,7 +17,7 @@ import {
   printBigint,
   trimLeadingZeros
 } from '@store/consts/utils'
-import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
+import { PlotTickData, InitMidPrice } from '@store/reducers/positions'
 import { SwapToken } from '@store/selectors/wallet'
 import { blurContent, unblurContent } from '@utils/uiUtils'
 import { VariantType } from 'notistack'
@@ -39,8 +39,8 @@ export interface INewPosition {
   copyPoolAddressHandler: (message: string, variant: VariantType) => void
   tokens: SwapToken[]
   data: PlotTickData[]
-  midPrice: TickPlotPositionData
-  setMidPrice: (mid: TickPlotPositionData) => void
+  midPrice: InitMidPrice
+  setMidPrice: (mid: InitMidPrice) => void
   addLiquidityHandler: (
     leftTickIndex: bigint,
     rightTickIndex: bigint,
@@ -154,6 +154,9 @@ export const NewPosition: React.FC<INewPosition> = ({
   const { classes } = useStyles()
   const navigate = useNavigate()
 
+  const minTick = getMinTick(tickSpacing)
+  const maxTick = getMaxTick(tickSpacing)
+
   const [positionOpeningMethod, setPositionOpeningMethod] = useState<PositionOpeningMethod>(
     initialOpeningPositionMethod
   )
@@ -178,11 +181,14 @@ export const NewPosition: React.FC<INewPosition> = ({
 
   const [shouldReversePlot, setShouldReversePlot] = useState(false)
 
-  const concentrationArray = useMemo(
-    () =>
-      getConcentrationArray(Number(tickSpacing), 2, Number(midPrice.index)).sort((a, b) => a - b),
-    [tickSpacing]
-  )
+  const concentrationArray = useMemo(() => {
+    const validatedMidPrice =
+      positionOpeningMethod === 'concentration'
+        ? 1
+        : Math.min(Math.max(Number(midPrice.index), Number(minTick)), Number(maxTick))
+
+    return getConcentrationArray(Number(tickSpacing), 2, validatedMidPrice).sort((a, b) => a - b)
+  }, [tickSpacing])
 
   const setRangeBlockerInfo = () => {
     if (tokenAIndex === null || tokenBIndex === null) {
@@ -299,12 +305,14 @@ export const NewPosition: React.FC<INewPosition> = ({
     }
   }
 
-  const onChangeMidPrice = (mid: bigint) => {
+  const onChangeMidPrice = (tickIndex: bigint, sqrtPrice: bigint) => {
     setMidPrice({
-      index: mid,
-      x: calcPrice(mid, isXtoY, xDecimal, yDecimal)
+      index: tickIndex,
+      x: calcPriceBySqrtPrice(sqrtPrice, isXtoY, xDecimal, yDecimal),
+      sqrtPrice: sqrtPrice
     })
-    if (tokenAIndex !== null && (isXtoY ? rightRange > mid : rightRange < mid)) {
+
+    if (tokenAIndex !== null && (isXtoY ? rightRange > tickIndex : rightRange < tickIndex)) {
       const deposit = tokenADeposit
       const amount = getOtherTokenAmount(
         convertBalanceToBigint(deposit, Number(tokens[tokenAIndex].decimals)),
@@ -318,7 +326,7 @@ export const NewPosition: React.FC<INewPosition> = ({
         return
       }
     }
-    if (tokenBIndex !== null && (isXtoY ? leftRange < mid : leftRange > mid)) {
+    if (tokenBIndex !== null && (isXtoY ? leftRange < tickIndex : leftRange > tickIndex)) {
       const deposit = tokenBDeposit
       const amount = getOtherTokenAmount(
         convertBalanceToBigint(deposit, Number(tokens[tokenBIndex].decimals)),
@@ -727,7 +735,7 @@ export const NewPosition: React.FC<INewPosition> = ({
             tokenBSymbol={
               tokenBIndex !== null && tokens[tokenBIndex] ? tokens[tokenBIndex].symbol : 'XYZ'
             }
-            midPrice={midPrice.index}
+            midPriceIndex={midPrice.index}
             onChangeMidPrice={onChangeMidPrice}
             currentPairReversed={currentPairReversed}
             positionOpeningMethod={positionOpeningMethod}
