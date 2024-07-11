@@ -77,7 +77,7 @@ export const Primary: Story = {
   render: () => {
     return (
       <NewPosition
-        midPrice={{ x: 1234, index: 23n }}
+        midPrice={{ x: 1234, index: 23n, sqrtPrice: 123n }}
         currentPriceSqrt={123n}
         tickSpacing={1n}
         xDecimal={9n}

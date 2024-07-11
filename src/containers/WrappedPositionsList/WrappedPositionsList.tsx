@@ -5,7 +5,8 @@ import { POSITIONS_PER_PAGE } from '@store/consts/static'
 import {
   calcYPerXPriceByTickIndex,
   positionListPageToQueryPage,
-  printBigint
+  printBigint,
+  calcPriceBySqrtPrice
 } from '@store/consts/utils'
 import { actions } from '@store/reducers/positions'
 import { Status } from '@store/reducers/wallet'
@@ -102,8 +103,9 @@ export const WrappedPositionsList: React.FC = () => {
         tokenYLiq = 0
       }
 
-      const currentPrice = calcYPerXPriceByTickIndex(
-        position.poolData?.currentTickIndex ?? 0n,
+      const currentPrice = calcPriceBySqrtPrice(
+        position.poolData?.sqrtPrice ?? 0n,
+        true,
         position.tokenX.decimals,
         position.tokenY.decimals
       )
