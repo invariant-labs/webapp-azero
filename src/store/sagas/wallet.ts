@@ -22,9 +22,9 @@ import {
   takeLatest,
   takeLeading
 } from 'typed-redux-saga'
-import { getConnection } from './connection'
 import { Signer } from '@polkadot/api/types'
 import { positionsList } from '@store/selectors/positions'
+import { getApi } from './connection'
 
 export function* getWallet(): SagaGenerator<NightlyConnectAdapter> {
   const wallet = yield* call(getAlephZeroWallet)
@@ -44,7 +44,7 @@ type FrameSystemAccountInfo = {
   sufficients: number
 }
 export function* getBalance(walletAddress: string): SagaGenerator<string> {
-  const connection = yield* call(getConnection)
+  const connection = yield* getApi()
   const accountInfoResponse = yield* call(
     [connection.query.system.account, connection.query.system.account],
     walletAddress
@@ -81,7 +81,7 @@ export function* handleAirdrop(): Generator {
       })
     )
 
-    const connection = yield* getConnection()
+    const connection = yield* getApi()
     const adapter = yield* call(getAlephZeroWallet)
 
     const psp22 = yield* call(
@@ -212,7 +212,7 @@ export function* handleDisconnect(): Generator {
 
 export function* fetchBalances(tokens: string[]): Generator {
   const walletAddress = yield* select(address)
-  const api = yield* getConnection()
+  const api = yield* getApi()
   const network = yield* select(networkType)
 
   yield* put(walletActions.setIsBalanceLoading(true))

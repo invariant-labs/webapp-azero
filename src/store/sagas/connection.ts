@@ -75,17 +75,9 @@ export function* getWrappedAZERO(): SagaGenerator<WrappedAZERO> {
   return wrappedAZERO
 }
 
-export function* getConnection(): SagaGenerator<ApiPromise> {
-  const rpc = yield* select(rpcAddress)
-  const network = yield* select(networkType)
-  const api = yield* call([apiSingleton, apiSingleton.loadInstance], network, rpc)
-
-  return api
-}
-
 export function* initConnection(): Generator {
   try {
-    yield* call(getConnection)
+    yield* getApi()
 
     yield* put(
       snackbarsActions.add({

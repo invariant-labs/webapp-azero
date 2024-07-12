@@ -24,21 +24,15 @@ import invariantSingleton from '@store/services/invariantSingleton'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
-import { getConnection } from './connection'
 import { MAX_POOL_KEYS_RETURNED } from '@invariant-labs/a0-sdk/target/consts'
+import { getApi } from './connection'
 
 export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) {
   const walletAddress = yield* select(address)
-  const connection = yield* call(getConnection)
+  const api = yield* getApi()
   const network = yield* select(networkType)
   const invAddress = yield* select(invariantAddress)
-  const pools = yield* call(
-    getPoolsByPoolKeys,
-    invAddress,
-    action.payload.poolKeys,
-    connection,
-    network
-  )
+  const pools = yield* call(getPoolsByPoolKeys, invAddress, action.payload.poolKeys, api, network)
 
   const allTokens = yield* select(tokens)
   const unknownTokens = new Set(
@@ -55,14 +49,14 @@ export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) 
   const unknownTokensData = yield* call(
     getTokenDataByAddresses,
     [...unknownTokens],
-    connection,
+    api,
     network,
     walletAddress
   )
   const knownTokenBalances = yield* call(
     getTokenBalances,
     [...knownTokens],
-    connection,
+    api,
     network,
     walletAddress
   )
@@ -91,7 +85,7 @@ export function* handleInitPool(action: PayloadAction<PoolKey>): Generator {
 
     const { tokenX, tokenY, feeTier } = action.payload
 
-    const api = yield* getConnection()
+    const api = yield* getApi()
     const network = yield* select(networkType)
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
@@ -149,7 +143,7 @@ export function* handleInitPool(action: PayloadAction<PoolKey>): Generator {
 }
 
 export function* fetchPoolData(action: PayloadAction<PoolKey>): Generator {
-  const api = yield* getConnection()
+  const api = yield* getApi()
   const network = yield* select(networkType)
   const invAddress = yield* select(invariantAddress)
   const { feeTier, tokenX, tokenY } = action.payload
@@ -181,7 +175,7 @@ export function* fetchPoolData(action: PayloadAction<PoolKey>): Generator {
 }
 
 export function* fetchAllPoolKeys(): Generator {
-  const api = yield* getConnection()
+  const api = yield* getApi()
   const network = yield* select(networkType)
   const invAddress = yield* select(invariantAddress)
 
@@ -216,7 +210,7 @@ export function* fetchAllPoolKeys(): Generator {
 }
 
 export function* fetchAllPoolsForPairData(action: PayloadAction<PairTokens>) {
-  const api = yield* call(getConnection)
+  const api = yield* getApi()
   const network = yield* select(networkType)
   const invAddress = yield* select(invariantAddress)
   const invariant = yield* call(
@@ -240,7 +234,7 @@ export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMa
   const { tokenFrom, tokenTo, allPools } = action.payload
 
   try {
-    const api = yield* call(getConnection)
+    const api = yield* getApi()
     const network = yield* select(networkType)
     const invAddress = yield* select(invariantAddress)
     const invariant = yield* call(
@@ -283,7 +277,7 @@ export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMa
 
 export function* fetchTokens(poolsWithPoolKeys: PoolWithPoolKey[]) {
   const walletAddress = yield* select(address)
-  const connection = yield* call(getConnection)
+  const connection = yield* getApi()
   const network = yield* select(networkType)
   const allTokens = yield* select(tokens)
 

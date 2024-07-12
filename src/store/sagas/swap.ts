@@ -34,7 +34,7 @@ import {
 import { actions as poolActions } from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Simulate, Swap, actions } from '@store/reducers/swap'
-import { invariantAddress, networkType } from '@store/selectors/connection'
+import { invariantAddress, networkType, wrappedAZEROAddress } from '@store/selectors/connection'
 import { poolTicks, pools, tickMaps, tokens } from '@store/selectors/pools'
 import { simulateResult } from '@store/selectors/swap'
 import { address, balance } from '@store/selectors/wallet'
@@ -44,9 +44,9 @@ import wrappedAZEROSingleton from '@store/services/wrappedAZEROSingleton'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
 import { all, call, put, select, spawn, takeEvery } from 'typed-redux-saga'
-import { getConnection } from './connection'
 import { fetchBalances } from './wallet'
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types'
+import { getApi } from './connection'
 
 export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generator {
   const {
@@ -83,7 +83,7 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
       })
     )
 
-    const api = yield* getConnection()
+    const api = yield* getApi()
     const network = yield* select(networkType)
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
@@ -252,12 +252,13 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
       })
     )
 
-    const api = yield* getConnection()
+    const api = yield* getApi()
     const network = yield* select(networkType)
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
     const swapSimulateResult = yield* select(simulateResult)
     const invAddress = yield* select(invariantAddress)
+    const wrappedAZEROAddr = yield* select(wrappedAZEROAddress)
 
     const tokenX = allTokens[poolKey.tokenX]
     const tokenY = allTokens[poolKey.tokenY]
@@ -268,7 +269,8 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
     const wazero = yield* call(
       [wrappedAZEROSingleton, wrappedAZEROSingleton.loadInstance],
       api,
-      network
+      network,
+      wrappedAZEROAddr
     )
     const psp22 = yield* call([psp22Singleton, psp22Singleton.loadInstance], api, network)
     const invariant = yield* call(
