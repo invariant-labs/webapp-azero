@@ -2,7 +2,7 @@ import React from 'react'
 import { theme } from '@static/theme'
 import { useStyles } from './style'
 import { Box, Grid, Typography, useMediaQuery } from '@mui/material'
-import { formatNumbers, showPrefix } from '@store/consts/utils'
+import { formatNumbers, showPrefix } from '@utils/utils'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
 

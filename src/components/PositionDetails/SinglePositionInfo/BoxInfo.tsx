@@ -1,7 +1,7 @@
 import { Button, Grid, Typography } from '@mui/material'
 import loader from '@static/gif/loading2.gif'
 import SwapPosition from '@static/svg/swap-position.svg'
-import { formatNumber, formatNumbers, showPrefix } from '@store/consts/utils'
+import { formatNumber, formatNumbers, showPrefix } from '@utils/utils'
 import React from 'react'
 import loadingAnimation from '@static/gif/loading.gif'
 import { ILiquidityToken } from './consts'

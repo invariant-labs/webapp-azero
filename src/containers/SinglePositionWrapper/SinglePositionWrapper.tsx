@@ -12,7 +12,7 @@ import {
   getMockedTokenPrice,
   poolKeyToString,
   printBigint
-} from '@store/consts/utils'
+} from '@utils/utils'
 import { actions as poolsActions } from '@store/reducers/pools'
 import { actions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'

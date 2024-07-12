@@ -7,7 +7,7 @@ import {
   getPoolsByPoolKeys,
   getTokenBalances,
   getTokenDataByAddresses
-} from '@store/consts/utils'
+} from '@utils/utils'
 import {
   FetchTicksAndTickMaps,
   ListPoolsRequest,

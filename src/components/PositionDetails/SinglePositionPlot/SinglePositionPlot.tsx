@@ -9,7 +9,7 @@ import {
   calcTicksAmountInRange,
   numberToString,
   spacingMultiplicityGte
-} from '@store/consts/utils'
+} from '@utils/utils'
 import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
 import React, { useEffect, useState } from 'react'
 import { ILiquidityToken } from '../SinglePositionInfo/consts'

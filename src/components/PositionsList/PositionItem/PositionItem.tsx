@@ -1,7 +1,7 @@
 import { Grid, Hidden, Tooltip, Typography, useMediaQuery } from '@mui/material'
 import SwapList from '@static/svg/swap-list.svg'
 import { theme } from '@static/theme'
-import { formatNumber, initialXtoY, tickerToAddress } from '@store/consts/utils'
+import { formatNumber, initialXtoY, tickerToAddress } from '@utils/utils'
 import classNames from 'classnames'
 import { useMemo, useState } from 'react'
 import { useStyles } from './style'

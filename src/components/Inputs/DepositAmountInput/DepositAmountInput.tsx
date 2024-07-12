@@ -1,6 +1,6 @@
 import { Button, Grid, Input, Tooltip, Typography } from '@mui/material'
 import loadingAnimation from '@static/gif/loading.gif'
-import { formatNumber, getScaleFromString } from '@store/consts/utils'
+import { formatNumber, getScaleFromString } from '@utils/utils'
 import React, { CSSProperties, useRef } from 'react'
 import useStyles from './style'
 

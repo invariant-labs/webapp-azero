@@ -1,4 +1,4 @@
-import { getNetworkTokensList, getTokenDataByAddresses } from '@store/consts/utils'
+import { getNetworkTokensList, getTokenDataByAddresses } from '@utils/utils'
 import { actions } from '@store/reducers/pools'
 import { actions as walletActions } from '@store/reducers/wallet'
 import {

@@ -4,7 +4,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
 import { useStyles } from './style'
 import { Grid, Typography, useMediaQuery } from '@mui/material'
-import { formatNumbers, showPrefix } from '@store/consts/utils'
+import { formatNumbers, showPrefix } from '@utils/utils'
 
 export enum SortType {
   NAME_ASC,

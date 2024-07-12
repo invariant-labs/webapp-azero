@@ -17,7 +17,7 @@ import {
   printBigint,
   trimLeadingZeros,
   validConcentrationMidPriceTick
-} from '@store/consts/utils'
+} from '@utils/utils'
 import { PlotTickData, InitMidPrice } from '@store/reducers/positions'
 import { SwapToken } from '@store/selectors/wallet'
 import { blurContent, unblurContent } from '@utils/uiUtils'
@@ -485,7 +485,7 @@ export const NewPosition: React.FC<INewPosition> = ({
         className={classes.headerContainer}>
         <Box className={classes.titleContainer}>
           <Typography className={classes.title}>Add new liquidity position</Typography>
-          {poolKey !== '' && (
+          {poolKey !== '' && tokenAIndex !== tokenBIndex && (
             <Refresher
               currentIndex={refresherTime}
               maxIndex={REFRESHER_INTERVAL}

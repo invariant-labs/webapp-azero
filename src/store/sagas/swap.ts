@@ -30,7 +30,7 @@ import {
   isErrorMessage,
   poolKeyToString,
   printBigint
-} from '@store/consts/utils'
+} from '@utils/utils'
 import { actions as poolActions } from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Simulate, Swap, actions } from '@store/reducers/swap'

@@ -19,7 +19,7 @@ import {
   getNewTokenOrThrow,
   poolKeyToString,
   printBigint
-} from '@store/consts/utils'
+} from '@utils/utils'
 import { actions as poolsActions } from '@store/reducers/pools'
 import { InitMidPrice, actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
@@ -428,7 +428,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     }
   }, [tokenBIndex])
 
-  const initialSlippage = localStorage.getItem('INVARIANT_NEW_POSITION_SLIPPAGE') ?? '1'
+  const initialSlippage = localStorage.getItem('INVARIANT_NEW_POSITION_SLIPPAGE') ?? '1.00'
 
   const onSlippageChange = (slippage: string) => {
     localStorage.setItem('INVARIANT_NEW_POSITION_SLIPPAGE', slippage)
