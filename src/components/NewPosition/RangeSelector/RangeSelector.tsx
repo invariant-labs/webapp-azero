@@ -11,7 +11,7 @@ import {
   calculateConcentrationRange,
   nearestTickIndex,
   toMaxNumericPlaces
-} from '@store/consts/utils'
+} from '@utils/utils'
 import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
 import React, { useEffect, useRef, useState } from 'react'
 import ConcentrationSlider from '../ConcentrationSlider/ConcentrationSlider'

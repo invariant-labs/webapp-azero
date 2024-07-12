@@ -7,7 +7,7 @@ import {
   positionListPageToQueryPage,
   printBigint,
   calcPriceBySqrtPrice
-} from '@store/consts/utils'
+} from '@utils/utils'
 import { actions } from '@store/reducers/positions'
 import { Status } from '@store/reducers/wallet'
 import {

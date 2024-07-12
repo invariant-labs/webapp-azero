@@ -1,5 +1,5 @@
 import { Position } from '@invariant-labs/a0-sdk'
-import { poolKeyToString } from '@store/consts/utils'
+import { poolKeyToString } from '@utils/utils'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { createSelector } from 'reselect'
 import { IPositionsStore, positionsSliceName } from '../reducers/positions'

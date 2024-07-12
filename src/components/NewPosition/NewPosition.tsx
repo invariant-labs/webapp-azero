@@ -17,7 +17,7 @@ import {
   printBigint,
   trimLeadingZeros,
   validConcentrationMidPriceTick
-} from '@store/consts/utils'
+} from '@utils/utils'
 import { PlotTickData, InitMidPrice } from '@store/reducers/positions'
 import { SwapToken } from '@store/selectors/wallet'
 import { blurContent, unblurContent } from '@utils/uiUtils'

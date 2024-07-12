@@ -12,7 +12,7 @@ import {
   trimZeros,
   calculateTickFromBalance,
   validConcentrationMidPriceTick
-} from '@store/consts/utils'
+} from '@utils/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import useStyles from './style'
 import { calculateTick, calculateTickDelta, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'

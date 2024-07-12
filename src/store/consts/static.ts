@@ -8,7 +8,7 @@ import {
 } from '@invariant-labs/a0-sdk'
 import { Keyring } from '@polkadot/api'
 import { BestTier, FormatNumberThreshold, PrefixConfig, Token, TokenPriceData } from './types'
-import { testnetBestTiersCreator } from './utils'
+import { testnetBestTiersCreator } from '@utils/utils'
 
 export enum AlephZeroNetworks {
   TEST = 'wss://ws.test.azero.dev',

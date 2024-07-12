@@ -13,7 +13,7 @@ import {
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { AZERO, BTC, ETH, USDC } from '@store/consts/static'
 import { PayloadType, Token } from '@store/consts/types'
-import { poolKeyToString } from '@store/consts/utils'
+import { poolKeyToString } from '@utils/utils'
 
 import * as R from 'remeda'
 

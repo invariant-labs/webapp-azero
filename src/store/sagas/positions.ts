@@ -29,7 +29,7 @@ import {
   ensureError,
   isErrorMessage,
   poolKeyToString
-} from '@store/consts/utils'
+} from '@utils/utils'
 import { FetchTicksAndTickMaps, ListType, actions as poolsActions } from '@store/reducers/pools'
 import {
   ClosePositionData,

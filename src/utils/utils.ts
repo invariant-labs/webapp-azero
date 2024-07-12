@@ -53,7 +53,7 @@ import {
   reversedAddressTickerMap,
   subNumbers,
   tokensPrices
-} from './static'
+} from '@store/consts/static'
 import { sleep } from '@store/sagas/wallet'
 import {
   BestTier,
@@ -62,7 +62,7 @@ import {
   PrefixConfig,
   Token,
   TokenPriceData
-} from './types'
+} from '@store/consts/types'
 import { POSITIONS_PER_QUERY } from '@store/sagas/positions'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
