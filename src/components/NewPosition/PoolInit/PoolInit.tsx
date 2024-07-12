@@ -290,6 +290,14 @@ export const PoolInit: React.FC<IPoolInit> = ({
     [midPriceInput, isXtoY, xDecimal, yDecimal]
   )
 
+  const [animatedStartingPrice, setAnimatedStartingPrice] = useState(price)
+
+  useEffect(() => {
+    if (formatNumber(price) !== formatNumber(animatedStartingPrice)) {
+      setAnimatedStartingPrice(price)
+    }
+  }, [price])
+
   return (
     <Grid container direction='column' className={classes.wrapper}>
       <Grid
@@ -326,7 +334,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
             <Typography className={classes.priceValue}>
               <span>~</span>
               <AnimatedNumber
-                value={price.toFixed(isXtoY ? Number(xDecimal) : Number(yDecimal))}
+                value={animatedStartingPrice.toFixed(isXtoY ? Number(xDecimal) : Number(yDecimal))}
                 duration={300}
                 formatValue={(e: any) => formatNumber(e)}
               />
