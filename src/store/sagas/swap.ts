@@ -34,19 +34,16 @@ import {
 import { actions as poolActions } from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Simulate, Swap, actions } from '@store/reducers/swap'
-import { invariantAddress, networkType } from '@store/selectors/connection'
+import { invariantAddress } from '@store/selectors/connection'
 import { poolTicks, pools, tickMaps, tokens } from '@store/selectors/pools'
 import { simulateResult } from '@store/selectors/swap'
 import { address, balance } from '@store/selectors/wallet'
-import invariantSingleton from '@store/services/invariantSingleton'
-import psp22Singleton from '@store/services/psp22Singleton'
-import wrappedAZEROSingleton from '@store/services/wrappedAZEROSingleton'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
 import { all, call, put, select, spawn, takeEvery } from 'typed-redux-saga'
-import { getConnection } from './connection'
 import { fetchBalances } from './wallet'
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types'
+import { getApi, getInvariant, getPSP22, getWrappedAZERO } from './connection'
 
 export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generator {
   const {
@@ -83,8 +80,7 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
       })
     )
 
-    const api = yield* getConnection()
-    const network = yield* select(networkType)
+    const api = yield* getApi()
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
     const invAddress = yield* select(invariantAddress)
@@ -95,13 +91,8 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
 
     const txs = []
 
-    const psp22 = yield* call([psp22Singleton, psp22Singleton.loadInstance], api, network)
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
+    const psp22 = yield* getPSP22()
+    const invariant = yield* getInvariant()
     const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(estimatedPriceAfterSwap, slippage, !xToY)
     const calculatedAmountIn = slippage
       ? calculateAmountInWithSlippage(amountOut, sqrtPriceLimit, xToY, poolKey.feeTier.fee)
@@ -252,8 +243,7 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
       })
     )
 
-    const api = yield* getConnection()
-    const network = yield* select(networkType)
+    const api = yield* getApi()
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
     const swapSimulateResult = yield* select(simulateResult)
@@ -265,18 +255,9 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
 
     const txs = []
 
-    const wazero = yield* call(
-      [wrappedAZEROSingleton, wrappedAZEROSingleton.loadInstance],
-      api,
-      network
-    )
-    const psp22 = yield* call([psp22Singleton, psp22Singleton.loadInstance], api, network)
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
+    const wazero = yield* getWrappedAZERO()
+    const psp22 = yield* getPSP22()
+    const invariant = yield* getInvariant()
     const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(estimatedPriceAfterSwap, slippage, !xToY)
     const calculatedAmountIn = slippage
       ? calculateAmountInWithSlippage(amountOut, sqrtPriceLimit, xToY, poolKey.feeTier.fee)
