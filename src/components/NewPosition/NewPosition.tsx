@@ -15,7 +15,8 @@ import {
   determinePositionTokenBlock,
   parseFeeToPathFee,
   printBigint,
-  trimLeadingZeros
+  trimLeadingZeros,
+  validConcentrationMidPriceTick
 } from '@store/consts/utils'
 import { PlotTickData, InitMidPrice } from '@store/reducers/positions'
 import { SwapToken } from '@store/selectors/wallet'
@@ -156,9 +157,6 @@ export const NewPosition: React.FC<INewPosition> = ({
   const { classes } = useStyles()
   const navigate = useNavigate()
 
-  const minTick = getMinTick(tickSpacing)
-  const maxTick = getMaxTick(tickSpacing)
-
   const [positionOpeningMethod, setPositionOpeningMethod] = useState<PositionOpeningMethod>(
     initialOpeningPositionMethod
   )
@@ -184,13 +182,12 @@ export const NewPosition: React.FC<INewPosition> = ({
   const [shouldReversePlot, setShouldReversePlot] = useState(false)
 
   const concentrationArray = useMemo(() => {
-    const validatedMidPrice =
-      positionOpeningMethod === 'concentration'
-        ? 1
-        : Math.min(Math.max(Number(midPrice.index), Number(minTick)), Number(maxTick))
+    const validatedMidPrice = validConcentrationMidPriceTick(midPrice.index, isXtoY, tickSpacing)
 
-    return getConcentrationArray(Number(tickSpacing), 2, validatedMidPrice).sort((a, b) => a - b)
-  }, [tickSpacing])
+    return getConcentrationArray(Number(tickSpacing), 2, Number(validatedMidPrice)).sort(
+      (a, b) => a - b
+    )
+  }, [tickSpacing, midPrice.index])
 
   const setRangeBlockerInfo = () => {
     if (tokenAIndex === null || tokenBIndex === null) {
