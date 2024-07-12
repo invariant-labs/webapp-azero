@@ -431,7 +431,8 @@ export const Swap: React.FC<ISwap> = ({
               isBalanceLoading ||
               getStateMessage() === 'Loading' ||
               tokenFromIndex === null ||
-              tokenToIndex === null
+              tokenToIndex === null ||
+              tokenFromIndex === tokenToIndex
             }>
             <img src={refreshIcon} className={classes.refreshIcon} alt='Refresh' />
           </Button>
@@ -607,13 +608,15 @@ export const Swap: React.FC<ISwap> = ({
                 <CardMedia image={infoIcon} className={classes.infoIcon} />
               </Grid>
             </button>
-            {tokenFromIndex !== null && tokenToIndex !== null && (
-              <Refresher
-                currentIndex={refresherTime}
-                maxIndex={REFRESHER_INTERVAL}
-                onClick={handleRefresh}
-              />
-            )}
+            {tokenFromIndex !== null &&
+              tokenToIndex !== null &&
+              tokenFromIndex !== tokenToIndex && (
+                <Refresher
+                  currentIndex={refresherTime}
+                  maxIndex={REFRESHER_INTERVAL}
+                  onClick={handleRefresh}
+                />
+              )}
           </Grid>
           {canShowDetails ? (
             <ExchangeRate
