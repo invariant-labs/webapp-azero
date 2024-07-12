@@ -64,6 +64,7 @@ import {
   Token,
   TokenPriceData
 } from '@store/consts/types'
+import icons from '@static/icons'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -386,7 +387,7 @@ export const getTokenDataByAddresses = async (
       name: results[baseIndex + 1] ? (results[baseIndex + 1] as string) : '',
       decimals: results[baseIndex + 2] as bigint,
       balance: results[baseIndex + 3] as bigint,
-      logoURI: '/unknownToken.svg',
+      logoURI: icons.unknownToken,
       isUnknown: true
     }
   })
