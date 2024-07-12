@@ -113,9 +113,6 @@ const poolsSlice = createSlice({
   name: poolsSliceName,
   initialState: defaultState,
   reducers: {
-    initPool(state, _action: PayloadAction<PoolKey>) {
-      return state
-    },
     addTokens(state, action: PayloadAction<Record<string, Token>>) {
       state.tokens = {
         ...state.tokens,
