@@ -1,4 +1,3 @@
-import AnimatedNumber from '@components/AnimatedNumber'
 import RangeInput from '@components/Inputs/RangeInput/RangeInput'
 import SimpleInput from '@components/Inputs/SimpleInput/SimpleInput'
 import { Button, Grid, Typography } from '@mui/material'
@@ -19,6 +18,7 @@ import { calculateTick, calculateTickDelta, getMaxTick, getMinTick } from '@inva
 import { PositionOpeningMethod } from '@store/consts/types'
 import ConcentrationSlider from '../ConcentrationSlider/ConcentrationSlider'
 import { MINIMAL_POOL_INIT_PRICE } from '@store/consts/static'
+import AnimatedNumber from '@components/AnimatedNumber/AnimatedNumber'
 
 export interface IPoolInit {
   tokenASymbol: string
@@ -307,12 +307,9 @@ export const PoolInit: React.FC<IPoolInit> = ({
             <Typography className={classes.priceLabel}>{tokenASymbol} starting price: </Typography>
             <Typography className={classes.priceValue}>
               <span>~</span>
-              <AnimatedNumber
-                value={animatedStartingPrice.toFixed(isXtoY ? Number(xDecimal) : Number(yDecimal))}
-                duration={300}
-                formatValue={(e: any) => formatNumber(e)}
-              />
-              <span> </span> {tokenBSymbol}
+              <AnimatedNumber start={animatedStartingPrice} finish={price} />
+              <span> </span>
+              {tokenBSymbol}
             </Typography>
           </Grid>
         </Grid>
@@ -350,7 +347,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
                   )
               changeRangeHandler(BigInt(newLeft), rightRange)
             }}
-            diffLabel='Min - Current price'
+            diffLabel='Min - Current'
             percentDiff={((+leftInput - price) / price) * 100}
           />
           <RangeInput
@@ -386,7 +383,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
 
               changeRangeHandler(leftRange, BigInt(newRight))
             }}
-            diffLabel='Max - Current price'
+            diffLabel='Max - Current'
             percentDiff={((+rightInput - price) / price) * 100}
           />
         </Grid>

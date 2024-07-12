@@ -113,7 +113,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     backgroundColor: colors.invariant.light,
     display: 'flex',
     alignItems: 'center',
-    paddingInline: 10
+    paddingInline: 6
   },
   diffLabel: {
     ...typography.caption2,
