@@ -22,7 +22,6 @@ class SingletonWrappedAZERO {
       network !== this.network ||
       address !== this.wrappedAZERO.contract.address.toString()
     ) {
-      console.log('new wazero')
       this.wrappedAZERO = await WrappedAZERO.load(
         api,
         network,

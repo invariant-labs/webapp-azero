@@ -22,7 +22,6 @@ class SingletonInvariant {
       network !== this.network ||
       address !== this.invariant.contract.address.toString()
     ) {
-      console.log('new invariant')
       this.invariant = await Invariant.load(api, network, address, DEFAULT_INVARIANT_OPTIONS)
       this.api = api
       this.network = network

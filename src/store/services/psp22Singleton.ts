@@ -13,7 +13,6 @@ class SingletonPSP22 {
 
   static async loadInstance(api: ApiPromise, network: Network): Promise<PSP22> {
     if (!this.psp22 || api !== this.api || network !== this.network) {
-      console.log('new psp22')
       this.psp22 = await PSP22.load(api, network, DEFAULT_PSP22_OPTIONS)
       this.api = api
       this.network = network
