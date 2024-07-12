@@ -24,7 +24,7 @@ import { SwapError } from '@store/sagas/swap'
 import { SwapToken } from '@store/selectors/wallet'
 import { blurContent, unblurContent } from '@utils/uiUtils'
 import classNames from 'classnames'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Simulate } from '@store/reducers/swap'
 import ExchangeRate from './ExchangeRate/ExchangeRate'
 import TransactionDetailsBox from './TransactionDetailsBox/TransactionDetailsBox'
@@ -291,6 +291,13 @@ export const Swap: React.FC<ISwap> = ({
     return false
   }
 
+  const isInsufficientLiquidityError = useMemo(
+    () =>
+      simulateResult.poolKey === null &&
+      (isError(SwapError.InsufficientLiquidity) || isError(SwapError.MaxTicksCrossed)),
+    [simulateResult]
+  )
+
   const getStateMessage = () => {
     if ((tokenFromIndex !== null && tokenToIndex !== null && throttle) || isWaitingForNewPool) {
       return 'Loading'
@@ -312,10 +319,7 @@ export const Swap: React.FC<ISwap> = ({
       return 'No route found'
     }
 
-    if (
-      simulateResult.poolKey === null &&
-      (isError(SwapError.InsufficientLiquidity) || isError(SwapError.MaxTicksCrossed))
-    ) {
+    if (isInsufficientLiquidityError) {
       return 'Insufficient liquidity'
     }
 
@@ -441,7 +445,7 @@ export const Swap: React.FC<ISwap> = ({
             setSlippage={setSlippage}
             handleClose={handleCloseSettings}
             anchorEl={anchorEl}
-            defaultSlippage={'1'}
+            defaultSlippage={'1.00'}
             initialSlippage={initialSlippage}
           />
         </Grid>
@@ -598,7 +602,7 @@ export const Swap: React.FC<ISwap> = ({
               }>
               <Grid className={classes.transactionDetailsWrapper}>
                 <Typography className={classes.transactionDetailsHeader}>
-                  See transaction details
+                  {detailsOpen && canShowDetails ? 'Hide' : 'Show'} transaction details
                 </Typography>
                 <CardMedia image={infoIcon} className={classes.infoIcon} />
               </Grid>
@@ -626,7 +630,11 @@ export const Swap: React.FC<ISwap> = ({
         </Box>
         <TransactionDetailsBox
           open={getStateMessage() !== 'Loading' ? detailsOpen && canShowDetails : prevOpenState}
-          fee={simulateResult.poolKey?.feeTier.fee ?? 0n}
+          fee={
+            isInsufficientLiquidityError
+              ? simulateResult.fee
+              : simulateResult.poolKey?.feeTier.fee ?? 0n
+          }
           exchangeRate={{
             val: rateReversed ? 1 / swapRate : swapRate,
             symbol: canShowDetails
@@ -636,7 +644,7 @@ export const Swap: React.FC<ISwap> = ({
               ? Number(tokens[rateReversed ? tokenFromIndex : tokenToIndex].decimals)
               : 0
           }}
-          priceImpact={simulateResult.priceImpact}
+          priceImpact={isInsufficientLiquidityError ? 1 : simulateResult.priceImpact}
           slippage={+slippTolerance}
           isLoadingRate={getStateMessage() === 'Loading'}
         />

@@ -54,22 +54,30 @@ export const positionsWithPoolsData = createSelector(
       }
     })
 
-    return list.map((position, index) => {
+    const result = []
+    for (let index = 0; index < list.length; index++) {
+      const position = list[index]
       const tokenX = tokens.find(token => token.assetAddress === position.poolKey.tokenX)
       const tokenY = tokens.find(token => token.assetAddress === position.poolKey.tokenY)
 
-      if (!tokenX || !tokenY) {
-        throw new Error(`Token not found for position: ${position}`)
+      if (!tokenX) {
+        console.log(`Token ${position.poolKey.tokenX} not found for position`)
+        continue
+      } else if (!tokenY) {
+        console.log(`Token ${position.poolKey.tokenY} not found for position`)
+        continue
       }
 
-      return {
+      result.push({
         ...position,
         poolData: poolsByKey[poolKeyToString(position.poolKey)],
         tokenX,
         tokenY,
         positionIndex: index
-      }
-    })
+      })
+    }
+
+    return result
   }
 )
 
