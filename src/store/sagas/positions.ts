@@ -953,18 +953,10 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
 }
 
 export function* handleGetRemainingPositions(): Generator {
-  const api = yield* getConnection()
-  const network = yield* select(networkType)
-  const invAddress = yield* select(invariantAddress)
   const walletAddress = yield* select(address)
   const { length, list, loadedPages } = yield* select(positionsList)
 
-  const invariant = yield* call(
-    [invariantSingleton, invariantSingleton.loadInstance],
-    api,
-    network,
-    invAddress
-  )
+  const invariant = yield* getInvariant()
 
   const pages = yield* call(
     [invariant, invariant.getAllPositions],
@@ -986,7 +978,7 @@ export function* handleGetRemainingPositions(): Generator {
   yield* put(actions.setPositionsList(allList))
   yield* put(
     actions.setPositionsListLoadedStatus({
-      indexes: pages.map(({ index }) => index),
+      indexes: pages.map(({ index }: { index: number }) => index),
       isLoaded: true
     })
   )
