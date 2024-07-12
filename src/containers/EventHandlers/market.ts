@@ -1,11 +1,20 @@
 import { getNetworkTokensList, getTokenDataByAddresses } from '@store/consts/utils'
 import { actions } from '@store/reducers/pools'
 import { actions as walletActions } from '@store/reducers/wallet'
-import { networkType, rpcAddress, status } from '@store/selectors/connection'
+import {
+  invariantAddress,
+  networkType,
+  rpcAddress,
+  status,
+  wrappedAZEROAddress
+} from '@store/selectors/connection'
 import { poolsArraySortedByFees } from '@store/selectors/pools'
 import { swap } from '@store/selectors/swap'
 import { address } from '@store/selectors/wallet'
 import apiSingleton from '@store/services/apiSingleton'
+import invariantSingleton from '@store/services/invariantSingleton'
+import psp22Singleton from '@store/services/psp22Singleton'
+import wrappedAZEROSingleton from '@store/services/wrappedAZEROSingleton'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -17,6 +26,8 @@ const MarketEvents = () => {
   const allPools = useSelector(poolsArraySortedByFees)
   const rpc = useSelector(rpcAddress)
   const walletAddress = useSelector(address)
+  const invariantAddr = useSelector(invariantAddress)
+  const wrappedAZEROAddr = useSelector(wrappedAZEROAddress)
 
   useEffect(() => {
     const connectEvents = async () => {
@@ -54,6 +65,20 @@ const MarketEvents = () => {
       dispatch(actions.getTicksAndTickMaps({ tokenFrom, tokenTo, allPools }))
     }
   }, [tokenFrom, tokenTo])
+
+  useEffect(() => {
+    const loadInstances = async () => {
+      const api = await apiSingleton.loadInstance(network, rpc)
+
+      if (api) {
+        invariantSingleton.loadInstance(api, network, invariantAddr)
+        psp22Singleton.loadInstance(api, network)
+        wrappedAZEROSingleton.loadInstance(api, network, wrappedAZEROAddr)
+      }
+    }
+
+    loadInstances()
+  }, [network, rpc, invariantAddr, wrappedAZEROAddr])
 
   return null
 }

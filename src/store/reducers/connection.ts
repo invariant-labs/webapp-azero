@@ -1,4 +1,4 @@
-import { Network, TESTNET_INVARIANT_ADDRESS } from '@invariant-labs/a0-sdk'
+import { Network, TESTNET_INVARIANT_ADDRESS, TESTNET_WAZERO_ADDRESS } from '@invariant-labs/a0-sdk'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { AlephZeroNetworks } from '@store/consts/static'
 import { PayloadType } from '@store/consts/types'
@@ -16,6 +16,7 @@ export interface IAlephZeroConnectionStore {
   blockNumber: number
   rpcAddress: string
   invariantAddress: string
+  wrappedAZEROAddress: string
 }
 
 export const defaultState: IAlephZeroConnectionStore = {
@@ -24,7 +25,8 @@ export const defaultState: IAlephZeroConnectionStore = {
   networkType: Network.Testnet,
   blockNumber: 0,
   rpcAddress: AlephZeroNetworks.TEST,
-  invariantAddress: TESTNET_INVARIANT_ADDRESS
+  invariantAddress: TESTNET_INVARIANT_ADDRESS,
+  wrappedAZEROAddress: TESTNET_WAZERO_ADDRESS
 }
 export const connectionSliceName = 'connection'
 const connectionSlice = createSlice({
