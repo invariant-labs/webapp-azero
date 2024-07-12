@@ -9,7 +9,7 @@ import {
 } from '@invariant-labs/a0-sdk'
 import { Keyring } from '@polkadot/api'
 import { BestTier, FormatNumberThreshold, PrefixConfig, Token, TokenPriceData } from './types'
-import { testnetBestTiersCreator } from './utils'
+import { testnetBestTiersCreator } from '@utils/utils'
 import { POSITIONS_ENTRIES_LIMIT } from '@invariant-labs/a0-sdk/target/consts'
 
 export enum AlephZeroNetworks {

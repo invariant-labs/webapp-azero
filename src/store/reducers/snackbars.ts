@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { PayloadType } from '../consts/types'
-import { createLoaderKey } from '@store/consts/utils'
+import { createLoaderKey } from '@utils/utils'
 import { SnackbarAction, VariantType } from 'notistack'
 
 export interface ISnackbar {

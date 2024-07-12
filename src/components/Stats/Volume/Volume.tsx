@@ -7,7 +7,7 @@ import { useStyles } from './style'
 import { TimeData } from '@store/reducers/stats'
 import { Grid, Typography, useMediaQuery } from '@mui/material'
 import { Box } from '@mui/system'
-import { formatNumbers, showPrefix } from '@store/consts/utils'
+import { formatNumbers, showPrefix } from '@utils/utils'
 
 interface StatsInterface {
   percentVolume: number

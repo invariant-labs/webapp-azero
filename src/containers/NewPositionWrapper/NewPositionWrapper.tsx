@@ -19,7 +19,7 @@ import {
   getNewTokenOrThrow,
   poolKeyToString,
   printBigint
-} from '@store/consts/utils'
+} from '@utils/utils'
 import { actions as poolsActions } from '@store/reducers/pools'
 import { InitMidPrice, actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
