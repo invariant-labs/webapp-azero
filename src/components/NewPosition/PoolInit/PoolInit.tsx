@@ -107,7 +107,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
       }
     }
 
-    return calcPriceByTickIndex(midPriceTick, isXtoY, xDecimal, yDecimal)
+    return Number(midPrice)
   }
 
   const validConcentrationMidPriceTick = (midPriceTick: bigint) => {
