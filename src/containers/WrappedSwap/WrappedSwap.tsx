@@ -188,7 +188,7 @@ export const WrappedSwap = () => {
     }
   }, [tokenTo])
 
-  const initialSlippage = localStorage.getItem('INVARIANT_SWAP_SLIPPAGE') ?? '1'
+  const initialSlippage = localStorage.getItem('INVARIANT_SWAP_SLIPPAGE') ?? '1.00'
 
   const onSlippageChange = (slippage: string) => {
     localStorage.setItem('INVARIANT_SWAP_SLIPPAGE', slippage)
