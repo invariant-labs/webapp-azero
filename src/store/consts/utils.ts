@@ -1100,3 +1100,34 @@ export function testnetBestTiersCreator() {
 export const positionListPageToQueryPage = (page: number): number => {
   return Math.max(Math.ceil((page * POSITIONS_PER_PAGE) / POSITIONS_PER_QUERY) - 1, 0)
 }
+
+export const validConcentrationMidPriceTick = (
+  midPriceTick: bigint,
+  isXtoY: boolean,
+  tickSpacing: bigint
+) => {
+  const minTick = getMinTick(tickSpacing)
+  const maxTick = getMaxTick(tickSpacing)
+
+  const parsedTickSpacing = Number(tickSpacing)
+  const tickDelta = BigInt(calculateTickDelta(parsedTickSpacing, 2, 2))
+
+  const minTickLimit = minTick + (2n + tickDelta) * tickSpacing
+  const maxTickLimit = maxTick - (2n + tickDelta) * tickSpacing
+
+  if (isXtoY) {
+    if (midPriceTick < minTickLimit) {
+      return minTickLimit
+    } else if (midPriceTick > maxTickLimit) {
+      return maxTickLimit
+    }
+  } else {
+    if (midPriceTick > maxTickLimit) {
+      return maxTickLimit
+    } else if (midPriceTick < minTickLimit) {
+      return minTickLimit
+    }
+  }
+
+  return midPriceTick
+}
