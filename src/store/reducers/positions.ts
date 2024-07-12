@@ -153,6 +153,10 @@ const positionsSlice = createSlice({
       state.positionsList.loading = true
       return state
     },
+    getRemainingPositions(state, _action: PayloadAction<void>) {
+      state.positionsList.loading = true
+      return state
+    },
     setPositionsListLength(state, action: PayloadAction<bigint>) {
       state.positionsList.length = action.payload
       return state
@@ -176,11 +180,13 @@ const positionsSlice = createSlice({
       }
 
       state.positionsList.list.pop()
+      state.positionsList.length -= 1n
 
       return state
     },
     addPosition(state, action: PayloadAction<Position>) {
       state.positionsList.list.push(action.payload)
+      state.positionsList.length += 1n
       return state
     },
     getSinglePosition(state, _action: PayloadAction<bigint>) {
