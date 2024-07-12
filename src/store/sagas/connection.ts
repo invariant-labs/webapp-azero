@@ -105,8 +105,7 @@ export function* initConnection(): Generator {
 export function* handleNetworkChange(action: PayloadAction<PayloadTypes['setNetwork']>): Generator {
   yield* delay(1000)
 
-  const { networkType, rpcAddress } = action.payload
-  yield* call([apiSingleton, apiSingleton.loadInstance], networkType, rpcAddress)
+  yield* getApi()
 
   yield* put(
     snackbarsActions.add({

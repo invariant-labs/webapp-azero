@@ -12,6 +12,7 @@ class SingletonApi {
 
   static async loadInstance(network: Network, rpc: string): Promise<ApiPromise> {
     if (!this.api || network !== this.network || rpc !== this.rpc) {
+      console.log('new api')
       this.api = await initPolkadotApi(network, rpc)
       this.network = network
       this.rpc = rpc

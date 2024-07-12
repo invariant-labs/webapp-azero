@@ -32,6 +32,7 @@ const MarketEvents = () => {
   useEffect(() => {
     const connectEvents = async () => {
       const api = await apiSingleton.loadInstance(network, rpc)
+      const psp22 = await psp22Singleton.loadInstance(api, network)
       let tokens = getNetworkTokensList(network)
 
       const currentListStr = localStorage.getItem(`CUSTOM_TOKENS_${network}`)
@@ -42,7 +43,7 @@ const MarketEvents = () => {
               .map((address: string) => address)
           : []
 
-      getTokenDataByAddresses(currentList, api, network, walletAddress)
+      getTokenDataByAddresses(currentList, psp22, walletAddress)
         .then(data => {
           tokens = {
             ...tokens,

@@ -41,12 +41,9 @@ import {
 } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { actions as walletActions } from '@store/reducers/wallet'
-import { invariantAddress, networkType, wrappedAZEROAddress } from '@store/selectors/connection'
+import { invariantAddress } from '@store/selectors/connection'
 import { poolsArraySortedByFees, tickMaps, tokens } from '@store/selectors/pools'
 import { address, balance } from '@store/selectors/wallet'
-import invariantSingleton from '@store/services/invariantSingleton'
-import psp22Singleton from '@store/services/psp22Singleton'
-import wrappedAZEROSingleton from '@store/services/wrappedAZEROSingleton'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
 import { all, call, fork, join, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
@@ -55,7 +52,7 @@ import { fetchBalances } from './wallet'
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types'
 import { calculateTokenAmountsWithSlippage } from '@invariant-labs/a0-sdk/target/utils'
 import { positionsList } from '@store/selectors/positions'
-import { getApi } from './connection'
+import { getApi, getInvariant, getPSP22, getWrappedAZERO } from './connection'
 
 function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator {
   const {
@@ -93,14 +90,13 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     )
 
     const api = yield* getApi()
-    const network = yield* select(networkType)
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
     const invAddress = yield* select(invariantAddress)
 
     const txs = []
 
-    const psp22 = yield* call([psp22Singleton, psp22Singleton.loadInstance], api, network)
+    const psp22 = yield* getPSP22()
 
     const [xAmountWithSlippage, yAmountWithSlippage] = calculateTokenAmountsWithSlippage(
       feeTier.tickSpacing,
@@ -118,12 +114,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     const YTokenTx = psp22.approveTx(invAddress, yAmountWithSlippage, tokenY, PSP22_APPROVE_OPTIONS)
     txs.push(YTokenTx)
 
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
+    const invariant = yield* getInvariant()
 
     if (initPool) {
       const createPoolTx = invariant.createPoolTx(
@@ -249,23 +240,16 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     )
 
     const api = yield* getApi()
-    const network = yield* select(networkType)
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
     const invAddress = yield* select(invariantAddress)
-    const wrappedAZEROAddr = yield* select(wrappedAZEROAddress)
     const azeroBalance = yield* select(balance)
 
     const txs = []
 
-    const wazero = yield* call(
-      [wrappedAZEROSingleton, wrappedAZEROSingleton.loadInstance],
-      api,
-      network,
-      wrappedAZEROAddr
-    )
+    const wazero = yield* getWrappedAZERO()
 
-    const psp22 = yield* call([psp22Singleton, psp22Singleton.loadInstance], api, network)
+    const psp22 = yield* getPSP22()
 
     const [xAmountWithSlippage, yAmountWithSlippage] = calculateTokenAmountsWithSlippage(
       feeTier.tickSpacing,
@@ -292,12 +276,7 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     const YTokenTx = psp22.approveTx(invAddress, yAmountWithSlippage, tokenY, PSP22_APPROVE_OPTIONS)
     txs.push(YTokenTx)
 
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
+    const invariant = yield* getInvariant()
 
     if (initPool) {
       const createPoolTx = invariant.createPoolTx(
@@ -423,16 +402,8 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
 
 export function* handleGetCurrentPositionTicks(action: PayloadAction<GetPositionTicks>) {
   const { poolKey, lowerTickIndex, upperTickIndex } = action.payload
-  const api = yield* getApi()
-  const network = yield* select(networkType)
-  const invAddress = yield* select(invariantAddress)
 
-  const invariant = yield* call(
-    [invariantSingleton, invariantSingleton.loadInstance],
-    api,
-    network,
-    invAddress
-  )
+  const invariant = yield* getInvariant()
 
   const [lowerTick, upperTick] = yield* all([
     call([invariant, invariant.getTick], poolKey, lowerTickIndex),
@@ -449,9 +420,6 @@ export function* handleGetCurrentPositionTicks(action: PayloadAction<GetPosition
 
 export function* handleGetCurrentPlotTicks(action: PayloadAction<GetCurrentTicksData>): Generator {
   const { poolKey, isXtoY, fetchTicksAndTickmap } = action.payload
-  const api = yield* getApi()
-  const network = yield* select(networkType)
-  const invAddress = yield* select(invariantAddress)
   let allTickmaps = yield* select(tickMaps)
   const allTokens = yield* select(tokens)
   const allPools = yield* select(poolsArraySortedByFees)
@@ -460,12 +428,7 @@ export function* handleGetCurrentPlotTicks(action: PayloadAction<GetCurrentTicks
   const yDecimal = allTokens[poolKey.tokenY].decimals
 
   try {
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
+    const invariant = yield* getInvariant()
 
     if (!allTickmaps[poolKeyToString(poolKey)] || fetchTicksAndTickmap) {
       const fetchTicksAndTickMapsAction: PayloadAction<FetchTicksAndTickMaps> = {
@@ -553,16 +516,8 @@ export function* handleClaimFee(action: PayloadAction<HandleClaimFee>) {
       })
     )
     const walletAddress = yield* select(address)
-    const api = yield* getApi()
-    const network = yield* select(networkType)
-    const invAddress = yield* select(invariantAddress)
 
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
+    const invariant = yield* getInvariant()
 
     const adapter = yield* call(getAlephZeroWallet)
 
@@ -652,17 +607,11 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<HandleClaimFee>) 
 
     const walletAddress = yield* select(address)
     const api = yield* getApi()
-    const network = yield* select(networkType)
     const invAddress = yield* select(invariantAddress)
     const { index, addressTokenX, addressTokenY } = action.payload
 
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
-    const psp22 = yield* call([psp22Singleton, psp22Singleton.loadInstance], api, network)
+    const invariant = yield* getInvariant()
+    const psp22 = yield* getPSP22()
     const adapter = yield* call(getAlephZeroWallet)
 
     const txs = []
@@ -762,15 +711,7 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<HandleClaimFee>) 
 export function* handleGetSinglePosition(action: PayloadAction<bigint>) {
   try {
     const walletAddress = yield* select(address)
-    const api = yield* getApi()
-    const network = yield* select(networkType)
-    const invAddress = yield* select(invariantAddress)
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
+    const invariant = yield* getInvariant()
     const position = yield* call([invariant, invariant.getPosition], walletAddress, action.payload)
     yield* put(
       actions.setSinglePosition({
@@ -818,16 +759,8 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
     )
 
     const walletAddress = yield* select(address)
-    const api = yield* getApi()
-    const network = yield* select(networkType)
-    const invAddress = yield* select(invariantAddress)
 
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
+    const invariant = yield* getInvariant()
     const adapter = yield* call(getAlephZeroWallet)
 
     const allPositions = yield* select(positionsList)
@@ -927,15 +860,9 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
     const { addressTokenX, addressTokenY, positionIndex, onSuccess } = action.payload
     const walletAddress = yield* select(address)
     const api = yield* getApi()
-    const network = yield* select(networkType)
     const invAddress = yield* select(invariantAddress)
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
-    const psp22 = yield* call([psp22Singleton, psp22Singleton.loadInstance], api, network)
+    const invariant = yield* getInvariant()
+    const psp22 = yield* getPSP22()
     const adapter = yield* call(getAlephZeroWallet)
 
     const allPositions = yield* select(positionsList)
@@ -1039,18 +966,10 @@ export function* handleGetPositionsListPage(
 ) {
   const { index, refresh } = action.payload
 
-  const api = yield* getApi()
-  const network = yield* select(networkType)
-  const invAddress = yield* select(invariantAddress)
   const walletAddress = yield* select(address)
   const { length, list, loadedPages } = yield* select(positionsList)
 
-  const invariant = yield* call(
-    [invariantSingleton, invariantSingleton.loadInstance],
-    api,
-    network,
-    invAddress
-  )
+  const invariant = yield* getInvariant()
 
   let entries: [Position, Pool, Tick, Tick][] = []
   let positionsLength = 0n
