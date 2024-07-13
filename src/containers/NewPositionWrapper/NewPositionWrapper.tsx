@@ -7,7 +7,12 @@ import {
   newPoolKey
 } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
-import { ALL_FEE_TIERS_DATA, bestTiers, commonTokensForNetworks } from '@store/consts/static'
+import {
+  ALL_FEE_TIERS_DATA,
+  U128MAX,
+  bestTiers,
+  commonTokensForNetworks
+} from '@store/consts/static'
 import { PositionOpeningMethod, TokenPriceData } from '@store/consts/types'
 import {
   addNewTokenToLocalStorage,
@@ -19,12 +24,12 @@ import {
   getNewTokenOrThrow,
   poolKeyToString,
   printBigint
-} from '@store/consts/utils'
+} from '@utils/utils'
 import { actions as poolsActions } from '@store/reducers/pools'
 import { InitMidPrice, actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Status, actions as walletActions } from '@store/reducers/wallet'
-import { networkType, rpcAddress } from '@store/selectors/connection'
+import { networkType } from '@store/selectors/connection'
 import {
   isLoadingLatestPoolsForTransaction,
   isLoadingTicksAndTickMaps,
@@ -34,6 +39,7 @@ import {
 } from '@store/selectors/pools'
 import { initPosition, plotTicks, shouldNotUpdateRange } from '@store/selectors/positions'
 import { address, balanceLoading, status, swapTokens } from '@store/selectors/wallet'
+import SingletonPSP22 from '@store/services/psp22Singleton'
 import { openWalletSelectorModal } from '@utils/web3/selector'
 import { VariantType } from 'notistack'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
@@ -65,7 +71,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const { data: ticksData, loading: ticksLoading, hasError: hasTicksError } = useSelector(plotTicks)
   const isFetchingNewPool = useSelector(isLoadingLatestPoolsForTransaction)
   const currentNetwork = useSelector(networkType)
-  const rpc = useSelector(rpcAddress)
 
   const tokensList = useSelector(swapTokens)
 
@@ -80,6 +85,8 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const [currentPairReversed, setCurrentPairReversed] = useState<boolean | null>(null)
 
   const [initialLoader, setInitialLoader] = useState(true)
+
+  const [isGetLiquidityError, setIsGetLiquidityError] = useState(false)
 
   const isMountedRef = useRef(false)
 
@@ -324,8 +331,10 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   }
 
   const addTokenHandler = async (address: string) => {
-    if (tokensList.findIndex(token => token.address.toString() === address) === -1) {
-      getNewTokenOrThrow(address, currentNetwork, rpc, walletAddress)
+    const psp22 = SingletonPSP22.getInstance()
+
+    if (psp22 && tokensList.findIndex(token => token.address.toString() === address) === -1) {
+      getNewTokenOrThrow(address, psp22, walletAddress)
         .then(data => {
           dispatch(poolsActions.addTokens(data))
           dispatch(walletActions.getBalances(Object.keys(data)))
@@ -426,7 +435,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     }
   }, [tokenBIndex])
 
-  const initialSlippage = localStorage.getItem('INVARIANT_NEW_POSITION_SLIPPAGE') ?? '1'
+  const initialSlippage = localStorage.getItem('INVARIANT_NEW_POSITION_SLIPPAGE') ?? '1.00'
 
   const onSlippageChange = (slippage: string) => {
     localStorage.setItem('INVARIANT_NEW_POSITION_SLIPPAGE', slippage)
@@ -457,10 +466,15 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         if (isMountedRef.current) {
           liquidityRef.current = positionLiquidity
         }
-
+        setIsGetLiquidityError(false)
         return tokenYAmount
       }
+    } catch (error) {
+      setIsGetLiquidityError(true)
+      return printBigint(U128MAX, tokens[tokenAIndex].decimals)
+    }
 
+    try {
       const { amount: tokenXAmount, l: positionLiquidity } = getLiquidityByY(
         amount,
         lowerTick,
@@ -472,19 +486,11 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       if (isMountedRef.current) {
         liquidityRef.current = positionLiquidity
       }
-
+      setIsGetLiquidityError(false)
       return tokenXAmount
     } catch (error) {
-      const result = (byX ? getLiquidityByY : getLiquidityByX)(
-        amount,
-        lowerTick,
-        upperTick,
-        poolsData[poolKey] ? poolsData[poolKey].sqrtPrice : midPrice.sqrtPrice,
-        true
-      )
-      if (isMountedRef.current) {
-        liquidityRef.current = result.liquidity
-      }
+      setIsGetLiquidityError(true)
+      return printBigint(U128MAX, tokens[tokenBIndex].decimals)
     }
 
     return BigInt(0)
@@ -702,6 +708,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       isBalanceLoading={isBalanceLoading}
       shouldNotUpdatePriceRange={shouldNotUpdatePriceRange}
       unblockUpdatePriceRange={unblockUpdatePriceRange}
+      isGetLiquidityError={isGetLiquidityError}
     />
   )
 }

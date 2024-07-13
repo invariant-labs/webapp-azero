@@ -53,14 +53,11 @@ const Notifier = () => {
         action: action,
         variant: variant,
         persist: persist,
-        // autoHideDuration: 5000,
         onExited: (_event, myKey) => {
           dispatch(actions.remove(myKey as string))
           removeDisplayed(myKey as string)
         },
         txid: txid
-
-        // currentNetwork: currentNetwork.toLowerCase()
       })
       storeDisplayed(key)
     })

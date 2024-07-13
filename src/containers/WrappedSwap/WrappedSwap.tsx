@@ -7,12 +7,12 @@ import {
   getCoinGeckoTokenPrice,
   getMockedTokenPrice,
   getNewTokenOrThrow
-} from '@store/consts/utils'
+} from '@utils/utils'
 import { actions as poolsActions } from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Simulate, actions } from '@store/reducers/swap'
 import { actions as walletActions } from '@store/reducers/wallet'
-import { networkType, rpcAddress } from '@store/selectors/connection'
+import { networkType } from '@store/selectors/connection'
 import {
   isLoadingLatestPoolsForTransaction,
   poolsArraySortedByFees,
@@ -27,6 +27,7 @@ import {
   swapTokensDict
 } from '@store/selectors/wallet'
 import apiSingleton from '@store/services/apiSingleton'
+import SingletonPSP22 from '@store/services/psp22Singleton'
 import { openWalletSelectorModal } from '@utils/web3/selector'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -45,9 +46,8 @@ export const WrappedSwap = () => {
   const { success, inProgress } = useSelector(swapPool)
   const isFetchingNewPool = useSelector(isLoadingLatestPoolsForTransaction)
   const network = useSelector(networkType)
-  const rpc = useSelector(rpcAddress)
   const swapSimulateResult = useSelector(simulateResult)
-  const api = apiSingleton.loadInstance(network, rpc)
+  const api = apiSingleton.getInstance()
   const [progress, setProgress] = useState<ProgressState>('none')
   const [tokenFrom, setTokenFrom] = useState<string | null>(null)
   const [tokenTo, setTokenTo] = useState<string | null>(null)
@@ -96,11 +96,14 @@ export const WrappedSwap = () => {
     lastTokenTo === null ? null : tokensList.findIndex(token => token.assetAddress === lastTokenTo)
 
   const addTokenHandler = async (address: string) => {
+    const psp22 = SingletonPSP22.getInstance()
+
     if (
+      psp22 &&
       api !== null &&
       tokensList.findIndex(token => token.address.toString() === address) === -1
     ) {
-      getNewTokenOrThrow(address, network, rpc, walletAddress)
+      getNewTokenOrThrow(address, psp22, walletAddress)
         .then(data => {
           dispatch(poolsActions.addTokens(data))
           dispatch(walletActions.getBalances(Object.keys(data)))
@@ -188,7 +191,7 @@ export const WrappedSwap = () => {
     }
   }, [tokenTo])
 
-  const initialSlippage = localStorage.getItem('INVARIANT_SWAP_SLIPPAGE') ?? '1'
+  const initialSlippage = localStorage.getItem('INVARIANT_SWAP_SLIPPAGE') ?? '1.00'
 
   const onSlippageChange = (slippage: string) => {
     localStorage.setItem('INVARIANT_SWAP_SLIPPAGE', slippage)

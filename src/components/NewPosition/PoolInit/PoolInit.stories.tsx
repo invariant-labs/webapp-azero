@@ -15,7 +15,7 @@ export const Primary: Story = {
   args: {
     currentPairReversed: false,
     isXtoY: true,
-    midPriceIndex: 0 as any, //Storybook doesn't support bigint correctly
+    midPriceIndex: 0 as any,
     onChangeMidPrice: fn(),
     onChangeRange: fn(),
     tickSpacing: 1 as any,
