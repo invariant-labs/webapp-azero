@@ -149,7 +149,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
     }
 
     if (isGetLiquidityError) {
-      return 'Please provide a smaller amount to add liquidity.'
+      return 'Provide a smaller amount'
     }
 
     if (
