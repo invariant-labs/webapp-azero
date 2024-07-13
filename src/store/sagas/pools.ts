@@ -1,8 +1,6 @@
-import { PoolKey, newPoolKey, sendTx, toSqrtPrice } from '@invariant-labs/a0-sdk'
-import { Signer } from '@polkadot/api/types'
+import { PoolKey, newPoolKey } from '@invariant-labs/a0-sdk'
 import { PayloadAction } from '@reduxjs/toolkit'
 import {
-  createLoaderKey,
   findPairs,
   getPoolsByPoolKeys,
   getTokenBalances,
@@ -15,12 +13,9 @@ import {
   PoolWithPoolKey,
   actions
 } from '@store/reducers/pools'
-import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { actions as walletActions } from '@store/reducers/wallet'
 import { tokens } from '@store/selectors/pools'
 import { address } from '@store/selectors/wallet'
-import { getAlephZeroWallet } from '@utils/web3/wallet'
-import { closeSnackbar } from 'notistack'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
 import { MAX_POOL_KEYS_RETURNED } from '@invariant-labs/a0-sdk/target/consts'
 import { getInvariant, getPSP22 } from './connection'
@@ -58,69 +53,6 @@ export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) 
   console.log(yield* select(tokens))
 
   yield* put(actions.addPoolsForList({ data: pools, listType: action.payload.listType }))
-}
-
-export function* handleInitPool(action: PayloadAction<PoolKey>): Generator {
-  const loaderKey = createLoaderKey()
-  const loaderSigningTx = createLoaderKey()
-  try {
-    yield put(
-      snackbarsActions.add({
-        message: 'Creating new pool...',
-        variant: 'pending',
-        persist: true,
-        key: loaderKey
-      })
-    )
-
-    const { tokenX, tokenY, feeTier } = action.payload
-
-    const walletAddress = yield* select(address)
-    const adapter = yield* call(getAlephZeroWallet)
-    const invariant = yield* getInvariant()
-
-    const poolKey = newPoolKey(tokenX, tokenY, feeTier)
-
-    const initSqrtPrice = toSqrtPrice(1n, 0n)
-
-    const tx = yield* call([invariant, invariant.createPoolTx], poolKey, initSqrtPrice)
-
-    yield put(
-      snackbarsActions.add({
-        message: 'Signing transaction...',
-        variant: 'pending',
-        persist: true,
-        key: loaderSigningTx
-      })
-    )
-
-    const signedTx = yield* call([tx, tx.signAsync], walletAddress, {
-      signer: adapter.signer as Signer
-    })
-
-    closeSnackbar(loaderSigningTx)
-    yield put(snackbarsActions.remove(loaderSigningTx))
-
-    const txResult = yield* call(sendTx, signedTx)
-
-    yield put(
-      snackbarsActions.add({
-        message: 'Pool successfully created',
-        variant: 'success',
-        persist: false,
-        txid: txResult.hash
-      })
-    )
-
-    closeSnackbar(loaderKey)
-    yield put(snackbarsActions.remove(loaderKey))
-  } catch (error) {
-    console.log(error)
-    closeSnackbar(loaderKey)
-    yield put(snackbarsActions.remove(loaderKey))
-    closeSnackbar(loaderSigningTx)
-    yield put(snackbarsActions.remove(loaderSigningTx))
-  }
 }
 
 export function* fetchPoolData(action: PayloadAction<PoolKey>): Generator {
@@ -255,10 +187,6 @@ export function* getPoolsDataForListHandler(): Generator {
   yield* takeEvery(actions.getPoolsDataForList, fetchPoolsDataForList)
 }
 
-export function* initPoolHandler(): Generator {
-  yield* takeLatest(actions.initPool, handleInitPool)
-}
-
 export function* getPoolDataHandler(): Generator {
   yield* takeLatest(actions.getPoolData, fetchPoolData)
 }
@@ -278,7 +206,6 @@ export function* getTicksAndTickMapsHandler(): Generator {
 export function* poolsSaga(): Generator {
   yield all(
     [
-      initPoolHandler,
       getPoolDataHandler,
       getPoolKeysHandler,
       getPoolsDataForListHandler,
