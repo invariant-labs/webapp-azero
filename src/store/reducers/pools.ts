@@ -149,11 +149,7 @@ const poolsSlice = createSlice({
         const { poolKey } = action.payload
         const keyStringified = poolKeyToString(poolKey)
 
-        // Check if a pool with the same PoolKey already exists
-        // if (!state.pools[keyStringified]) {
-        // If the pool does not exist, add it to the pools object
         state.pools[keyStringified] = action.payload
-        // }
       }
 
       state.isLoadingLatestPoolsForTransaction = false
