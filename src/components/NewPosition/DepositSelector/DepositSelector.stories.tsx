@@ -5,7 +5,7 @@ import DepositSelector from './DepositSelector'
 
 const tokens: any[] = [
   {
-    balance: 111, // change type number
+    balance: 111,
     decimals: 6,
     symbol: 'SOL',
     assetAddress: 'So11111111111111111111111111111111111111112',
@@ -14,7 +14,7 @@ const tokens: any[] = [
       'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png'
   },
   {
-    balance: 1000, // change type number
+    balance: 1000,
     decimals: 6,
     symbol: 'BTC',
     assetAddress: '9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E',
@@ -23,7 +23,7 @@ const tokens: any[] = [
       'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E/logo.png'
   },
   {
-    balance: 222, // change type number
+    balance: 222,
     decimals: 6,
     symbol: 'USDC',
     assetAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
@@ -91,7 +91,8 @@ export const Primary: Story = {
     bestTierIndex: 2,
     priceA: 1111,
     priceB: 2222,
-    isBalanceLoading: false
+    isBalanceLoading: false,
+    isGetLiquidityError: false
   },
   render: args => {
     const [feeTierIndex, setFeeTierIndex] = useState<number>(0)

@@ -6,18 +6,13 @@ import FooterWrapper from '@containers/FooterWrapper'
 import HeaderWrapper from '@containers/HeaderWrapper/HeaderWrapper'
 import { Grid } from '@mui/material'
 import { Status, actions as alephZeroConnectionActions } from '@store/reducers/connection'
-// import { actions } from '@store/reducers/positions'
-// import { Status as WalletStatus } from '@store/reducers/wallet'
 import { status as connectionStatus } from '@store/selectors/connection'
-// import { address, status } from '@store/selectors/wallet'
 import { toBlur } from '@utils/uiUtils'
 import useStyles from './style'
 
 const RootPage: React.FC = React.memo(() => {
   const dispatch = useDispatch()
   const signerStatus = useSelector(connectionStatus)
-  // const walletAddress = useSelector(address)
-  // const walletStatus = useSelector(status)
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -37,20 +32,6 @@ const RootPage: React.FC = React.memo(() => {
   useEffect(() => {
     initConnection()
   }, [initConnection])
-
-  // const fetchPositionsList = useCallback(() => {
-  //   if (
-  //     signerStatus === Status.Initialized &&
-  //     walletStatus === WalletStatus.Initialized &&
-  //     walletAddress
-  //   ) {
-  //     dispatch(actions.getPositionsList())
-  //   }
-  // }, [dispatch, signerStatus, walletStatus, walletAddress])
-
-  // useEffect(() => {
-  //   fetchPositionsList()
-  // }, [fetchPositionsList])
 
   return (
     <>

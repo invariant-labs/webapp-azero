@@ -9,7 +9,7 @@ import { ILiquidityToken } from './consts'
 import useStyles from './style'
 import { useNavigate } from 'react-router-dom'
 import { TokenPriceData } from '@store/consts/types'
-import { addressToTicker } from '@store/consts/utils'
+import { addressToTicker } from '@utils/utils'
 
 interface IProp {
   fee: number

@@ -1,17 +1,16 @@
-// theme.ts
 import { createTheme } from '@mui/material/styles'
 
 export const colors = {
   black: {
     full: '#000000',
-    background: '#1B1C2A', // v2.0
+    background: '#1B1C2A',
     light: '#090B1B',
     kinda: '#1A1A1A',
     greyish: '#081323',
-    cinder: '#0E0C12', // v2.0 background color
-    controls: '#44424E', // v2.0 controls background color
-    header: '#1A1D28', // v2.0 header
-    card: '#28242E' // v2.0 card color
+    cinder: '#0E0C12',
+    controls: '#44424E',
+    header: '#1A1D28',
+    card: '#28242E'
   },
   blue: {
     accent: '#072E5A',
@@ -22,7 +21,7 @@ export const colors = {
     neon: '#08F7FE',
     astel: '#48ADF1',
     bastille: '#1E1A23',
-    charade: '#272735', // v2.0 component
+    charade: '#272735',
     deep: '#4B5983'
   },
   green: {
@@ -47,7 +46,6 @@ export const colors = {
     neon: '#F5D300'
   },
   navy: {
-    // colors with suffix "2" on figma
     background: '#0C0D2C',
     dark: '#0E0E2A',
     component: '#1D1D49',
@@ -158,12 +156,11 @@ export const typography = {
   }
 }
 
-// Create a theme instance.
 export const theme = createTheme({
   palette: {
     primary: {
-      main: colors.navy.button, // v2.0
-      contrastText: colors.navy.veryLightGrey // v2.0
+      main: colors.navy.button,
+      contrastText: colors.navy.veryLightGrey
     },
     secondary: {
       main: colors.green.button,
@@ -198,15 +195,4 @@ export const theme = createTheme({
       xl: 1920
     }
   }
-  // overrides: {
-  //   MuiInputBase: {
-  //     input: {
-  //       MozAppearance: "textfield",
-  //       "&::-webkit-clear-button, &::-webkit-outer-spin-button, &::-webkit-inner-spin-button":
-  //         {
-  //           display: "none",
-  //         },
-  //     },
-  //   },
-  // },
 })

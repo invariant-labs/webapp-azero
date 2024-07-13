@@ -73,7 +73,6 @@ const preview: Preview = {
       ]
     },
     createBrowserRouter: { withRouter }
-    // actions: { argTypesRegex: '^on.*' }
   },
 
   decorators: [
@@ -85,7 +84,6 @@ const preview: Preview = {
       Provider: ThemeProvider,
       GlobalStyles: CssBaseline
     })
-    // withRouter
   ]
 }
 

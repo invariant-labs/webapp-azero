@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material'
 import loadingAnimation from '@static/gif/loading.gif'
-import { formatNumber } from '@store/consts/utils'
+import { formatNumber } from '@utils/utils'
 import React from 'react'
 import useStyles from './style'
 
