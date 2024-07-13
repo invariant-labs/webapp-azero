@@ -1,4 +1,4 @@
-import { formatNumber } from '@store/consts/utils'
+import { formatNumber } from '@utils/utils'
 import React from 'react'
 import { useSpring, animated } from 'react-spring'
 interface IProps {

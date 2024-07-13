@@ -100,6 +100,7 @@ export interface INewPosition {
   isBalanceLoading: boolean
   shouldNotUpdatePriceRange: boolean
   unblockUpdatePriceRange: () => void
+  isGetLiquidityError: boolean
 }
 
 export const NewPosition: React.FC<INewPosition> = ({
@@ -150,7 +151,8 @@ export const NewPosition: React.FC<INewPosition> = ({
   onRefresh,
   isBalanceLoading,
   shouldNotUpdatePriceRange,
-  unblockUpdatePriceRange
+  unblockUpdatePriceRange,
+  isGetLiquidityError
 }) => {
   const { classes } = useStyles()
   const navigate = useNavigate()
@@ -572,7 +574,13 @@ export const NewPosition: React.FC<INewPosition> = ({
             }
           }}
           tokenAInputState={{
-            value: tokenADeposit,
+            value:
+              tokenAIndex !== null &&
+              tokenBIndex !== null &&
+              !isWaitingForNewPool &&
+              blockedToken === PositionTokenBlock.A
+                ? '0'
+                : tokenADeposit,
             setValue: value => {
               if (tokenAIndex === null) {
                 return
@@ -598,7 +606,13 @@ export const NewPosition: React.FC<INewPosition> = ({
             decimalsLimit: tokenAIndex !== null ? Number(tokens[tokenAIndex].decimals) : 0
           }}
           tokenBInputState={{
-            value: tokenBDeposit,
+            value:
+              tokenAIndex !== null &&
+              tokenBIndex !== null &&
+              !isWaitingForNewPool &&
+              blockedToken === PositionTokenBlock.B
+                ? '0'
+                : tokenBDeposit,
             setValue: value => {
               if (tokenBIndex === null) {
                 return
@@ -651,6 +665,7 @@ export const NewPosition: React.FC<INewPosition> = ({
           minimumSliderIndex={minimumSliderIndex}
           positionOpeningMethod={positionOpeningMethod}
           isBalanceLoading={isBalanceLoading}
+          isGetLiquidityError={isGetLiquidityError}
         />
         <Hidden mdUp>
           <Grid container justifyContent='end' mb={2}>
