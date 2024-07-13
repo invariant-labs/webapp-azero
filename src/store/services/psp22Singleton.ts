@@ -3,28 +3,23 @@ import { ApiPromise } from '@polkadot/api'
 import { DEFAULT_PSP22_OPTIONS } from '@store/consts/static'
 
 class SingletonPSP22 {
-  private static instance: SingletonPSP22
-  private psp22: PSP22 | null = null
-  private currentApi: ApiPromise | null = null
-  private currentNetwork: Network | null = null
+  static psp22: PSP22 | null = null
+  static api: ApiPromise | null = null
+  static network: Network | null = null
 
-  private constructor() {}
-
-  public static getInstance(): SingletonPSP22 {
-    if (!SingletonPSP22.instance) {
-      SingletonPSP22.instance = new SingletonPSP22()
-    }
-    return SingletonPSP22.instance
+  static getInstance(): PSP22 | null {
+    return this.psp22
   }
 
-  public async loadInstance(api: ApiPromise, network: Network): Promise<PSP22> {
-    if (!this.psp22 || this.currentApi !== api || this.currentNetwork !== network) {
+  static async loadInstance(api: ApiPromise, network: Network): Promise<PSP22> {
+    if (!this.psp22 || api !== this.api || network !== this.network) {
       this.psp22 = await PSP22.load(api, network, DEFAULT_PSP22_OPTIONS)
-      this.currentApi = api
-      this.currentNetwork = network
+      this.api = api
+      this.network = network
     }
+
     return this.psp22
   }
 }
 
-export default SingletonPSP22.getInstance()
+export default SingletonPSP22

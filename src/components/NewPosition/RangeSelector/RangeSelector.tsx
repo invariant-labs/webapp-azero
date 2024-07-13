@@ -11,7 +11,7 @@ import {
   calculateConcentrationRange,
   nearestTickIndex,
   toMaxNumericPlaces
-} from '@store/consts/utils'
+} from '@utils/utils'
 import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
 import React, { useEffect, useRef, useState } from 'react'
 import ConcentrationSlider from '../ConcentrationSlider/ConcentrationSlider'
@@ -493,7 +493,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
               changeRangeHandler(BigInt(newLeft), rightRange)
               autoZoomHandler(BigInt(newLeft), rightRange)
             }}
-            diffLabel='Min - Current price'
+            diffLabel='Min - Current'
             percentDiff={((+leftInput - midPrice.x) / midPrice.x) * 100}
           />
           <RangeInput
@@ -532,7 +532,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
               changeRangeHandler(leftRange, BigInt(newRight))
               autoZoomHandler(leftRange, BigInt(newRight))
             }}
-            diffLabel='Max - Current price'
+            diffLabel='Max - Current'
             percentDiff={((+rightInput - midPrice.x) / midPrice.x) * 100}
           />
         </Grid>

@@ -7,7 +7,7 @@ import {
   positionListPageToQueryPage,
   printBigint,
   calcPriceBySqrtPrice
-} from '@store/consts/utils'
+} from '@utils/utils'
 import { actions } from '@store/reducers/positions'
 import { Status } from '@store/reducers/wallet'
 import {
@@ -48,7 +48,7 @@ export const WrappedPositionsList: React.FC = () => {
     }
 
     if (lastPage > Math.ceil(list.length / POSITIONS_PER_PAGE)) {
-      setLastPage(lastPage - 1)
+      setLastPage(lastPage === 1 ? 1 : lastPage - 1)
     }
   }, [list])
 
@@ -172,6 +172,11 @@ export const WrappedPositionsList: React.FC = () => {
             })
           )
         }
+      }}
+      length={length}
+      loadedPages={loadedPages}
+      getRemainingPositions={() => {
+        dispatch(actions.getRemainingPositions())
       }}
     />
   )

@@ -1,15 +1,13 @@
-import { Network, sendTx } from '@invariant-labs/a0-sdk'
+import { sendTx } from '@invariant-labs/a0-sdk'
 import { NightlyConnectAdapter } from '@nightlylabs/wallet-selector-polkadot'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { FaucetTokenList, TokenAirdropAmount } from '@store/consts/static'
-import { createLoaderKey, getTokenBalances } from '@store/consts/utils'
+import { createLoaderKey, getTokenBalances } from '@utils/utils'
 import { actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Status, actions, actions as walletActions } from '@store/reducers/wallet'
-import { networkType } from '@store/selectors/connection'
 import { tokens } from '@store/selectors/pools'
 import { address, status } from '@store/selectors/wallet'
-import psp22Singleton from '@store/services/psp22Singleton'
 import { disconnectWallet, getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
 import {
@@ -22,9 +20,9 @@ import {
   takeLatest,
   takeLeading
 } from 'typed-redux-saga'
-import { getConnection } from './connection'
 import { Signer } from '@polkadot/api/types'
 import { positionsList } from '@store/selectors/positions'
+import { getApi, getPSP22 } from './connection'
 
 export function* getWallet(): SagaGenerator<NightlyConnectAdapter> {
   const wallet = yield* call(getAlephZeroWallet)
@@ -44,7 +42,7 @@ type FrameSystemAccountInfo = {
   sufficients: number
 }
 export function* getBalance(walletAddress: string): SagaGenerator<string> {
-  const connection = yield* call(getConnection)
+  const connection = yield* getApi()
   const accountInfoResponse = yield* call(
     [connection.query.system.account, connection.query.system.account],
     walletAddress
@@ -81,14 +79,10 @@ export function* handleAirdrop(): Generator {
       })
     )
 
-    const connection = yield* getConnection()
+    const connection = yield* getApi()
     const adapter = yield* call(getAlephZeroWallet)
 
-    const psp22 = yield* call(
-      [psp22Singleton, psp22Singleton.loadInstance],
-      connection,
-      Network.Testnet
-    )
+    const psp22 = yield* getPSP22()
 
     const txs = []
 
@@ -212,15 +206,14 @@ export function* handleDisconnect(): Generator {
 
 export function* fetchBalances(tokens: string[]): Generator {
   const walletAddress = yield* select(address)
-  const api = yield* getConnection()
-  const network = yield* select(networkType)
+  const psp22 = yield* getPSP22()
 
   yield* put(walletActions.setIsBalanceLoading(true))
 
   const balance = yield* call(getBalance, walletAddress)
   yield* put(walletActions.setBalance(BigInt(balance)))
 
-  const tokenBalances = yield* call(getTokenBalances, tokens, api, network, walletAddress)
+  const tokenBalances = yield* call(getTokenBalances, tokens, psp22, walletAddress)
   yield* put(
     walletActions.addTokenBalances(
       tokenBalances.map(([address, balance]) => {

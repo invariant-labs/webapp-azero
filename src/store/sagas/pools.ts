@@ -7,7 +7,7 @@ import {
   getPoolsByPoolKeys,
   getTokenBalances,
   getTokenDataByAddresses
-} from '@store/consts/utils'
+} from '@utils/utils'
 import {
   FetchTicksAndTickMaps,
   ListPoolsRequest,
@@ -17,28 +17,19 @@ import {
 } from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { actions as walletActions } from '@store/reducers/wallet'
-import { invariantAddress, networkType } from '@store/selectors/connection'
 import { tokens } from '@store/selectors/pools'
 import { address } from '@store/selectors/wallet'
-import invariantSingleton from '@store/services/invariantSingleton'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
-import { getConnection } from './connection'
 import { MAX_POOL_KEYS_RETURNED } from '@invariant-labs/a0-sdk/target/consts'
+import { getInvariant, getPSP22 } from './connection'
 
 export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) {
   const walletAddress = yield* select(address)
-  const connection = yield* call(getConnection)
-  const network = yield* select(networkType)
-  const invAddress = yield* select(invariantAddress)
-  const pools = yield* call(
-    getPoolsByPoolKeys,
-    invAddress,
-    action.payload.poolKeys,
-    connection,
-    network
-  )
+  const invariant = yield* getInvariant()
+  const pools = yield* call(getPoolsByPoolKeys, invariant, action.payload.poolKeys)
+  const psp22 = yield* getPSP22()
 
   const allTokens = yield* select(tokens)
   const unknownTokens = new Set(
@@ -55,17 +46,10 @@ export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) 
   const unknownTokensData = yield* call(
     getTokenDataByAddresses,
     [...unknownTokens],
-    connection,
-    network,
+    psp22,
     walletAddress
   )
-  const knownTokenBalances = yield* call(
-    getTokenBalances,
-    [...knownTokens],
-    connection,
-    network,
-    walletAddress
-  )
+  const knownTokenBalances = yield* call(getTokenBalances, [...knownTokens], psp22, walletAddress)
 
   yield* put(walletActions.getBalances(Object.keys(unknownTokensData)))
   yield* put(actions.addTokens(unknownTokensData))
@@ -91,18 +75,9 @@ export function* handleInitPool(action: PayloadAction<PoolKey>): Generator {
 
     const { tokenX, tokenY, feeTier } = action.payload
 
-    const api = yield* getConnection()
-    const network = yield* select(networkType)
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
-    const invAddress = yield* select(invariantAddress)
-
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
+    const invariant = yield* getInvariant()
 
     const poolKey = newPoolKey(tokenX, tokenY, feeTier)
 
@@ -149,18 +124,10 @@ export function* handleInitPool(action: PayloadAction<PoolKey>): Generator {
 }
 
 export function* fetchPoolData(action: PayloadAction<PoolKey>): Generator {
-  const api = yield* getConnection()
-  const network = yield* select(networkType)
-  const invAddress = yield* select(invariantAddress)
   const { feeTier, tokenX, tokenY } = action.payload
 
   try {
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
+    const invariant = yield* getInvariant()
 
     const pool = yield* call([invariant, invariant.getPool], tokenX, tokenY, feeTier)
 
@@ -181,17 +148,8 @@ export function* fetchPoolData(action: PayloadAction<PoolKey>): Generator {
 }
 
 export function* fetchAllPoolKeys(): Generator {
-  const api = yield* getConnection()
-  const network = yield* select(networkType)
-  const invAddress = yield* select(invariantAddress)
-
   try {
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
+    const invariant = yield* getInvariant()
 
     const [poolKeys, poolKeysCount] = yield* call(
       [invariant, invariant.getPoolKeys],
@@ -216,15 +174,7 @@ export function* fetchAllPoolKeys(): Generator {
 }
 
 export function* fetchAllPoolsForPairData(action: PayloadAction<PairTokens>) {
-  const api = yield* call(getConnection)
-  const network = yield* select(networkType)
-  const invAddress = yield* select(invariantAddress)
-  const invariant = yield* call(
-    [invariantSingleton, invariantSingleton.loadInstance],
-    api,
-    network,
-    invAddress
-  )
+  const invariant = yield* getInvariant()
 
   const token0 = action.payload.first.toString()
   const token1 = action.payload.second.toString()
@@ -240,16 +190,7 @@ export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMa
   const { tokenFrom, tokenTo, allPools } = action.payload
 
   try {
-    const api = yield* call(getConnection)
-    const network = yield* select(networkType)
-    const invAddress = yield* select(invariantAddress)
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
-
+    const invariant = yield* getInvariant()
     const pools = findPairs(tokenFrom.toString(), tokenTo.toString(), allPools)
 
     const tickmapCalls = pools.map(pool =>
@@ -283,9 +224,8 @@ export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMa
 
 export function* fetchTokens(poolsWithPoolKeys: PoolWithPoolKey[]) {
   const walletAddress = yield* select(address)
-  const connection = yield* call(getConnection)
-  const network = yield* select(networkType)
   const allTokens = yield* select(tokens)
+  const psp22 = yield* getPSP22()
 
   const unknownTokens = new Set(
     poolsWithPoolKeys.flatMap(({ poolKey: { tokenX, tokenY } }) =>
@@ -301,17 +241,10 @@ export function* fetchTokens(poolsWithPoolKeys: PoolWithPoolKey[]) {
   const unknownTokensData = yield* call(
     getTokenDataByAddresses,
     [...unknownTokens],
-    connection,
-    network,
+    psp22,
     walletAddress
   )
-  const knownTokenBalances = yield* call(
-    getTokenBalances,
-    [...knownTokens],
-    connection,
-    network,
-    walletAddress
-  )
+  const knownTokenBalances = yield* call(getTokenBalances, [...knownTokens], psp22, walletAddress)
 
   yield* put(walletActions.getBalances(Object.keys(unknownTokensData)))
   yield* put(actions.addTokens(unknownTokensData))

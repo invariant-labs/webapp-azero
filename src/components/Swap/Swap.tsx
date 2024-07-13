@@ -11,12 +11,7 @@ import refreshIcon from '@static/svg/refresh.svg'
 import settingIcon from '@static/svg/settings.svg'
 import SwapArrows from '@static/svg/swap-arrows.svg'
 import { DEFAULT_TOKEN_DECIMAL, REFRESHER_INTERVAL } from '@store/consts/static'
-import {
-  convertBalanceToBigint,
-  printBigint,
-  stringToFixed,
-  trimLeadingZeros
-} from '@store/consts/utils'
+import { convertBalanceToBigint, printBigint, stringToFixed, trimLeadingZeros } from '@utils/utils'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { Swap as SwapData } from '@store/reducers/swap'
 import { Status } from '@store/reducers/wallet'
@@ -431,7 +426,8 @@ export const Swap: React.FC<ISwap> = ({
               isBalanceLoading ||
               getStateMessage() === 'Loading' ||
               tokenFromIndex === null ||
-              tokenToIndex === null
+              tokenToIndex === null ||
+              tokenFromIndex === tokenToIndex
             }>
             <img src={refreshIcon} className={classes.refreshIcon} alt='Refresh' />
           </Button>
@@ -607,13 +603,15 @@ export const Swap: React.FC<ISwap> = ({
                 <CardMedia image={infoIcon} className={classes.infoIcon} />
               </Grid>
             </button>
-            {tokenFromIndex !== null && tokenToIndex !== null && (
-              <Refresher
-                currentIndex={refresherTime}
-                maxIndex={REFRESHER_INTERVAL}
-                onClick={handleRefresh}
-              />
-            )}
+            {tokenFromIndex !== null &&
+              tokenToIndex !== null &&
+              tokenFromIndex !== tokenToIndex && (
+                <Refresher
+                  currentIndex={refresherTime}
+                  maxIndex={REFRESHER_INTERVAL}
+                  onClick={handleRefresh}
+                />
+              )}
           </Grid>
           {canShowDetails ? (
             <ExchangeRate

@@ -1,6 +1,7 @@
 import {
   FEE_TIERS,
   Network,
+  Position,
   TESTNET_BTC_ADDRESS,
   TESTNET_ETH_ADDRESS,
   TESTNET_USDC_ADDRESS,
@@ -8,7 +9,8 @@ import {
 } from '@invariant-labs/a0-sdk'
 import { Keyring } from '@polkadot/api'
 import { BestTier, FormatNumberThreshold, PrefixConfig, Token, TokenPriceData } from './types'
-import { testnetBestTiersCreator } from './utils'
+import { testnetBestTiersCreator } from '@utils/utils'
+import { POSITIONS_ENTRIES_LIMIT } from '@invariant-labs/a0-sdk/target/consts'
 
 export enum AlephZeroNetworks {
   TEST = 'wss://ws.test.azero.dev',
@@ -255,5 +257,24 @@ export const reversedAddressTickerMap = Object.fromEntries(
 export const LIQUIDITY_PLOT_DECIMAL = 12n
 
 export const DEFAULT_TOKEN_DECIMAL = 12n
+
+export const EMPTY_POSITION: Position = {
+  poolKey: {
+    tokenX: TESTNET_BTC_ADDRESS,
+    tokenY: TESTNET_ETH_ADDRESS,
+    feeTier: { fee: 0n, tickSpacing: 1n }
+  },
+  liquidity: 0n,
+  lowerTickIndex: 0n,
+  upperTickIndex: 0n,
+  feeGrowthInsideX: 0n,
+  feeGrowthInsideY: 0n,
+  lastBlockNumber: 0n,
+  tokensOwedX: 0n,
+  tokensOwedY: 0n
+}
+
+export const POSITIONS_PER_QUERY =
+  Number(POSITIONS_ENTRIES_LIMIT) - (Number(POSITIONS_ENTRIES_LIMIT) % POSITIONS_PER_PAGE)
 
 export const MINIMAL_POOL_INIT_PRICE = 0.00000001
