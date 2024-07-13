@@ -11,12 +11,7 @@ import refreshIcon from '@static/svg/refresh.svg'
 import settingIcon from '@static/svg/settings.svg'
 import SwapArrows from '@static/svg/swap-arrows.svg'
 import { DEFAULT_TOKEN_DECIMAL, REFRESHER_INTERVAL } from '@store/consts/static'
-import {
-  convertBalanceToBigint,
-  printBigint,
-  stringToFixed,
-  trimLeadingZeros
-} from '@store/consts/utils'
+import { convertBalanceToBigint, printBigint, stringToFixed, trimLeadingZeros } from '@utils/utils'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { Swap as SwapData } from '@store/reducers/swap'
 import { Status } from '@store/reducers/wallet'
@@ -24,7 +19,7 @@ import { SwapError } from '@store/sagas/swap'
 import { SwapToken } from '@store/selectors/wallet'
 import { blurContent, unblurContent } from '@utils/uiUtils'
 import classNames from 'classnames'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Simulate } from '@store/reducers/swap'
 import ExchangeRate from './ExchangeRate/ExchangeRate'
 import TransactionDetailsBox from './TransactionDetailsBox/TransactionDetailsBox'
@@ -291,6 +286,13 @@ export const Swap: React.FC<ISwap> = ({
     return false
   }
 
+  const isInsufficientLiquidityError = useMemo(
+    () =>
+      simulateResult.poolKey === null &&
+      (isError(SwapError.InsufficientLiquidity) || isError(SwapError.MaxTicksCrossed)),
+    [simulateResult]
+  )
+
   const getStateMessage = () => {
     if ((tokenFromIndex !== null && tokenToIndex !== null && throttle) || isWaitingForNewPool) {
       return 'Loading'
@@ -312,10 +314,7 @@ export const Swap: React.FC<ISwap> = ({
       return 'No route found'
     }
 
-    if (
-      simulateResult.poolKey === null &&
-      (isError(SwapError.InsufficientLiquidity) || isError(SwapError.MaxTicksCrossed))
-    ) {
+    if (isInsufficientLiquidityError) {
       return 'Insufficient liquidity'
     }
 
@@ -427,7 +426,8 @@ export const Swap: React.FC<ISwap> = ({
               isBalanceLoading ||
               getStateMessage() === 'Loading' ||
               tokenFromIndex === null ||
-              tokenToIndex === null
+              tokenToIndex === null ||
+              tokenFromIndex === tokenToIndex
             }>
             <img src={refreshIcon} className={classes.refreshIcon} alt='Refresh' />
           </Button>
@@ -441,7 +441,7 @@ export const Swap: React.FC<ISwap> = ({
             setSlippage={setSlippage}
             handleClose={handleCloseSettings}
             anchorEl={anchorEl}
-            defaultSlippage={'1'}
+            defaultSlippage={'1.00'}
             initialSlippage={initialSlippage}
           />
         </Grid>
@@ -598,18 +598,20 @@ export const Swap: React.FC<ISwap> = ({
               }>
               <Grid className={classes.transactionDetailsWrapper}>
                 <Typography className={classes.transactionDetailsHeader}>
-                  See transaction details
+                  {detailsOpen && canShowDetails ? 'Hide' : 'Show'} transaction details
                 </Typography>
                 <CardMedia image={infoIcon} className={classes.infoIcon} />
               </Grid>
             </button>
-            {tokenFromIndex !== null && tokenToIndex !== null && (
-              <Refresher
-                currentIndex={refresherTime}
-                maxIndex={REFRESHER_INTERVAL}
-                onClick={handleRefresh}
-              />
-            )}
+            {tokenFromIndex !== null &&
+              tokenToIndex !== null &&
+              tokenFromIndex !== tokenToIndex && (
+                <Refresher
+                  currentIndex={refresherTime}
+                  maxIndex={REFRESHER_INTERVAL}
+                  onClick={handleRefresh}
+                />
+              )}
           </Grid>
           {canShowDetails ? (
             <ExchangeRate
@@ -626,7 +628,11 @@ export const Swap: React.FC<ISwap> = ({
         </Box>
         <TransactionDetailsBox
           open={getStateMessage() !== 'Loading' ? detailsOpen && canShowDetails : prevOpenState}
-          fee={simulateResult.poolKey?.feeTier.fee ?? 0n}
+          fee={
+            isInsufficientLiquidityError
+              ? simulateResult.fee
+              : simulateResult.poolKey?.feeTier.fee ?? 0n
+          }
           exchangeRate={{
             val: rateReversed ? 1 / swapRate : swapRate,
             symbol: canShowDetails
@@ -636,7 +642,7 @@ export const Swap: React.FC<ISwap> = ({
               ? Number(tokens[rateReversed ? tokenFromIndex : tokenToIndex].decimals)
               : 0
           }}
-          priceImpact={simulateResult.priceImpact}
+          priceImpact={isInsufficientLiquidityError ? 1 : simulateResult.priceImpact}
           slippage={+slippTolerance}
           isLoadingRate={getStateMessage() === 'Loading'}
         />

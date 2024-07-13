@@ -1,18 +1,24 @@
-import AnimatedNumber from '@components/AnimatedNumber'
 import RangeInput from '@components/Inputs/RangeInput/RangeInput'
 import SimpleInput from '@components/Inputs/SimpleInput/SimpleInput'
 import { Button, Grid, Typography } from '@mui/material'
 import {
-  calcPrice,
-  calculateTickFromBalance,
-  formatNumbers,
+  calcPriceByTickIndex,
+  calculateConcentrationRange,
+  calculateSqrtPriceFromBalance,
+  formatNumber,
   nearestTickIndex,
-  showPrefix,
-  toMaxNumericPlaces
-} from '@store/consts/utils'
+  toMaxNumericPlaces,
+  trimZeros,
+  calculateTickFromBalance,
+  validConcentrationMidPriceTick
+} from '@utils/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import useStyles from './style'
-import { Price, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
+import { calculateTick, calculateTickDelta, getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
+import { PositionOpeningMethod } from '@store/consts/types'
+import ConcentrationSlider from '../ConcentrationSlider/ConcentrationSlider'
+import { MINIMAL_POOL_INIT_PRICE } from '@store/consts/static'
+import AnimatedNumber from '@components/AnimatedNumber/AnimatedNumber'
 
 export interface IPoolInit {
   tokenASymbol: string
@@ -22,9 +28,14 @@ export interface IPoolInit {
   xDecimal: bigint
   yDecimal: bigint
   tickSpacing: bigint
-  midPrice: bigint
-  onChangeMidPrice: (mid: Price) => void
+  midPriceIndex: bigint
+  onChangeMidPrice: (tickIndex: bigint, sqrtPrice: bigint) => void
   currentPairReversed: boolean | null
+  positionOpeningMethod?: PositionOpeningMethod
+  setConcentrationIndex: (val: number) => void
+  concentrationIndex: number
+  concentrationArray: number[]
+  minimumSliderIndex: number
 }
 
 export const PoolInit: React.FC<IPoolInit> = ({
@@ -35,39 +46,85 @@ export const PoolInit: React.FC<IPoolInit> = ({
   xDecimal,
   yDecimal,
   tickSpacing,
-  midPrice,
+  midPriceIndex,
   onChangeMidPrice,
-  currentPairReversed
+  currentPairReversed,
+  positionOpeningMethod,
+  setConcentrationIndex,
+  concentrationIndex,
+  concentrationArray,
+  minimumSliderIndex
 }) => {
+  const minTick = getMinTick(tickSpacing)
+  const maxTick = getMaxTick(tickSpacing)
+
   const { classes } = useStyles()
 
   const [leftRange, setLeftRange] = useState(tickSpacing * 10n * (isXtoY ? -1n : 1n))
   const [rightRange, setRightRange] = useState(tickSpacing * 10n * (isXtoY ? 1n : -1n))
 
   const [leftInput, setLeftInput] = useState(
-    calcPrice(leftRange, isXtoY, xDecimal, yDecimal).toString()
+    calcPriceByTickIndex(leftRange, isXtoY, xDecimal, yDecimal).toString()
   )
   const [rightInput, setRightInput] = useState(
-    calcPrice(rightRange, isXtoY, xDecimal, yDecimal).toString()
+    calcPriceByTickIndex(rightRange, isXtoY, xDecimal, yDecimal).toString()
   )
 
   const [leftInputRounded, setLeftInputRounded] = useState((+leftInput).toFixed(12))
   const [rightInputRounded, setRightInputRounded] = useState((+rightInput).toFixed(12))
 
   const [midPriceInput, setMidPriceInput] = useState(
-    calcPrice(midPrice, isXtoY, xDecimal, yDecimal).toString()
+    calcPriceByTickIndex(midPriceIndex, isXtoY, xDecimal, yDecimal).toFixed(8)
   )
 
+  const validConcentrationMidPrice = (midPrice: string) => {
+    const minTick = getMinTick(tickSpacing)
+    const maxTick = getMaxTick(tickSpacing)
+
+    const midPriceTick = BigInt(
+      calculateTickFromBalance(+midPrice, tickSpacing, isXtoY, xDecimal, yDecimal)
+    )
+
+    const parsedTickSpacing = Number(tickSpacing)
+    const tickDelta = BigInt(calculateTickDelta(parsedTickSpacing, 2, 2))
+
+    const minTickLimit = minTick + (2n + tickDelta) * tickSpacing
+    const maxTickLimit = maxTick - (2n + tickDelta) * tickSpacing
+
+    const minPrice = calcPriceByTickIndex(minTickLimit, isXtoY, xDecimal, yDecimal)
+    const maxPrice = calcPriceByTickIndex(maxTickLimit, isXtoY, xDecimal, yDecimal)
+
+    if (isXtoY) {
+      if (midPriceTick < minTickLimit) {
+        return minPrice
+      } else if (midPriceTick > maxTickLimit) {
+        return maxPrice
+      }
+    } else {
+      if (midPriceTick > maxTickLimit) {
+        return maxPrice
+      } else if (midPriceTick < minTickLimit) {
+        return minPrice
+      }
+    }
+
+    return Number(midPrice)
+  }
+
   useEffect(() => {
-    const tickIndex = calculateTickFromBalance(
-      +midPriceInput,
+    const midPriceInConcentrationMode = validConcentrationMidPrice(midPriceInput)
+
+    const sqrtPrice = calculateSqrtPriceFromBalance(
+      positionOpeningMethod === 'range' ? +midPriceInput : midPriceInConcentrationMode,
       tickSpacing,
       isXtoY,
       xDecimal,
       yDecimal
     )
 
-    onChangeMidPrice(BigInt(tickIndex))
+    const priceTickIndex = calculateTick(sqrtPrice, tickSpacing)
+
+    onChangeMidPrice(BigInt(priceTickIndex), sqrtPrice)
   }, [midPriceInput])
 
   const setLeftInputValues = (val: string) => {
@@ -94,35 +151,90 @@ export const PoolInit: React.FC<IPoolInit> = ({
     setLeftRange(left)
     setRightRange(right)
 
-    setLeftInputValues(calcPrice(left, isXtoY, xDecimal, yDecimal).toString())
-    setRightInputValues(calcPrice(right, isXtoY, xDecimal, yDecimal).toString())
+    setLeftInputValues(calcPriceByTickIndex(left, isXtoY, xDecimal, yDecimal).toString())
+    setRightInputValues(calcPriceByTickIndex(right, isXtoY, xDecimal, yDecimal).toString())
 
     onChangeRange(left, right)
   }
 
   const resetRange = () => {
-    changeRangeHandler(
-      tickSpacing * 10n * (isXtoY ? -1n : 1n),
-      tickSpacing * 10n * (isXtoY ? 1n : -1n)
-    )
+    if (positionOpeningMethod === 'range') {
+      const higherTick = BigInt(
+        Math.max(Number(minTick), Number(midPriceIndex) - Number(tickSpacing) * 10)
+      )
+      const lowerTick = BigInt(
+        Math.min(Number(maxTick), Number(midPriceIndex) + Number(tickSpacing) * 10)
+      )
+      changeRangeHandler(isXtoY ? higherTick : lowerTick, isXtoY ? lowerTick : higherTick)
+    }
   }
 
   useEffect(() => {
-    changeRangeHandler(leftRange, rightRange)
-  }, [midPrice])
+    if (positionOpeningMethod === 'concentration') {
+      setConcentrationIndex(0)
+      const { leftRange, rightRange } = calculateConcentrationRange(
+        tickSpacing,
+        concentrationArray[0],
+        2,
+        validConcentrationMidPriceTick(midPriceIndex, isXtoY, tickSpacing),
+        isXtoY
+      )
+
+      changeRangeHandler(leftRange, rightRange)
+    } else {
+      changeRangeHandler(leftRange, rightRange)
+    }
+  }, [positionOpeningMethod])
+
+  useEffect(() => {
+    if (positionOpeningMethod === 'concentration') {
+      const index =
+        concentrationIndex > concentrationArray.length - 1
+          ? concentrationArray.length - 1
+          : concentrationIndex
+      setConcentrationIndex(index)
+      const { leftRange, rightRange } = calculateConcentrationRange(
+        tickSpacing,
+        concentrationArray[index],
+        2,
+        validConcentrationMidPriceTick(midPriceIndex, isXtoY, tickSpacing),
+        isXtoY
+      )
+      changeRangeHandler(leftRange, rightRange)
+    } else {
+      changeRangeHandler(leftRange, rightRange)
+    }
+  }, [midPriceInput, concentrationArray, midPriceIndex])
 
   const validateMidPriceInput = (midPriceInput: string) => {
-    const minTick = getMinTick(tickSpacing)
-    const maxTick = getMaxTick(tickSpacing)
-    const minPrice = isXtoY
-      ? calcPrice(minTick, isXtoY, xDecimal, yDecimal)
-      : calcPrice(maxTick, isXtoY, xDecimal, yDecimal)
-    const maxPrice = isXtoY
-      ? calcPrice(maxTick, isXtoY, xDecimal, yDecimal)
-      : calcPrice(minTick, isXtoY, xDecimal, yDecimal)
-    const numericMidPriceInput = parseFloat(midPriceInput)
-    const validatedMidPrice = Math.min(Math.max(numericMidPriceInput, minPrice), maxPrice)
-    return toMaxNumericPlaces(validatedMidPrice, 5)
+    if (positionOpeningMethod === 'concentration') {
+      const validatedMidPrice = validConcentrationMidPrice(midPriceInput)
+
+      const validatedPrice =
+        validatedMidPrice < MINIMAL_POOL_INIT_PRICE ? MINIMAL_POOL_INIT_PRICE : validatedMidPrice
+
+      return trimZeros(validatedPrice.toFixed(8))
+    } else {
+      const minPriceFromTick = isXtoY
+        ? calcPriceByTickIndex(minTick, isXtoY, xDecimal, yDecimal)
+        : calcPriceByTickIndex(maxTick, isXtoY, xDecimal, yDecimal)
+
+      const maxPriceFromTick = isXtoY
+        ? calcPriceByTickIndex(maxTick, isXtoY, xDecimal, yDecimal)
+        : calcPriceByTickIndex(minTick, isXtoY, xDecimal, yDecimal)
+
+      const minimalAllowedInput =
+        minPriceFromTick < MINIMAL_POOL_INIT_PRICE ? MINIMAL_POOL_INIT_PRICE : minPriceFromTick
+
+      const numericMidPriceInput = parseFloat(midPriceInput)
+
+      const validatedMidPrice = Math.min(
+        Math.max(numericMidPriceInput, minimalAllowedInput),
+        maxPriceFromTick
+      )
+
+      return trimZeros(validatedMidPrice.toFixed(8))
+    }
   }
 
   useEffect(() => {
@@ -134,10 +246,31 @@ export const PoolInit: React.FC<IPoolInit> = ({
     }
   }, [currentPairReversed])
 
+  useEffect(() => {
+    const validatedMidPrice = validateMidPriceInput(midPriceInput)
+
+    setMidPriceInput(validatedMidPrice)
+  }, [positionOpeningMethod])
+
   const price = useMemo(
-    () => calcPrice(midPrice, isXtoY, xDecimal, yDecimal),
-    [midPrice, isXtoY, xDecimal, yDecimal]
+    () =>
+      Math.min(
+        Math.max(
+          +midPriceInput,
+          Number(calcPriceByTickIndex(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
+        ),
+        Number(calcPriceByTickIndex(isXtoY ? maxTick : minTick, isXtoY, xDecimal, yDecimal))
+      ),
+    [midPriceInput, isXtoY, xDecimal, yDecimal]
   )
+
+  const [animatedStartingPrice, setAnimatedStartingPrice] = useState(price)
+
+  useEffect(() => {
+    if (formatNumber(price) !== formatNumber(animatedStartingPrice)) {
+      setAnimatedStartingPrice(price)
+    }
+  }, [price])
 
   return (
     <Grid container direction='column' className={classes.wrapper}>
@@ -173,18 +306,17 @@ export const PoolInit: React.FC<IPoolInit> = ({
             alignItems='center'>
             <Typography className={classes.priceLabel}>{tokenASymbol} starting price: </Typography>
             <Typography className={classes.priceValue}>
-              <AnimatedNumber
-                value={price.toFixed(isXtoY ? Number(xDecimal) : Number(yDecimal))}
-                duration={300}
-                formatValue={formatNumbers()}
-              />
-              {showPrefix(price)} {tokenBSymbol}
+              <span>~</span>
+              <AnimatedNumber start={animatedStartingPrice} finish={price} />
+              <span> </span>
+              {tokenBSymbol}
             </Typography>
           </Grid>
         </Grid>
         <Typography className={classes.subheader}>Set price range</Typography>
         <Grid container className={classes.inputs}>
           <RangeInput
+            disabled={positionOpeningMethod === 'concentration'}
             className={classes.input}
             label='Min price'
             tokenFromSymbol={tokenASymbol}
@@ -193,8 +325,8 @@ export const PoolInit: React.FC<IPoolInit> = ({
             setValue={onLeftInputChange}
             decreaseValue={() => {
               const newLeft = isXtoY
-                ? Math.max(Number(getMinTick(tickSpacing)), Number(leftRange - tickSpacing))
-                : Math.min(Number(getMaxTick(tickSpacing)), Number(leftRange + tickSpacing))
+                ? Math.max(Number(minTick), Number(leftRange - tickSpacing))
+                : Math.min(Number(maxTick), Number(leftRange + tickSpacing))
               changeRangeHandler(BigInt(newLeft), rightRange)
             }}
             increaseValue={() => {
@@ -215,10 +347,11 @@ export const PoolInit: React.FC<IPoolInit> = ({
                   )
               changeRangeHandler(BigInt(newLeft), rightRange)
             }}
-            diffLabel='Min - Current price'
+            diffLabel='Min - Current'
             percentDiff={((+leftInput - price) / price) * 100}
           />
           <RangeInput
+            disabled={positionOpeningMethod === 'concentration'}
             className={classes.input}
             label='Max price'
             tokenFromSymbol={tokenASymbol}
@@ -233,8 +366,8 @@ export const PoolInit: React.FC<IPoolInit> = ({
             }}
             increaseValue={() => {
               const newRight = isXtoY
-                ? Math.min(Number(getMaxTick(tickSpacing)), Number(rightRange + tickSpacing))
-                : Math.max(Number(getMinTick(tickSpacing)), Number(rightRange - tickSpacing))
+                ? Math.min(Number(maxTick), Number(rightRange + tickSpacing))
+                : Math.max(Number(minTick), Number(rightRange - tickSpacing))
               changeRangeHandler(leftRange, BigInt(newRight))
             }}
             onBlur={() => {
@@ -250,25 +383,47 @@ export const PoolInit: React.FC<IPoolInit> = ({
 
               changeRangeHandler(leftRange, BigInt(newRight))
             }}
-            diffLabel='Max - Current price'
+            diffLabel='Max - Current'
             percentDiff={((+rightInput - price) / price) * 100}
           />
         </Grid>
-        <Grid container className={classes.buttons}>
-          <Button className={classes.button} onClick={resetRange}>
-            Reset range
-          </Button>
-          <Button
-            className={classes.button}
-            onClick={() => {
-              changeRangeHandler(
-                isXtoY ? getMinTick(tickSpacing) : getMaxTick(tickSpacing),
-                isXtoY ? getMaxTick(tickSpacing) : getMinTick(tickSpacing)
-              )
-            }}>
-            Set full range
-          </Button>
-        </Grid>
+        {positionOpeningMethod === 'concentration' ? (
+          <Grid container className={classes.sliderWrapper}>
+            <ConcentrationSlider
+              valueIndex={concentrationIndex}
+              values={concentrationArray}
+              valueChangeHandler={value => {
+                setConcentrationIndex(value)
+                const { leftRange, rightRange } = calculateConcentrationRange(
+                  tickSpacing,
+                  concentrationArray[value],
+                  2,
+                  validConcentrationMidPriceTick(midPriceIndex, isXtoY, tickSpacing),
+                  isXtoY
+                )
+
+                changeRangeHandler(leftRange, rightRange)
+              }}
+              dragHandler={value => {
+                setConcentrationIndex(value)
+              }}
+              minimumSliderIndex={minimumSliderIndex}
+            />
+          </Grid>
+        ) : (
+          <Grid container className={classes.buttons}>
+            <Button className={classes.button} onClick={resetRange}>
+              Reset range
+            </Button>
+            <Button
+              className={classes.button}
+              onClick={() => {
+                changeRangeHandler(isXtoY ? minTick : maxTick, isXtoY ? maxTick : minTick)
+              }}>
+              Set full range
+            </Button>
+          </Grid>
+        )}
       </Grid>
     </Grid>
   )

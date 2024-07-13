@@ -25,15 +25,10 @@ export const HeaderWrapper: React.FC = () => {
       wallet.addListener('connect', () => {
         dispatch(walletActions.connect())
       })
-      // if (wallet.connected) {
-      //   dispatch(walletActions.connect())
-      // }
 
       await wallet.canEagerConnect().then(
         async canEagerConnect => {
           if (canEagerConnect) {
-            // await wallet.connect()
-
             dispatch(walletActions.connect())
           }
         },

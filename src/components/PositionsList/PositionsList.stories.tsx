@@ -96,6 +96,10 @@ export const Primary: Story = {
     searchSetValue: () => {},
     handleRefresh: () => {},
     initialPage: 1,
-    setLastPage: () => {}
+    setLastPage: () => {},
+    pageChanged: () => {},
+    length: 0 as any,
+    loadedPages: {},
+    getRemainingPositions: () => {}
   }
 }

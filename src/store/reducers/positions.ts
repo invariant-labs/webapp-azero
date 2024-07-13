@@ -3,6 +3,8 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { PayloadType } from '@store/consts/types'
 
 export interface PositionsListStore {
+  length: bigint
+  loadedPages: Record<number, boolean>
   list: Position[]
   loading: boolean
 }
@@ -13,6 +15,9 @@ export interface PlotTickData {
 }
 
 export type TickPlotPositionData = Omit<PlotTickData, 'y'>
+
+export type InitMidPrice = TickPlotPositionData & { sqrtPrice: bigint }
+
 export interface PlotTicks {
   data: PlotTickData[]
   loading: boolean
@@ -87,6 +92,8 @@ export const defaultState: IPositionsStore = {
     loading: false
   },
   positionsList: {
+    length: 0n,
+    loadedPages: {},
     list: [],
     loading: true
   },
@@ -142,8 +149,44 @@ const positionsSlice = createSlice({
       state.positionsList.loading = false
       return state
     },
-    getPositionsList(state) {
+    getPositionsListPage(state, _action: PayloadAction<{ index: number; refresh: boolean }>) {
       state.positionsList.loading = true
+      return state
+    },
+    getRemainingPositions(state, _action: PayloadAction<void>) {
+      state.positionsList.loading = true
+      return state
+    },
+    setPositionsListLength(state, action: PayloadAction<bigint>) {
+      state.positionsList.length = action.payload
+      return state
+    },
+    setPositionsListLoadedStatus(
+      state,
+      action: PayloadAction<{ indexes: number[]; isLoaded: boolean }>
+    ) {
+      const { indexes, isLoaded } = action.payload
+
+      for (const index of indexes) {
+        state.positionsList.loadedPages[index] = isLoaded
+      }
+
+      return state
+    },
+    removePosition(state, action: PayloadAction<bigint>) {
+      if (Number(action.payload) !== state.positionsList.list.length - 1) {
+        state.positionsList.list[Number(action.payload)] =
+          state.positionsList.list[state.positionsList.list.length - 1]
+      }
+
+      state.positionsList.list.pop()
+      state.positionsList.length -= 1n
+
+      return state
+    },
+    addPosition(state, action: PayloadAction<Position>) {
+      state.positionsList.list.push(action.payload)
+      state.positionsList.length += 1n
       return state
     },
     getSinglePosition(state, _action: PayloadAction<bigint>) {

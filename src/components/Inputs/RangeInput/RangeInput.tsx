@@ -1,11 +1,12 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import useStyles from './style'
 import { colors } from '@static/theme'
 import { Button, Grid, Input, Typography } from '@mui/material'
-import { formatNumbers, showPrefix } from '@store/consts/utils'
+import { formatNumbers, showPrefix } from '@utils/utils'
 import { FormatNumberThreshold } from '@store/consts/types'
+import AnimatedNumber from '@components/AnimatedNumber/AnimatedNumber'
 
 export interface IRangeInput {
   label: string
@@ -41,6 +42,14 @@ export const RangeInput: React.FC<IRangeInput> = ({
   const { classes } = useStyles()
 
   const inputRef = useRef<HTMLInputElement>(null)
+
+  const [animatedPercentDiff, setAnimatedPercentDiff] = useState(percentDiff)
+
+  useEffect(() => {
+    if (percentDiff !== animatedPercentDiff) {
+      setAnimatedPercentDiff(percentDiff)
+    }
+  }, [percentDiff])
 
   const allowOnlyDigitsAndTrimUnnecessaryZeros: React.ChangeEventHandler<HTMLInputElement> = e => {
     const regex = /^\d*\.?\d*$/
@@ -163,9 +172,18 @@ export const RangeInput: React.FC<IRangeInput> = ({
             color: percentDiff >= 0 ? colors.invariant.green : colors.invariant.Error
           }}>
           {percentDiff >= 0 ? '+' : ''}
-          {percentDiff
-            ? formatNumbers(percentageThresholds)(percentDiff.toString()) + showPrefix(percentDiff)
-            : 0}
+          {percentDiff ? (
+            <>
+              <AnimatedNumber
+                start={animatedPercentDiff}
+                finish={percentDiff}
+                format={e => formatNumbers(percentageThresholds)(e.toString())}
+              />
+              {showPrefix(percentDiff)}
+            </>
+          ) : (
+            0
+          )}
           %
         </Typography>
       </Grid>

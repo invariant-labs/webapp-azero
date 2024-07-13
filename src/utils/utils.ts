@@ -2,6 +2,7 @@ import {
   Invariant,
   LiquidityTick,
   Network,
+  PSP22,
   PoolKey,
   Tick,
   Tickmap,
@@ -17,18 +18,19 @@ import {
   PERCENTAGE_DENOMINATOR,
   PERCENTAGE_SCALE,
   PRICE_SCALE,
+  SQRT_PRICE_SCALE,
   TESTNET_BTC_ADDRESS,
   TESTNET_ETH_ADDRESS,
   TESTNET_USDC_ADDRESS,
   TESTNET_WAZERO_ADDRESS
 } from '@invariant-labs/a0-sdk/target/consts'
-import { calculateLiquidityBreakpoints } from '@invariant-labs/a0-sdk/target/utils'
-import { ApiPromise, Keyring } from '@polkadot/api'
+import {
+  calculateLiquidityBreakpoints,
+  priceToSqrtPrice
+} from '@invariant-labs/a0-sdk/target/utils'
+import { Keyring } from '@polkadot/api'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
-import apiSingleton from '@store/services/apiSingleton'
-import invariantSingleton from '@store/services/invariantSingleton'
-import psp22Singleton from '@store/services/psp22Singleton'
 import axios from 'axios'
 import {
   BTC,
@@ -39,6 +41,8 @@ import {
   FAUCET_DEPLOYER_MNEMONIC,
   FormatConfig,
   LIQUIDITY_PLOT_DECIMAL,
+  POSITIONS_PER_PAGE,
+  POSITIONS_PER_QUERY,
   PositionTokenBlock,
   STABLECOIN_ADDRESSES,
   USDC,
@@ -48,7 +52,7 @@ import {
   reversedAddressTickerMap,
   subNumbers,
   tokensPrices
-} from './static'
+} from '@store/consts/static'
 import { sleep } from '@store/sagas/wallet'
 import {
   BestTier,
@@ -57,7 +61,8 @@ import {
   PrefixConfig,
   Token,
   TokenPriceData
-} from './types'
+} from '@store/consts/types'
+import icons from '@static/icons'
 
 export const createLoaderKey = () => (new Date().getMilliseconds() + Math.random()).toString()
 
@@ -180,7 +185,7 @@ export const toMaxNumericPlaces = (num: number, places: number): string => {
   return num.toFixed(places + Math.abs(log) - 1)
 }
 
-export const calcPrice = (
+export const calcPriceByTickIndex = (
   amountTickIndex: bigint,
   isXtoY: boolean,
   xDecimal: bigint,
@@ -195,6 +200,16 @@ export const calcPrice = (
   return price === 0 ? Number.MAX_SAFE_INTEGER : 1 / price
 }
 
+export const calcPriceBySqrtPrice = (
+  sqrtPrice: bigint,
+  isXtoY: boolean,
+  xDecimal: bigint,
+  yDecimal: bigint
+): number => {
+  const price = calcYPerXPriceBySqrtPrice(sqrtPrice, xDecimal, yDecimal) ** (isXtoY ? 1 : -1)
+
+  return price
+}
 export const createPlaceholderLiquidityPlot = (
   isXtoY: boolean,
   yValueToFill: number,
@@ -207,7 +222,7 @@ export const createPlaceholderLiquidityPlot = (
   const min = getMinTick(tickSpacing)
   const max = getMaxTick(tickSpacing)
 
-  const minPrice = calcPrice(min, isXtoY, tokenXDecimal, tokenYDecimal)
+  const minPrice = calcPriceByTickIndex(min, isXtoY, tokenXDecimal, tokenYDecimal)
 
   ticksData.push({
     x: minPrice,
@@ -215,7 +230,7 @@ export const createPlaceholderLiquidityPlot = (
     index: min
   })
 
-  const maxPrice = calcPrice(max, isXtoY, tokenXDecimal, tokenYDecimal)
+  const maxPrice = calcPriceByTickIndex(max, isXtoY, tokenXDecimal, tokenYDecimal)
 
   ticksData.push({
     x: maxPrice,
@@ -345,12 +360,9 @@ export const parseFeeToPathFee = (fee: bigint): string => {
 
 export const getTokenDataByAddresses = async (
   tokens: string[],
-  api: ApiPromise,
-  network: Network,
+  psp22: PSP22,
   address: string
 ): Promise<Record<string, Token>> => {
-  const psp22 = await psp22Singleton.loadInstance(api, network)
-
   const promises = tokens.flatMap(token => {
     return [
       psp22.tokenSymbol(token),
@@ -370,7 +382,7 @@ export const getTokenDataByAddresses = async (
       name: results[baseIndex + 1] ? (results[baseIndex + 1] as string) : '',
       decimals: results[baseIndex + 2] as bigint,
       balance: results[baseIndex + 3] as bigint,
-      logoURI: '/unknownToken.svg',
+      logoURI: icons.unknownToken,
       isUnknown: true
     }
   })
@@ -379,12 +391,9 @@ export const getTokenDataByAddresses = async (
 
 export const getTokenBalances = async (
   tokens: string[],
-  api: ApiPromise,
-  network: Network,
+  psp22: PSP22,
   address: string
 ): Promise<[string, bigint][]> => {
-  const psp22 = await psp22Singleton.loadInstance(api, network)
-
   const promises: Promise<bigint>[] = []
   tokens.map(token => {
     promises.push(psp22.balanceOf(address, token))
@@ -399,13 +408,9 @@ export const getTokenBalances = async (
 }
 
 export const getPoolsByPoolKeys = async (
-  invariantAddress: string,
-  poolKeys: PoolKey[],
-  api: ApiPromise,
-  network: Network
+  invariant: Invariant,
+  poolKeys: PoolKey[]
 ): Promise<PoolWithPoolKey[]> => {
-  const invariant = await invariantSingleton.loadInstance(api, network, invariantAddress)
-
   const promises = poolKeys.map(({ tokenX, tokenY, feeTier }) =>
     invariant.getPool(tokenX, tokenY, feeTier)
   )
@@ -504,6 +509,52 @@ export const nearestSpacingMultiplicity = (centerTick: number, spacing: number) 
   )
 }
 
+export const calculateSqrtPriceFromBalance = (
+  price: number,
+  spacing: bigint,
+  isXtoY: boolean,
+  xDecimal: bigint,
+  yDecimal: bigint
+) => {
+  const minTick = getMinTick(spacing)
+  const maxTick = getMaxTick(spacing)
+
+  const basePrice = Math.min(
+    Math.max(
+      price,
+      Number(calcPriceByTickIndex(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
+    ),
+    Number(calcPriceByTickIndex(isXtoY ? maxTick : minTick, isXtoY, xDecimal, yDecimal))
+  )
+
+  const primaryUnitsPrice = getPrimaryUnitsPrice(
+    basePrice,
+    isXtoY,
+    Number(xDecimal),
+    Number(yDecimal)
+  )
+
+  const parsedPrimaryUnits =
+    primaryUnitsPrice > 1 && Number.isInteger(primaryUnitsPrice)
+      ? primaryUnitsPrice.toString()
+      : primaryUnitsPrice.toFixed(24)
+
+  const bigintPrice = convertBalanceToBigint(parsedPrimaryUnits, SQRT_PRICE_SCALE)
+  const sqrtPrice = priceToSqrtPrice(bigintPrice)
+
+  const minSqrtPrice = calculateSqrtPrice(minTick)
+  const maxSqrtPrice = calculateSqrtPrice(maxTick)
+
+  let validatedSqrtPrice = sqrtPrice
+  if (sqrtPrice < minSqrtPrice) {
+    validatedSqrtPrice = minSqrtPrice
+  } else if (sqrtPrice > maxSqrtPrice) {
+    validatedSqrtPrice = maxSqrtPrice
+  }
+
+  return validatedSqrtPrice
+}
+
 export const calculateTickFromBalance = (
   price: number,
   spacing: bigint,
@@ -516,7 +567,7 @@ export const calculateTickFromBalance = (
 
   const basePrice = Math.max(
     price,
-    Number(calcPrice(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
+    Number(calcPriceByTickIndex(isXtoY ? minTick : maxTick, isXtoY, xDecimal, yDecimal))
   )
   const primaryUnitsPrice = getPrimaryUnitsPrice(
     basePrice,
@@ -727,7 +778,7 @@ export const createLiquidityPlot = (
   const max = getMaxTick(tickSpacing)
 
   if (!ticks.length || ticks[0].index > min) {
-    const minPrice = calcPrice(min, isXtoY, tokenXDecimal, tokenYDecimal)
+    const minPrice = calcPriceByTickIndex(min, isXtoY, tokenXDecimal, tokenYDecimal)
 
     ticksData.push({
       x: minPrice,
@@ -738,14 +789,24 @@ export const createLiquidityPlot = (
 
   ticks.forEach((tick, i) => {
     if (i === 0 && tick.index - tickSpacing > min) {
-      const price = calcPrice(tick.index - tickSpacing, isXtoY, tokenXDecimal, tokenYDecimal)
+      const price = calcPriceByTickIndex(
+        tick.index - tickSpacing,
+        isXtoY,
+        tokenXDecimal,
+        tokenYDecimal
+      )
       ticksData.push({
         x: price,
         y: 0,
         index: tick.index - tickSpacing
       })
     } else if (i > 0 && tick.index - tickSpacing > ticks[i - 1].index) {
-      const price = calcPrice(tick.index - tickSpacing, isXtoY, tokenXDecimal, tokenYDecimal)
+      const price = calcPriceByTickIndex(
+        tick.index - tickSpacing,
+        isXtoY,
+        tokenXDecimal,
+        tokenYDecimal
+      )
       ticksData.push({
         x: price,
         y: +printBigint(ticks[i - 1].liqudity, LIQUIDITY_PLOT_DECIMAL),
@@ -753,7 +814,7 @@ export const createLiquidityPlot = (
       })
     }
 
-    const price = calcPrice(tick.index, isXtoY, tokenXDecimal, tokenYDecimal)
+    const price = calcPriceByTickIndex(tick.index, isXtoY, tokenXDecimal, tokenYDecimal)
     ticksData.push({
       x: price,
       y: +printBigint(ticks[i].liqudity, LIQUIDITY_PLOT_DECIMAL),
@@ -762,7 +823,7 @@ export const createLiquidityPlot = (
   })
   const lastTick = ticks[ticks.length - 1].index
   if (!ticks.length) {
-    const maxPrice = calcPrice(max, isXtoY, tokenXDecimal, tokenYDecimal)
+    const maxPrice = calcPriceByTickIndex(max, isXtoY, tokenXDecimal, tokenYDecimal)
 
     ticksData.push({
       x: maxPrice,
@@ -771,7 +832,12 @@ export const createLiquidityPlot = (
     })
   } else if (lastTick < max) {
     if (max - lastTick > tickSpacing) {
-      const price = calcPrice(lastTick + tickSpacing, isXtoY, tokenXDecimal, tokenYDecimal)
+      const price = calcPriceByTickIndex(
+        lastTick + tickSpacing,
+        isXtoY,
+        tokenXDecimal,
+        tokenYDecimal
+      )
       ticksData.push({
         x: price,
         y: 0,
@@ -779,7 +845,7 @@ export const createLiquidityPlot = (
       })
     }
 
-    const maxPrice = calcPrice(max, isXtoY, tokenXDecimal, tokenYDecimal)
+    const maxPrice = calcPriceByTickIndex(max, isXtoY, tokenXDecimal, tokenYDecimal)
 
     ticksData.push({
       x: maxPrice,
@@ -831,8 +897,12 @@ export const formatNumber = (number: number | bigint | string): string => {
         FormatConfig.DecimalsAfterDot
       ) +
       'K'
+  } else if (afterDot && countLeadingZeros(afterDot) <= 3) {
+    const roundedNumber = numberAsNumber.toFixed(countLeadingZeros(afterDot) + 4).slice(0, -1)
+    formattedNumber = trimZeros(roundedNumber)
   } else {
     const leadingZeros = afterDot ? countLeadingZeros(afterDot) : 0
+
     const parsedAfterDot =
       String(parseInt(afterDot)).length > 3 ? String(parseInt(afterDot)).slice(0, 3) : afterDot
     formattedNumber = trimZeros(
@@ -872,13 +942,10 @@ export const isErrorMessage = (message: string): boolean => {
 
 export const getNewTokenOrThrow = async (
   address: string,
-  network: Network,
-  rpc: string,
+  psp22: PSP22,
   walletAddress: string
 ): Promise<Record<string, Token>> => {
-  const api = await apiSingleton.loadInstance(network, rpc)
-
-  const tokenData = await getTokenDataByAddresses([address], api, network, walletAddress)
+  const tokenData = await getTokenDataByAddresses([address], psp22, walletAddress)
 
   if (tokenData) {
     return tokenData
@@ -1014,4 +1081,39 @@ export function testnetBestTiersCreator() {
   }
 
   return bestTiers
+}
+
+export const positionListPageToQueryPage = (page: number): number => {
+  return Math.max(Math.ceil((page * POSITIONS_PER_PAGE) / POSITIONS_PER_QUERY) - 1, 0)
+}
+
+export const validConcentrationMidPriceTick = (
+  midPriceTick: bigint,
+  isXtoY: boolean,
+  tickSpacing: bigint
+) => {
+  const minTick = getMinTick(tickSpacing)
+  const maxTick = getMaxTick(tickSpacing)
+
+  const parsedTickSpacing = Number(tickSpacing)
+  const tickDelta = BigInt(calculateTickDelta(parsedTickSpacing, 2, 2))
+
+  const minTickLimit = minTick + (2n + tickDelta) * tickSpacing
+  const maxTickLimit = maxTick - (2n + tickDelta) * tickSpacing
+
+  if (isXtoY) {
+    if (midPriceTick < minTickLimit) {
+      return minTickLimit
+    } else if (midPriceTick > maxTickLimit) {
+      return maxTickLimit
+    }
+  } else {
+    if (midPriceTick > maxTickLimit) {
+      return maxTickLimit
+    } else if (midPriceTick < minTickLimit) {
+      return minTickLimit
+    }
+  }
+
+  return midPriceTick
 }

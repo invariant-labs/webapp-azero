@@ -9,15 +9,16 @@ import backIcon from '@static/svg/back-arrow.svg'
 import settingIcon from '@static/svg/settings.svg'
 import { ALL_FEE_TIERS_DATA, PositionTokenBlock, REFRESHER_INTERVAL } from '@store/consts/static'
 import {
-  calcPrice,
+  calcPriceBySqrtPrice,
   calculateConcentrationRange,
   convertBalanceToBigint,
   determinePositionTokenBlock,
   parseFeeToPathFee,
   printBigint,
-  trimLeadingZeros
-} from '@store/consts/utils'
-import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
+  trimLeadingZeros,
+  validConcentrationMidPriceTick
+} from '@utils/utils'
+import { PlotTickData, InitMidPrice } from '@store/reducers/positions'
 import { SwapToken } from '@store/selectors/wallet'
 import { blurContent, unblurContent } from '@utils/uiUtils'
 import { VariantType } from 'notistack'
@@ -39,8 +40,8 @@ export interface INewPosition {
   copyPoolAddressHandler: (message: string, variant: VariantType) => void
   tokens: SwapToken[]
   data: PlotTickData[]
-  midPrice: TickPlotPositionData
-  setMidPrice: (mid: TickPlotPositionData) => void
+  midPrice: InitMidPrice
+  setMidPrice: (mid: InitMidPrice) => void
   addLiquidityHandler: (
     leftTickIndex: bigint,
     rightTickIndex: bigint,
@@ -99,6 +100,7 @@ export interface INewPosition {
   isBalanceLoading: boolean
   shouldNotUpdatePriceRange: boolean
   unblockUpdatePriceRange: () => void
+  isGetLiquidityError: boolean
 }
 
 export const NewPosition: React.FC<INewPosition> = ({
@@ -149,7 +151,8 @@ export const NewPosition: React.FC<INewPosition> = ({
   onRefresh,
   isBalanceLoading,
   shouldNotUpdatePriceRange,
-  unblockUpdatePriceRange
+  unblockUpdatePriceRange,
+  isGetLiquidityError
 }) => {
   const { classes } = useStyles()
   const navigate = useNavigate()
@@ -178,11 +181,13 @@ export const NewPosition: React.FC<INewPosition> = ({
 
   const [shouldReversePlot, setShouldReversePlot] = useState(false)
 
-  const concentrationArray = useMemo(
-    () =>
-      getConcentrationArray(Number(tickSpacing), 2, Number(midPrice.index)).sort((a, b) => a - b),
-    [tickSpacing]
-  )
+  const concentrationArray = useMemo(() => {
+    const validatedMidPrice = validConcentrationMidPriceTick(midPrice.index, isXtoY, tickSpacing)
+
+    return getConcentrationArray(Number(tickSpacing), 2, Number(validatedMidPrice)).sort(
+      (a, b) => a - b
+    )
+  }, [tickSpacing, midPrice.index])
 
   const setRangeBlockerInfo = () => {
     if (tokenAIndex === null || tokenBIndex === null) {
@@ -299,12 +304,14 @@ export const NewPosition: React.FC<INewPosition> = ({
     }
   }
 
-  const onChangeMidPrice = (mid: bigint) => {
+  const onChangeMidPrice = (tickIndex: bigint, sqrtPrice: bigint) => {
     setMidPrice({
-      index: mid,
-      x: calcPrice(mid, isXtoY, xDecimal, yDecimal)
+      index: tickIndex,
+      x: calcPriceBySqrtPrice(sqrtPrice, isXtoY, xDecimal, yDecimal),
+      sqrtPrice: sqrtPrice
     })
-    if (tokenAIndex !== null && (isXtoY ? rightRange > mid : rightRange < mid)) {
+
+    if (tokenAIndex !== null && (isXtoY ? rightRange > tickIndex : rightRange < tickIndex)) {
       const deposit = tokenADeposit
       const amount = getOtherTokenAmount(
         convertBalanceToBigint(deposit, Number(tokens[tokenAIndex].decimals)),
@@ -318,7 +325,7 @@ export const NewPosition: React.FC<INewPosition> = ({
         return
       }
     }
-    if (tokenBIndex !== null && (isXtoY ? leftRange < mid : leftRange > mid)) {
+    if (tokenBIndex !== null && (isXtoY ? leftRange < tickIndex : leftRange > tickIndex)) {
       const deposit = tokenBDeposit
       const amount = getOtherTokenAmount(
         convertBalanceToBigint(deposit, Number(tokens[tokenBIndex].decimals)),
@@ -390,7 +397,9 @@ export const NewPosition: React.FC<INewPosition> = ({
   }, [midPrice.index, leftRange, rightRange])
 
   useEffect(() => {
-    onChangeRange(leftRange, rightRange)
+    if (positionOpeningMethod === 'range') {
+      onChangeRange(leftRange, rightRange)
+    }
   }, [currentPriceSqrt])
 
   const handleClickSettings = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -429,9 +438,9 @@ export const NewPosition: React.FC<INewPosition> = ({
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      if (refresherTime > 0 && poolKey !== '') {
+      if (refresherTime > 0 && isCurrentPoolExisting) {
         setRefresherTime(refresherTime - 1)
-      } else {
+      } else if (isCurrentPoolExisting) {
         onRefresh()
         setRefresherTime(REFRESHER_INTERVAL)
       }
@@ -449,6 +458,19 @@ export const NewPosition: React.FC<INewPosition> = ({
     }
   }, [poolKey])
 
+  const blockedToken = useMemo(
+    () =>
+      positionOpeningMethod === 'range'
+        ? determinePositionTokenBlock(
+            currentPriceSqrt,
+            BigInt(Math.min(Number(leftRange), Number(rightRange))),
+            BigInt(Math.max(Number(leftRange), Number(rightRange))),
+            isXtoY
+          )
+        : false,
+    [leftRange, rightRange, currentPriceSqrt]
+  )
+
   return (
     <Grid container className={classes.wrapper} direction='column'>
       <Link to='/pool' style={{ textDecoration: 'none', maxWidth: 'fit-content' }}>
@@ -465,7 +487,7 @@ export const NewPosition: React.FC<INewPosition> = ({
         className={classes.headerContainer}>
         <Box className={classes.titleContainer}>
           <Typography className={classes.title}>Add new liquidity position</Typography>
-          {poolKey !== '' && (
+          {poolKey !== '' && tokenAIndex !== tokenBIndex && (
             <Refresher
               currentIndex={refresherTime}
               maxIndex={REFRESHER_INTERVAL}
@@ -484,30 +506,26 @@ export const NewPosition: React.FC<INewPosition> = ({
               copyPoolAddressHandler={copyPoolAddressHandler}
             />
           ) : null}
+          <Hidden mdDown>
+            <ConcentrationTypeSwitch
+              onSwitch={val => {
+                if (val) {
+                  setPositionOpeningMethod('concentration')
+                  onPositionOpeningMethodChange('concentration')
+                } else {
+                  setPositionOpeningMethod('range')
+                  onPositionOpeningMethodChange('range')
+                }
+              }}
+              className={classes.switch}
+              currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
+            />
+          </Hidden>
           {poolKey !== '' && (
-            <Hidden mdDown>
-              <ConcentrationTypeSwitch
-                onSwitch={val => {
-                  if (val) {
-                    setPositionOpeningMethod('concentration')
-                    onPositionOpeningMethodChange('concentration')
-                  } else {
-                    setPositionOpeningMethod('range')
-                    onPositionOpeningMethodChange('range')
-                  }
-                }}
-                className={classes.switch}
-                style={{
-                  opacity: poolKey ? 1 : 0
-                }}
-                disabled={poolKey === ''}
-                currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
-              />
-            </Hidden>
+            <Button onClick={handleClickSettings} className={classes.settingsIconBtn} disableRipple>
+              <img src={settingIcon} className={classes.settingsIcon} alt='settings' />
+            </Button>
           )}
-          <Button onClick={handleClickSettings} className={classes.settingsIconBtn} disableRipple>
-            <img src={settingIcon} className={classes.settingsIcon} alt='settings' />
-          </Button>
         </Grid>
       </Grid>
 
@@ -516,7 +534,7 @@ export const NewPosition: React.FC<INewPosition> = ({
         setSlippage={setSlippage}
         handleClose={handleCloseSettings}
         anchorEl={anchorEl}
-        defaultSlippage={'1'}
+        defaultSlippage={'1.00'}
         initialSlippage={initialSlippage}
         infoText='Slippage tolerance is a pricing difference between the price at the confirmation time and the actual price of the transaction users are willing to accept when initializing position.'
         headerText='Position Transaction Settings'
@@ -556,7 +574,13 @@ export const NewPosition: React.FC<INewPosition> = ({
             }
           }}
           tokenAInputState={{
-            value: tokenADeposit,
+            value:
+              tokenAIndex !== null &&
+              tokenBIndex !== null &&
+              !isWaitingForNewPool &&
+              blockedToken === PositionTokenBlock.A
+                ? '0'
+                : tokenADeposit,
             setValue: value => {
               if (tokenAIndex === null) {
                 return
@@ -576,18 +600,19 @@ export const NewPosition: React.FC<INewPosition> = ({
               tokenAIndex !== null &&
               tokenBIndex !== null &&
               !isWaitingForNewPool &&
-              determinePositionTokenBlock(
-                currentPriceSqrt,
-                BigInt(Math.min(Number(leftRange), Number(rightRange))),
-                BigInt(Math.max(Number(leftRange), Number(rightRange))),
-                isXtoY
-              ) === PositionTokenBlock.A,
+              blockedToken === PositionTokenBlock.A,
 
             blockerInfo: 'Range only for single-asset deposit.',
             decimalsLimit: tokenAIndex !== null ? Number(tokens[tokenAIndex].decimals) : 0
           }}
           tokenBInputState={{
-            value: tokenBDeposit,
+            value:
+              tokenAIndex !== null &&
+              tokenBIndex !== null &&
+              !isWaitingForNewPool &&
+              blockedToken === PositionTokenBlock.B
+                ? '0'
+                : tokenBDeposit,
             setValue: value => {
               if (tokenBIndex === null) {
                 return
@@ -606,12 +631,7 @@ export const NewPosition: React.FC<INewPosition> = ({
               tokenAIndex !== null &&
               tokenBIndex !== null &&
               !isWaitingForNewPool &&
-              determinePositionTokenBlock(
-                currentPriceSqrt,
-                BigInt(Math.min(Number(leftRange), Number(rightRange))),
-                BigInt(Math.max(Number(leftRange), Number(rightRange))),
-                isXtoY
-              ) === PositionTokenBlock.B,
+              blockedToken === PositionTokenBlock.B,
             blockerInfo: 'Range only for single-asset deposit.',
             decimalsLimit: tokenBIndex !== null ? Number(tokens[tokenBIndex].decimals) : 0
           }}
@@ -645,6 +665,7 @@ export const NewPosition: React.FC<INewPosition> = ({
           minimumSliderIndex={minimumSliderIndex}
           positionOpeningMethod={positionOpeningMethod}
           isBalanceLoading={isBalanceLoading}
+          isGetLiquidityError={isGetLiquidityError}
         />
         <Hidden mdUp>
           <Grid container justifyContent='end' mb={2}>
@@ -659,10 +680,6 @@ export const NewPosition: React.FC<INewPosition> = ({
                 }
               }}
               className={classes.switch}
-              style={{
-                opacity: poolKey ? 1 : 0
-              }}
-              disabled={poolKey === ''}
               currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
             />
           </Grid>
@@ -730,9 +747,14 @@ export const NewPosition: React.FC<INewPosition> = ({
             tokenBSymbol={
               tokenBIndex !== null && tokens[tokenBIndex] ? tokens[tokenBIndex].symbol : 'XYZ'
             }
-            midPrice={midPrice.index}
+            midPriceIndex={midPrice.index}
             onChangeMidPrice={onChangeMidPrice}
             currentPairReversed={currentPairReversed}
+            positionOpeningMethod={positionOpeningMethod}
+            concentrationArray={concentrationArray}
+            concentrationIndex={concentrationIndex}
+            setConcentrationIndex={setConcentrationIndex}
+            minimumSliderIndex={minimumSliderIndex}
           />
         )}
       </Grid>

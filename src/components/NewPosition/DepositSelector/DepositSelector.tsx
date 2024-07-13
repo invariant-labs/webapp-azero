@@ -10,7 +10,7 @@ import {
   parsePathFeeToFeeString,
   printBigint,
   tickerToAddress
-} from '@store/consts/utils'
+} from '@utils/utils'
 import classNames from 'classnames'
 import React, { useCallback, useEffect, useState } from 'react'
 import FeeSwitch from '../FeeSwitch/FeeSwitch'
@@ -58,6 +58,7 @@ export interface IDepositSelector {
   minimumSliderIndex: number
   positionOpeningMethod: PositionOpeningMethod
   isBalanceLoading: boolean
+  isGetLiquidityError: boolean
 }
 
 export const DepositSelector: React.FC<IDepositSelector> = ({
@@ -88,7 +89,8 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
   concentrationIndex,
   minimumSliderIndex,
   positionOpeningMethod,
-  isBalanceLoading
+  isBalanceLoading,
+  isGetLiquidityError
 }) => {
   const { classes } = useStyles()
 
@@ -144,6 +146,10 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
       return concentrationArray[minimumSliderIndex]
         ? `Set concentration to at least ${concentrationArray[minimumSliderIndex].toFixed(0)}x`
         : 'Set higher fee tier'
+    }
+
+    if (isGetLiquidityError) {
+      return 'Provide a smaller amount'
     }
 
     if (

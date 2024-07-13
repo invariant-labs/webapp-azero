@@ -3,33 +3,37 @@ import { ApiPromise } from '@polkadot/api'
 import { DEFAULT_WAZERO_OPTIONS } from '@store/consts/static'
 
 class SingletonWrappedAZERO {
-  private static instance: SingletonWrappedAZERO
-  private wrappedAZERO: WrappedAZERO | null = null
-  private currentApi: ApiPromise | null = null
-  private currentNetwork: Network | null = null
+  static wrappedAZERO: WrappedAZERO | null = null
+  static api: ApiPromise | null = null
+  static network: Network | null = null
 
-  private constructor() {}
-
-  public static getInstance(): SingletonWrappedAZERO {
-    if (!SingletonWrappedAZERO.instance) {
-      SingletonWrappedAZERO.instance = new SingletonWrappedAZERO()
-    }
-    return SingletonWrappedAZERO.instance
+  static getInstance(): WrappedAZERO | null {
+    return this.wrappedAZERO
   }
 
-  public async loadInstance(api: ApiPromise, network: Network): Promise<WrappedAZERO> {
-    if (!this.wrappedAZERO || this.currentApi !== api || this.currentNetwork !== network) {
+  static async loadInstance(
+    api: ApiPromise,
+    network: Network,
+    address: string
+  ): Promise<WrappedAZERO> {
+    if (
+      !this.wrappedAZERO ||
+      api !== this.api ||
+      network !== this.network ||
+      address !== this.wrappedAZERO.contract.address.toString()
+    ) {
       this.wrappedAZERO = await WrappedAZERO.load(
         api,
         network,
         TESTNET_WAZERO_ADDRESS,
         DEFAULT_WAZERO_OPTIONS
       )
-      this.currentApi = api
-      this.currentNetwork = network
+      this.api = api
+      this.network = network
     }
+
     return this.wrappedAZERO
   }
 }
 
-export default SingletonWrappedAZERO.getInstance()
+export default SingletonWrappedAZERO

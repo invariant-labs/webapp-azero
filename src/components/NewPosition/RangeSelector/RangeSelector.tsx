@@ -6,12 +6,12 @@ import { Button, Grid, Tooltip, Typography } from '@mui/material'
 import loader from '@static/gif/loader.gif'
 import activeLiquidity from '@static/svg/activeLiquidity.svg'
 import {
-  calcPrice,
+  calcPriceByTickIndex,
   calcTicksAmountInRange,
   calculateConcentrationRange,
   nearestTickIndex,
   toMaxNumericPlaces
-} from '@store/consts/utils'
+} from '@utils/utils'
 import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
 import React, { useEffect, useRef, useState } from 'react'
 import ConcentrationSlider from '../ConcentrationSlider/ConcentrationSlider'
@@ -166,8 +166,8 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
 
     setLeftRange(leftInRange)
     setRightRange(rightInRange)
-    setLeftInputValues(calcPrice(leftInRange, isXtoY, xDecimal, yDecimal).toString())
-    setRightInputValues(calcPrice(rightInRange, isXtoY, xDecimal, yDecimal).toString())
+    setLeftInputValues(calcPriceByTickIndex(leftInRange, isXtoY, xDecimal, yDecimal).toString())
+    setRightInputValues(calcPriceByTickIndex(rightInRange, isXtoY, xDecimal, yDecimal).toString())
     onChangeRange(leftInRange, rightInRange)
   }
 
@@ -175,7 +175,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
     if (positionOpeningMethod === 'range') {
       const initSideDist = Math.abs(
         midPrice.x -
-          calcPrice(
+          calcPriceByTickIndex(
             BigInt(
               Math.max(Number(getMinTick(tickSpacing)), Number(midPrice.index - tickSpacing * 15n))
             ),
@@ -217,7 +217,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
     } else {
       const initSideDist = Math.abs(
         midPrice.x -
-          calcPrice(
+          calcPriceByTickIndex(
             BigInt(
               Math.max(Number(getMinTick(tickSpacing)), Number(midPrice.index - tickSpacing * 15n))
             ),
@@ -281,8 +281,8 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   const autoZoomHandler = (left: bigint, right: bigint, canZoomCloser: boolean = false) => {
     const { leftInRange, rightInRange } = getTicksInsideRange(left, right, isXtoY)
 
-    const leftX = calcPrice(leftInRange, isXtoY, xDecimal, yDecimal)
-    const rightX = calcPrice(rightInRange, isXtoY, xDecimal, yDecimal)
+    const leftX = calcPriceByTickIndex(leftInRange, isXtoY, xDecimal, yDecimal)
+    const rightX = calcPriceByTickIndex(rightInRange, isXtoY, xDecimal, yDecimal)
 
     const higherLeftIndex = BigInt(
       Math.max(Number(getMinTick(tickSpacing)), Number(leftInRange - tickSpacing * 15n))
@@ -302,10 +302,22 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
 
     if (leftX < plotMin || rightX > plotMax || canZoomCloser) {
       const leftDist = Math.abs(
-        leftX - calcPrice(isXtoY ? higherLeftIndex : lowerLeftIndex, isXtoY, xDecimal, yDecimal)
+        leftX -
+          calcPriceByTickIndex(
+            isXtoY ? higherLeftIndex : lowerLeftIndex,
+            isXtoY,
+            xDecimal,
+            yDecimal
+          )
       )
       const rightDist = Math.abs(
-        rightX - calcPrice(isXtoY ? lowerRightIndex : higherRightIndex, isXtoY, xDecimal, yDecimal)
+        rightX -
+          calcPriceByTickIndex(
+            isXtoY ? lowerRightIndex : higherRightIndex,
+            isXtoY,
+            xDecimal,
+            yDecimal
+          )
       )
 
       let dist
@@ -422,11 +434,11 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
           onChangeRange={changeRangeHandler}
           leftRange={{
             index: leftRange,
-            x: calcPrice(leftRange, isXtoY, xDecimal, yDecimal)
+            x: calcPriceByTickIndex(leftRange, isXtoY, xDecimal, yDecimal)
           }}
           rightRange={{
             index: rightRange,
-            x: calcPrice(rightRange, isXtoY, xDecimal, yDecimal)
+            x: calcPriceByTickIndex(rightRange, isXtoY, xDecimal, yDecimal)
           }}
           midPrice={midPrice}
           plotMin={plotMin}
@@ -481,7 +493,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
               changeRangeHandler(BigInt(newLeft), rightRange)
               autoZoomHandler(BigInt(newLeft), rightRange)
             }}
-            diffLabel='Min - Current price'
+            diffLabel='Min - Current'
             percentDiff={((+leftInput - midPrice.x) / midPrice.x) * 100}
           />
           <RangeInput
@@ -520,7 +532,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
               changeRangeHandler(leftRange, BigInt(newRight))
               autoZoomHandler(leftRange, BigInt(newRight))
             }}
-            diffLabel='Max - Current price'
+            diffLabel='Max - Current'
             percentDiff={((+rightInput - midPrice.x) / midPrice.x) * 100}
           />
         </Grid>

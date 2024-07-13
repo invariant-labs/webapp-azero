@@ -44,6 +44,7 @@ export const defaultState: ISwapStore = {
     amountOut: 0n,
     priceImpact: 0,
     targetSqrtPrice: 0n,
+    fee: 0n,
     errors: []
   }
 }

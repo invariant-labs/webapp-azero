@@ -5,11 +5,11 @@ import { getMinTick } from '@invariant-labs/a0-sdk'
 import { Card, Grid, Hidden, Tooltip, Typography } from '@mui/material'
 import activeLiquidity from '@static/svg/activeLiquidity.svg'
 import {
-  calcPrice,
+  calcPriceByTickIndex,
   calcTicksAmountInRange,
   numberToString,
   spacingMultiplicityGte
-} from '@store/consts/utils'
+} from '@utils/utils'
 import { PlotTickData, TickPlotPositionData } from '@store/reducers/positions'
 import React, { useEffect, useState } from 'react'
 import { ILiquidityToken } from '../SinglePositionInfo/consts'
@@ -60,11 +60,24 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
   const [isPlotDiscrete, setIsPlotDiscrete] = useState(initialIsDiscreteValue)
 
   const [isInitialLoad, setIsInitialLoad] = useState(true)
+  const [currentXtoY, setCurrentXtoY] = useState(xToY)
+
+  const middle = (Math.abs(leftRange.x) + Math.abs(rightRange.x)) / 2
+
+  const calcZoomScale = (newMaxPlot: number) => {
+    const proportionLength = newMaxPlot - middle
+    const scaleMultiplier = ((rightRange.x - middle) * 100) / proportionLength
+
+    return scaleMultiplier
+  }
+
+  //Proportion between middle of price range and right range in ratio to middle of price range and plotMax
+  const [zoomScale, setZoomScale] = useState(0.7)
 
   useEffect(() => {
     const initSideDist = Math.abs(
       leftRange.x -
-        calcPrice(
+        calcPriceByTickIndex(
           BigInt(
             Math.max(
               spacingMultiplicityGte(Number(getMinTick(tickSpacing)), Number(tickSpacing)),
@@ -77,10 +90,21 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
         )
     )
 
+    if (currentXtoY !== xToY) {
+      const plotMax = ((rightRange.x - middle) * 100) / zoomScale + middle
+      const plotMin = -(((middle - leftRange.x) * 100) / zoomScale - middle)
+
+      setPlotMax(plotMax)
+      setPlotMin(plotMin)
+      setCurrentXtoY(xToY)
+    }
+
     if (isInitialLoad) {
       setIsInitialLoad(false)
       setPlotMin(leftRange.x - initSideDist)
       setPlotMax(rightRange.x + initSideDist)
+
+      setZoomScale(calcZoomScale(rightRange.x + initSideDist))
     }
   }, [ticksLoading, leftRange, rightRange, isInitialLoad])
 
@@ -88,6 +112,10 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
     const diff = plotMax - plotMin
     const newMin = plotMin - diff / 4
     const newMax = plotMax + diff / 4
+
+    const zoomMultiplier = calcZoomScale(newMax)
+    setZoomScale(zoomMultiplier)
+
     setPlotMin(newMin)
     setPlotMax(newMax)
   }
@@ -96,6 +124,9 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
     const diff = plotMax - plotMin
     const newMin = plotMin + diff / 6
     const newMax = plotMax - diff / 6
+
+    const zoomMultiplier = calcZoomScale(newMax)
+    setZoomScale(zoomMultiplier)
 
     if (
       calcTicksAmountInRange(

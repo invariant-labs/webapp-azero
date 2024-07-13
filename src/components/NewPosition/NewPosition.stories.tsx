@@ -72,12 +72,13 @@ export const Primary: Story = {
     onRefresh: fn(),
     isBalanceLoading: false,
     shouldNotUpdatePriceRange: false,
-    unblockUpdatePriceRange: fn()
+    unblockUpdatePriceRange: fn(),
+    isGetLiquidityError: false
   },
   render: () => {
     return (
       <NewPosition
-        midPrice={{ x: 1234, index: 23n }}
+        midPrice={{ x: 1234, index: 23n, sqrtPrice: 123n }}
         currentPriceSqrt={123n}
         tickSpacing={1n}
         xDecimal={9n}
@@ -130,6 +131,7 @@ export const Primary: Story = {
         isBalanceLoading={false}
         shouldNotUpdatePriceRange={false}
         unblockUpdatePriceRange={fn()}
+        isGetLiquidityError={false}
       />
     )
   }

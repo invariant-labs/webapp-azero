@@ -1,13 +1,15 @@
-import { PoolKey, TESTNET_WAZERO_ADDRESS, sendTx } from '@invariant-labs/a0-sdk'
+import { Pool, Position, TESTNET_WAZERO_ADDRESS, sendTx } from '@invariant-labs/a0-sdk'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
 import {
+  EMPTY_POSITION,
   ErrorMessage,
   INVARIANT_CLAIM_FEE_OPTIONS,
   INVARIANT_CREATE_POOL_OPTIONS,
   INVARIANT_CREATE_POSITION_OPTIONS,
   INVARIANT_REMOVE_POSITION_OPTIONS,
   INVARIANT_WITHDRAW_ALL_WAZERO,
+  POSITIONS_PER_QUERY,
   PSP22_APPROVE_OPTIONS,
   U128MAX,
   WAZERO_DEPOSIT_OPTIONS
@@ -20,7 +22,7 @@ import {
   ensureError,
   isErrorMessage,
   poolKeyToString
-} from '@store/consts/utils'
+} from '@utils/utils'
 import { FetchTicksAndTickMaps, ListType, actions as poolsActions } from '@store/reducers/pools'
 import {
   ClosePositionData,
@@ -32,20 +34,18 @@ import {
 } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { actions as walletActions } from '@store/reducers/wallet'
-import { invariantAddress, networkType } from '@store/selectors/connection'
+import { invariantAddress } from '@store/selectors/connection'
 import { poolsArraySortedByFees, tickMaps, tokens } from '@store/selectors/pools'
 import { address, balance } from '@store/selectors/wallet'
-import invariantSingleton from '@store/services/invariantSingleton'
-import psp22Singleton from '@store/services/psp22Singleton'
-import wrappedAZEROSingleton from '@store/services/wrappedAZEROSingleton'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
 import { all, call, fork, join, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
-import { getConnection } from './connection'
-import { fetchTicksAndTickMaps } from './pools'
+import { fetchTicksAndTickMaps, fetchTokens } from './pools'
 import { fetchBalances } from './wallet'
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types'
 import { calculateTokenAmountsWithSlippage } from '@invariant-labs/a0-sdk/target/utils'
+import { positionsList } from '@store/selectors/positions'
+import { getApi, getInvariant, getPSP22, getWrappedAZERO } from './connection'
 
 function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator {
   const {
@@ -82,15 +82,14 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       })
     )
 
-    const api = yield* getConnection()
-    const network = yield* select(networkType)
+    const api = yield* getApi()
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
     const invAddress = yield* select(invariantAddress)
 
     const txs = []
 
-    const psp22 = yield* call([psp22Singleton, psp22Singleton.loadInstance], api, network)
+    const psp22 = yield* getPSP22()
 
     const [xAmountWithSlippage, yAmountWithSlippage] = calculateTokenAmountsWithSlippage(
       feeTier.tickSpacing,
@@ -108,12 +107,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     const YTokenTx = psp22.approveTx(invAddress, yAmountWithSlippage, tokenY, PSP22_APPROVE_OPTIONS)
     txs.push(YTokenTx)
 
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
+    const invariant = yield* getInvariant()
 
     if (initPool) {
       const createPoolTx = invariant.createPoolTx(
@@ -174,7 +168,9 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       })
     )
 
-    yield put(actions.getPositionsList())
+    const { length } = yield* select(positionsList)
+    const position = yield* call([invariant, invariant.getPosition], walletAddress, length)
+    yield* put(actions.addPosition(position))
 
     yield* call(fetchBalances, [tokenX, tokenY])
 
@@ -236,8 +232,7 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
       })
     )
 
-    const api = yield* getConnection()
-    const network = yield* select(networkType)
+    const api = yield* getApi()
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
     const invAddress = yield* select(invariantAddress)
@@ -245,13 +240,9 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
 
     const txs = []
 
-    const wazero = yield* call(
-      [wrappedAZEROSingleton, wrappedAZEROSingleton.loadInstance],
-      api,
-      network
-    )
+    const wazero = yield* getWrappedAZERO()
 
-    const psp22 = yield* call([psp22Singleton, psp22Singleton.loadInstance], api, network)
+    const psp22 = yield* getPSP22()
 
     const [xAmountWithSlippage, yAmountWithSlippage] = calculateTokenAmountsWithSlippage(
       feeTier.tickSpacing,
@@ -278,12 +269,7 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
     const YTokenTx = psp22.approveTx(invAddress, yAmountWithSlippage, tokenY, PSP22_APPROVE_OPTIONS)
     txs.push(YTokenTx)
 
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
+    const invariant = yield* getInvariant()
 
     if (initPool) {
       const createPoolTx = invariant.createPoolTx(
@@ -369,7 +355,9 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
 
     yield put(walletActions.getBalances([tokenX, tokenY]))
 
-    yield put(actions.getPositionsList())
+    const { length } = yield* select(positionsList)
+    const position = yield* call([invariant, invariant.getPosition], walletAddress, length)
+    yield* put(actions.addPosition(position))
 
     yield* call(fetchBalances, [tokenX === TESTNET_WAZERO_ADDRESS ? tokenY : tokenX])
 
@@ -405,57 +393,10 @@ function* handleInitPositionWithAZERO(action: PayloadAction<InitPositionData>): 
   }
 }
 
-export function* handleGetPositionsList() {
-  try {
-    const api = yield* getConnection()
-    const network = yield* select(networkType)
-    const invAddress = yield* select(invariantAddress)
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
-    const walletAddress = yield* select(address)
-
-    const positions = yield* call([invariant, invariant.getAllPositions], walletAddress)
-
-    const pools: PoolKey[] = []
-    const poolSet: Set<string> = new Set()
-    for (let i = 0; i < positions.length; i++) {
-      const poolKeyString = poolKeyToString(positions[i].poolKey)
-
-      if (!poolSet.has(poolKeyString)) {
-        poolSet.add(poolKeyString)
-        pools.push(positions[i].poolKey)
-      }
-    }
-
-    yield* put(
-      poolsActions.getPoolsDataForList({
-        poolKeys: Array.from(pools),
-        listType: ListType.POSITIONS
-      })
-    )
-
-    yield* put(actions.setPositionsList(positions))
-  } catch (e) {
-    yield* put(actions.setPositionsList([]))
-  }
-}
-
 export function* handleGetCurrentPositionTicks(action: PayloadAction<GetPositionTicks>) {
   const { poolKey, lowerTickIndex, upperTickIndex } = action.payload
-  const api = yield* getConnection()
-  const network = yield* select(networkType)
-  const invAddress = yield* select(invariantAddress)
 
-  const invariant = yield* call(
-    [invariantSingleton, invariantSingleton.loadInstance],
-    api,
-    network,
-    invAddress
-  )
+  const invariant = yield* getInvariant()
 
   const [lowerTick, upperTick] = yield* all([
     call([invariant, invariant.getTick], poolKey, lowerTickIndex),
@@ -472,9 +413,6 @@ export function* handleGetCurrentPositionTicks(action: PayloadAction<GetPosition
 
 export function* handleGetCurrentPlotTicks(action: PayloadAction<GetCurrentTicksData>): Generator {
   const { poolKey, isXtoY, fetchTicksAndTickmap } = action.payload
-  const api = yield* getConnection()
-  const network = yield* select(networkType)
-  const invAddress = yield* select(invariantAddress)
   let allTickmaps = yield* select(tickMaps)
   const allTokens = yield* select(tokens)
   const allPools = yield* select(poolsArraySortedByFees)
@@ -483,12 +421,7 @@ export function* handleGetCurrentPlotTicks(action: PayloadAction<GetCurrentTicks
   const yDecimal = allTokens[poolKey.tokenY].decimals
 
   try {
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
+    const invariant = yield* getInvariant()
 
     if (!allTickmaps[poolKeyToString(poolKey)] || fetchTicksAndTickmap) {
       const fetchTicksAndTickMapsAction: PayloadAction<FetchTicksAndTickMaps> = {
@@ -576,16 +509,8 @@ export function* handleClaimFee(action: PayloadAction<HandleClaimFee>) {
       })
     )
     const walletAddress = yield* select(address)
-    const api = yield* getConnection()
-    const network = yield* select(networkType)
-    const invAddress = yield* select(invariantAddress)
 
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
+    const invariant = yield* getInvariant()
 
     const adapter = yield* call(getAlephZeroWallet)
 
@@ -674,18 +599,12 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<HandleClaimFee>) 
     )
 
     const walletAddress = yield* select(address)
-    const api = yield* getConnection()
-    const network = yield* select(networkType)
+    const api = yield* getApi()
     const invAddress = yield* select(invariantAddress)
     const { index, addressTokenX, addressTokenY } = action.payload
 
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
-    const psp22 = yield* call([psp22Singleton, psp22Singleton.loadInstance], api, network)
+    const invariant = yield* getInvariant()
+    const psp22 = yield* getPSP22()
     const adapter = yield* call(getAlephZeroWallet)
 
     const txs = []
@@ -785,15 +704,7 @@ export function* handleClaimFeeWithAZERO(action: PayloadAction<HandleClaimFee>) 
 export function* handleGetSinglePosition(action: PayloadAction<bigint>) {
   try {
     const walletAddress = yield* select(address)
-    const api = yield* getConnection()
-    const network = yield* select(networkType)
-    const invAddress = yield* select(invariantAddress)
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
+    const invariant = yield* getInvariant()
     const position = yield* call([invariant, invariant.getPosition], walletAddress, action.payload)
     yield* put(
       actions.setSinglePosition({
@@ -841,17 +752,20 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
     )
 
     const walletAddress = yield* select(address)
-    const api = yield* getConnection()
-    const network = yield* select(networkType)
-    const invAddress = yield* select(invariantAddress)
 
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
+    const invariant = yield* getInvariant()
     const adapter = yield* call(getAlephZeroWallet)
+
+    const allPositions = yield* select(positionsList)
+    const getPositionsListPagePayload: PayloadAction<{ index: number; refresh: boolean }> = {
+      type: actions.getPositionsListPage.type,
+      payload: {
+        index: Math.floor(Number(allPositions.length) / POSITIONS_PER_QUERY),
+        refresh: false
+      }
+    }
+    const fetchTask = yield* fork(handleGetPositionsListPage, getPositionsListPagePayload)
+    yield* join(fetchTask)
 
     const tx = invariant.removePositionTx(positionIndex, INVARIANT_REMOVE_POSITION_OPTIONS)
 
@@ -889,7 +803,7 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
       })
     )
 
-    yield* put(actions.getPositionsList())
+    yield* put(actions.removePosition(positionIndex))
     onSuccess()
 
     yield* call(fetchBalances, [addressTokenX, addressTokenY])
@@ -938,17 +852,22 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
 
     const { addressTokenX, addressTokenY, positionIndex, onSuccess } = action.payload
     const walletAddress = yield* select(address)
-    const api = yield* getConnection()
-    const network = yield* select(networkType)
+    const api = yield* getApi()
     const invAddress = yield* select(invariantAddress)
-    const invariant = yield* call(
-      [invariantSingleton, invariantSingleton.loadInstance],
-      api,
-      network,
-      invAddress
-    )
-    const psp22 = yield* call([psp22Singleton, psp22Singleton.loadInstance], api, network)
+    const invariant = yield* getInvariant()
+    const psp22 = yield* getPSP22()
     const adapter = yield* call(getAlephZeroWallet)
+
+    const allPositions = yield* select(positionsList)
+    const getPositionsListPagePayload: PayloadAction<{ index: number; refresh: boolean }> = {
+      type: actions.getPositionsListPage.type,
+      payload: {
+        index: Math.floor(Number(allPositions.length) / POSITIONS_PER_QUERY),
+        refresh: false
+      }
+    }
+    const fetchTask = yield* fork(handleGetPositionsListPage, getPositionsListPagePayload)
+    yield* join(fetchTask)
 
     const txs = []
 
@@ -1000,7 +919,7 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
       })
     )
 
-    yield* put(actions.getPositionsList())
+    yield* put(actions.removePosition(positionIndex))
     onSuccess()
 
     yield* call(fetchBalances, [addressTokenX, addressTokenY])
@@ -1033,12 +952,124 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
   }
 }
 
-export function* initPositionHandler(): Generator {
-  yield* takeEvery(actions.initPosition, handleInitPosition)
+export function* handleGetRemainingPositions(): Generator {
+  const walletAddress = yield* select(address)
+  const { length, list, loadedPages } = yield* select(positionsList)
+
+  const invariant = yield* getInvariant()
+
+  const pages = yield* call(
+    [invariant, invariant.getAllPositions],
+    walletAddress,
+    length,
+    Object.entries(loadedPages)
+      .filter(([_, isLoaded]) => isLoaded)
+      .map(([index]) => Number(index)),
+    BigInt(POSITIONS_PER_QUERY)
+  )
+
+  const allList = [...list]
+  for (const { index, entries } of pages) {
+    for (let i = 0; i < entries.length; i++) {
+      allList[i + index * Number(POSITIONS_PER_QUERY)] = entries[i][0]
+    }
+  }
+
+  yield* put(actions.setPositionsList(allList))
+  yield* put(
+    actions.setPositionsListLoadedStatus({
+      indexes: pages.map(({ index }: { index: number }) => index),
+      isLoaded: true
+    })
+  )
 }
 
-export function* getPositionsListHandler(): Generator {
-  yield* takeLatest(actions.getPositionsList, handleGetPositionsList)
+export function* handleGetPositionsListPage(
+  action: PayloadAction<{ index: number; refresh: boolean }>
+) {
+  const { index, refresh } = action.payload
+
+  const walletAddress = yield* select(address)
+  const { length, list, loadedPages } = yield* select(positionsList)
+
+  const invariant = yield* getInvariant()
+
+  let entries: [Position, Pool][] = []
+  let positionsLength = 0n
+
+  if (refresh) {
+    yield* put(
+      actions.setPositionsListLoadedStatus({
+        indexes: Object.keys(loadedPages)
+          .map(key => Number(key))
+          .filter(keyIndex => keyIndex !== index),
+        isLoaded: false
+      })
+    )
+  }
+
+  if (!length || refresh) {
+    console.log('call', index)
+    const result = yield* call(
+      [invariant, invariant.getPositions],
+      walletAddress,
+      BigInt(POSITIONS_PER_QUERY),
+      BigInt(index * POSITIONS_PER_QUERY)
+    )
+    entries = result[0]
+    positionsLength = result[1]
+
+    const poolsWithPoolKeys = entries.map(entry => ({
+      poolKey: entry[0].poolKey,
+      ...entry[1]
+    }))
+
+    yield* put(
+      poolsActions.addPoolsForList({ data: poolsWithPoolKeys, listType: ListType.POSITIONS })
+    )
+    yield* call(fetchTokens, poolsWithPoolKeys)
+
+    yield* put(actions.setPositionsListLength(positionsLength))
+  }
+
+  const allList = length ? [...list] : Array(Number(positionsLength)).fill(EMPTY_POSITION)
+
+  const isPageLoaded = loadedPages[index]
+
+  if (!isPageLoaded || refresh) {
+    if (length && !refresh) {
+      console.log('call', index)
+      const result = yield* call(
+        [invariant, invariant.getPositions],
+        walletAddress,
+        BigInt(POSITIONS_PER_QUERY),
+        BigInt(index * POSITIONS_PER_QUERY)
+      )
+      entries = result[0]
+      positionsLength = result[1]
+
+      const poolsWithPoolKeys = entries.map(entry => ({
+        poolKey: entry[0].poolKey,
+        ...entry[1]
+      }))
+
+      yield* put(
+        poolsActions.addPoolsForList({ data: poolsWithPoolKeys, listType: ListType.POSITIONS })
+      )
+      yield* call(fetchTokens, poolsWithPoolKeys)
+    }
+
+    for (let i = 0; i < entries.length; i++) {
+      allList[i + index * POSITIONS_PER_QUERY] = entries[i][0]
+    }
+  }
+
+  yield* put(actions.setPositionsList(allList))
+  yield* put(actions.setPositionsListLoadedStatus({ indexes: [index], isLoaded: true }))
+}
+
+export function* initPositionHandler(): Generator {
+  yield* takeEvery(actions.initPosition, handleInitPosition)
 }
 
 export function* getCurrentPositionTicksHandler(): Generator {
@@ -1060,16 +1091,25 @@ export function* closePositionHandler(): Generator {
   yield* takeEvery(actions.closePosition, handleClosePosition)
 }
 
+export function* getPositionsListPage(): Generator {
+  yield* takeLatest(actions.getPositionsListPage, handleGetPositionsListPage)
+}
+
+export function* getRemainingPositions(): Generator {
+  yield* takeLatest(actions.getRemainingPositions, handleGetRemainingPositions)
+}
+
 export function* positionsSaga(): Generator {
   yield all(
     [
       initPositionHandler,
-      getPositionsListHandler,
       getCurrentPositionTicksHandler,
       getCurrentPlotTicksHandler,
       claimFeeHandler,
       getSinglePositionHandler,
-      closePositionHandler
+      closePositionHandler,
+      getPositionsListPage,
+      getRemainingPositions
     ].map(spawn)
   )
 }

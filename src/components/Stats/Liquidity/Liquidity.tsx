@@ -6,7 +6,7 @@ import { colors } from '@static/theme'
 import { useStyles } from './style'
 import { TimeData } from '@store/reducers/stats'
 import { Grid, Typography } from '@mui/material'
-import { formatNumbers, showPrefix } from '@store/consts/utils'
+import { formatNumbers, showPrefix } from '@utils/utils'
 
 interface LiquidityInterface {
   liquidityPercent: number

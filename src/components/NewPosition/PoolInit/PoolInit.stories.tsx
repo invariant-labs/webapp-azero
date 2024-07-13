@@ -15,21 +15,26 @@ export const Primary: Story = {
   args: {
     currentPairReversed: false,
     isXtoY: true,
-    midPrice: 0 as any, //Storybook doesn't support bigint correctly
+    midPriceIndex: 0 as any,
     onChangeMidPrice: fn(),
     onChangeRange: fn(),
     tickSpacing: 1 as any,
     tokenASymbol: 'BTC',
     tokenBSymbol: 'ETH',
     xDecimal: 9 as any,
-    yDecimal: 12 as any
+    yDecimal: 12 as any,
+    concentrationArray: [0.1, 0.2, 0.3, 0.4, 0.5],
+    concentrationIndex: 2,
+    minimumSliderIndex: 0,
+    setConcentrationIndex: fn(),
+    positionOpeningMethod: 'range'
   },
   render: args => {
     const [midPrice, setMidPrice] = useState(0n)
     return (
       <PoolInit
         {...args}
-        midPrice={midPrice}
+        midPriceIndex={midPrice}
         onChangeMidPrice={setMidPrice}
         tickSpacing={1n}
         xDecimal={9n}

@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IPositionItem, PositionItem } from './PositionItem/PositionItem'
 import { useStyles } from './style'
+import { POSITIONS_PER_QUERY } from '@store/consts/static'
 
 interface IProps {
   initialPage: number
@@ -22,6 +23,10 @@ interface IProps {
   searchValue: string
   searchSetValue: (value: string) => void
   handleRefresh: () => void
+  pageChanged: (page: number) => void
+  length: bigint
+  loadedPages: Record<number, boolean>
+  getRemainingPositions: () => void
 }
 
 export const PositionsList: React.FC<IProps> = ({
@@ -35,7 +40,11 @@ export const PositionsList: React.FC<IProps> = ({
   itemsPerPage,
   searchValue,
   searchSetValue,
-  handleRefresh
+  handleRefresh,
+  pageChanged,
+  length,
+  loadedPages,
+  getRemainingPositions
 }) => {
   const { classes } = useStyles()
   const navigate = useNavigate()
@@ -43,6 +52,10 @@ export const PositionsList: React.FC<IProps> = ({
   const [page, setPage] = useState(initialPage)
 
   const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (Object.keys(loadedPages).length * POSITIONS_PER_QUERY < Number(length)) {
+      getRemainingPositions()
+    }
+
     searchSetValue(e.target.value.toLowerCase())
   }
 
@@ -77,6 +90,10 @@ export const PositionsList: React.FC<IProps> = ({
     handleChangePagination(initialPage)
   }, [initialPage])
 
+  useEffect(() => {
+    pageChanged(page)
+  }, [page])
+
   return (
     <Grid container direction='column' className={classes.root}>
       <Grid
@@ -88,7 +105,7 @@ export const PositionsList: React.FC<IProps> = ({
         <Grid className={classes.searchRoot}>
           <Grid className={classes.titleBar}>
             <Typography className={classes.title}>Your Liquidity Positions</Typography>
-            <Typography className={classes.positionsNumber}>{data.length}</Typography>
+            <Typography className={classes.positionsNumber}>{String(length)}</Typography>
           </Grid>
           <Grid className={classes.searchWrapper}>
             <InputBase
@@ -151,6 +168,7 @@ export const PositionsList: React.FC<IProps> = ({
           defaultPage={defaultPage}
           handleChangePage={handleChangePagination}
           variant='end'
+          page={page}
         />
       ) : null}
     </Grid>

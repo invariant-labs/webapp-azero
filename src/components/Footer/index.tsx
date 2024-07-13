@@ -67,11 +67,11 @@ export const Footer = () => {
       <Grid className={classes.footerItem}>
         <Tooltip
           classes={{ tooltip: classes.tooltip }}
-          title='Twitter'
+          title='X'
           placement='top'
           TransitionComponent={FooterTransition}>
-          <a href={social.twitter} className={classes.footerLink} target='_blank'>
-            <img className={classes.icon} src={icons.TwitterIcon} alt={'twitter icon'} />
+          <a href={social.x} className={classes.footerLink} target='_blank'>
+            <img className={classes.icon} src={icons.XIcon} alt={'x icon'} />
           </a>
         </Tooltip>
       </Grid>
