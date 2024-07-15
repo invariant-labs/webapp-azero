@@ -353,6 +353,7 @@ export function* handleClaimFee(action: PayloadAction<HandleClaimFee>) {
 
   const loaderKey = createLoaderKey()
   const loaderSigningTx = createLoaderKey()
+
   try {
     yield put(
       snackbarsActions.add({
@@ -362,13 +363,46 @@ export function* handleClaimFee(action: PayloadAction<HandleClaimFee>) {
         key: loaderKey
       })
     )
+
     const walletAddress = yield* select(address)
-
-    const invariant = yield* getInvariant()
-
     const adapter = yield* call(getAlephZeroWallet)
+    const invAddress = yield* select(invariantAddress)
+    const wazeroAddress = yield* select(wrappedAZEROAddress)
 
-    const tx = invariant.claimFeeTx(index, INVARIANT_CLAIM_FEE_OPTIONS)
+    const api = yield* getApi()
+    const invariant = yield* getInvariant()
+    const psp22 = yield* getPSP22()
+
+    const txs = []
+
+    const claimTx = invariant.claimFeeTx(index, INVARIANT_CLAIM_FEE_OPTIONS)
+    txs.push(claimTx)
+
+    if (addressTokenX === wazeroAddress || addressTokenY === wazeroAddress) {
+      const approveTx = psp22.approveTx(
+        invAddress,
+        U128MAX,
+        TESTNET_WAZERO_ADDRESS,
+        PSP22_APPROVE_OPTIONS
+      )
+      txs.push(approveTx)
+
+      const unwrapTx = invariant.withdrawAllWAZEROTx(
+        TESTNET_WAZERO_ADDRESS,
+        INVARIANT_WITHDRAW_ALL_WAZERO
+      )
+      txs.push(unwrapTx)
+
+      const resetApproveTx = psp22.approveTx(
+        invAddress,
+        0n,
+        TESTNET_WAZERO_ADDRESS,
+        PSP22_APPROVE_OPTIONS
+      )
+      txs.push(resetApproveTx)
+    }
+
+    const batchedTx = api.tx.utility.batchAll(txs)
 
     yield put(
       snackbarsActions.add({
@@ -379,9 +413,9 @@ export function* handleClaimFee(action: PayloadAction<HandleClaimFee>) {
       })
     )
 
-    let signedTx: SubmittableExtrinsic
+    let signedBatchedTx: SubmittableExtrinsic
     try {
-      signedTx = yield* call([tx, tx.signAsync], walletAddress, {
+      signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
         signer: adapter.signer as Signer
       })
     } catch (e) {
@@ -391,7 +425,7 @@ export function* handleClaimFee(action: PayloadAction<HandleClaimFee>) {
     closeSnackbar(loaderSigningTx)
     yield put(snackbarsActions.remove(loaderSigningTx))
 
-    const txResult = yield* call(sendTx, signedTx)
+    const txResult = yield* call(sendTx, signedBatchedTx)
 
     closeSnackbar(loaderKey)
     yield put(snackbarsActions.remove(loaderKey))
