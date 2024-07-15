@@ -151,7 +151,7 @@ export function* init(isEagerConnect: boolean): Generator {
       yield* put(
         snackbarsActions.add({
           message: 'Wallet reconnected.',
-          variant: 'info',
+          variant: 'success',
           persist: false
         })
       )
@@ -159,7 +159,7 @@ export function* init(isEagerConnect: boolean): Generator {
       yield* put(
         snackbarsActions.add({
           message: 'Wallet connected.',
-          variant: 'info',
+          variant: 'success',
           persist: false
         })
       )
