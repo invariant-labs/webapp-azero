@@ -472,123 +472,6 @@ export function* handleClaimFee(action: PayloadAction<HandleClaimFee>) {
   }
 }
 
-export function* handleClaimFeeWithAZERO(action: PayloadAction<HandleClaimFee>) {
-  const loaderKey = createLoaderKey()
-  const loaderSigningTx = createLoaderKey()
-
-  try {
-    yield put(
-      snackbarsActions.add({
-        message: 'Claiming fee...',
-        variant: 'pending',
-        persist: true,
-        key: loaderKey
-      })
-    )
-
-    const walletAddress = yield* select(address)
-    const api = yield* getApi()
-    const invAddress = yield* select(invariantAddress)
-    const { index, addressTokenX, addressTokenY } = action.payload
-
-    const invariant = yield* getInvariant()
-    const psp22 = yield* getPSP22()
-    const adapter = yield* call(getAlephZeroWallet)
-
-    const txs = []
-    const claimTx = invariant.claimFeeTx(index, INVARIANT_CLAIM_FEE_OPTIONS)
-    txs.push(claimTx)
-
-    const approveTx = psp22.approveTx(
-      invAddress,
-      U128MAX,
-      TESTNET_WAZERO_ADDRESS,
-      PSP22_APPROVE_OPTIONS
-    )
-    txs.push(approveTx)
-
-    const unwrapTx = invariant.withdrawAllWAZEROTx(
-      TESTNET_WAZERO_ADDRESS,
-      INVARIANT_WITHDRAW_ALL_WAZERO
-    )
-    txs.push(unwrapTx)
-
-    const resetApproveTx = psp22.approveTx(
-      invAddress,
-      0n,
-      TESTNET_WAZERO_ADDRESS,
-      PSP22_APPROVE_OPTIONS
-    )
-    txs.push(resetApproveTx)
-
-    const batchedTx = api.tx.utility.batchAll(txs)
-
-    yield put(
-      snackbarsActions.add({
-        message: 'Signing transaction...',
-        variant: 'pending',
-        persist: true,
-        key: loaderSigningTx
-      })
-    )
-
-    let signedBatchedTx: SubmittableExtrinsic
-    try {
-      signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
-        signer: adapter.signer as Signer
-      })
-    } catch (e) {
-      throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
-    }
-
-    closeSnackbar(loaderSigningTx)
-    yield put(snackbarsActions.remove(loaderSigningTx))
-
-    const txResult = yield* call(sendTx, signedBatchedTx)
-
-    closeSnackbar(loaderKey)
-    yield put(snackbarsActions.remove(loaderKey))
-    yield put(
-      snackbarsActions.add({
-        message: 'Fee successfully created',
-        variant: 'success',
-        persist: false,
-        txid: txResult.hash
-      })
-    )
-
-    yield put(actions.getSinglePosition(index))
-
-    yield* call(fetchBalances, [addressTokenX, addressTokenY])
-  } catch (e: unknown) {
-    const error = ensureError(e)
-    console.log(error)
-
-    closeSnackbar(loaderSigningTx)
-    yield put(snackbarsActions.remove(loaderSigningTx))
-    closeSnackbar(loaderKey)
-    yield put(snackbarsActions.remove(loaderKey))
-
-    if (isErrorMessage(error.message)) {
-      yield put(
-        snackbarsActions.add({
-          message: error.message,
-          variant: 'error',
-          persist: false
-        })
-      )
-    } else {
-      yield put(
-        snackbarsActions.add({
-          message: 'Failed to close position. Please try again.',
-          variant: 'error',
-          persist: false
-        })
-      )
-    }
-  }
-}
-
 export function* handleGetSinglePosition(action: PayloadAction<bigint>) {
   try {
     const walletAddress = yield* select(address)
@@ -621,11 +504,6 @@ export function* handleGetSinglePosition(action: PayloadAction<bigint>) {
 export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
   const { addressTokenX, addressTokenY, onSuccess, positionIndex } = action.payload
 
-  if (addressTokenX === TESTNET_WAZERO_ADDRESS || addressTokenY === TESTNET_WAZERO_ADDRESS) {
-    yield* call(handleClosePositionWithAZERO, action)
-    return
-  }
-
   const loaderKey = createLoaderKey()
   const loaderSigningTx = createLoaderKey()
 
@@ -640,113 +518,15 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
     )
 
     const walletAddress = yield* select(address)
-
-    const invariant = yield* getInvariant()
     const adapter = yield* call(getAlephZeroWallet)
-
     const allPositions = yield* select(positionsList)
-    const getPositionsListPagePayload: PayloadAction<{ index: number; refresh: boolean }> = {
-      type: actions.getPositionsListPage.type,
-      payload: {
-        index: Math.floor(Number(allPositions.length) / POSITIONS_PER_QUERY),
-        refresh: false
-      }
-    }
-    const fetchTask = yield* fork(handleGetPositionsListPage, getPositionsListPagePayload)
-    yield* join(fetchTask)
-
-    const tx = invariant.removePositionTx(positionIndex, INVARIANT_REMOVE_POSITION_OPTIONS)
-
-    yield put(
-      snackbarsActions.add({
-        message: 'Signing transaction...',
-        variant: 'pending',
-        persist: true,
-        key: loaderSigningTx
-      })
-    )
-
-    let signedTx: SubmittableExtrinsic
-    try {
-      signedTx = yield* call([tx, tx.signAsync], walletAddress, {
-        signer: adapter.signer as Signer
-      })
-    } catch (e) {
-      throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
-    }
-
-    closeSnackbar(loaderSigningTx)
-    yield put(snackbarsActions.remove(loaderSigningTx))
-
-    const txResult = yield* call(sendTx, signedTx)
-
-    closeSnackbar(loaderKey)
-    yield put(snackbarsActions.remove(loaderKey))
-    yield put(
-      snackbarsActions.add({
-        message: 'Position successfully removed',
-        variant: 'success',
-        persist: false,
-        txid: txResult.hash
-      })
-    )
-
-    yield* put(actions.removePosition(positionIndex))
-    onSuccess()
-
-    yield* call(fetchBalances, [addressTokenX, addressTokenY])
-  } catch (e: unknown) {
-    const error = ensureError(e)
-    console.log(error)
-
-    closeSnackbar(loaderSigningTx)
-    yield put(snackbarsActions.remove(loaderSigningTx))
-    closeSnackbar(loaderKey)
-    yield put(snackbarsActions.remove(loaderKey))
-
-    if (isErrorMessage(error.message)) {
-      yield put(
-        snackbarsActions.add({
-          message: error.message,
-          variant: 'error',
-          persist: false
-        })
-      )
-    } else {
-      yield put(
-        snackbarsActions.add({
-          message: 'Failed to close position. Please try again.',
-          variant: 'error',
-          persist: false
-        })
-      )
-    }
-  }
-}
-
-export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositionData>) {
-  const loaderSigningTx = createLoaderKey()
-  const loaderKey = createLoaderKey()
-
-  try {
-    yield put(
-      snackbarsActions.add({
-        message: 'Removing position...',
-        variant: 'pending',
-        persist: true,
-        key: loaderKey
-      })
-    )
-
-    const { addressTokenX, addressTokenY, positionIndex, onSuccess } = action.payload
-    const walletAddress = yield* select(address)
-    const api = yield* getApi()
     const invAddress = yield* select(invariantAddress)
+    const wazeroAddress = yield* select(wrappedAZEROAddress)
+
+    const api = yield* getApi()
     const invariant = yield* getInvariant()
     const psp22 = yield* getPSP22()
-    const adapter = yield* call(getAlephZeroWallet)
 
-    const allPositions = yield* select(positionsList)
     const getPositionsListPagePayload: PayloadAction<{ index: number; refresh: boolean }> = {
       type: actions.getPositionsListPage.type,
       payload: {
@@ -759,17 +539,22 @@ export function* handleClosePositionWithAZERO(action: PayloadAction<ClosePositio
 
     const txs = []
 
-    const removePositionTx = invariant.removePositionTx(positionIndex)
+    const removePositionTx = invariant.removePositionTx(
+      positionIndex,
+      INVARIANT_REMOVE_POSITION_OPTIONS
+    )
     txs.push(removePositionTx)
 
-    const approveTx = psp22.approveTx(invAddress, U128MAX, TESTNET_WAZERO_ADDRESS)
-    txs.push(approveTx)
+    if (addressTokenX === wazeroAddress || addressTokenY === wazeroAddress) {
+      const approveTx = psp22.approveTx(invAddress, U128MAX, TESTNET_WAZERO_ADDRESS)
+      txs.push(approveTx)
 
-    const unwrapTx = invariant.withdrawAllWAZEROTx(TESTNET_WAZERO_ADDRESS)
-    txs.push(unwrapTx)
+      const unwrapTx = invariant.withdrawAllWAZEROTx(TESTNET_WAZERO_ADDRESS)
+      txs.push(unwrapTx)
 
-    const resetApproveTx = psp22.approveTx(invAddress, 0n, TESTNET_WAZERO_ADDRESS)
-    txs.push(resetApproveTx)
+      const resetApproveTx = psp22.approveTx(invAddress, 0n, TESTNET_WAZERO_ADDRESS)
+      txs.push(resetApproveTx)
+    }
 
     const batchedTx = api.tx.utility.batchAll(txs)
 
