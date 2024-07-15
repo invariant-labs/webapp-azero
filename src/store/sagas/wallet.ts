@@ -23,6 +23,7 @@ import {
 import { Signer } from '@polkadot/api/types'
 import { positionsList } from '@store/selectors/positions'
 import { getApi, getPSP22 } from './connection'
+import { connect, getAccounts } from '@utils/web3/new-selector'
 
 export function* getWallet(): SagaGenerator<NightlyConnectAdapter> {
   const wallet = yield* call(getAlephZeroWallet)
@@ -143,9 +144,9 @@ export function* init(): Generator {
   try {
     yield* put(actions.setStatus(Status.Init))
 
-    const walletAdapter = yield* call(getWallet)
-    yield* call([walletAdapter, walletAdapter.connect])
-    const accounts = yield* call([walletAdapter.accounts, walletAdapter.accounts.get])
+    yield* call(connect, 'polkadot-js')
+    const accounts = yield* call(getAccounts, 'polkadot-js')
+    yield* call([localStorage, localStorage.setItem], 'CAN_EAGER_CONNECT', 'true')
 
     yield* put(actions.setAddress(accounts[0].address))
 
@@ -179,6 +180,7 @@ export function* handleConnect(): Generator {
 
 export function* handleDisconnect(): Generator {
   try {
+    yield* call([localStorage, localStorage.setItem], 'CAN_EAGER_CONNECT', 'false')
     const { loadedPages } = yield* select(positionsList)
 
     yield* call(disconnectWallet)

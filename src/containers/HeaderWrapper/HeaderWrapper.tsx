@@ -5,7 +5,6 @@ import { actions } from '@store/reducers/connection'
 import { Status, actions as walletActions } from '@store/reducers/wallet'
 import { networkType, rpcAddress } from '@store/selectors/connection'
 import { address, status } from '@store/selectors/wallet'
-import { openWalletSelectorModal } from '@utils/web3/selector'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import React, { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -41,6 +40,12 @@ export const HeaderWrapper: React.FC = () => {
     fetchWallet()
   }, [])
 
+  useEffect(() => {
+    if (localStorage.getItem('CAN_EAGER_CONNECT') === 'true') {
+      dispatch(walletActions.connect())
+    }
+  }, [])
+
   const defaultTestnetRPC = useMemo(() => {
     const lastRPC = localStorage.getItem('INVARIANT_TESTNET_RPC')
 
@@ -59,7 +64,9 @@ export const HeaderWrapper: React.FC = () => {
           dispatch(actions.setNetwork({ networkType: network, rpcAddress, rpcName }))
         }
       }}
-      onConnectWallet={openWalletSelectorModal}
+      onConnectWallet={() => {
+        dispatch(walletActions.connect())
+      }}
       landing={location.pathname.substring(1)}
       walletConnected={walletStatus === Status.Initialized}
       onDisconnectWallet={() => {
