@@ -34,9 +34,8 @@ import {
 import { actions as poolActions } from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Simulate, Swap, actions } from '@store/reducers/swap'
-import { invariantAddress } from '@store/selectors/connection'
+import { invariantAddress, wrappedAZEROAddress } from '@store/selectors/connection'
 import { poolTicks, pools, tickMaps, tokens } from '@store/selectors/pools'
-import { simulateResult } from '@store/selectors/swap'
 import { address, balance } from '@store/selectors/wallet'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
@@ -61,16 +60,10 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
     return
   }
 
-  if (poolKey.tokenX === TESTNET_WAZERO_ADDRESS || poolKey.tokenY === TESTNET_WAZERO_ADDRESS) {
-    return yield* call(handleSwapWithAZERO, action)
-  }
-
   const loaderSwappingTokens = createLoaderKey()
   const loaderSigningTx = createLoaderKey()
 
   try {
-    const allTokens = yield* select(tokens)
-
     yield put(
       snackbarsActions.add({
         message: 'Swapping tokens...',
@@ -80,184 +73,23 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
       })
     )
 
-    const api = yield* getApi()
     const walletAddress = yield* select(address)
     const adapter = yield* call(getAlephZeroWallet)
+    const allTokens = yield* select(tokens)
     const invAddress = yield* select(invariantAddress)
+    const wazeroAddress = yield* select(wrappedAZEROAddress)
 
-    const tokenX = allTokens[poolKey.tokenX]
-    const tokenY = allTokens[poolKey.tokenY]
-    const xToY = tokenFrom.toString() === poolKey.tokenX
-
-    const txs = []
-
-    const psp22 = yield* getPSP22()
+    const api = yield* getApi()
     const invariant = yield* getInvariant()
-    const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(estimatedPriceAfterSwap, slippage, !xToY)
-    const calculatedAmountIn = slippage
-      ? calculateAmountInWithSlippage(amountOut, sqrtPriceLimit, xToY, poolKey.feeTier.fee)
-      : amountIn
-
-    if (xToY) {
-      const approveTx = psp22.approveTx(
-        invAddress,
-        calculatedAmountIn,
-        tokenX.address.toString(),
-        PSP22_APPROVE_OPTIONS
-      )
-      txs.push(approveTx)
-    } else {
-      const approveTx = psp22.approveTx(
-        invAddress,
-        calculatedAmountIn,
-        tokenY.address.toString(),
-        PSP22_APPROVE_OPTIONS
-      )
-      txs.push(approveTx)
-    }
-
-    const swapTx = invariant.swapWithSlippageTx(
-      poolKey,
-      xToY,
-      byAmountIn ? amountIn : amountOut,
-      byAmountIn,
-      estimatedPriceAfterSwap,
-      slippage,
-      INVARIANT_SWAP_OPTIONS
-    )
-    txs.push(swapTx)
-
-    const batchedTx = api.tx.utility.batchAll(txs)
-
-    yield put(
-      snackbarsActions.add({
-        message: 'Signing transaction...',
-        variant: 'pending',
-        persist: true,
-        key: loaderSigningTx
-      })
-    )
-
-    let signedBatchedTx: SubmittableExtrinsic
-    try {
-      signedBatchedTx = yield* call([batchedTx, batchedTx.signAsync], walletAddress, {
-        signer: adapter.signer as Signer
-      })
-    } catch (e) {
-      throw new Error(ErrorMessage.TRANSACTION_SIGNING_ERROR)
-    }
-
-    closeSnackbar(loaderSigningTx)
-    yield put(snackbarsActions.remove(loaderSigningTx))
-
-    const txResult = yield* call(sendTx, signedBatchedTx)
-
-    closeSnackbar(loaderSwappingTokens)
-    yield put(snackbarsActions.remove(loaderSwappingTokens))
-
-    yield put(
-      snackbarsActions.add({
-        message: 'Tokens swapped successfully.',
-        variant: 'success',
-        persist: false,
-        txid: txResult.hash
-      })
-    )
-
-    yield* call(fetchBalances, [poolKey.tokenX, poolKey.tokenY])
-
-    yield put(actions.setSwapSuccess(true))
-
-    yield put(
-      poolActions.getAllPoolsForPairData({
-        first: tokenFrom,
-        second: tokenTo
-      })
-    )
-  } catch (e: unknown) {
-    const error = ensureError(e)
-    console.log(error)
-
-    yield put(actions.setSwapSuccess(false))
-
-    closeSnackbar(loaderSwappingTokens)
-    yield put(snackbarsActions.remove(loaderSwappingTokens))
-    closeSnackbar(loaderSigningTx)
-    yield put(snackbarsActions.remove(loaderSigningTx))
-
-    if (isErrorMessage(error.message)) {
-      yield put(
-        snackbarsActions.add({
-          message: error.message,
-          variant: 'error',
-          persist: false
-        })
-      )
-    } else {
-      yield put(
-        snackbarsActions.add({
-          message: 'Tokens swapping failed. Please try again.',
-          variant: 'error',
-          persist: false
-        })
-      )
-    }
-
-    yield put(
-      poolActions.getAllPoolsForPairData({
-        first: tokenFrom,
-        second: tokenTo
-      })
-    )
-  }
-}
-
-export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>): Generator {
-  const {
-    poolKey,
-    tokenFrom,
-    slippage,
-    amountIn,
-    amountOut,
-    byAmountIn,
-    estimatedPriceAfterSwap,
-    tokenTo
-  } = action.payload
-
-  if (!poolKey) {
-    return
-  }
-
-  const loaderSwappingTokens = createLoaderKey()
-  const loaderSigningTx = createLoaderKey()
-
-  try {
-    const allTokens = yield* select(tokens)
-
-    yield put(
-      snackbarsActions.add({
-        message: 'Swapping tokens...',
-        variant: 'pending',
-        persist: true,
-        key: loaderSwappingTokens
-      })
-    )
-
-    const api = yield* getApi()
-    const walletAddress = yield* select(address)
-    const adapter = yield* call(getAlephZeroWallet)
-    const swapSimulateResult = yield* select(simulateResult)
-    const invAddress = yield* select(invariantAddress)
-
-    const tokenX = allTokens[poolKey.tokenX]
-    const tokenY = allTokens[poolKey.tokenY]
-    const xToY = tokenFrom.toString() === poolKey.tokenX
-
-    const txs = []
-
+    const psp22 = yield* getPSP22()
     const wazero = yield* getWrappedAZERO()
-    const psp22 = yield* getPSP22()
-    const invariant = yield* getInvariant()
+
+    const tokenX = allTokens[poolKey.tokenX]
+    const tokenY = allTokens[poolKey.tokenY]
+    const xToY = tokenFrom.toString() === poolKey.tokenX
+
+    const txs = []
+
     const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(estimatedPriceAfterSwap, slippage, !xToY)
     const calculatedAmountIn = slippage
       ? calculateAmountInWithSlippage(amountOut, sqrtPriceLimit, xToY, poolKey.feeTier.fee)
@@ -304,10 +136,10 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
     txs.push(swapTx)
 
     if (
-      (!xToY && poolKey.tokenX === TESTNET_WAZERO_ADDRESS) ||
+      (!xToY && poolKey.tokenX === wazeroAddress) ||
       (xToY && poolKey.tokenY === TESTNET_WAZERO_ADDRESS)
     ) {
-      const withdrawTx = wazero.withdrawTx(swapSimulateResult.amountOut, WAZERO_WITHDRAW_OPTIONS)
+      const withdrawTx = wazero.withdrawTx(amountOut, WAZERO_WITHDRAW_OPTIONS)
       txs.push(withdrawTx)
     }
 
@@ -362,9 +194,7 @@ export function* handleSwapWithAZERO(action: PayloadAction<Omit<Swap, 'txid'>>):
       })
     )
 
-    yield* call(fetchBalances, [
-      poolKey.tokenX === TESTNET_WAZERO_ADDRESS ? poolKey.tokenY : poolKey.tokenX
-    ])
+    yield* call(fetchBalances, [poolKey.tokenX, poolKey.tokenY])
 
     yield put(actions.setSwapSuccess(true))
 
