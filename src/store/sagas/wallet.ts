@@ -262,16 +262,10 @@ export function* airdropSaga(): Generator {
   yield takeLeading(actions.airdrop, handleAirdrop)
 }
 
-export function* initSaga(): Generator {
-  yield takeLeading(actions.initWallet, init)
-}
-
 export function* getBalancesHandler(): Generator {
   yield takeLeading(actions.getBalances, handleGetBalances)
 }
 
 export function* walletSaga(): Generator {
-  yield all(
-    [initSaga, airdropSaga, connectHandler, disconnectHandler, getBalancesHandler].map(spawn)
-  )
+  yield all([airdropSaga, connectHandler, disconnectHandler, getBalancesHandler].map(spawn))
 }

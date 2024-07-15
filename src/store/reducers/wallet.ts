@@ -36,9 +36,6 @@ const walletSlice = createSlice({
     resetState() {
       return defaultState
     },
-    initWallet(state) {
-      return state
-    },
     setAddress(state, action: PayloadAction<string>) {
       state.address = action.payload
       return state
