@@ -139,13 +139,31 @@ export function* handleAirdrop(): Generator {
   }
 }
 
-export function* init(): Generator {
+export function* init(isEagerConnect: boolean): Generator {
   try {
     yield* put(actions.setStatus(Status.Init))
 
     const walletAdapter = yield* call(getWallet)
     yield* call([walletAdapter, walletAdapter.connect])
     const accounts = yield* call([walletAdapter.accounts, walletAdapter.accounts.get])
+
+    if (isEagerConnect) {
+      yield* put(
+        snackbarsActions.add({
+          message: 'Wallet reconnected.',
+          variant: 'info',
+          persist: false
+        })
+      )
+    } else {
+      yield* put(
+        snackbarsActions.add({
+          message: 'Wallet connected.',
+          variant: 'info',
+          persist: false
+        })
+      )
+    }
 
     yield* put(actions.setAddress(accounts[0].address))
 
@@ -162,7 +180,7 @@ export const sleep = (ms: number) => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-export function* handleConnect(): Generator {
+export function* handleConnect(action: PayloadAction<boolean>): Generator {
   const walletStatus = yield* select(status)
   if (walletStatus === Status.Initialized) {
     yield* put(
@@ -174,7 +192,7 @@ export function* handleConnect(): Generator {
     )
     return
   }
-  yield* call(init)
+  yield* call(init, action.payload)
 }
 
 export function* handleDisconnect(): Generator {
