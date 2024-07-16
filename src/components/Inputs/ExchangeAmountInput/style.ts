@@ -158,10 +158,7 @@ export const useStyles = makeStyles<{ walletDisconnected: boolean }>()(
       color: colors.invariant.lightHover,
       overflow: 'hidden',
       whiteSpace: 'nowrap',
-      textOverflow: 'ellipsis',
-      '&:hover': {
-        color: colors.white.main
-      }
+      textOverflow: 'ellipsis'
     },
     bottom: {
       paddingInline: 15
