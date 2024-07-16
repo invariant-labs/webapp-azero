@@ -5,17 +5,20 @@ import { MaterialDesignContent } from 'notistack'
 
 export const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ theme }) => ({
   '&.notistack-MuiContent-success': {
-    backgroundColor: colors.invariant.component,
-    borderStyle: 'solid',
-    borderWidth: 1,
     borderColor: colors.invariant.component,
-    borderRadius: 10,
     ...typography.body2,
     maxWidth: '100vw',
     width: 330,
     padding: '4px 16px',
     minWidth: 100,
-
+    marginBottom: 3,
+    background: `linear-gradient(${colors.invariant.component},${colors.invariant.component} ) padding-box,
+    linear-gradient(to right, ${colors.invariant.green}, ${colors.invariant.pink}) border-box`,
+    backgroundColor: colors.invariant.component,
+    borderStyle: 'solid',
+    borderRadius: 15,
+    border: `0px solid transparent`,
+    borderBottomWidth: 2,
     '& > div:first-of-type': {
       flex: 1
     },
@@ -34,16 +37,20 @@ export const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ them
     }
   },
   '&.notistack-MuiContent-error': {
-    backgroundColor: colors.invariant.component,
-    borderStyle: 'solid',
-    borderWidth: 1,
     borderColor: colors.invariant.component,
-    borderRadius: 10,
     ...typography.body2,
     maxWidth: '100vw',
     width: 330,
     padding: '4px 16px',
     minWidth: 100,
+    marginBottom: 3,
+    background: `linear-gradient(${colors.invariant.component},${colors.invariant.component} ) padding-box,
+    linear-gradient(to right, ${colors.invariant.green}, ${colors.invariant.pink}) border-box`,
+    backgroundColor: colors.invariant.component,
+    borderStyle: 'solid',
+    borderRadius: 15,
+    border: `0px solid transparent`,
+    borderBottomWidth: 2,
 
     '& > div:first-of-type': {
       flex: 1
@@ -63,16 +70,20 @@ export const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ them
     }
   },
   '&.notistack-MuiContent-info': {
-    backgroundColor: colors.invariant.component,
-    borderStyle: 'solid',
-    borderWidth: 1,
     borderColor: colors.invariant.component,
-    borderRadius: 10,
     ...typography.body2,
     maxWidth: '100vw',
     width: 330,
-    padding: '6px 16px',
+    padding: '4px 16px',
     minWidth: 100,
+    marginBottom: 3,
+    background: `linear-gradient(${colors.invariant.component},${colors.invariant.component} ) padding-box,
+    linear-gradient(to right, ${colors.invariant.green}, ${colors.invariant.pink}) border-box`,
+    backgroundColor: colors.invariant.component,
+    borderStyle: 'solid',
+    borderRadius: 15,
+    border: `0px solid transparent`,
+    borderBottomWidth: 2,
 
     '& > div:first-of-type': {
       flex: 1
@@ -92,16 +103,20 @@ export const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ them
     }
   },
   '&.notistack-MuiContent-warning': {
-    backgroundColor: colors.invariant.component,
-    borderStyle: 'solid',
-    borderWidth: 1,
     borderColor: colors.invariant.component,
-    borderRadius: 10,
     ...typography.body2,
     maxWidth: '100vw',
     width: 330,
-    padding: '6px 16px',
+    padding: '4px 16px',
     minWidth: 100,
+    marginBottom: 3,
+    background: `linear-gradient(${colors.invariant.component},${colors.invariant.component} ) padding-box,
+    linear-gradient(to right, ${colors.invariant.green}, ${colors.invariant.pink}) border-box`,
+    backgroundColor: colors.invariant.component,
+    borderStyle: 'solid',
+    borderRadius: 15,
+    border: `0px solid transparent`,
+    borderBottomWidth: 2,
 
     '& > div:first-of-type': {
       flex: 1
