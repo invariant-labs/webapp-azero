@@ -60,8 +60,7 @@ const useStyles = makeStyles()((theme: Theme) => {
     selectTokenInput: {
       backgroundColor: colors.invariant.newDark,
       width: '100%',
-      fontSize: 16,
-      fontWeight: 600,
+      ...typography.body3,
       position: 'relative',
       color: 'white',
       border: `1px solid ${colors.invariant.newDark}`,
@@ -75,7 +74,7 @@ const useStyles = makeStyles()((theme: Theme) => {
 
       '&::placeholder': {
         color: colors.invariant.light,
-        ...typography.body1
+        ...typography.body3
       },
       '&:focus': {
         outline: 'none'
@@ -86,7 +85,7 @@ const useStyles = makeStyles()((theme: Theme) => {
       width: 24,
       height: 26,
       right: '12px',
-      top: '14px'
+      top: '18px'
     },
     commonTokensHeader: {
       ...typography.body2
@@ -102,13 +101,13 @@ const useStyles = makeStyles()((theme: Theme) => {
       cursor: 'pointer',
       justifyContent: 'center',
       alignItems: 'center',
-      background: colors.invariant.dark,
+      background: colors.invariant.newDark,
       borderRadius: 12,
       padding: '6px 11px',
       marginRight: 6,
       marginBottom: 8,
       '& p': {
-        ...typography.heading4,
+        ...typography.body3,
         fontWeight: 400
       },
 
@@ -153,12 +152,29 @@ const useStyles = makeStyles()((theme: Theme) => {
     },
     tokenName: {
       color: colors.white.main,
-      ...typography.heading4,
-      lineHeight: '20px'
+      ...typography.heading3
+    },
+    tokenAddress: {
+      backgroundColor: colors.invariant.newDark,
+      borderRadius: 4,
+      padding: '2px 4px',
+      width: 'min-content',
+      height: 'min-content',
+      '& a': {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '12px',
+        textDecoration: 'none',
+        '& p': {
+          color: colors.invariant.lightGrey,
+          ...typography.caption4
+        }
+      }
     },
     tokenDescrpiption: {
-      color: colors.invariant.lightGrey,
-      ...typography.caption4,
+      color: colors.invariant.textGrey,
+      ...typography.caption2,
       lineHeight: '16px',
       whiteSpace: 'nowrap'
     },

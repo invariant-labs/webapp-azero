@@ -21,6 +21,7 @@ import {
 import { formatNumber, printBigint } from '@utils/utils'
 import { SwapToken } from '@store/selectors/wallet'
 import Scrollbars from 'rc-scrollbars'
+import icons from '@static/icons'
 
 export interface ISelectTokenModal {
   tokens: SwapToken[]
@@ -240,9 +241,28 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
                       src={token.logoURI}
                       loading='lazy'
                       alt={token.name + 'logo'}
-                    />{' '}
+                    />
                     <Grid container className={classes.tokenContainer}>
-                      <Typography className={classes.tokenName}>{token.symbol}</Typography>
+                      <Grid container direction='row' columnGap='6px' alignItems='center'>
+                        <Typography className={classes.tokenName}>{token.symbol} </Typography>
+                        <Grid className={classes.tokenAddress} container direction='column'>
+                          <a
+                            href={`https://ascan.alephzero.org/testnet/account/${token.assetAddress}`}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            onClick={event => {
+                              event.stopPropagation()
+                            }}>
+                            <Typography>
+                              {token.assetAddress.slice(0, 4) +
+                                '...' +
+                                token.assetAddress.slice(-5, -1)}
+                            </Typography>
+                            <img width={8} height={8} src={icons.newTab} alt={'Token address'} />
+                          </a>
+                        </Grid>
+                      </Grid>
+
                       <Typography className={classes.tokenDescrpiption}>
                         {token.name ? token.name.slice(0, isXs ? 20 : 30) : 'Unknown token'}
                         {token.name.length > (isXs ? 20 : 30) ? '...' : ''}
