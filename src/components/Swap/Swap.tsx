@@ -415,8 +415,6 @@ export const Swap: React.FC<ISwap> = ({
     setRefresherTime(REFRESHER_INTERVAL)
   }, [tokenFromIndex, tokenToIndex])
 
-  console.log(inputRef)
-
   return (
     <Grid container className={classes.swapWrapper} alignItems='center'>
       <Grid container className={classes.header}>
