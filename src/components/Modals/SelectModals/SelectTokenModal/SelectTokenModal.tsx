@@ -212,7 +212,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
             <List
               height={352}
               width={360}
-              itemSize={66}
+              itemSize={74}
               itemCount={filteredTokens.length}
               outerElementType={CustomScrollbarsVirtualList}
               outerRef={outerRef}>

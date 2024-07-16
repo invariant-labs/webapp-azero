@@ -103,7 +103,7 @@ const useStyles = makeStyles()((theme: Theme) => {
       alignItems: 'center',
       background: colors.invariant.newDark,
       borderRadius: 12,
-      padding: '6px 11px',
+      padding: '8px 12px',
       marginRight: 6,
       marginBottom: 8,
       '& p': {
@@ -126,7 +126,7 @@ const useStyles = makeStyles()((theme: Theme) => {
       borderTop: `1px solid ${colors.invariant.light}`,
       width: 451,
       height: 352,
-      paddingTop: 20
+      paddingTop: 8
     },
 
     tokenContainer: {
@@ -137,10 +137,10 @@ const useStyles = makeStyles()((theme: Theme) => {
     tokenItem: {
       display: 'flex',
       justifyContent: 'space-between',
-      margin: '0 0 2px 0',
-      borderRadius: 10,
+      marginBottom: 4,
+      borderRadius: 24,
       cursor: 'pointer',
-      padding: 12,
+      padding: '35px 16px ',
       '& > p': {
         whiteSpace: 'nowrap'
       },
@@ -180,8 +180,8 @@ const useStyles = makeStyles()((theme: Theme) => {
     },
     tokenBalanceStatus: {
       filter: 'brightness(0.8)',
-      color: colors.invariant.lightGrey,
-      ...typography.caption2,
+      color: colors.invariant.textGrey,
+      ...typography.body2,
       minWidth: 'auto'
     },
 
