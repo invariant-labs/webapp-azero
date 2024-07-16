@@ -1,8 +1,7 @@
-import PlotTypeSwitch from '@components/PlotTypeSwitch/PlotTypeSwitch'
 import LiquidationRangeInfo from '@components/PositionDetails/LiquidationRangeInfo/LiquidationRangeInfo'
 import PriceRangePlot from '@components/PriceRangePlot/PriceRangePlot'
 import { getMinTick } from '@invariant-labs/a0-sdk'
-import { Card, Grid, Hidden, Tooltip, Typography } from '@mui/material'
+import { Card, Grid, Tooltip, Typography } from '@mui/material'
 import activeLiquidity from '@static/svg/activeLiquidity.svg'
 import {
   calcPriceByTickIndex,
@@ -28,8 +27,6 @@ export interface ISinglePositionPlot {
   min: number
   max: number
   xToY: boolean
-  initialIsDiscreteValue: boolean
-  onDiscreteChange: (val: boolean) => void
   hasTicksError?: boolean
   reloadHandler: () => void
 }
@@ -47,8 +44,6 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
   min,
   max,
   xToY,
-  initialIsDiscreteValue,
-  onDiscreteChange,
   hasTicksError,
   reloadHandler
 }) => {
@@ -56,8 +51,6 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
 
   const [plotMin, setPlotMin] = useState(0)
   const [plotMax, setPlotMax] = useState(1)
-
-  const [isPlotDiscrete, setIsPlotDiscrete] = useState(initialIsDiscreteValue)
 
   const [isInitialLoad, setIsInitialLoad] = useState(true)
   const [currentXtoY, setCurrentXtoY] = useState(xToY)
@@ -147,15 +140,6 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
     <Grid item className={classes.root}>
       <Grid className={classes.headerContainer} container justifyContent='space-between'>
         <Typography className={classes.header}>Price range</Typography>
-        <Hidden mdDown>
-          <PlotTypeSwitch
-            onSwitch={val => {
-              setIsPlotDiscrete(val)
-              onDiscreteChange(val)
-            }}
-            initialValue={isPlotDiscrete ? 1 : 0}
-          />
-        </Hidden>
       </Grid>
       <Grid className={classes.infoRow} container justifyContent='flex-end'>
         <Grid>
@@ -214,7 +198,6 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
           tickSpacing={tickSpacing}
           xDecimal={tokenX.decimal}
           yDecimal={tokenY.decimal}
-          isDiscrete={isPlotDiscrete}
           coverOnLoading
           hasError={hasTicksError}
           reloadHandler={reloadHandler}

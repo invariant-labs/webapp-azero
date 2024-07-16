@@ -322,14 +322,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     }
   }, [poolKey])
 
-  const initialIsDiscreteValue = localStorage.getItem('IS_PLOT_DISCRETE')
-    ? localStorage.getItem('IS_PLOT_DISCRETE') === 'true'
-    : true
-
-  const setIsDiscreteValue = (val: boolean) => {
-    localStorage.setItem('IS_PLOT_DISCRETE', val ? 'true' : 'false')
-  }
-
   const addTokenHandler = async (address: string) => {
     const psp22 = SingletonPSP22.getInstance()
 
@@ -634,8 +626,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       poolIndex={poolIndex}
       currentPairReversed={currentPairReversed}
       bestTiers={bestTiers[currentNetwork]}
-      initialIsDiscreteValue={initialIsDiscreteValue}
-      onDiscreteChange={setIsDiscreteValue}
       currentPriceSqrt={
         poolsData[poolKey] ? poolsData[poolKey].sqrtPrice : calculateSqrtPrice(midPrice.index)
       }

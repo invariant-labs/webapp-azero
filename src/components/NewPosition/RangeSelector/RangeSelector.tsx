@@ -1,5 +1,4 @@
 import RangeInput from '@components/Inputs/RangeInput/RangeInput'
-import PlotTypeSwitch from '@components/PlotTypeSwitch/PlotTypeSwitch'
 import PriceRangePlot from '@components/PriceRangePlot/PriceRangePlot'
 import { getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
 import { Button, Grid, Tooltip, Typography } from '@mui/material'
@@ -31,8 +30,6 @@ export interface IRangeSelector {
   yDecimal: bigint
   tickSpacing: bigint
   currentPairReversed: boolean | null
-  initialIsDiscreteValue: boolean
-  onDiscreteChange: (val: boolean) => void
   positionOpeningMethod?: PositionOpeningMethod
   poolIndex: number | null
   hasTicksError?: boolean
@@ -70,8 +67,6 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   yDecimal,
   tickSpacing,
   currentPairReversed,
-  initialIsDiscreteValue,
-  onDiscreteChange,
   positionOpeningMethod,
   hasTicksError,
   reloadHandler,
@@ -99,8 +94,6 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
 
   const [plotMin, setPlotMin] = useState(0)
   const [plotMax, setPlotMax] = useState(1)
-
-  const [isPlotDiscrete, setIsPlotDiscrete] = useState(initialIsDiscreteValue)
 
   const [currentMidPrice, setCurrentMidPrice] = useState(midPrice)
   const [triggerReset, setTriggerReset] = useState(false)
@@ -377,13 +370,6 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
     <Grid container className={classes.wrapper} direction='column'>
       <Grid className={classes.headerContainer} container justifyContent='space-between'>
         <Typography className={classes.header}>Price range</Typography>
-        <PlotTypeSwitch
-          onSwitch={val => {
-            setIsPlotDiscrete(val)
-            onDiscreteChange(val)
-          }}
-          initialValue={isPlotDiscrete ? 1 : 0}
-        />
       </Grid>
       <Grid className={classes.infoRow} container justifyContent='flex-end'>
         <Grid container direction='column' alignItems='flex-end'>
@@ -450,7 +436,6 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
           tickSpacing={tickSpacing}
           xDecimal={xDecimal}
           yDecimal={yDecimal}
-          isDiscrete={isPlotDiscrete}
           disabled={positionOpeningMethod === 'concentration'}
           hasError={hasTicksError}
           reloadHandler={reloadHandler}
