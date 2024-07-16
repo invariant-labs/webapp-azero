@@ -118,6 +118,7 @@ export const Swap: React.FC<ISwap> = ({
 }) => {
   const { classes } = useStyles()
   enum inputTarget {
+    DEFAULT = 'default',
     FROM = 'from',
     TO = 'to'
   }
@@ -133,7 +134,7 @@ export const Swap: React.FC<ISwap> = ({
   const [throttle, setThrottle] = React.useState<boolean>(false)
   const [settings, setSettings] = React.useState<boolean>(false)
   const [detailsOpen, setDetailsOpen] = React.useState<boolean>(false)
-  const [inputRef, setInputRef] = React.useState<string>(inputTarget.FROM)
+  const [inputRef, setInputRef] = React.useState<string>(inputTarget.DEFAULT)
   const [rateReversed, setRateReversed] = React.useState<boolean>(false)
   const [refresherTime, setRefresherTime] = React.useState<number>(REFRESHER_INTERVAL)
 
@@ -222,10 +223,12 @@ export const Swap: React.FC<ISwap> = ({
   }, [tokenToIndex, tokenFromIndex, pools.length])
 
   useEffect(() => {
-    const temp: string = amountFrom
-    setAmountFrom(amountTo)
-    setAmountTo(temp)
-    setInputRef(inputRef === inputTarget.FROM ? inputTarget.TO : inputTarget.FROM)
+    if (inputRef !== inputTarget.DEFAULT) {
+      const temp: string = amountFrom
+      setAmountFrom(amountTo)
+      setAmountTo(temp)
+      setInputRef(inputRef === inputTarget.FROM ? inputTarget.TO : inputTarget.FROM)
+    }
   }, [swap])
 
   useEffect(() => {
@@ -494,6 +497,10 @@ export const Swap: React.FC<ISwap> = ({
             priceLoading={priceFromLoading}
             isBalanceLoading={isBalanceLoading}
             showMaxButton={true}
+            showBlur={
+              getStateMessage() === 'Loading' &&
+              (inputRef === inputTarget.TO || inputRef === inputTarget.DEFAULT)
+            }
           />
         </Box>
         <Box className={classes.tokenComponentTextContainer}>
@@ -573,6 +580,10 @@ export const Swap: React.FC<ISwap> = ({
             priceLoading={priceToLoading}
             isBalanceLoading={isBalanceLoading}
             showMaxButton={false}
+            showBlur={
+              getStateMessage() === 'Loading' &&
+              (inputRef === inputTarget.FROM || inputRef === inputTarget.DEFAULT)
+            }
           />
         </Box>
         <Box className={classes.transactionDetails}>
