@@ -6,20 +6,22 @@ import { SnackbarContent } from 'notistack'
 
 export const StyledSnackbarContent = styled(SnackbarContent)(({ theme }) => ({
   display: 'flex',
+  position: 'relative',
   flexDirection: 'column',
-  backgroundColor: colors.invariant.component,
-  borderStyle: 'solid',
-  borderWidth: 1,
-  borderColor: colors.invariant.component,
-  borderRadius: 10,
   maxWidth: 330,
   width: 330,
   padding: '7px 16px',
   minWidth: 100,
+  overflow: 'hidden',
+  boxShadow: `0px 3px 5px -1px rgba(0,0,0,0.2), 0px 6px 10px 0px rgba(0,0,0,0.14), 0px 1px 18px 0px rgba(0,0,0,0.12)`,
+  background: `linear-gradient(${colors.invariant.component},${colors.invariant.component} ) padding-box,
+  linear-gradient(to right top, ${colors.invariant.green}, ${colors.invariant.pink}) border-box`,
+  backgroundColor: colors.invariant.component,
+  borderStyle: 'solid',
+  borderRadius: 10,
+  border: `1px solid transparent`,
+  borderBottomWidth: 5,
   ...typography.body2,
-
-  boxShadow:
-    '0px 3px 5px -1px rgba(0,0,0,0.2),0px 6px 10px 0px rgba(0,0,0,0.14),0px 1px 18px 0px rgba(0,0,0,0.12)',
 
   '& .MuiCircularProgress-colorPrimary': {
     color: colors.invariant.textGrey
