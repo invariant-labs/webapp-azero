@@ -140,8 +140,6 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
     <Grid item className={classes.root}>
       <Grid className={classes.headerContainer} container justifyContent='space-between'>
         <Typography className={classes.header}>Price range</Typography>
-      </Grid>
-      <Grid className={classes.infoRow} container justifyContent='flex-end'>
         <Grid>
           <Tooltip
             title={
@@ -178,7 +176,7 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
               Active liquidity <span className={classes.activeLiquidityIcon}>i</span>
             </Typography>
           </Tooltip>
-          <Typography className={classes.currentPrice}>Current price</Typography>
+          <Typography className={classes.currentPrice}>Current price ━━━</Typography>
         </Grid>
       </Grid>
       <Grid className={classes.plotWrapper}>

@@ -370,9 +370,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
     <Grid container className={classes.wrapper} direction='column'>
       <Grid className={classes.headerContainer} container justifyContent='space-between'>
         <Typography className={classes.header}>Price range</Typography>
-      </Grid>
-      <Grid className={classes.infoRow} container justifyContent='flex-end'>
-        <Grid container direction='column' alignItems='flex-end'>
+        <Grid className={classes.activeLiquidityContainer} container direction='column'>
           <Tooltip
             title={
               <>
@@ -409,7 +407,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
             </Typography>
           </Tooltip>
           <Grid>
-            <Typography className={classes.currentPrice}>Current price</Typography>
+            <Typography className={classes.currentPrice}>Current price ━━━</Typography>
           </Grid>
         </Grid>
       </Grid>

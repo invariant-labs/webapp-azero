@@ -215,6 +215,9 @@ const useStyles = makeStyles()(theme => {
       color: colors.invariant.yellow,
       ...typography.caption2,
       textAlign: 'right'
+    },
+    activeLiquidityContainer: {
+      width: 'auto'
     }
   }
 })
