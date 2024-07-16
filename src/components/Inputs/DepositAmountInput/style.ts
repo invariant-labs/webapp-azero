@@ -2,8 +2,8 @@ import { Theme } from '@mui/material'
 import { colors, typography } from '@static/theme'
 import { makeStyles } from 'tss-react/mui'
 
-export const useStyles = makeStyles()((theme: Theme) => {
-  return {
+export const useStyles = makeStyles<{ hideBalance: boolean }>()(
+  (theme: Theme, { hideBalance }) => ({
     wrapper: {
       position: 'relative',
       marginBottom: 16,
@@ -20,7 +20,7 @@ export const useStyles = makeStyles()((theme: Theme) => {
       ...typography.heading2
     },
     inputContainer: {
-      marginBottom: 6,
+      marginBottom: hideBalance ? 0 : 6,
 
       [theme.breakpoints.down('sm')]: {
         marginBottom: 0
@@ -212,7 +212,6 @@ export const useStyles = makeStyles()((theme: Theme) => {
       width: 15,
       height: 15
     }
-  }
-})
-
+  })
+)
 export default useStyles

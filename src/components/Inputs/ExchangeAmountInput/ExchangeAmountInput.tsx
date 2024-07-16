@@ -60,7 +60,8 @@ export const AmountInput: React.FC<IProps> = ({
   isBalanceLoading,
   showMaxButton = true
 }) => {
-  const { classes } = useStyles({ walletDisconnected: hideBalances })
+  const hideBalance = balance === '- -' || !balance || hideBalances
+  const { classes } = useStyles({ walletDisconnected: hideBalance })
   const inputRef = useRef<HTMLInputElement>(null)
 
   const allowOnlyDigitsAndTrimUnnecessaryZeros: React.ChangeEventHandler<HTMLInputElement> = e => {
@@ -134,7 +135,7 @@ export const AmountInput: React.FC<IProps> = ({
           }}
         />
       </Grid>
-      {!hideBalances && (
+      {!hideBalance && (
         <Grid
           container
           justifyContent='space-between'

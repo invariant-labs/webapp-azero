@@ -42,7 +42,7 @@ export const DepositAmountInput: React.FC<IProps> = ({
   priceLoading = false,
   isBalanceLoading
 }) => {
-  const { classes } = useStyles()
+  const { classes } = useStyles({ hideBalance: !balanceValue })
 
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -127,64 +127,62 @@ export const DepositAmountInput: React.FC<IProps> = ({
             }}
           />
         </Grid>
-        <Grid
-          container
-          justifyContent='space-between'
-          alignItems='center'
-          direction='row'
-          wrap='nowrap'>
+        {balanceValue && (
           <Grid
-            className={classes.balance}
             container
+            justifyContent='space-between'
             alignItems='center'
-            wrap='nowrap'
-            onClick={onMaxClick}>
-            {
-              <>
-                <Typography className={classes.caption2}>
-                  Balance:{' '}
-                  {isBalanceLoading ? (
-                    <img src={loadingAnimation} className={classes.loadingBalance} alt='loading' />
-                  ) : (
-                    formatNumber(balanceValue || 0)
-                  )}{' '}
-                  {currency}
-                </Typography>
-                <Button
-                  className={
-                    currency
-                      ? classes.maxButton
-                      : `${classes.maxButton} ${classes.maxButtonNotActive}`
-                  }
-                  onClick={onMaxClick}>
-                  Max
-                </Button>
-              </>
-            }
-          </Grid>
-          <Grid className={classes.percentages} container alignItems='center' wrap='nowrap'>
-            {currency ? (
-              priceLoading ? (
-                <img src={loadingAnimation} className={classes.loading} alt='loading' />
-              ) : tokenPrice ? (
-                <Typography className={classes.caption2}>
-                  ~${formatNumber(usdBalance.toFixed(2))}
-                </Typography>
-              ) : (
-                <Tooltip
-                  title='Cannot fetch price of token'
-                  placement='bottom'
-                  classes={{
-                    tooltip: classes.tooltip
-                  }}>
-                  <Typography className={classes.noData}>
-                    <span className={classes.noDataIcon}>?</span>No data
+            direction='row'
+            wrap='nowrap'>
+            <Grid
+              className={classes.balance}
+              container
+              alignItems='center'
+              wrap='nowrap'
+              onClick={onMaxClick}>
+              <Typography className={classes.caption2}>
+                Balance:{' '}
+                {isBalanceLoading ? (
+                  <img src={loadingAnimation} className={classes.loadingBalance} alt='loading' />
+                ) : (
+                  formatNumber(balanceValue || 0)
+                )}{' '}
+                {currency}
+              </Typography>
+              <Button
+                className={
+                  currency
+                    ? classes.maxButton
+                    : `${classes.maxButton} ${classes.maxButtonNotActive}`
+                }
+                onClick={onMaxClick}>
+                Max
+              </Button>
+            </Grid>
+            <Grid className={classes.percentages} container alignItems='center' wrap='nowrap'>
+              {currency ? (
+                priceLoading ? (
+                  <img src={loadingAnimation} className={classes.loading} alt='loading' />
+                ) : tokenPrice ? (
+                  <Typography className={classes.caption2}>
+                    ~${formatNumber(usdBalance.toFixed(2))}
                   </Typography>
-                </Tooltip>
-              )
-            ) : null}
+                ) : (
+                  <Tooltip
+                    title='Cannot fetch price of token'
+                    placement='bottom'
+                    classes={{
+                      tooltip: classes.tooltip
+                    }}>
+                    <Typography className={classes.noData}>
+                      <span className={classes.noDataIcon}>?</span>No data
+                    </Typography>
+                  </Tooltip>
+                )
+              ) : null}
+            </Grid>
           </Grid>
-        </Grid>
+        )}
       </div>
       {blocked && (
         <>
