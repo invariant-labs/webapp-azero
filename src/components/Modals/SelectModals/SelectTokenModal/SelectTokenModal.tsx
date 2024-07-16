@@ -266,6 +266,8 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
         addToken={(address: string) => {
           handleAddToken(address)
           setIsAddOpen(false)
+          setHideUnknown(false)
+          onHideUnknownTokensChange(false)
         }}
       />
     </>
