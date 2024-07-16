@@ -202,6 +202,14 @@ export function* handleDisconnect(): Generator {
     yield* call(disconnectWallet)
     yield* put(actions.resetState())
 
+    yield* put(
+      snackbarsActions.add({
+        message: 'Wallet disconnected.',
+        variant: 'success',
+        persist: false
+      })
+    )
+
     yield* put(positionsActions.setPositionsList([]))
     yield* put(positionsActions.setPositionsListLength(0n))
     yield* put(
