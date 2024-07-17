@@ -271,6 +271,26 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     justifyContent: 'space-between',
     alignItems: 'center',
     gap: 8
+  },
+  slippageButton: {
+    height: 27,
+    padding: '0px 8px',
+    borderRadius: 8,
+    backgroundColor: colors.invariant.component,
+    color: colors.invariant.textGrey,
+    fontSize: 14,
+    cursor: 'pointer',
+    userSelect: 'none',
+    display: 'flex',
+    alignItems: 'center',
+
+    '&:hover': {
+      background: colors.invariant.light,
+      color: colors.invariant.text
+    }
+  },
+  slippageAmount: {
+    color: colors.invariant.green
   }
 }))
 

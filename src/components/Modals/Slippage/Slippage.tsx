@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import useStyles from './style'
 import { Box, Button, Grid, Input, Popover, Typography } from '@mui/material'
+import classNames from 'classnames'
 
 interface Props {
   open: boolean
@@ -81,62 +82,100 @@ const Slippage: React.FC<Props> = ({
     }
   }
 
+  const slippageTiers = ['0.3', '0.5', '1']
+  const initialTierIndex = slippageTiers.findIndex(tier => tier === slippTolerance)
+
+  const [tierIndex, setTierIndex] = useState(initialTierIndex)
+
+  const setTieredSlippage = (tierIndex: number) => {
+    setTierIndex(tierIndex)
+    setSlippage(String(Number(slippageTiers[tierIndex]).toFixed(2)))
+    setSlippTolerance('')
+  }
+
+  useEffect(() => {
+    const tierIndex = slippageTiers.findIndex(
+      tier => String(Number(tier).toFixed(2)) === slippTolerance
+    )
+    setTierIndex(tierIndex)
+
+    if (tierIndex !== -1) {
+      setSlippTolerance('')
+    }
+  }, [])
+
   return (
-    <Popover
-      open={open}
-      onClose={handleClose}
-      classes={{ paper: classes.paper }}
-      anchorEl={anchorEl}
-      anchorOrigin={{
-        vertical: 'bottom',
-        horizontal: 'right'
-      }}>
-      <Grid container className={classes.detailsWrapper}>
-        <Grid container justifyContent='space-between' style={{ marginBottom: 6 }}>
-          <Typography component='h2'>{headerText ?? 'Swap Transaction Settings'}</Typography>
-          <Button className={classes.selectTokenClose} onClick={handleClose} />
+    <>
+      <Popover
+        open={open}
+        onClose={handleClose}
+        classes={{ paper: classes.paper }}
+        anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right'
+        }}>
+        <Grid container className={classes.detailsWrapper}>
+          <Grid container justifyContent='space-between' style={{ marginBottom: 6 }}>
+            <Typography component='h2'>{headerText ?? 'Swap Transaction Settings'}</Typography>
+            <Button className={classes.selectTokenClose} onClick={handleClose} />
+          </Grid>
+          <Typography className={classes.label}>Slippage tolerance</Typography>
+          <Grid container gap='9px'>
+            {slippageTiers.map((tier, index) => (
+              <Button
+                className={classNames(classes.slippagePercentageButton, {
+                  [classes.slippagePercentageButtonActive]: index === tierIndex
+                })}
+                onClick={() => setTieredSlippage(index)}>
+                {tier}%
+              </Button>
+            ))}
+          </Grid>
+          <Box marginTop='6px'>
+            <Input
+              disableUnderline
+              placeholder='0.00'
+              className={classes.detailsInfoForm}
+              type={'text'}
+              value={slippTolerance}
+              onChange={e => {
+                allowOnlyDigitsAndTrimUnnecessaryZeros(e)
+                checkSlippage(e)
+                setTierIndex(-1)
+              }}
+              ref={inputRef}
+              onBlur={() => {
+                setSlippTolerance(Number(slippTolerance).toFixed(2))
+                setSlippage(String(Number(slippTolerance).toFixed(2)))
+              }}
+              startAdornment='Custom'
+              endAdornment={
+                <>
+                  %
+                  <button
+                    className={classes.detailsInfoBtn}
+                    onClick={() => {
+                      setSlippTolerance(defaultSlippage)
+                      setSlippage(defaultSlippage)
+                      setTierIndex(-1)
+                    }}>
+                    Auto
+                  </button>
+                </>
+              }
+              classes={{
+                input: classes.innerInput
+              }}
+            />
+          </Box>
+          <Typography className={classes.info}>
+            {infoText ??
+              'Slippage tolerance is a pricing difference between the price at the confirmation time and the actual price of the transaction users are willing to accept when swapping.'}
+          </Typography>
         </Grid>
-        <Typography className={classes.label}>Slippage tolerance:</Typography>
-        <Box>
-          <Input
-            disableUnderline
-            placeholder='1.00'
-            className={classes.detailsInfoForm}
-            type={'text'}
-            value={slippTolerance}
-            onChange={e => {
-              allowOnlyDigitsAndTrimUnnecessaryZeros(e)
-              checkSlippage(e)
-            }}
-            ref={inputRef}
-            onBlur={() => {
-              setSlippTolerance(Number(slippTolerance).toFixed(2))
-              setSlippage(slippTolerance)
-            }}
-            endAdornment={
-              <>
-                %
-                <button
-                  className={classes.detailsInfoBtn}
-                  onClick={() => {
-                    setSlippTolerance(defaultSlippage)
-                    setSlippage(defaultSlippage)
-                  }}>
-                  Auto
-                </button>
-              </>
-            }
-            classes={{
-              input: classes.innerInput
-            }}
-          />
-        </Box>
-        <Typography className={classes.info}>
-          {infoText ??
-            'Slippage tolerance is a pricing difference between the price at the confirmation time and the actual price of the transaction users are willing to accept when swapping.'}
-        </Typography>
-      </Grid>
-    </Popover>
+      </Popover>
+    </>
   )
 }
 export default Slippage

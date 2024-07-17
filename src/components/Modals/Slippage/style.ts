@@ -11,7 +11,7 @@ export const useStyles = makeStyles()(() => {
       }
     },
     detailsWrapper: {
-      width: 306,
+      width: 332,
       display: 'flex',
       flexDirection: 'column',
       backgroundColor: colors.invariant.component,
@@ -87,9 +87,25 @@ export const useStyles = makeStyles()(() => {
     },
     info: {
       ...typography.caption2,
-      color: colors.white.main,
-      marginTop: 10,
-      textAlign: 'justify'
+      color: colors.invariant.textGrey,
+      marginTop: 10
+    },
+    slippagePercentageButton: {
+      height: 28,
+      borderRadius: 8,
+      backgroundColor: colors.invariant.newDark,
+      color: colors.invariant.textGrey,
+      flex: 1,
+
+      '&:hover': {
+        backgroundColor: colors.invariant.light,
+        color: colors.invariant.text
+      }
+    },
+    slippagePercentageButtonActive: {
+      backgroundColor: colors.invariant.light,
+      color: colors.invariant.text,
+      fontWeight: 'bold'
     }
   }
 })
