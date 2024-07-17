@@ -52,7 +52,8 @@ export const Primary: Story = {
       fee: 200000000n,
       errors: []
     },
-    simulateSwap: fn()
+    simulateSwap: fn(),
+    copyTokenAddressHandler: fn()
   },
   render: args => {
     return (
