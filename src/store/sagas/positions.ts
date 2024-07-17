@@ -1,4 +1,4 @@
-import { Pool, Position, TESTNET_WAZERO_ADDRESS, sendTx } from '@invariant-labs/a0-sdk'
+import { Pool, Position, sendTx } from '@invariant-labs/a0-sdk'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
 import {
@@ -101,12 +101,9 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       (tokenX === wazeroAddress && tokenXAmount !== 0n) ||
       (tokenY === wazeroAddress && tokenYAmount !== 0n)
     ) {
-      let azeroAmount = 0n
-      if (tokenX === wazeroAddress) {
-        azeroAmount = azeroBalance > xAmountWithSlippage ? xAmountWithSlippage : azeroBalance
-      } else {
-        azeroAmount = azeroBalance > yAmountWithSlippage ? yAmountWithSlippage : azeroBalance
-      }
+      const isTokenX = tokenX === wazeroAddress
+      const slippageAmount = isTokenX ? xAmountWithSlippage : yAmountWithSlippage
+      const azeroAmount = azeroBalance > slippageAmount ? slippageAmount : azeroBalance
 
       const depositTx = wazero.depositTx(azeroAmount, WAZERO_DEPOSIT_OPTIONS)
       txs.push(depositTx)
@@ -137,27 +134,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       INVARIANT_CREATE_POSITION_OPTIONS
     )
     txs.push(tx)
-    const approveTx = psp22.approveTx(
-      invAddress,
-      U128MAX,
-      TESTNET_WAZERO_ADDRESS,
-      PSP22_APPROVE_OPTIONS
-    )
-    txs.push(approveTx)
 
-    const unwrapTx = invariant.withdrawAllWAZEROTx(
-      TESTNET_WAZERO_ADDRESS,
-      INVARIANT_WITHDRAW_ALL_WAZERO
-    )
-    txs.push(unwrapTx)
-
-    const resetApproveTx = psp22.approveTx(
-      invAddress,
-      0n,
-      TESTNET_WAZERO_ADDRESS,
-      PSP22_APPROVE_OPTIONS
-    )
-    txs.push(resetApproveTx)
     if (
       (tokenX === wazeroAddress && tokenXAmount !== 0n) ||
       (tokenY === wazeroAddress && tokenYAmount !== 0n)
@@ -218,7 +195,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     const position = yield* call([invariant, invariant.getPosition], walletAddress, length)
     yield* put(actions.addPosition(position))
 
-    yield* call(fetchBalances, [tokenX === TESTNET_WAZERO_ADDRESS ? tokenY : tokenX])
+    yield* call(fetchBalances, [tokenX === wazeroAddress ? tokenY : tokenX])
 
     yield* put(poolsActions.getPoolKeys())
   } catch (e: unknown) {
@@ -379,26 +356,13 @@ export function* handleClaimFee(action: PayloadAction<HandleClaimFee>) {
     txs.push(claimTx)
 
     if (addressTokenX === wazeroAddress || addressTokenY === wazeroAddress) {
-      const approveTx = psp22.approveTx(
-        invAddress,
-        U128MAX,
-        TESTNET_WAZERO_ADDRESS,
-        PSP22_APPROVE_OPTIONS
-      )
+      const approveTx = psp22.approveTx(invAddress, U128MAX, wazeroAddress, PSP22_APPROVE_OPTIONS)
       txs.push(approveTx)
 
-      const unwrapTx = invariant.withdrawAllWAZEROTx(
-        TESTNET_WAZERO_ADDRESS,
-        INVARIANT_WITHDRAW_ALL_WAZERO
-      )
+      const unwrapTx = invariant.withdrawAllWAZEROTx(wazeroAddress, INVARIANT_WITHDRAW_ALL_WAZERO)
       txs.push(unwrapTx)
 
-      const resetApproveTx = psp22.approveTx(
-        invAddress,
-        0n,
-        TESTNET_WAZERO_ADDRESS,
-        PSP22_APPROVE_OPTIONS
-      )
+      const resetApproveTx = psp22.approveTx(invAddress, 0n, wazeroAddress, PSP22_APPROVE_OPTIONS)
       txs.push(resetApproveTx)
     }
 
@@ -440,9 +404,7 @@ export function* handleClaimFee(action: PayloadAction<HandleClaimFee>) {
 
     yield put(actions.getSinglePosition(index))
 
-    yield* call(fetchBalances, [
-      addressTokenX === TESTNET_WAZERO_ADDRESS ? addressTokenY : addressTokenX
-    ])
+    yield* call(fetchBalances, [addressTokenX === wazeroAddress ? addressTokenY : addressTokenX])
   } catch (e: unknown) {
     const error = ensureError(e)
     console.log(error)
@@ -546,13 +508,13 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
     txs.push(removePositionTx)
 
     if (addressTokenX === wazeroAddress || addressTokenY === wazeroAddress) {
-      const approveTx = psp22.approveTx(invAddress, U128MAX, TESTNET_WAZERO_ADDRESS)
+      const approveTx = psp22.approveTx(invAddress, U128MAX, wazeroAddress)
       txs.push(approveTx)
 
-      const unwrapTx = invariant.withdrawAllWAZEROTx(TESTNET_WAZERO_ADDRESS)
+      const unwrapTx = invariant.withdrawAllWAZEROTx(wazeroAddress)
       txs.push(unwrapTx)
 
-      const resetApproveTx = psp22.approveTx(invAddress, 0n, TESTNET_WAZERO_ADDRESS)
+      const resetApproveTx = psp22.approveTx(invAddress, 0n, wazeroAddress)
       txs.push(resetApproveTx)
     }
 
