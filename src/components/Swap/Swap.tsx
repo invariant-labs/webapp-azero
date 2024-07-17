@@ -450,6 +450,7 @@ export const Swap: React.FC<ISwap> = ({
         </Grid>
       </Grid>
       <Grid container className={classes.root} direction='column'>
+        <Typography className={classes.swapLabel}>Pay</Typography>
         <Box
           className={classNames(
             classes.exchangeRoot,
@@ -534,6 +535,9 @@ export const Swap: React.FC<ISwap> = ({
             </Box>
           </Box>
         </Box>
+        <Typography className={classes.swapLabel} mt={1.5}>
+          Receive
+        </Typography>
         <Box
           className={classNames(
             classes.exchangeRoot,

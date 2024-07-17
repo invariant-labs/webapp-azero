@@ -145,13 +145,9 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     zIndex: 2,
     left: '50%',
     top: '0%',
-    transform: 'translateX(-50%) translateY(-40%)',
+    transform: 'translateX(-50%) translateY(-6px)',
     cursor: 'pointer',
-    transition: 'background-color 200ms',
-
-    [theme.breakpoints.down('sm')]: {
-      transform: 'translateX(-50%) translateY(-14%)'
-    }
+    transition: 'background-color 200ms'
   },
   swapImgRoot: {
     background: colors.invariant.newDark,
@@ -225,11 +221,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   },
 
   transactionBottom: {
-    marginTop: 10,
-
-    [theme.breakpoints.down('sm')]: {
-      marginTop: 36
-    }
+    // marginTop: 10,
+    // [theme.breakpoints.down('sm')]: {
+    //   marginTop: 36
+    // }
   },
 
   transtactionData: {
@@ -271,6 +266,11 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     justifyContent: 'space-between',
     alignItems: 'center',
     gap: 8
+  },
+  swapLabel: {
+    ...typography.caption1,
+    color: colors.invariant.lightGrey,
+    marginBottom: 8
   }
 }))
 
