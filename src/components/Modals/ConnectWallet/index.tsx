@@ -10,16 +10,16 @@ export interface IConnectWalletModal {
   anchorEl: HTMLButtonElement | null
   handleClose: () => void
   callDisconect: () => void
-  callCopyAddress: () => void
-  callChangeWallet: () => void
+  callCopyAddress?: () => void
+  callChangeWallet?: () => void
 }
 export const ConnectWallet: React.FC<IConnectWalletModal> = ({
   open,
   anchorEl,
   handleClose,
   callDisconect,
-  callCopyAddress,
-  callChangeWallet
+  callCopyAddress = () => {},
+  callChangeWallet = () => {}
 }) => {
   const { classes } = useStyles()
 

@@ -16,8 +16,8 @@ export interface IProps {
   onDisconnect: () => void
   hideArrow?: boolean
   className?: string
-  onCopyAddress: () => void
-  onChangeWallet: () => void
+  onCopyAddress?: () => void
+  onChangeWallet?: () => void
 }
 export const ChangeWalletButton: React.FC<IProps> = ({
   name,
@@ -27,8 +27,8 @@ export const ChangeWalletButton: React.FC<IProps> = ({
   hideArrow,
   onDisconnect,
   className,
-  onCopyAddress,
-  onChangeWallet
+  onCopyAddress = () => {},
+  onChangeWallet = () => {}
 }) => {
   const { classes } = useStyles()
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
