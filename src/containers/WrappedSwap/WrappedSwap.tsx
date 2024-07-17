@@ -31,6 +31,7 @@ import SingletonPSP22 from '@store/services/psp22Singleton'
 import { openWalletSelectorModal } from '@utils/web3/selector'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { VariantType } from 'notistack'
 
 export const WrappedSwap = () => {
   const dispatch = useDispatch()
@@ -255,6 +256,16 @@ export const WrappedSwap = () => {
     dispatch(actions.getSimulateResult(simulate))
   }
 
+  const copyTokenAddressHandler = (message: string, variant: VariantType) => {
+    dispatch(
+      snackbarsActions.add({
+        message,
+        variant,
+        persist: false
+      })
+    )
+  }
+
   return (
     <Swap
       isFetchingNewPool={isFetchingNewPool}
@@ -329,6 +340,7 @@ export const WrappedSwap = () => {
       isBalanceLoading={isBalanceLoading}
       simulateResult={swapSimulateResult}
       simulateSwap={simulateSwap}
+      copyTokenAddressHandler={copyTokenAddressHandler}
     />
   )
 }

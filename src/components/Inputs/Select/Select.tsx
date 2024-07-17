@@ -72,7 +72,7 @@ export const Select: React.FC<ISelectModal> = ({
             />
           )
         }
-        endIcon={<ExpandMoreIcon className={classes.endIcon} />}
+        endIcon={<ExpandMoreIcon />}
         classes={{
           endIcon: 'selectArrow'
         }}

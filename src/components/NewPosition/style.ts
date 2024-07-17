@@ -4,7 +4,8 @@ import { makeStyles } from 'tss-react/mui'
 const useStyles = makeStyles()(theme => {
   return {
     wrapper: {
-      width: 952
+      width: 952,
+      maxWidth: '100%'
     },
     headerContainer: {
       columnGap: 24

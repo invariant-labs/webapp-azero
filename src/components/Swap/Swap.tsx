@@ -25,6 +25,8 @@ import ExchangeRate from './ExchangeRate/ExchangeRate'
 import TransactionDetailsBox from './TransactionDetailsBox/TransactionDetailsBox'
 import useStyles from './style'
 import { SimulateResult, TokenPriceData } from '@store/consts/types'
+import TokensInfo from './TokensInfo/TokensInfo'
+import { VariantType } from 'notistack'
 
 export interface Pools {
   tokenX: string
@@ -84,6 +86,7 @@ export interface ISwap {
   isBalanceLoading: boolean
   simulateResult: SimulateResult
   simulateSwap: (simulate: Simulate) => void
+  copyTokenAddressHandler: (message: string, variant: VariantType) => void
 }
 
 export const Swap: React.FC<ISwap> = ({
@@ -114,7 +117,8 @@ export const Swap: React.FC<ISwap> = ({
   isBalanceLoading,
   swapData,
   simulateResult,
-  simulateSwap
+  simulateSwap,
+  copyTokenAddressHandler
 }) => {
   const { classes } = useStyles()
   enum inputTarget {
@@ -661,6 +665,15 @@ export const Swap: React.FC<ISwap> = ({
           slippage={+slippTolerance}
           isLoadingRate={getStateMessage() === 'Loading'}
         />
+        {tokenFromIndex !== null && tokenToIndex !== null && (
+          <TokensInfo
+            tokenFrom={tokens[tokenFromIndex]}
+            tokenTo={tokens[tokenToIndex]}
+            tokenToPrice={tokenToPriceData?.price}
+            tokenFromPrice={tokenFromPriceData?.price}
+            copyTokenAddressHandler={copyTokenAddressHandler}
+          />
+        )}
         {walletStatus !== Status.Initialized && getStateMessage() !== 'Loading' ? (
           <ChangeWalletButton
             name='Connect wallet'
