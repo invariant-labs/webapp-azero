@@ -12,13 +12,23 @@ export const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ them
     padding: '4px 16px',
     minWidth: 100,
     marginBottom: 3,
-    background: `linear-gradient(${colors.invariant.component},${colors.invariant.component} ) padding-box,
-    linear-gradient(to right, ${colors.invariant.green}, ${colors.invariant.pink}) border-box`,
-    backgroundColor: colors.invariant.component,
-    borderStyle: 'solid',
+    position: 'relative',
+    overflow: 'hidden',
+    background: colors.invariant.component,
     borderRadius: 15,
-    border: `0px solid transparent`,
-    borderBottomWidth: 2,
+
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      height: 2,
+      // borderBottomLeftRadius: 15,
+      // borderBottomRightRadius: 15,
+      background: `linear-gradient(to right, ${colors.invariant.green}, ${colors.invariant.pink})`
+    },
+
     '& > div:first-of-type': {
       flex: 1
     },
@@ -44,13 +54,22 @@ export const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ them
     padding: '4px 16px',
     minWidth: 100,
     marginBottom: 3,
-    background: `linear-gradient(${colors.invariant.component},${colors.invariant.component} ) padding-box,
-    linear-gradient(to right, ${colors.invariant.green}, ${colors.invariant.pink}) border-box`,
-    backgroundColor: colors.invariant.component,
-    borderStyle: 'solid',
+    position: 'relative',
+    overflow: 'hidden',
+    background: colors.invariant.component,
     borderRadius: 15,
-    border: `0px solid transparent`,
-    borderBottomWidth: 2,
+
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      height: 2,
+      // borderBottomLeftRadius: 15,
+      // borderBottomRightRadius: 15,
+      background: `linear-gradient(to right, ${colors.invariant.green}, ${colors.invariant.pink})`
+    },
 
     '& > div:first-of-type': {
       flex: 1
@@ -77,13 +96,22 @@ export const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ them
     padding: '4px 16px',
     minWidth: 100,
     marginBottom: 3,
-    background: `linear-gradient(${colors.invariant.component},${colors.invariant.component} ) padding-box,
-    linear-gradient(to right, ${colors.invariant.green}, ${colors.invariant.pink}) border-box`,
-    backgroundColor: colors.invariant.component,
-    borderStyle: 'solid',
+    position: 'relative',
+    overflow: 'hidden',
+    background: colors.invariant.component,
     borderRadius: 15,
-    border: `0px solid transparent`,
-    borderBottomWidth: 2,
+
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      height: 2,
+      // borderBottomLeftRadius: 15,
+      // borderBottomRightRadius: 15,
+      background: `linear-gradient(to right, ${colors.invariant.green}, ${colors.invariant.pink})`
+    },
 
     '& > div:first-of-type': {
       flex: 1
@@ -110,13 +138,22 @@ export const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ them
     padding: '4px 16px',
     minWidth: 100,
     marginBottom: 3,
-    background: `linear-gradient(${colors.invariant.component},${colors.invariant.component} ) padding-box,
-    linear-gradient(to right, ${colors.invariant.green}, ${colors.invariant.pink}) border-box`,
-    backgroundColor: colors.invariant.component,
-    borderStyle: 'solid',
+    position: 'relative',
+    overflow: 'hidden',
+    background: colors.invariant.component,
     borderRadius: 15,
-    border: `0px solid transparent`,
-    borderBottomWidth: 2,
+
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      height: 2,
+      // borderBottomLeftRadius: 15,
+      // borderBottomRightRadius: 15,
+      background: `linear-gradient(to right, ${colors.invariant.green}, ${colors.invariant.pink})`
+    },
 
     '& > div:first-of-type': {
       flex: 1

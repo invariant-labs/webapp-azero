@@ -14,13 +14,8 @@ export const StyledSnackbarContent = styled(SnackbarContent)(({ theme }) => ({
   minWidth: 100,
   overflow: 'hidden',
   boxShadow: `0px 3px 5px -1px rgba(0,0,0,0.2), 0px 6px 10px 0px rgba(0,0,0,0.14), 0px 1px 18px 0px rgba(0,0,0,0.12)`,
-  background: `linear-gradient(${colors.invariant.component},${colors.invariant.component} ) padding-box,
-  linear-gradient(to right, ${colors.invariant.green}, ${colors.invariant.pink}) border-box`,
-  backgroundColor: colors.invariant.component,
-  borderStyle: 'solid',
+  background: colors.invariant.component,
   borderRadius: 15,
-  border: `0px solid transparent`,
-  borderBottomWidth: 2,
   ...typography.body2,
   marginBottom: 3,
 
@@ -31,6 +26,18 @@ export const StyledSnackbarContent = styled(SnackbarContent)(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
     maxWidth: 'calc(100vw - 64px)',
     width: 'auto'
+  },
+
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 2,
+    borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15,
+    background: `linear-gradient(to right, ${colors.invariant.green}, ${colors.invariant.pink})`
   }
 }))
 
