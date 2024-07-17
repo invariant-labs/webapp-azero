@@ -28,6 +28,8 @@ export interface IHeader {
   onFaucet?: () => void
   onDisconnectWallet: () => void
   defaultTestnetRPC: string
+  onCopyAddress: () => void
+  onChangeWallet: () => void
 }
 
 export const Header: React.FC<IHeader> = ({
@@ -40,7 +42,9 @@ export const Header: React.FC<IHeader> = ({
   rpc,
   onFaucet,
   onDisconnectWallet,
-  defaultTestnetRPC
+  defaultTestnetRPC,
+  onCopyAddress,
+  onChangeWallet
 }) => {
   const { classes } = useStyles()
   const buttonStyles = useButtonStyles()
@@ -175,6 +179,8 @@ export const Header: React.FC<IHeader> = ({
             startIcon={
               walletConnected ? <DotIcon className={classes.connectedWalletIcon} /> : undefined
             }
+            onCopyAddress={onCopyAddress}
+            onChangeWallet={onChangeWallet}
           />
         </Grid>
 

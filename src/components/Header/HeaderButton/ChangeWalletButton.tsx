@@ -16,6 +16,8 @@ export interface IProps {
   onDisconnect: () => void
   hideArrow?: boolean
   className?: string
+  onCopyAddress: () => void
+  onChangeWallet: () => void
 }
 export const ChangeWalletButton: React.FC<IProps> = ({
   name,
@@ -24,7 +26,9 @@ export const ChangeWalletButton: React.FC<IProps> = ({
   startIcon,
   hideArrow,
   onDisconnect,
-  className
+  className,
+  onCopyAddress,
+  onChangeWallet
 }) => {
   const { classes } = useStyles()
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
@@ -47,6 +51,18 @@ export const ChangeWalletButton: React.FC<IProps> = ({
 
   const handleDisconnect = () => {
     onDisconnect()
+    unblurContent()
+    setOpen(false)
+  }
+
+  const handleChangeWallet = () => {
+    onChangeWallet()
+    unblurContent()
+    setOpen(false)
+  }
+
+  const handleCopyAddress = () => {
+    onCopyAddress()
     unblurContent()
     setOpen(false)
   }
@@ -78,6 +94,8 @@ export const ChangeWalletButton: React.FC<IProps> = ({
         anchorEl={anchorEl}
         handleClose={handleClose}
         callDisconect={handleDisconnect}
+        callCopyAddress={handleCopyAddress}
+        callChangeWallet={handleChangeWallet}
       />
     </>
   )
