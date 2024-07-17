@@ -700,7 +700,10 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       }}
       showNoConnected={walletStatus !== Status.Initialized}
       noConnectedBlockerProps={{
-        onConnect: openWalletSelectorModal,
+        onConnect: async () => {
+          await openWalletSelectorModal()
+          dispatch(walletActions.connect(false))
+        },
         descCustomText: 'Cannot add any liquidity.'
       }}
       poolKey={poolKey}

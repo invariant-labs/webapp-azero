@@ -303,7 +303,10 @@ export const WrappedSwap = () => {
           )
         }
       }}
-      onConnectWallet={openWalletSelectorModal}
+      onConnectWallet={async () => {
+        await openWalletSelectorModal()
+        dispatch(walletActions.connect(false))
+      }}
       onDisconnectWallet={() => {
         dispatch(walletActions.disconnect())
       }}
