@@ -103,13 +103,14 @@ const useStyles = makeStyles()(theme => {
       zIndex: 99
     },
     buttons: {
+      marginTop: 40,
       width: '100%',
       flexDirection: 'row',
       gap: 16,
       alignItems: 'center'
     },
     sliderWrapper: {
-      paddingTop: 24,
+      marginTop: 40,
       paddingInline: 8,
       height: 77,
       position: 'relative'
