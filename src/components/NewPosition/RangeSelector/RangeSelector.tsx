@@ -2,7 +2,7 @@ import RangeInput from '@components/Inputs/RangeInput/RangeInput'
 import PlotTypeSwitch from '@components/PlotTypeSwitch/PlotTypeSwitch'
 import PriceRangePlot from '@components/PriceRangePlot/PriceRangePlot'
 import { getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
-import { Button, Grid, Tooltip, Typography } from '@mui/material'
+import { Button, Checkbox, FormControlLabel, Grid, Tooltip, Typography } from '@mui/material'
 import loader from '@static/gif/loader.gif'
 import activeLiquidity from '@static/svg/activeLiquidity.svg'
 import {
@@ -54,6 +54,8 @@ export interface IRangeSelector {
   setShouldReversePlot: (val: boolean) => void
   shouldNotUpdatePriceRange: boolean
   unblockUpdatePriceRange: () => void
+  onlyUserPositions: boolean
+  setOnlyUserPositions: (onlyUserPositions: boolean) => void
 }
 
 export const RangeSelector: React.FC<IRangeSelector> = ({
@@ -84,7 +86,9 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   shouldReversePlot,
   setShouldReversePlot,
   shouldNotUpdatePriceRange,
-  unblockUpdatePriceRange
+  unblockUpdatePriceRange,
+  onlyUserPositions,
+  setOnlyUserPositions
 }) => {
   const { classes } = useStyles()
 
@@ -427,7 +431,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
           </Grid>
         </Grid>
       </Grid>
-      <Grid container className={classes.innerWrapper}>
+      <Grid className={classes.innerWrapper}>
         <PriceRangePlot
           className={classes.plot}
           data={data}
@@ -454,6 +458,20 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
           disabled={positionOpeningMethod === 'concentration'}
           hasError={hasTicksError}
           reloadHandler={reloadHandler}
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={onlyUserPositions}
+              onChange={() => {
+                setOnlyUserPositions(!onlyUserPositions)
+              }}
+              name='onlyUserPositions'
+              color='secondary'
+            />
+          }
+          label='Only your positions'
+          classes={{ label: classes.checkboxLabel }}
         />
         <Typography className={classes.subheader}>Set price range</Typography>
         <Grid container className={classes.inputs}>

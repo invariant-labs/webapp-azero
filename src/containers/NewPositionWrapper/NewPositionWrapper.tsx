@@ -144,7 +144,8 @@ export const NewPositionWrapper: React.FC<IProps> = ({
           isXtoY:
             allPools[poolIndex].poolKey.tokenX ===
             tokens[currentPairReversed === true ? tokenBIndex : tokenAIndex].assetAddress,
-          disableLoading: true
+          disableLoading: true,
+          onlyUserPositions
         })
       )
     }
@@ -245,7 +246,8 @@ export const NewPositionWrapper: React.FC<IProps> = ({
           positionsActions.getCurrentPlotTicks({
             poolKey: allPoolKeys[poolKey],
             isXtoY,
-            fetchTicksAndTickmap: true
+            fetchTicksAndTickmap: true,
+            onlyUserPositions
           })
         )
       }
@@ -529,12 +531,28 @@ export const NewPositionWrapper: React.FC<IProps> = ({
             isXtoY:
               allPools[poolIndex].poolKey.tokenX ===
               tokens[currentPairReversed === true ? tokenBIndex : tokenAIndex].assetAddress,
-            fetchTicksAndTickmap: true
+            fetchTicksAndTickmap: true,
+            onlyUserPositions
           })
         )
       }
     }
   }
+
+  const [onlyUserPositions, setOnlyUserPositions] = useState(true)
+
+  useEffect(() => {
+    if (poolKey !== '') {
+      dispatch(
+        positionsActions.getCurrentPlotTicks({
+          poolKey: allPoolKeys[poolKey],
+          isXtoY,
+          fetchTicksAndTickmap: true,
+          onlyUserPositions
+        })
+      )
+    }
+  }, [onlyUserPositions])
 
   return (
     <NewPosition
@@ -591,7 +609,8 @@ export const NewPositionWrapper: React.FC<IProps> = ({
             dispatch(
               positionsActions.getCurrentPlotTicks({
                 poolKey: allPoolKeys[poolKey],
-                isXtoY: allPoolKeys[poolKey].tokenX === tokens[tokenAIndex].assetAddress.toString()
+                isXtoY: allPoolKeys[poolKey].tokenX === tokens[tokenAIndex].assetAddress.toString(),
+                onlyUserPositions
               })
             )
           } else if (
@@ -657,7 +676,8 @@ export const NewPositionWrapper: React.FC<IProps> = ({
               poolKey: allPoolKeys[poolKey],
               isXtoY:
                 allPools[poolIndex].poolKey.tokenX ===
-                tokens[currentPairReversed === true ? tokenBIndex : tokenAIndex].assetAddress
+                tokens[currentPairReversed === true ? tokenBIndex : tokenAIndex].assetAddress,
+              onlyUserPositions
             })
           )
         }
@@ -709,6 +729,8 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       shouldNotUpdatePriceRange={shouldNotUpdatePriceRange}
       unblockUpdatePriceRange={unblockUpdatePriceRange}
       isGetLiquidityError={isGetLiquidityError}
+      onlyUserPositions={onlyUserPositions}
+      setOnlyUserPositions={setOnlyUserPositions}
     />
   )
 }

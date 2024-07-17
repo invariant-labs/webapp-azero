@@ -215,6 +215,11 @@ const useStyles = makeStyles()(theme => {
       color: colors.invariant.yellow,
       ...typography.caption2,
       textAlign: 'right'
+    },
+    checkboxLabel: {
+      color: colors.invariant.textGrey,
+      fontSize: 14,
+      fontWeight: 'normal'
     }
   }
 })

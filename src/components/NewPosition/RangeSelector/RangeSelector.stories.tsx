@@ -37,7 +37,9 @@ export const Primary: Story = {
     setShouldReversePlot: fn(),
     shouldReversePlot: false,
     shouldNotUpdatePriceRange: false,
-    unblockUpdatePriceRange: fn()
+    unblockUpdatePriceRange: fn(),
+    onlyUserPositions: false,
+    setOnlyUserPositions: fn()
   },
   render: args => {
     const [concentrationIndex, setConcentrationIndex] = useState(2)

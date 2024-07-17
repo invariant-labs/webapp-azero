@@ -58,6 +58,7 @@ export interface GetCurrentTicksData {
   isXtoY: boolean
   fetchTicksAndTickmap?: boolean
   disableLoading?: boolean
+  onlyUserPositions?: boolean
 }
 
 export interface ClosePositionData {
