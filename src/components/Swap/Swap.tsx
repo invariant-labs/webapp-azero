@@ -665,15 +665,13 @@ export const Swap: React.FC<ISwap> = ({
           slippage={+slippTolerance}
           isLoadingRate={getStateMessage() === 'Loading'}
         />
-        {tokenFromIndex !== null && tokenToIndex !== null && (
-          <TokensInfo
-            tokenFrom={tokens[tokenFromIndex]}
-            tokenTo={tokens[tokenToIndex]}
-            tokenToPrice={tokenToPriceData?.price}
-            tokenFromPrice={tokenFromPriceData?.price}
-            copyTokenAddressHandler={copyTokenAddressHandler}
-          />
-        )}
+        <TokensInfo
+          tokenFrom={tokens[tokenFromIndex!]}
+          tokenTo={tokens[tokenToIndex!]}
+          tokenToPrice={tokenToPriceData?.price}
+          tokenFromPrice={tokenFromPriceData?.price}
+          copyTokenAddressHandler={copyTokenAddressHandler}
+        />
         {walletStatus !== Status.Initialized && getStateMessage() !== 'Loading' ? (
           <ChangeWalletButton
             name='Connect wallet'

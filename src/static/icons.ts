@@ -23,6 +23,8 @@ import successIcon from './svg/successIcon.svg'
 import xIcon from './svg/xCircle.svg'
 import unknownToken from './svg/unknownToken.svg'
 import newTab from './svg/newTab.svg'
+import selectToken from './svg/selectToken.svg'
+import copyAddress from './svg/copy-address.svg'
 
 const icons: { [key: string]: string } = {
   clear: clearIcon,
@@ -49,7 +51,9 @@ const icons: { [key: string]: string } = {
   successIcon: successIcon,
   XIcon: xIcon,
   unknownToken: unknownToken,
-  newTab: newTab
+  newTab: newTab,
+  selectToken: selectToken,
+  copyAddress: copyAddress
 }
 
 export default icons

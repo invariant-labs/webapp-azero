@@ -1,7 +1,7 @@
 import { colors, typography } from '@static/theme'
 import { makeStyles } from 'tss-react/mui'
 
-export const useStyles = makeStyles()(theme => ({
+export const useWrapperStyles = makeStyles()(theme => ({
   wrapper: {
     margin: '0px 0 24px',
     borderRadius: 16,
@@ -11,12 +11,6 @@ export const useStyles = makeStyles()(theme => ({
     [theme.breakpoints.down('sm')]: {
       flexDirection: 'column'
     }
-  },
-  token: {
-    display: 'flex',
-    justifyContent: 'flex-start',
-    flex: 1,
-    width: '100%'
   },
   divider: {
     width: 1,
@@ -28,14 +22,23 @@ export const useStyles = makeStyles()(theme => ({
       width: '100%',
       margin: '8px 0'
     }
+  }
+}))
+
+export const useStyles = makeStyles<{ isToken: boolean }>()((_theme, { isToken }) => ({
+  token: {
+    display: 'flex',
+    justifyContent: 'flex-start',
+    flex: 1,
+    width: '100%'
   },
+
   tokenIcon: {
     minWidth: 30,
     maxWidth: 30,
     height: 30,
     marginRight: 8,
-    borderRadius: '50%',
-    boxShadow: '0px 0px 10px rgba(216, 255, 181, 0.5)'
+    borderRadius: '50%'
   },
   tokenName: {
     color: colors.white.main,
@@ -51,10 +54,12 @@ export const useStyles = makeStyles()(theme => ({
     display: 'flex',
     flexWrap: 'nowrap',
     alignItems: 'center',
+    columnGap: 4,
 
     '& p': {
       color: colors.invariant.textGrey,
-      ...typography.caption4
+      ...typography.caption4,
+      whiteSpace: 'nowrap'
     }
   },
   tokenDescription: {
@@ -63,7 +68,8 @@ export const useStyles = makeStyles()(theme => ({
     lineHeight: '16px',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
-    textOverflow: 'ellipsis'
+    textOverflow: 'ellipsis',
+    paddingRight: 24
   },
   price: {
     color: colors.invariant.text,
@@ -78,13 +84,11 @@ export const useStyles = makeStyles()(theme => ({
   },
   clipboardIcon: {
     display: 'inline-block',
-    width: 15,
-    height: 13,
-    marginLeft: 2,
+    height: 10,
     color: colors.invariant.textGrey,
-    cursor: 'pointer',
+    cursor: isToken ? 'pointer' : 'default',
     '&:hover': {
-      filter: 'brightness(1.2)'
+      filter: isToken ? 'brightness(1.2)' : 'none'
     }
   },
   link: {

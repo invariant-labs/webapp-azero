@@ -1,13 +1,13 @@
 import React from 'react'
 import { Grid } from '@mui/material'
-import { useStyles } from './styles'
+import { useWrapperStyles } from './styles'
 import SingleToken from './SingleToken/SingleToken'
 import { SwapToken } from '@store/selectors/wallet'
 import { VariantType } from 'notistack'
 
 interface IProps {
-  tokenFrom: SwapToken
-  tokenTo: SwapToken
+  tokenFrom?: SwapToken
+  tokenTo?: SwapToken
   tokenToPrice?: number
   tokenFromPrice?: number
   copyTokenAddressHandler: (message: string, variant: VariantType) => void
@@ -20,7 +20,7 @@ const TokensInfo: React.FC<IProps> = ({
   tokenFromPrice,
   copyTokenAddressHandler
 }) => {
-  const { classes } = useStyles()
+  const { classes } = useWrapperStyles()
 
   return (
     <Grid
@@ -31,13 +31,13 @@ const TokensInfo: React.FC<IProps> = ({
       alignItems='center'>
       <SingleToken
         token={tokenFrom}
-        tokenPrice={tokenToPrice}
+        tokenPrice={tokenFromPrice}
         copyTokenAddressHandler={copyTokenAddressHandler}
       />
       <div className={classes.divider} />
       <SingleToken
         token={tokenTo}
-        tokenPrice={tokenFromPrice}
+        tokenPrice={tokenToPrice}
         copyTokenAddressHandler={copyTokenAddressHandler}
       />
     </Grid>
