@@ -116,7 +116,7 @@ export const useStyles = makeStyles<{ hideBalance: boolean }>()(
       cursor: 'pointer',
       paddingBlock: 6,
       flexShrink: 1,
-      marginRight: 10,
+      marginRight: 6,
 
       '&:hover': {
         color: colors.white.main

@@ -127,62 +127,61 @@ export const DepositAmountInput: React.FC<IProps> = ({
             }}
           />
         </Grid>
-        {balanceValue && (
+
+        <Grid
+          container
+          justifyContent='space-between'
+          alignItems='center'
+          direction='row'
+          wrap='nowrap'>
           <Grid
+            className={classes.balance}
             container
-            justifyContent='space-between'
             alignItems='center'
-            direction='row'
-            wrap='nowrap'>
-            <Grid
-              className={classes.balance}
-              container
-              alignItems='center'
-              wrap='nowrap'
+            wrap='nowrap'
+            onClick={onMaxClick}>
+            <Typography className={classes.caption2}>
+              Balance:{' '}
+              {isBalanceLoading ? (
+                <img src={loadingAnimation} className={classes.loadingBalance} alt='loading' />
+              ) : balanceValue ? (
+                formatNumber(balanceValue || 0)
+              ) : (
+                <span style={{ marginLeft: '8px' }}>-</span>
+              )}{' '}
+              {currency}
+            </Typography>
+            <Button
+              className={
+                currency ? classes.maxButton : `${classes.maxButton} ${classes.maxButtonNotActive}`
+              }
               onClick={onMaxClick}>
-              <Typography className={classes.caption2}>
-                Balance:{' '}
-                {isBalanceLoading ? (
-                  <img src={loadingAnimation} className={classes.loadingBalance} alt='loading' />
-                ) : (
-                  formatNumber(balanceValue || 0)
-                )}{' '}
-                {currency}
-              </Typography>
-              <Button
-                className={
-                  currency
-                    ? classes.maxButton
-                    : `${classes.maxButton} ${classes.maxButtonNotActive}`
-                }
-                onClick={onMaxClick}>
-                Max
-              </Button>
-            </Grid>
-            <Grid className={classes.percentages} container alignItems='center' wrap='nowrap'>
-              {currency ? (
-                priceLoading ? (
-                  <img src={loadingAnimation} className={classes.loading} alt='loading' />
-                ) : tokenPrice ? (
-                  <Typography className={classes.caption2}>
-                    ~${formatNumber(usdBalance.toFixed(2))}
-                  </Typography>
-                ) : (
-                  <Tooltip
-                    title='Cannot fetch price of token'
-                    placement='bottom'
-                    classes={{
-                      tooltip: classes.tooltip
-                    }}>
-                    <Typography className={classes.noData}>
-                      <span className={classes.noDataIcon}>?</span>No data
-                    </Typography>
-                  </Tooltip>
-                )
-              ) : null}
-            </Grid>
+              Max
+            </Button>
           </Grid>
-        )}
+          <Grid className={classes.percentages} container alignItems='center' wrap='nowrap'>
+            {currency ? (
+              priceLoading ? (
+                <img src={loadingAnimation} className={classes.loading} alt='loading' />
+              ) : tokenPrice ? (
+                <Typography className={classes.caption2}>
+                  ~${formatNumber(usdBalance.toFixed(2))}
+                </Typography>
+              ) : (
+                <Tooltip
+                  title='Cannot fetch price of token'
+                  placement='bottom'
+                  classes={{
+                    tooltip: classes.tooltip
+                  }}>
+                  <Typography className={classes.noData}>
+                    <span className={classes.noDataIcon}>?</span>No data
+                  </Typography>
+                </Tooltip>
+              )
+            ) : null}
+          </Grid>
+        </Grid>
       </div>
       {blocked && (
         <>
