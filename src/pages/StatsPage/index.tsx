@@ -1,6 +1,6 @@
 import { Grid } from '@mui/material'
 import { useStyles } from './styles'
-import workInProgress from '../../static/png/work-in-progress.png'
+// import workInProgress from '../../static/png/work-in-progress.png'
 import WrappedStats from '@containers/WrappedStats/WrappedStats'
 // import WrappedStats from '@containers/WrappedStats/WrappedStats'
 
