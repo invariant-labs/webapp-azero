@@ -124,6 +124,7 @@ const Slippage: React.FC<Props> = ({
           <Grid container gap='9px'>
             {slippageTiers.map((tier, index) => (
               <Button
+                key={tier}
                 className={classNames(classes.slippagePercentageButton, {
                   [classes.slippagePercentageButtonActive]: index === tierIndex
                 })}

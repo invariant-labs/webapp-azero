@@ -424,11 +424,11 @@ export const Swap: React.FC<ISwap> = ({
       <Grid container className={classes.header}>
         <Typography component='h1'>Swap tokens</Typography>
         <Box className={classes.swapControls}>
-          <Box className={classes.slippageButton} onClick={() => handleClickSettings}>
+          <Button className={classes.slippageButton} onClick={e => handleClickSettings(e)}>
             <p>
               Slippage: <span className={classes.slippageAmount}>{slippTolerance}%</span>
             </p>
-          </Box>
+          </Button>
           <Button
             onClick={handleRefresh}
             className={classes.refreshIconBtn}

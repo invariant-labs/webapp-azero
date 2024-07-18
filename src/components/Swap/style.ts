@@ -283,6 +283,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     userSelect: 'none',
     display: 'flex',
     alignItems: 'center',
+    textTransform: 'none',
 
     '&:hover': {
       background: colors.invariant.light,
