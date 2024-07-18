@@ -258,6 +258,7 @@ export function* fetchBalances(tokens: string[]): Generator {
 export function* handleReconnect(): Generator {
   yield* call(handleDisconnect)
   yield* call(openWalletSelectorModal)
+  yield* call(handleConnect, { type: actions.connect.type, payload: false })
 }
 
 export function* handleGetBalances(action: PayloadAction<string[]>): Generator {
