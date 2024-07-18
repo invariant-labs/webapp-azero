@@ -7,7 +7,7 @@ import { useStyles } from './style'
 import { TimeData } from '@store/reducers/stats'
 import { Grid, Typography, useMediaQuery } from '@mui/material'
 import { Box } from '@mui/system'
-import { formatNumbers, showPrefix } from '@utils/utils'
+import { formatNumber, formatNumbers, showPrefix } from '@utils/utils'
 
 interface StatsInterface {
   percentVolume: number
@@ -28,7 +28,7 @@ const Volume: React.FC<StatsInterface> = ({ percentVolume, volume, data, classNa
       ticks: { line: { stroke: colors.invariant.component }, text: { fill: '#A9B6BF' } },
       legend: { text: { stroke: 'transparent' } }
     },
-    grid: { line: { stroke: 'transparent' } }
+    grid: { line: { stroke: colors.invariant.light } }
   }
 
   const isLower = percentVolume < 0
@@ -62,7 +62,7 @@ const Volume: React.FC<StatsInterface> = ({ percentVolume, volume, data, classNa
       </Box>
       <div className={classes.barContainer}>
         <ResponsiveBar
-          margin={{ top: 30, bottom: 30, left: 0 }}
+          margin={{ top: 30, bottom: 30, left: 30 }}
           data={data as Array<{ timestamp: number; value: number }>}
           keys={['value']}
           indexBy='timestamp'
@@ -84,10 +84,20 @@ const Volume: React.FC<StatsInterface> = ({ percentVolume, volume, data, classNa
                 : ''
             }
           }}
+          axisLeft={{
+            tickSize: 0,
+            tickPadding: 2,
+            tickRotation: 0,
+            format: volume => {
+              return formatNumber(volume, true)
+            },
+            tickValues: 5
+          }}
+          gridYValues={5}
           theme={Theme}
           groupMode='grouped'
           enableLabel={false}
-          enableGridY={false}
+          enableGridY={true}
           innerPadding={isXsDown ? 1 : 2}
           isInteractive
           padding={0.03}

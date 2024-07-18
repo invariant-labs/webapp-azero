@@ -7,6 +7,7 @@ export const useStyles = makeStyles()(() => ({
     color: 'white',
     borderRadius: 24,
     paddingBlock: 24,
+    paddingLeft: 24,
     boxSizing: 'border-box'
   },
   liquidityContainer: {
