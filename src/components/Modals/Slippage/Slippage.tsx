@@ -157,9 +157,18 @@ const Slippage: React.FC<Props> = ({
                   <button
                     className={classes.detailsInfoBtn}
                     onClick={() => {
-                      setSlippTolerance(defaultSlippage)
+                      const tierIndex = slippageTiers.findIndex(
+                        tier => String(Number(tier).toFixed(2)) === defaultSlippage
+                      )
+                      setTierIndex(tierIndex)
+
+                      if (tierIndex !== -1) {
+                        setSlippTolerance('')
+                      } else {
+                        setSlippTolerance(defaultSlippage)
+                      }
+
                       setSlippage(defaultSlippage)
-                      setTierIndex(-1)
                     }}>
                     Auto
                   </button>
