@@ -42,7 +42,7 @@ export const DepositAmountInput: React.FC<IProps> = ({
   priceLoading = false,
   isBalanceLoading
 }) => {
-  const { classes } = useStyles({ hideBalance: !balanceValue })
+  const { classes } = useStyles()
 
   const inputRef = useRef<HTMLInputElement>(null)
 
