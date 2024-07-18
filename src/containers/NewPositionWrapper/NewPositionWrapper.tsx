@@ -539,7 +539,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     }
   }
 
-  const [onlyUserPositions, setOnlyUserPositions] = useState(true)
+  const [onlyUserPositions, setOnlyUserPositions] = useState(false)
 
   useEffect(() => {
     if (poolKey !== '') {
