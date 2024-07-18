@@ -1,4 +1,4 @@
-import { Pool, Position, sendTx } from '@invariant-labs/a0-sdk'
+import { Invariant, Pool, Position, PSP22, sendTx } from '@invariant-labs/a0-sdk'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
 import {
@@ -46,6 +46,26 @@ import { SubmittableExtrinsic } from '@polkadot/api/promise/types'
 import { calculateTokenAmountsWithSlippage } from '@invariant-labs/a0-sdk/target/utils'
 import { positionsList } from '@store/selectors/positions'
 import { getApi, getInvariant, getPSP22, getWrappedAZERO } from './connection'
+
+export function getWithdrawAllWAZEROTxs(
+  invariant: Invariant,
+  psp22: PSP22,
+  invariantAddress: string,
+  wazeroAddress: string
+): SubmittableExtrinsic[] {
+  const txs: SubmittableExtrinsic[] = []
+
+  const approveTx = psp22.approveTx(invariantAddress, U128MAX, wazeroAddress, PSP22_APPROVE_OPTIONS)
+  txs.push(approveTx)
+
+  const unwrapTx = invariant.withdrawAllWAZEROTx(wazeroAddress, INVARIANT_WITHDRAW_ALL_WAZERO)
+  txs.push(unwrapTx)
+
+  const resetApproveTx = psp22.approveTx(invariantAddress, 0n, wazeroAddress, PSP22_APPROVE_OPTIONS)
+  txs.push(resetApproveTx)
+
+  return txs
+}
 
 function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator {
   const {
@@ -139,14 +159,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       (tokenX === wazeroAddress && tokenXAmount !== 0n) ||
       (tokenY === wazeroAddress && tokenYAmount !== 0n)
     ) {
-      const approveTx = psp22.approveTx(invAddress, U128MAX, wazeroAddress, PSP22_APPROVE_OPTIONS)
-      txs.push(approveTx)
-
-      const unwrapTx = invariant.withdrawAllWAZEROTx(wazeroAddress, INVARIANT_WITHDRAW_ALL_WAZERO)
-      txs.push(unwrapTx)
-
-      const resetApproveTx = psp22.approveTx(invAddress, 0n, wazeroAddress, PSP22_APPROVE_OPTIONS)
-      txs.push(resetApproveTx)
+      txs.push(getWithdrawAllWAZEROTxs(invariant, psp22, invAddress, wazeroAddress))
     }
 
     const batchedTx = api.tx.utility.batchAll(txs)
@@ -356,14 +369,7 @@ export function* handleClaimFee(action: PayloadAction<HandleClaimFee>) {
     txs.push(claimTx)
 
     if (addressTokenX === wazeroAddress || addressTokenY === wazeroAddress) {
-      const approveTx = psp22.approveTx(invAddress, U128MAX, wazeroAddress, PSP22_APPROVE_OPTIONS)
-      txs.push(approveTx)
-
-      const unwrapTx = invariant.withdrawAllWAZEROTx(wazeroAddress, INVARIANT_WITHDRAW_ALL_WAZERO)
-      txs.push(unwrapTx)
-
-      const resetApproveTx = psp22.approveTx(invAddress, 0n, wazeroAddress, PSP22_APPROVE_OPTIONS)
-      txs.push(resetApproveTx)
+      txs.push(getWithdrawAllWAZEROTxs(invariant, psp22, invAddress, wazeroAddress))
     }
 
     const batchedTx = api.tx.utility.batchAll(txs)
@@ -508,14 +514,7 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
     txs.push(removePositionTx)
 
     if (addressTokenX === wazeroAddress || addressTokenY === wazeroAddress) {
-      const approveTx = psp22.approveTx(invAddress, U128MAX, wazeroAddress)
-      txs.push(approveTx)
-
-      const unwrapTx = invariant.withdrawAllWAZEROTx(wazeroAddress)
-      txs.push(unwrapTx)
-
-      const resetApproveTx = psp22.approveTx(invAddress, 0n, wazeroAddress)
-      txs.push(resetApproveTx)
+      txs.push(getWithdrawAllWAZEROTxs(invariant, psp22, invAddress, wazeroAddress))
     }
 
     const batchedTx = api.tx.utility.batchAll(txs)

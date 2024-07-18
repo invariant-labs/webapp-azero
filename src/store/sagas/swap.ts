@@ -1,5 +1,4 @@
 import {
-  TESTNET_WAZERO_ADDRESS,
   calculatePriceImpact,
   calculateSqrtPriceAfterSlippage,
   sendTx,
@@ -15,7 +14,6 @@ import { PayloadAction } from '@reduxjs/toolkit'
 import {
   ErrorMessage,
   INVARIANT_SWAP_OPTIONS,
-  INVARIANT_WITHDRAW_ALL_WAZERO,
   PSP22_APPROVE_OPTIONS,
   U128MAX,
   WAZERO_DEPOSIT_OPTIONS,
@@ -43,6 +41,7 @@ import { all, call, put, select, spawn, takeEvery } from 'typed-redux-saga'
 import { fetchBalances } from './wallet'
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types'
 import { getApi, getInvariant, getPSP22, getWrappedAZERO } from './connection'
+import { getWithdrawAllWAZEROTxs } from './positions'
 
 export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generator {
   const {
@@ -95,10 +94,7 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
       ? calculateAmountInWithSlippage(amountOut, sqrtPriceLimit, xToY, poolKey.feeTier.fee)
       : amountIn
 
-    if (
-      (xToY && poolKey.tokenX === TESTNET_WAZERO_ADDRESS) ||
-      (!xToY && poolKey.tokenY === TESTNET_WAZERO_ADDRESS)
-    ) {
+    if ((xToY && poolKey.tokenX === wazeroAddress) || (!xToY && poolKey.tokenY === wazeroAddress)) {
       const azeroBalance = yield* select(balance)
       const azeroAmountInWithSlippage =
         azeroBalance > calculatedAmountIn ? calculatedAmountIn : azeroBalance
@@ -106,23 +102,14 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
       txs.push(depositTx)
     }
 
-    if (xToY) {
-      const approveTx = psp22.approveTx(
-        invAddress,
-        calculatedAmountIn,
-        tokenX.address.toString(),
-        PSP22_APPROVE_OPTIONS
-      )
-      txs.push(approveTx)
-    } else {
-      const approveTx = psp22.approveTx(
-        invAddress,
-        calculatedAmountIn,
-        tokenY.address.toString(),
-        PSP22_APPROVE_OPTIONS
-      )
-      txs.push(approveTx)
-    }
+    const tokenAddress = xToY ? tokenX.address.toString() : tokenY.address.toString()
+    const approveTx = psp22.approveTx(
+      invAddress,
+      calculatedAmountIn,
+      tokenAddress,
+      PSP22_APPROVE_OPTIONS
+    )
+    txs.push(approveTx)
 
     const swapTx = invariant.swapWithSlippageTx(
       poolKey,
@@ -135,27 +122,14 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
     )
     txs.push(swapTx)
 
-    if (
-      (!xToY && poolKey.tokenX === wazeroAddress) ||
-      (xToY && poolKey.tokenY === TESTNET_WAZERO_ADDRESS)
-    ) {
+    if ((!xToY && poolKey.tokenX === wazeroAddress) || (xToY && poolKey.tokenY === wazeroAddress)) {
       const withdrawTx = wazero.withdrawTx(amountOut, WAZERO_WITHDRAW_OPTIONS)
       txs.push(withdrawTx)
     }
 
-    const approveTx = psp22.approveTx(
-      invAddress,
-      U128MAX,
-      TESTNET_WAZERO_ADDRESS,
-      PSP22_APPROVE_OPTIONS
-    )
-    txs.push(approveTx)
-
-    const unwrapTx = invariant.withdrawAllWAZEROTx(
-      TESTNET_WAZERO_ADDRESS,
-      INVARIANT_WITHDRAW_ALL_WAZERO
-    )
-    txs.push(unwrapTx)
+    if (poolKey.tokenX === wazeroAddress || poolKey.tokenX === wazeroAddress) {
+      txs.push(getWithdrawAllWAZEROTxs(invariant, psp22, invAddress, wazeroAddress))
+    }
 
     const batchedTx = api.tx.utility.batchAll(txs)
 
