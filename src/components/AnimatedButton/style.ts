@@ -1,7 +1,38 @@
 import { colors, typography } from '@static/theme'
 import { makeStyles } from 'tss-react/mui'
+import { keyframes } from 'tss-react'
 
 const useStyles = makeStyles()(() => {
+  const slideStart = keyframes`
+    0% {
+         transform: translateX(-50%)
+    }
+    100% {
+      transform: translateX(0)
+    }
+  `
+  const slideEndSuccess = keyframes`
+    0% {
+      transform: translateX(-50%)
+    }
+    80% {
+      transform: translateX(-35%)
+    }
+    100% {
+      transform: translateX(0)
+    }
+  `
+  const slideEndFail = keyframes`
+    0% {
+      transform: translateX(50%)
+    }
+    80% {
+      transform: translateX(35%)
+    }
+    100% {
+      transform: translateX(0)
+    }
+  `
   return {
     button: {
       height: 44,
@@ -34,45 +65,13 @@ const useStyles = makeStyles()(() => {
         background: `${colors.invariant.component} !important`
       }
     },
-    '@keyframes slide-start': {
-      '0%': {
-        left: '-100%'
-      },
-      '100%': {
-        left: '-50%'
-      }
-    },
-    '@keyframes slide-end-success': {
-      '0%': {
-        left: '-50%'
-      },
-      '80%': {
-        left: '-35%'
-      },
-      '100%': {
-        left: 0
-      }
-    },
-    '@keyframes slide-end-fail': {
-      '0%': {
-        left: '-50%'
-      },
-      '80%': {
-        left: '-65%'
-      },
-      '100%': {
-        left: '-100%'
-      }
-    },
     background: {
       width: '100%',
       height: '100%',
       position: 'absolute',
       padding: 0,
       zIndex: 1,
-      top: 0,
-      left: '-100%',
-      backgroundColor: colors.invariant.pink
+      top: 0
     },
     backgroundRelease: {
       position: 'absolute',
@@ -82,29 +81,25 @@ const useStyles = makeStyles()(() => {
       padding: 0,
       zIndex: 1,
       top: '0%',
-      animation: '$slide-start .4s ease-in',
-      transition: 'all .2s',
-      backgroundColor: colors.invariant.pink
+      animation: `${slideStart} .4s ease-in`
     },
     backgroundApprovedWithSuccess: {
       top: 0,
-      left: '-50%',
+      left: '0%',
       width: '100%',
       height: '100%',
       padding: 0,
       position: 'absolute',
-      animation: '$slide-end-success 1.5s',
-      animationFillMode: 'forwards'
+      animation: `${slideEndSuccess} 1.5s ease-out`
     },
     backgroundApprovedWithFail: {
       top: 0,
-      left: '-50%',
+      left: '-100%',
       width: '100%',
       height: '100%',
       padding: 0,
       position: 'absolute',
-      animation: '$slide-end-fail 1.5s',
-      animationFillMode: 'forwards'
+      animation: `${slideEndFail} 1.5s ease-out`
     },
     buttonContent: {
       position: 'relative',

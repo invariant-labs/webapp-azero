@@ -31,6 +31,8 @@ export const Primary: Story = {
     rpc: 'https://rpc.testnet.moonbeam.network',
     typeOfNetwork: Network.Testnet,
     walletConnected: true,
-    onFaucet: fn()
+    onFaucet: fn(),
+    onCopyAddress: fn(),
+    onChangeWallet: fn()
   }
 }
