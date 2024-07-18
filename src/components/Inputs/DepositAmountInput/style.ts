@@ -96,7 +96,8 @@ export const useStyles = makeStyles<{ hideBalance: boolean }>()(
     noCurrencyText: {
       ...typography.body3,
       color: colors.white.main,
-      cursor: 'default'
+      cursor: 'default',
+      transform: 'scaleX(2)'
     },
     balance: {
       height: 17,
