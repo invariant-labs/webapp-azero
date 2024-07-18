@@ -10,6 +10,7 @@ import { getAlephZeroWallet } from '@utils/web3/wallet'
 import React, { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
+import { actions as snackbarsActions } from '@store/reducers/snackbars'
 
 export const HeaderWrapper: React.FC = () => {
   const dispatch = useDispatch()
@@ -69,6 +70,20 @@ export const HeaderWrapper: React.FC = () => {
       typeOfNetwork={currentNetwork}
       rpc={currentRpc}
       defaultTestnetRPC={defaultTestnetRPC}
+      onCopyAddress={() => {
+        navigator.clipboard.writeText(walletAddress)
+
+        dispatch(
+          snackbarsActions.add({
+            message: 'Successfully copied wallet address.',
+            variant: 'success',
+            persist: false
+          })
+        )
+      }}
+      onChangeWallet={() => {
+        dispatch(walletActions.reconnect())
+      }}
     />
   )
 }
