@@ -77,7 +77,8 @@ const walletSlice = createSlice({
     },
     airdrop() {},
     connect() {},
-    disconnect() {}
+    disconnect() {},
+    reconnect() {}
   }
 })
 
