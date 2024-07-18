@@ -1,10 +1,11 @@
 import React from 'react'
 import { theme } from '@static/theme'
 import { useStyles } from './style'
-import { Box, Grid, Typography, useMediaQuery } from '@mui/material'
-import { formatNumbers, showPrefix } from '@utils/utils'
+import { Box, Button, Grid, Typography, useMediaQuery } from '@mui/material'
+import { formatNumber, formatNumbers, showPrefix } from '@utils/utils'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
+import { useNavigate } from 'react-router-dom'
 
 export enum SortType {
   NAME_ASC,
@@ -62,8 +63,12 @@ const PoolListItem: React.FC<IProps> = ({
 }) => {
   const { classes } = useStyles()
 
+  const navigate = useNavigate()
   const isXs = useMediaQuery(theme.breakpoints.down('xs'))
 
+  const handleOpenPosition = () => {
+    navigate(`/newPosition/${symbolFrom}/${symbolTo}/0_01`)
+  }
   return (
     <Grid>
       {displayType === 'token' ? (
@@ -126,6 +131,9 @@ const PoolListItem: React.FC<IProps> = ({
           <Typography>{fee}%</Typography>
           <Typography>{`$${formatNumbers()(volume.toString())}${showPrefix(volume)}`}</Typography>
           <Typography>{`$${formatNumbers()(TVL.toString())}${showPrefix(TVL)}`}</Typography>
+          <Button className={classes.openPosition} onClick={handleOpenPosition}>
+            Open position
+          </Button>
         </Grid>
       ) : (
         <Grid container classes={{ container: classes.container, root: classes.header }}>
@@ -216,6 +224,7 @@ const PoolListItem: React.FC<IProps> = ({
               <ArrowDropDownIcon className={classes.icon} />
             ) : null}
           </Typography>
+          <Typography>Action</Typography>
         </Grid>
       )}
     </Grid>

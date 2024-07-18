@@ -5,7 +5,7 @@ export const useStyles = makeStyles()(() => ({
   container: {
     color: colors.white.main,
     display: 'grid',
-    gridTemplateColumns: '5% 45% 15% 20% auto',
+    gridTemplateColumns: '5% auto 15% 15%  15% 140px',
     padding: '18px 0',
 
     backgroundColor: colors.invariant.component,
@@ -108,5 +108,19 @@ export const useStyles = makeStyles()(() => ({
   liquidityDesc: {
     color: colors.invariant.text,
     ...typography.caption1
+  },
+  openPosition: {
+    width: 140,
+    height: 32,
+    background: colors.invariant.greenLinearGradient,
+    ...typography.body1,
+    color: colors.invariant.black,
+    textTransform: 'none',
+    borderRadius: 10,
+    transition: 'filter 0.3s linear',
+
+    '&:hover': {
+      filter: 'brightness(1.15)'
+    }
   }
 }))
