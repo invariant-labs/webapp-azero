@@ -110,9 +110,8 @@ const useStyles = makeStyles()(theme => {
       alignItems: 'center'
     },
     sliderWrapper: {
-      marginTop: 40,
+      marginTop: 74,
       paddingInline: 8,
-      height: 77,
       position: 'relative'
     },
     warningWrapper: {
