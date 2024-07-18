@@ -1,7 +1,7 @@
 import React from 'react'
 import { ResponsiveBar } from '@nivo/bar'
 import classNames from 'classnames'
-import { colors, theme } from '@static/theme'
+import { colors, theme, typography } from '@static/theme'
 import { linearGradientDef } from '@nivo/core'
 import { useStyles } from './style'
 import { TimeData } from '@store/reducers/stats'
@@ -88,10 +88,18 @@ const Volume: React.FC<StatsInterface> = ({ percentVolume, volume, data, classNa
             tickSize: 0,
             tickPadding: 2,
             tickRotation: 0,
-            format: volume => {
-              return formatNumber(volume, true)
-            },
-            tickValues: 5
+            tickValues: 5,
+            renderTick: ({ x, y, value }) => (
+              <g transform={`translate(${x - 30},${y + 4})`}>
+                {' '}
+                <text
+                  style={{ fill: colors.invariant.textGrey, ...typography.tiny2 }}
+                  textAnchor='start'
+                  dominantBaseline='center'>
+                  {formatNumber(value, true)}
+                </text>
+              </g>
+            )
           }}
           gridYValues={5}
           theme={Theme}

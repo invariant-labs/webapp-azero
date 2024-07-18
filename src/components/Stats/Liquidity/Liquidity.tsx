@@ -2,7 +2,7 @@ import React from 'react'
 import { ResponsiveLine } from '@nivo/line'
 import { linearGradientDef } from '@nivo/core'
 import classNames from 'classnames'
-import { colors } from '@static/theme'
+import { colors, typography } from '@static/theme'
 import { useStyles } from './style'
 import { TimeData } from '@store/reducers/stats'
 import { Grid, Typography } from '@mui/material'
@@ -85,10 +85,18 @@ const Liquidity: React.FC<LiquidityInterface> = ({
             tickSize: 0,
             tickPadding: 2,
             tickRotation: 0,
-            format: volume => {
-              return formatNumber(volume, true)
-            },
-            tickValues: 5
+            tickValues: 5,
+            renderTick: ({ x, y, value }) => (
+              <g transform={`translate(${x - 30},${y + 4})`}>
+                {' '}
+                <text
+                  style={{ fill: colors.invariant.textGrey, ...typography.tiny2 }}
+                  textAnchor='start'
+                  dominantBaseline='center'>
+                  {formatNumber(value, true)}
+                </text>
+              </g>
+            )
           }}
           gridYValues={5}
           legends={[]}

@@ -46,14 +46,13 @@ export const useStyles = makeStyles()(() => ({
     minWidth: 'auto'
   },
   volumeStatusColor: {
-    height: 20,
     minWidth: 'auto',
     padding: '5px 15px 5px 15px',
     borderRadius: 6
   },
 
   volumeStatusHeader: {
-    ...typography.body1,
+    ...typography.caption3,
     filter: 'brightness(1.2)'
   },
 
