@@ -92,7 +92,13 @@ export const useStyles = makeStyles<{ isToken: boolean }>()((_theme, { isToken }
     }
   },
   link: {
-    transform: 'translateY(-2px)',
+    maxHeight: 8,
+
+    '& img': {
+      height: 8,
+      width: 8,
+      transform: 'translateY(-12px)'
+    },
     '&:hover': {
       filter: 'brightness(1.2)'
     }
