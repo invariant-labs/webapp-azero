@@ -2,7 +2,7 @@ import { Theme } from '@mui/material'
 import { colors, typography } from '@static/theme'
 import { makeStyles } from 'tss-react/mui'
 
-export const useStyles = makeStyles()((theme: Theme) => ({
+export const useStyles = makeStyles<{ isSelected: boolean }>()((theme: Theme, { isSelected }) => ({
   wrapper: {
     position: 'relative',
     marginBottom: 16,
@@ -100,7 +100,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   },
   balance: {
     height: 17,
-    cursor: 'pointer',
+    cursor: isSelected ? 'pointer' : '',
     flexShrink: 1,
     marginRight: 10
   },
@@ -112,13 +112,13 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     textOverflow: 'ellipsis',
     display: 'flex',
     alignItems: 'center',
-    cursor: 'pointer',
+
     paddingBlock: 6,
     flexShrink: 1,
     marginRight: 6,
 
     '&:hover': {
-      color: colors.white.main
+      color: isSelected ? colors.white.main : ''
     }
   },
   maxButton: {
