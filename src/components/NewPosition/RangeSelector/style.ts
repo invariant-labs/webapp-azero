@@ -101,7 +101,7 @@ const useStyles = makeStyles()(theme => {
       zIndex: 99
     },
     buttons: {
-      marginTop: 40,
+      marginTop: 38,
       width: '100%',
       flexDirection: 'row',
       gap: 16,

@@ -71,6 +71,7 @@ const useStyles = makeStyles()(theme => {
       }
     },
     buttons: {
+      marginTop: 38,
       width: '100%',
       flexDirection: 'row',
       gap: 16,
