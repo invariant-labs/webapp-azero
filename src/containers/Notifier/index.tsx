@@ -4,7 +4,6 @@ import { useSnackbar } from 'notistack'
 import { snackbarsSelectors } from '@store/selectors/snackbars'
 import { actions } from '@store/reducers/snackbars'
 import useStyles from './style'
-import icons from '@static/icons'
 
 let displayed: string[] = []
 
