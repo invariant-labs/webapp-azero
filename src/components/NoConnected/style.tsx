@@ -2,46 +2,23 @@ import { colors, typography } from '@static/theme'
 import { makeStyles } from 'tss-react/mui'
 
 export const useStyles = makeStyles()(() => ({
-  container: {
-    width: '100%',
-    height: '370px',
-    position: 'absolute',
-    zIndex: 14
+  wrapper: {
+    width: 300
   },
-  root: {
-    zIndex: 10,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingBottom: 25,
-    width: '100%',
-    height: '100%',
-    p: {
-      textAlign: 'center'
-    }
-  },
-  img: {
-    paddingBottom: 25
-  },
-  blur: {
-    width: '100%',
-    height: '370px',
-    backgroundColor: 'rgba(12, 11, 13, 0.8)',
-    position: 'absolute',
-    zIndex: 13,
-    borderRadius: 10
+  image: {
+    height: 75
   },
   desc: {
-    ...typography.body2,
-    fontWeight: 500,
-    lineHeight: '20px',
-    color: colors.invariant.lightHover
+    maxWidth: 170,
+    marginTop: 24,
+    color: colors.invariant.textGrey,
+    fontWeight: 400,
+    textAlign: 'center'
   },
   button: {
     height: 40,
     width: 200,
-    marginTop: 20,
+    marginTop: 56,
     color: colors.invariant.componentBcg,
     ...typography.body1,
     textTransform: 'none',
@@ -52,5 +29,20 @@ export const useStyles = makeStyles()(() => ({
       background: colors.invariant.pinkLinearGradient,
       boxShadow: '0px 0px 16px rgba(239, 132, 245, 0.35)'
     }
+  },
+  container: {
+    width: '100%',
+    height: 370,
+    borderRadius: 24,
+    backgroundColor: colors.invariant.black
+  },
+  root: {
+    width: 'fit-content',
+    height: '100%',
+    margin: '0 auto',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 }))

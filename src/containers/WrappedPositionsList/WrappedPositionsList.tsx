@@ -159,7 +159,7 @@ export const WrappedPositionsList: React.FC = () => {
       itemsPerPage={POSITIONS_PER_PAGE}
       noConnectedBlockerProps={{
         onConnect: openWalletSelectorModal,
-        descCustomText: 'You have no positions.'
+        descCustomText: 'Wallet is not connected. No liquidity positions to show.'
       }}
       pageChanged={page => {
         const index = positionListPageToQueryPage(page)
