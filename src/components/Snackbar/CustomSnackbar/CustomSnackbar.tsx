@@ -40,74 +40,51 @@ const CustomSnackbar = React.forwardRef<HTMLDivElement, CustomContentProps>(
     const icon = iconVariant[variant as keyof typeof iconVariant]
     const color = variantColors[variant] || variantColors.default
 
+    const Content = () => {
+      return (
+        <>
+          <Grid
+            container
+            alignItems='center'
+            ml={2}
+            flexDirection='row'
+            wrap='nowrap'
+            flexGrow={1}
+            style={{ width: 'fix-content' }}>
+            <Grid ml={1}>
+              {variant === 'pending' ? (
+                <StyledCircularProgress size={13} />
+              ) : (
+                <StyledIcon style={{ color }}>{icon}</StyledIcon>
+              )}
+            </Grid>
+            <StyledTitle>{message}</StyledTitle>
+          </Grid>
+          {txid && (
+            <Grid style={{ display: 'inline-flex' }}>
+              <StyledDetails
+                onClick={() => {
+                  window.open(`https://alephzero-testnet.subscan.io/extrinsic/${txid}`, '_blank')
+                }}>
+                Details
+              </StyledDetails>
+              <StyledCloseButton onClick={handleDismiss}>
+                <img width={30} src={icons.closeIcon} alt='Close'></img>
+              </StyledCloseButton>
+            </Grid>
+          )}
+        </>
+      )
+    }
+
     return (
       <StyledSnackbarContent ref={ref} role='alert'>
         <StyledBackground />
         <StyledHideContainer>
-          <Grid
-            container
-            alignItems='center'
-            ml={2}
-            flexDirection='row'
-            wrap='nowrap'
-            flexGrow={1}
-            style={{ width: 'fix-content' }}>
-            <Grid ml={1}>
-              {variant === 'pending' ? (
-                <StyledCircularProgress size={13} />
-              ) : (
-                <StyledIcon style={{ color }}>{icon}</StyledIcon>
-              )}
-            </Grid>
-            <StyledTitle>{message}</StyledTitle>
-          </Grid>
-
-          {txid && (
-            <Grid style={{ display: 'inline-flex' }}>
-              <StyledDetails
-                onClick={() => {
-                  window.open(`https://alephzero-testnet.subscan.io/extrinsic/${txid}`, '_blank')
-                }}>
-                Details
-              </StyledDetails>
-              <StyledCloseButton onClick={handleDismiss}>
-                <img width={30} src={icons.closeIcon} alt='Close'></img>
-              </StyledCloseButton>
-            </Grid>
-          )}
+          <Content />
         </StyledHideContainer>
         <StyledContainer>
-          <Grid
-            container
-            alignItems='center'
-            ml={2}
-            flexDirection='row'
-            wrap='nowrap'
-            flexGrow={1}
-            style={{ width: 'fix-content' }}>
-            <Grid ml={1}>
-              {variant === 'pending' ? (
-                <StyledCircularProgress size={13} />
-              ) : (
-                <StyledIcon style={{ color }}>{icon}</StyledIcon>
-              )}
-            </Grid>
-            <StyledTitle>{message}</StyledTitle>
-          </Grid>
-
-          {txid && (
-            <Grid style={{ display: 'inline-flex' }}>
-              <StyledDetails
-                onClick={() => {
-                  window.open(`https://alephzero-testnet.subscan.io/extrinsic/${txid}`, '_blank')
-                }}>
-                Details
-              </StyledDetails>
-              <StyledCloseButton onClick={handleDismiss}>
-                <img width={30} src={icons.closeIcon} alt='Close'></img>
-              </StyledCloseButton>
-            </Grid>
-          )}
+          <Content />
         </StyledContainer>
       </StyledSnackbarContent>
     )
