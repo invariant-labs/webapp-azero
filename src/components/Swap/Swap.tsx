@@ -10,7 +10,11 @@ import infoIcon from '@static/svg/info.svg'
 import refreshIcon from '@static/svg/refresh.svg'
 import settingIcon from '@static/svg/settings.svg'
 import SwapArrows from '@static/svg/swap-arrows.svg'
-import { DEFAULT_TOKEN_DECIMAL, REFRESHER_INTERVAL } from '@store/consts/static'
+import {
+  DEFAULT_SWAP_SLIPPAGE,
+  DEFAULT_TOKEN_DECIMAL,
+  REFRESHER_INTERVAL
+} from '@store/consts/static'
 import { convertBalanceToBigint, printBigint, stringToFixed, trimLeadingZeros } from '@utils/utils'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { Swap as SwapData } from '@store/reducers/swap'
@@ -424,6 +428,11 @@ export const Swap: React.FC<ISwap> = ({
       <Grid container className={classes.header}>
         <Typography component='h1'>Swap tokens</Typography>
         <Box className={classes.swapControls}>
+          <Button className={classes.slippageButton} onClick={e => handleClickSettings(e)}>
+            <p>
+              Slippage: <span className={classes.slippageAmount}>{slippTolerance}%</span>
+            </p>
+          </Button>
           <Button
             onClick={handleRefresh}
             className={classes.refreshIconBtn}
@@ -448,7 +457,7 @@ export const Swap: React.FC<ISwap> = ({
             setSlippage={setSlippage}
             handleClose={handleCloseSettings}
             anchorEl={anchorEl}
-            defaultSlippage={'1.00'}
+            defaultSlippage={DEFAULT_SWAP_SLIPPAGE}
             initialSlippage={initialSlippage}
           />
         </Grid>
