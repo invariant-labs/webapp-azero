@@ -1,6 +1,6 @@
 import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import { Swap } from '@components/Swap/Swap'
-import { commonTokensForNetworks } from '@store/consts/static'
+import { commonTokensForNetworks, DEFAULT_SWAP_SLIPPAGE } from '@store/consts/static'
 import { TokenPriceData } from '@store/consts/types'
 import {
   addNewTokenToLocalStorage,
@@ -191,7 +191,7 @@ export const WrappedSwap = () => {
     }
   }, [tokenTo])
 
-  const initialSlippage = localStorage.getItem('INVARIANT_SWAP_SLIPPAGE') ?? '1.00'
+  const initialSlippage = localStorage.getItem('INVARIANT_SWAP_SLIPPAGE') ?? DEFAULT_SWAP_SLIPPAGE
 
   const onSlippageChange = (slippage: string) => {
     localStorage.setItem('INVARIANT_SWAP_SLIPPAGE', slippage)

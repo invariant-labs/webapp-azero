@@ -9,6 +9,7 @@ import {
 import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import {
   ALL_FEE_TIERS_DATA,
+  DEFAULT_NEW_POSITION_SLIPPAGE,
   U128MAX,
   bestTiers,
   commonTokensForNetworks
@@ -435,7 +436,8 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     }
   }, [tokenBIndex])
 
-  const initialSlippage = localStorage.getItem('INVARIANT_NEW_POSITION_SLIPPAGE') ?? '1.00'
+  const initialSlippage =
+    localStorage.getItem('INVARIANT_NEW_POSITION_SLIPPAGE') ?? DEFAULT_NEW_POSITION_SLIPPAGE
 
   const onSlippageChange = (slippage: string) => {
     localStorage.setItem('INVARIANT_NEW_POSITION_SLIPPAGE', slippage)
