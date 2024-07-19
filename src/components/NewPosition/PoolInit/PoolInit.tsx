@@ -308,7 +308,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
           </Typography>
         </Grid>
       </Grid>
-      <div style={{ gap: 16, display: 'flex', flexDirection: 'column' }}>
+      <Grid className={classes.bottomInnerWrapper}>
         <Typography className={classes.subheader}>Set price range</Typography>
         <Grid container className={classes.inputs}>
           <RangeInput
@@ -420,7 +420,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
             </Button>
           </Grid>
         )}
-      </div>
+      </Grid>
     </Grid>
   )
 }

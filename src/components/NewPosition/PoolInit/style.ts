@@ -28,6 +28,11 @@ const useStyles = makeStyles()(theme => {
     topInnerWrapper: {
       minHeight: 300
     },
+    bottomInnerWrapper: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 16
+    },
     subheader: {
       ...typography.heading4,
       color: colors.white.main
