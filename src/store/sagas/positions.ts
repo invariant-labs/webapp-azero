@@ -105,7 +105,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     const psp22 = yield* getPSP22()
     const wazero = yield* getWrappedAZERO()
 
-    const txs = []
+    let txs = []
 
     const [xAmountWithSlippage, yAmountWithSlippage] = calculateTokenAmountsWithSlippage(
       feeTier.tickSpacing,
@@ -159,7 +159,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       (tokenX === wazeroAddress && tokenXAmount !== 0n) ||
       (tokenY === wazeroAddress && tokenYAmount !== 0n)
     ) {
-      txs.push(getWithdrawAllWAZEROTxs(invariant, psp22, invAddress, wazeroAddress))
+      txs = [...txs, ...getWithdrawAllWAZEROTxs(invariant, psp22, invAddress, wazeroAddress)]
     }
 
     const batchedTx = api.tx.utility.batchAll(txs)
@@ -363,13 +363,13 @@ export function* handleClaimFee(action: PayloadAction<HandleClaimFee>) {
     const invariant = yield* getInvariant()
     const psp22 = yield* getPSP22()
 
-    const txs = []
+    let txs = []
 
     const claimTx = invariant.claimFeeTx(index, INVARIANT_CLAIM_FEE_OPTIONS)
     txs.push(claimTx)
 
     if (addressTokenX === wazeroAddress || addressTokenY === wazeroAddress) {
-      txs.push(getWithdrawAllWAZEROTxs(invariant, psp22, invAddress, wazeroAddress))
+      txs = [...txs, ...getWithdrawAllWAZEROTxs(invariant, psp22, invAddress, wazeroAddress)]
     }
 
     const batchedTx = api.tx.utility.batchAll(txs)
@@ -505,7 +505,7 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
     const fetchTask = yield* fork(handleGetPositionsListPage, getPositionsListPagePayload)
     yield* join(fetchTask)
 
-    const txs = []
+    let txs = []
 
     const removePositionTx = invariant.removePositionTx(
       positionIndex,
@@ -514,7 +514,7 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
     txs.push(removePositionTx)
 
     if (addressTokenX === wazeroAddress || addressTokenY === wazeroAddress) {
-      txs.push(getWithdrawAllWAZEROTxs(invariant, psp22, invAddress, wazeroAddress))
+      txs = [...txs, ...getWithdrawAllWAZEROTxs(invariant, psp22, invAddress, wazeroAddress)]
     }
 
     const batchedTx = api.tx.utility.batchAll(txs)

@@ -87,7 +87,7 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
     const tokenY = allTokens[poolKey.tokenY]
     const xToY = tokenFrom.toString() === poolKey.tokenX
 
-    const txs = []
+    let txs = []
 
     const sqrtPriceLimit = calculateSqrtPriceAfterSlippage(estimatedPriceAfterSwap, slippage, !xToY)
     const calculatedAmountIn = slippage
@@ -128,7 +128,7 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
     }
 
     if (poolKey.tokenX === wazeroAddress || poolKey.tokenX === wazeroAddress) {
-      txs.push(getWithdrawAllWAZEROTxs(invariant, psp22, invAddress, wazeroAddress))
+      txs = [...txs, ...getWithdrawAllWAZEROTxs(invariant, psp22, invAddress, wazeroAddress)]
     }
 
     const batchedTx = api.tx.utility.batchAll(txs)
