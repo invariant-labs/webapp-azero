@@ -182,7 +182,11 @@ const useStyles = makeStyles()((theme: Theme) => {
       filter: 'brightness(0.8)',
       color: colors.invariant.textGrey,
       ...typography.body2,
-      minWidth: 'auto'
+      minWidth: 'auto',
+
+      '& span': {
+        color: colors.invariant.text
+      }
     },
 
     tokenIcon: {

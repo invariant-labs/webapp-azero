@@ -270,7 +270,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
                     </Grid>
                     {!hideBalances && Number(tokenBalance) > 0 ? (
                       <Typography className={classes.tokenBalanceStatus}>
-                        Balance: {formatNumber(tokenBalance)}
+                        Balance: <span>{formatNumber(tokenBalance)}</span>
                       </Typography>
                     ) : null}
                   </Grid>
