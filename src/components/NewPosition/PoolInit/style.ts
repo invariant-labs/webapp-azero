@@ -6,7 +6,7 @@ const useStyles = makeStyles()(theme => {
     wrapper: {
       borderRadius: 10,
       backgroundColor: colors.invariant.component,
-      padding: '16px 24px 13px 24px',
+      padding: '16px 24px 16px 24px',
       flex: '1 1 0%',
       [theme.breakpoints.down('sm')]: {
         padding: '16px 8px  16px 8px'
@@ -26,15 +26,13 @@ const useStyles = makeStyles()(theme => {
       gap: 4
     },
     topInnerWrapper: {
-      minHeight: 283
+      minHeight: 300
     },
     subheader: {
       ...typography.heading4,
-      marginBottom: 14,
       color: colors.white.main
     },
     inputs: {
-      marginBottom: 16,
       flexDirection: 'row',
       gap: 16
     },
@@ -106,7 +104,6 @@ const useStyles = makeStyles()(theme => {
     sliderWrapper: {
       paddingTop: 24,
       paddingInline: 8,
-      height: 77,
       position: 'relative'
     }
   }
