@@ -106,6 +106,9 @@ export const useStyles = makeStyles()(() => {
       backgroundColor: colors.invariant.light,
       color: colors.invariant.text,
       fontWeight: 'bold'
+    },
+    inputAdornedEnd: {
+      marginRight: 2
     }
   }
 })

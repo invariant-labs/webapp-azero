@@ -175,7 +175,8 @@ const Slippage: React.FC<Props> = ({
                 </>
               }
               classes={{
-                input: classes.innerInput
+                input: classes.innerInput,
+                inputAdornedEnd: classes.inputAdornedEnd
               }}
             />
           </Box>
