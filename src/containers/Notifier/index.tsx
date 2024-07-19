@@ -35,7 +35,7 @@ const Notifier = () => {
       enqueueSnackbar(message, {
         key,
         variant: variant,
-        persist: true,
+        persist: persist,
         onExited: (_event, myKey) => {
           dispatch(actions.remove(myKey as string))
           removeDisplayed(myKey as string)
