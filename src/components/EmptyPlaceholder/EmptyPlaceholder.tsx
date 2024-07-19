@@ -1,7 +1,7 @@
 import { Button, Grid, Typography } from '@mui/material'
-import empty from '@static/svg/empty.svg'
 import React from 'react'
 import { useStyles } from './style'
+import icons from '@static/icons'
 
 export interface IEmptyPlaceholder {
   desc: string
@@ -22,7 +22,7 @@ export const EmptyPlaceholder: React.FC<IEmptyPlaceholder> = ({
     <>
       <Grid className={classes.container}>
         <Grid className={classes.root}>
-          <img className={classes.image} src={empty} alt='empty' />
+          <img className={classes.image} src={icons.empty} alt='empty' />
           <Typography className={classes.title}>It's empty here...</Typography>
           {desc?.length && <Typography className={classes.desc}>{desc}</Typography>}
           <Button className={classes.button} variant='contained' onClick={buttonAction}>
