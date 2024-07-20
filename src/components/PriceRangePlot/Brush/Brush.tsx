@@ -31,6 +31,7 @@ export const Handle: React.FC<HandleProps> = ({
   const [drag, setDrag] = useState(false)
   const [currentPosition, setCurrentPosition] = useState(position)
   const [offset, setOffset] = useState(0)
+  const [isHovered, setIsHovered] = useState(false)
 
   const handleRef = useRef<SVGRectElement>(null)
 
@@ -111,7 +112,13 @@ export const Handle: React.FC<HandleProps> = ({
         <MinHandle
           height={height}
           x={!isReversed() ? currentPosition - 37 : currentPosition}
-          fill={disabled ? colors.invariant.light : colors.invariant.pink}
+          fill={
+            disabled
+              ? colors.invariant.light
+              : isHovered
+                ? colors.invariant.lightPink
+                : colors.invariant.pink
+          }
           textColor={disabled ? colors.invariant.lightHover : colors.invariant.componentBcg}
           isReversed={isReversed()}
         />
@@ -119,7 +126,13 @@ export const Handle: React.FC<HandleProps> = ({
         <MaxHandle
           height={height}
           x={!isReversed() ? currentPosition : currentPosition - 37}
-          fill={disabled ? colors.invariant.light : colors.invariant.pink}
+          fill={
+            disabled
+              ? colors.invariant.light
+              : isHovered
+                ? colors.invariant.lightPink
+                : colors.invariant.pink
+          }
           textColor={disabled ? colors.invariant.lightHover : colors.invariant.componentBcg}
           isReversed={isReversed()}
         />
@@ -145,6 +158,8 @@ export const Handle: React.FC<HandleProps> = ({
         onTouchEnd={!disabled ? endDrag : undefined}
         onTouchMove={!disabled ? dragTouchHandler : undefined}
         onTouchCancel={!disabled ? endDrag : undefined}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseOut={() => setIsHovered(false)}
         fill='transparent'
       />
     </>
