@@ -82,8 +82,6 @@ export interface INewPosition {
   poolIndex: number | null
   currentPairReversed: boolean | null
   bestTiers: BestTier[]
-  initialIsDiscreteValue: boolean
-  onDiscreteChange: (val: boolean) => void
   currentPriceSqrt: bigint
   handleAddToken: (address: string) => void
   commonTokens: string[]
@@ -134,8 +132,6 @@ export const NewPosition: React.FC<INewPosition> = ({
   poolIndex,
   currentPairReversed,
   bestTiers,
-  initialIsDiscreteValue,
-  onDiscreteChange,
   handleAddToken,
   commonTokens,
   initialOpeningPositionMethod,
@@ -723,8 +719,6 @@ export const NewPosition: React.FC<INewPosition> = ({
             xDecimal={xDecimal}
             yDecimal={yDecimal}
             currentPairReversed={currentPairReversed}
-            initialIsDiscreteValue={initialIsDiscreteValue}
-            onDiscreteChange={onDiscreteChange}
             positionOpeningMethod={positionOpeningMethod}
             hasTicksError={hasTicksError}
             reloadHandler={reloadHandler}
