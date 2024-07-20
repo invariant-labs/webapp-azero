@@ -15,7 +15,7 @@ export const useStyles = makeStyles()((theme: Theme) => {
       fontFamily: 'Mukta',
       backgroundColor: colors.invariant.light,
       ...typography.body3,
-      padding: 15,
+      padding: '12px 18px',
 
       filter: 'brightness(0.8)',
 
@@ -38,9 +38,6 @@ export const useStyles = makeStyles()((theme: Theme) => {
       minWidth: 20,
       height: 20,
       borderRadius: '100%'
-    },
-    endIcon: {
-      marginLeft: 9
     }
   }
 })

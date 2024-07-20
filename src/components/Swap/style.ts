@@ -4,6 +4,7 @@ import { makeStyles } from 'tss-react/mui'
 
 export const useStyles = makeStyles()((theme: Theme) => ({
   swapWrapper: {
+    maxWidth: '100%',
     display: 'flex',
     flexDirection: 'column',
     [theme.breakpoints.down('sm')]: {
@@ -11,6 +12,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     }
   },
   header: {
+    maxWidth: '100%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -89,6 +91,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     position: 'absolute'
   },
   root: {
+    maxWidth: '100%',
     background: colors.invariant.component,
     borderRadius: 24,
     paddingInline: 24,
@@ -145,13 +148,9 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     zIndex: 2,
     left: '50%',
     top: '0%',
-    transform: 'translateX(-50%) translateY(-40%)',
+    transform: 'translateX(-50%) translateY(-6px)',
     cursor: 'pointer',
-    transition: 'background-color 200ms',
-
-    [theme.breakpoints.down('sm')]: {
-      transform: 'translateX(-50%) translateY(-14%)'
-    }
+    transition: 'background-color 200ms'
   },
   swapImgRoot: {
     background: colors.invariant.newDark,
@@ -180,7 +179,8 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     alignItems: 'center',
     justifyContent: 'space-between',
     flexFlow: 'row nowrap',
-    marginTop: 5,
+    marginTop: 24,
+    marginBottom: 12,
     position: 'relative',
     cursor: 'default',
     filter: 'brightness(0.9)'
@@ -189,7 +189,6 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     display: 'flex',
     flexDirection: 'row',
     backgroundColor: colors.invariant.light,
-    margin: '16px 0 ',
     paddingInline: 15,
     borderRadius: '10px',
     alignItems: 'center',
@@ -225,11 +224,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   },
 
   transactionBottom: {
-    marginTop: 10,
-
-    [theme.breakpoints.down('sm')]: {
-      marginTop: 36
-    }
+    // marginTop: 10,
+    // [theme.breakpoints.down('sm')]: {
+    //   marginTop: 36
+    // }
   },
 
   transtactionData: {
@@ -282,6 +280,11 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   },
   slippageAmount: {
     color: colors.invariant.green
+  },
+  swapLabel: {
+    ...typography.caption1,
+    color: colors.invariant.lightGrey,
+    marginBottom: 8
   }
 }))
 

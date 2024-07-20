@@ -29,6 +29,8 @@ import ExchangeRate from './ExchangeRate/ExchangeRate'
 import TransactionDetailsBox from './TransactionDetailsBox/TransactionDetailsBox'
 import useStyles from './style'
 import { SimulateResult, TokenPriceData } from '@store/consts/types'
+import TokensInfo from './TokensInfo/TokensInfo'
+import { VariantType } from 'notistack'
 
 export interface Pools {
   tokenX: string
@@ -88,6 +90,7 @@ export interface ISwap {
   isBalanceLoading: boolean
   simulateResult: SimulateResult
   simulateSwap: (simulate: Simulate) => void
+  copyTokenAddressHandler: (message: string, variant: VariantType) => void
 }
 
 export const Swap: React.FC<ISwap> = ({
@@ -118,7 +121,8 @@ export const Swap: React.FC<ISwap> = ({
   isBalanceLoading,
   swapData,
   simulateResult,
-  simulateSwap
+  simulateSwap,
+  copyTokenAddressHandler
 }) => {
   const { classes } = useStyles()
   enum inputTarget {
@@ -459,6 +463,7 @@ export const Swap: React.FC<ISwap> = ({
         </Grid>
       </Grid>
       <Grid container className={classes.root} direction='column'>
+        <Typography className={classes.swapLabel}>Pay</Typography>
         <Box
           className={classNames(
             classes.exchangeRoot,
@@ -543,6 +548,9 @@ export const Swap: React.FC<ISwap> = ({
             </Box>
           </Box>
         </Box>
+        <Typography className={classes.swapLabel} mt={1.5}>
+          Receive
+        </Typography>
         <Box
           className={classNames(
             classes.exchangeRoot,
@@ -665,6 +673,13 @@ export const Swap: React.FC<ISwap> = ({
           priceImpact={isInsufficientLiquidityError ? 1 : simulateResult.priceImpact}
           slippage={+slippTolerance}
           isLoadingRate={getStateMessage() === 'Loading'}
+        />
+        <TokensInfo
+          tokenFrom={tokens[tokenFromIndex!]}
+          tokenTo={tokens[tokenToIndex!]}
+          tokenToPrice={tokenToPriceData?.price}
+          tokenFromPrice={tokenFromPriceData?.price}
+          copyTokenAddressHandler={copyTokenAddressHandler}
         />
         {walletStatus !== Status.Initialized && getStateMessage() !== 'Loading' ? (
           <ChangeWalletButton
