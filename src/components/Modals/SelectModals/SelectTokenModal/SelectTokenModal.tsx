@@ -242,9 +242,11 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
                       alt={token.name + 'logo'}
                     />{' '}
                     <Grid container className={classes.tokenContainer}>
-                      <Typography className={classes.tokenName}>{token.symbol}</Typography>
+                      <Typography className={classes.tokenName}>
+                        {token.symbol ? token.symbol : 'Unknown'}
+                      </Typography>
                       <Typography className={classes.tokenDescrpiption}>
-                        {token.name ? token.name.slice(0, isXs ? 20 : 30) : 'Unknown token'}
+                        {token.name ? token.name.slice(0, isXs ? 20 : 30) : 'Unknown'}
                         {token.name.length > (isXs ? 20 : 30) ? '...' : ''}
                       </Typography>
                     </Grid>
@@ -266,6 +268,8 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
         addToken={(address: string) => {
           handleAddToken(address)
           setIsAddOpen(false)
+          setHideUnknown(false)
+          onHideUnknownTokensChange(false)
         }}
       />
     </>

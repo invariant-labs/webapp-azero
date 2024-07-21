@@ -9,9 +9,6 @@ const useStyles = makeStyles()(theme => {
       padding: '16px 24px 16px 24px',
       flex: '1 1 0%',
       position: 'relative',
-      [theme.breakpoints.down('lg')]: {
-        paddingBottom: 24
-      },
 
       [theme.breakpoints.down('sm')]: {
         padding: '16px 8px  24px 8px '
@@ -29,7 +26,10 @@ const useStyles = makeStyles()(theme => {
       backgroundColor: colors.invariant.component,
       width: '100%',
       position: 'relative',
-      gap: 4
+      gap: 16
+    },
+    topInnerWrapper: {
+      minHeight: 300
     },
     plot: {
       width: '100%',
@@ -37,11 +37,9 @@ const useStyles = makeStyles()(theme => {
     },
     subheader: {
       ...typography.heading4,
-      marginBottom: 14,
       color: colors.white.main
     },
     inputs: {
-      marginBottom: 8,
       flexDirection: 'row',
       gap: 16
     },
@@ -103,6 +101,7 @@ const useStyles = makeStyles()(theme => {
       zIndex: 99
     },
     buttons: {
+      marginTop: 38,
       width: '100%',
       flexDirection: 'row',
       gap: 16,
@@ -111,7 +110,6 @@ const useStyles = makeStyles()(theme => {
     sliderWrapper: {
       paddingTop: 24,
       paddingInline: 8,
-      height: 77,
       position: 'relative'
     },
     warningWrapper: {
@@ -215,6 +213,9 @@ const useStyles = makeStyles()(theme => {
       color: colors.invariant.yellow,
       ...typography.caption2,
       textAlign: 'right'
+    },
+    activeLiquidityContainer: {
+      width: 'auto'
     }
   }
 })

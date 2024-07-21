@@ -37,8 +37,6 @@ interface IProps {
   fee: bigint
   min: number
   max: number
-  initialIsDiscreteValue: boolean
-  onDiscreteChange: (val: boolean) => void
   showFeesLoader?: boolean
   hasTicksError?: boolean
   reloadHandler: () => void
@@ -68,8 +66,6 @@ const PositionDetails: React.FC<IProps> = ({
   fee,
   min,
   max,
-  initialIsDiscreteValue,
-  onDiscreteChange,
   showFeesLoader = false,
   hasTicksError,
   reloadHandler,
@@ -196,8 +192,6 @@ const PositionDetails: React.FC<IProps> = ({
           min={xToY ? min : 1 / max}
           max={xToY ? max : 1 / min}
           xToY={xToY}
-          initialIsDiscreteValue={initialIsDiscreteValue}
-          onDiscreteChange={onDiscreteChange}
           hasTicksError={hasTicksError}
           reloadHandler={reloadHandler}
         />

@@ -22,7 +22,6 @@ export const Primary: Story = {
   args: {
     currentPrice: 10000 as any,
     data: [{ x: 0, y: 0, index: 0 as any }],
-    initialIsDiscreteValue: false,
     leftRange: {
       index: 2 as any,
       x: 10000 as any
@@ -34,7 +33,6 @@ export const Primary: Story = {
     max: 100,
     min: 0,
     midPrice: {} as any,
-    onDiscreteChange: fn(),
     reloadHandler: fn(),
     ticksLoading: false,
     tickSpacing: 1 as any,

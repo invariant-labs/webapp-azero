@@ -1,9 +1,8 @@
 import React from 'react'
 import { CustomContentProps, SnackbarProvider } from 'notistack'
-import LoadingSnackbar from './LoadingSnackbar'
 import { theme } from '@static/theme'
-import { useMediaQuery } from '@mui/system'
-import { StyledMaterialDesignContent } from './style'
+import { useMediaQuery } from '@mui/material'
+import CustomSnackbar from './CustomSnackbar/CustomSnackbar'
 
 type ExtraVariants = 'pending'
 
@@ -11,6 +10,7 @@ export type SnackbarVariant = ExtraVariants
 
 interface CustomProps {
   txid?: string
+  snackbarId: string
 }
 
 export interface SnackbarSnackbarProps extends CustomContentProps, CustomProps {}
@@ -23,11 +23,11 @@ declare module 'notistack' {
 }
 
 interface ISnackbarProps {
-  children: JSX.Element
+  children: React.ReactNode
   maxSnack?: number
 }
 
-const Snackbar: React.FC<ISnackbarProps> = ({ maxSnack, children }) => {
+const Snackbar: React.FC<ISnackbarProps> = ({ maxSnack = 3, children }) => {
   const isExSmall = useMediaQuery(theme.breakpoints.down('xs'))
 
   return (
@@ -40,14 +40,15 @@ const Snackbar: React.FC<ISnackbarProps> = ({ maxSnack, children }) => {
           : { vertical: 'bottom', horizontal: 'left' }
       }
       Components={{
-        success: StyledMaterialDesignContent,
-        error: StyledMaterialDesignContent,
-        info: StyledMaterialDesignContent,
-        warning: StyledMaterialDesignContent,
-        pending: LoadingSnackbar
+        success: CustomSnackbar,
+        error: CustomSnackbar,
+        info: CustomSnackbar,
+        warning: CustomSnackbar,
+        pending: CustomSnackbar
       }}>
       {children}
     </SnackbarProvider>
   )
 }
+
 export default Snackbar

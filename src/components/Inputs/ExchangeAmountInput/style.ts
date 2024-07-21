@@ -48,7 +48,8 @@ export const useStyles = makeStyles<{ walletDisconnected: boolean }>()(
       }
     },
     select: {
-      marginRight: 20
+      marginRight: 20,
+      width: 'min-content'
     },
     input: {
       textAlign: 'right',
@@ -85,8 +86,11 @@ export const useStyles = makeStyles<{ walletDisconnected: boolean }>()(
       color: colors.invariant.lightGrey
     },
     exchangeContainer: {
+      height: 65,
       padding: `10px 15px ${walletDisconnected ? '10px' : '0'} 15px `,
-      display: 'flex'
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center'
     },
     noData: {
       color: colors.invariant.warning,
@@ -158,13 +162,18 @@ export const useStyles = makeStyles<{ walletDisconnected: boolean }>()(
       color: colors.invariant.lightHover,
       overflow: 'hidden',
       whiteSpace: 'nowrap',
-      textOverflow: 'ellipsis',
-      '&:hover': {
-        color: colors.white.main
-      }
+      textOverflow: 'ellipsis'
     },
     bottom: {
       paddingInline: 15
+    },
+    blur: {
+      width: 120,
+      height: 40,
+      borderRadius: 16,
+      background: `linear-gradient(90deg, ${colors.invariant.component} 25%, ${colors.invariant.light} 50%, ${colors.invariant.component} 75%)`,
+      backgroundSize: '200% 100%',
+      animation: 'shimmer 2s infinite'
     }
   })
 )

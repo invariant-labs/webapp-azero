@@ -33,7 +33,10 @@ export const useStyles = makeStyles()(() => ({
     height: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    display: 'flex'
+    display: 'flex',
+    '&:hover': {
+      borderColor: colors.invariant.lightHover
+    }
   }
 }))
 

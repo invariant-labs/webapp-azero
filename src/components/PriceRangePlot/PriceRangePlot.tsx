@@ -32,7 +32,6 @@ export interface IPriceRangePlot {
   xDecimal: bigint
   yDecimal: bigint
   tickSpacing: bigint
-  isDiscrete?: boolean
   coverOnLoading?: boolean
   hasError?: boolean
   reloadHandler: () => void
@@ -56,7 +55,6 @@ export const PriceRangePlot: React.FC<IPriceRangePlot> = ({
   xDecimal,
   yDecimal,
   tickSpacing,
-  isDiscrete = false,
   coverOnLoading = false,
   hasError = false,
   reloadHandler
@@ -426,7 +424,7 @@ export const PriceRangePlot: React.FC<IPriceRangePlot> = ({
             data: currentGreaterThanRange.length ? currentGreaterThanRange : [{ x: plotMax, y: 0 }]
           }
         ]}
-        curve={isDiscrete ? (isXtoY ? 'stepAfter' : 'stepBefore') : 'basis'}
+        curve={isXtoY ? 'stepAfter' : 'stepBefore'}
         margin={{ top: isSmDown ? 55 : 25, bottom: 15 }}
         colors={[colors.invariant.pink, colors.invariant.green, colors.invariant.pink]}
         axisTop={null}

@@ -33,6 +33,7 @@ interface IProps {
   priceLoading?: boolean
   isBalanceLoading: boolean
   showMaxButton: boolean
+  showBlur: boolean
 }
 
 export const AmountInput: React.FC<IProps> = ({
@@ -58,9 +59,11 @@ export const AmountInput: React.FC<IProps> = ({
   tokenPrice,
   priceLoading = false,
   isBalanceLoading,
-  showMaxButton = true
+  showMaxButton = true,
+  showBlur
 }) => {
-  const { classes } = useStyles({ walletDisconnected: hideBalances })
+  const hideBalance = balance === '- -' || !balance || hideBalances
+  const { classes } = useStyles({ walletDisconnected: hideBalance })
   const inputRef = useRef<HTMLInputElement>(null)
 
   const allowOnlyDigitsAndTrimUnnecessaryZeros: React.ChangeEventHandler<HTMLInputElement> = e => {
@@ -119,22 +122,26 @@ export const AmountInput: React.FC<IProps> = ({
           initialHideUnknownTokensValue={initialHideUnknownTokensValue}
           onHideUnknownTokensChange={onHideUnknownTokensChange}
         />
-        <Input
-          inputRef={inputRef}
-          error={!!error}
-          className={classNames(classes.amountInput, className)}
-          classes={{ input: classes.input }}
-          style={style}
-          value={value}
-          disableUnderline={true}
-          placeholder={placeholder}
-          onChange={allowOnlyDigitsAndTrimUnnecessaryZeros}
-          inputProps={{
-            inputMode: 'decimal'
-          }}
-        />
+        {showBlur ? (
+          <div className={classes.blur}></div>
+        ) : (
+          <Input
+            inputRef={inputRef}
+            error={!!error}
+            className={classNames(classes.amountInput, className)}
+            classes={{ input: classes.input }}
+            style={style}
+            value={value}
+            disableUnderline={true}
+            placeholder={placeholder}
+            onChange={allowOnlyDigitsAndTrimUnnecessaryZeros}
+            inputProps={{
+              inputMode: 'decimal'
+            }}
+          />
+        )}
       </Grid>
-      {!hideBalances && (
+      {!hideBalance && (
         <Grid
           container
           justifyContent='space-between'
