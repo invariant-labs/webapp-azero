@@ -16,11 +16,9 @@ export const CustomScrollbar = forwardRef<React.LegacyRef<Scrollbars>, IProps>((
       autoHide
       autoHideDuration={200}
       autoHideTimeout={200}
-      renderThumbVertical={() => {
-        return <div className={classes.scrollbarThumb} />
-      }}
-      renderTrackVertical={() => {
-        return <div className={classes.scrollbarTrack} />
+      classes={{
+        thumbVertical: classes.scrollbarThumb,
+        trackVertical: classes.scrollbarTrack
       }}
       className={classes.hideScroll}
       {...props}

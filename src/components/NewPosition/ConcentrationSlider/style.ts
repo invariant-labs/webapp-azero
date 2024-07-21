@@ -93,6 +93,7 @@ export const useSliderStyles = makeStyles<{ valuesLength: number; disabledRange:
       top: -8,
       borderRadius: 7,
       background: colors.invariant.light,
+      maxWidth: '100%',
 
       '& span': {
         display: 'flex',

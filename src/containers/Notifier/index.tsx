@@ -4,7 +4,6 @@ import { useSnackbar } from 'notistack'
 import { snackbarsSelectors } from '@store/selectors/snackbars'
 import { actions } from '@store/reducers/snackbars'
 import useStyles from './style'
-import icons from '@static/icons'
 
 let displayed: string[] = []
 
@@ -32,32 +31,16 @@ const Notifier = () => {
       // do nothing if snackbar is already displayed
       if (key && displayed.includes(key)) return
 
-      const action = () =>
-        txid && (
-          <div className={classes.detailsWrapper}>
-            <button
-              className={classes.button}
-              onClick={() => {
-                window.open(`https://alephzero-testnet.subscan.io/extrinsic/${txid}`, '_blank')
-              }}>
-              <span>Details</span>
-            </button>
-            <button className={classes.closeButton} onClick={() => closeSnackbar(key)}>
-              <img src={icons.closeIcon} alt='Close'></img>
-            </button>
-          </div>
-        )
-      // display snackbar using notistack
       enqueueSnackbar(message, {
         key,
-        action: action,
         variant: variant,
         persist: persist,
         onExited: (_event, myKey) => {
           dispatch(actions.remove(myKey as string))
           removeDisplayed(myKey as string)
         },
-        txid: txid
+        txid: txid,
+        snackbarId: key
       })
       storeDisplayed(key)
     })

@@ -4,6 +4,7 @@ import { makeStyles } from 'tss-react/mui'
 
 export const useStyles = makeStyles()((theme: Theme) => ({
   swapWrapper: {
+    maxWidth: '100%',
     display: 'flex',
     flexDirection: 'column',
     [theme.breakpoints.down('sm')]: {
@@ -11,6 +12,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     }
   },
   header: {
+    maxWidth: '100%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -89,6 +91,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     position: 'absolute'
   },
   root: {
+    maxWidth: '100%',
     background: colors.invariant.component,
     borderRadius: 24,
     paddingInline: 24,
@@ -145,13 +148,9 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     zIndex: 2,
     left: '50%',
     top: '0%',
-    transform: 'translateX(-50%) translateY(-40%)',
+    transform: 'translateX(-50%) translateY(-6px)',
     cursor: 'pointer',
-    transition: 'background-color 200ms',
-
-    [theme.breakpoints.down('sm')]: {
-      transform: 'translateX(-50%) translateY(-14%)'
-    }
+    transition: 'background-color 200ms'
   },
   swapImgRoot: {
     background: colors.invariant.newDark,
@@ -180,7 +179,8 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     alignItems: 'center',
     justifyContent: 'space-between',
     flexFlow: 'row nowrap',
-    marginTop: 5,
+    marginTop: 24,
+    marginBottom: 12,
     position: 'relative',
     cursor: 'default',
     filter: 'brightness(0.9)'
@@ -189,7 +189,6 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     display: 'flex',
     flexDirection: 'row',
     backgroundColor: colors.invariant.light,
-    margin: '16px 0 ',
     paddingInline: 15,
     borderRadius: '10px',
     alignItems: 'center',
@@ -225,11 +224,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   },
 
   transactionBottom: {
-    marginTop: 10,
-
-    [theme.breakpoints.down('sm')]: {
-      marginTop: 36
-    }
+    // marginTop: 10,
+    // [theme.breakpoints.down('sm')]: {
+    //   marginTop: 36
+    // }
   },
 
   transtactionData: {
@@ -237,16 +235,6 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     borderRadius: '10px',
     padding: '5px 15px 5px 15px',
     color: colors.invariant.lightGrey
-  },
-
-  buttonSelectDisabled: {
-    background: `${colors.invariant.pinkLinearGradient} !important`,
-
-    '&:hover': {
-      filter: 'brightness(1.15)',
-      boxShadow:
-        '0px 3px 1px -2px rgba(43, 193, 144, 0.2),0px 1px 2px 0px rgba(45, 168, 128, 0.14),0px 0px 5px 7px rgba(59, 183, 142, 0.12)'
-    }
   },
   ButtonSwapActive: {
     transition: 'filter 0.3s linear',
@@ -271,6 +259,32 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     justifyContent: 'space-between',
     alignItems: 'center',
     gap: 8
+  },
+  slippageButton: {
+    height: 27,
+    padding: '0px 8px',
+    borderRadius: 8,
+    backgroundColor: colors.invariant.component,
+    color: colors.invariant.textGrey,
+    fontSize: 14,
+    cursor: 'pointer',
+    userSelect: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    textTransform: 'none',
+
+    '&:hover': {
+      background: colors.invariant.light,
+      color: colors.invariant.text
+    }
+  },
+  slippageAmount: {
+    color: colors.invariant.green
+  },
+  swapLabel: {
+    ...typography.caption1,
+    color: colors.invariant.lightGrey,
+    marginBottom: 8
   }
 }))
 
