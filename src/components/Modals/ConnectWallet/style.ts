@@ -47,8 +47,8 @@ const useStyles = makeStyles()(() => {
       display: 'none'
     },
     icon: {
-      width: 20,
-      height: 20,
+      width: 16,
+      height: 16,
       display: 'inline',
       float: 'left',
       marginRight: 8

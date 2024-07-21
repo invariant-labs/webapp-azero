@@ -10,7 +10,11 @@ import infoIcon from '@static/svg/info.svg'
 import refreshIcon from '@static/svg/refresh.svg'
 import settingIcon from '@static/svg/settings.svg'
 import SwapArrows from '@static/svg/swap-arrows.svg'
-import { DEFAULT_TOKEN_DECIMAL, REFRESHER_INTERVAL } from '@store/consts/static'
+import {
+  DEFAULT_SWAP_SLIPPAGE,
+  DEFAULT_TOKEN_DECIMAL,
+  REFRESHER_INTERVAL
+} from '@store/consts/static'
 import { convertBalanceToBigint, printBigint, stringToFixed, trimLeadingZeros } from '@utils/utils'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { Swap as SwapData } from '@store/reducers/swap'
@@ -25,6 +29,8 @@ import ExchangeRate from './ExchangeRate/ExchangeRate'
 import TransactionDetailsBox from './TransactionDetailsBox/TransactionDetailsBox'
 import useStyles from './style'
 import { SimulateResult, TokenPriceData } from '@store/consts/types'
+import TokensInfo from './TokensInfo/TokensInfo'
+import { VariantType } from 'notistack'
 
 export interface Pools {
   tokenX: string
@@ -84,6 +90,7 @@ export interface ISwap {
   isBalanceLoading: boolean
   simulateResult: SimulateResult
   simulateSwap: (simulate: Simulate) => void
+  copyTokenAddressHandler: (message: string, variant: VariantType) => void
 }
 
 export const Swap: React.FC<ISwap> = ({
@@ -114,10 +121,12 @@ export const Swap: React.FC<ISwap> = ({
   isBalanceLoading,
   swapData,
   simulateResult,
-  simulateSwap
+  simulateSwap,
+  copyTokenAddressHandler
 }) => {
   const { classes } = useStyles()
   enum inputTarget {
+    DEFAULT = 'default',
     FROM = 'from',
     TO = 'to'
   }
@@ -133,7 +142,7 @@ export const Swap: React.FC<ISwap> = ({
   const [throttle, setThrottle] = React.useState<boolean>(false)
   const [settings, setSettings] = React.useState<boolean>(false)
   const [detailsOpen, setDetailsOpen] = React.useState<boolean>(false)
-  const [inputRef, setInputRef] = React.useState<string>(inputTarget.FROM)
+  const [inputRef, setInputRef] = React.useState<string>(inputTarget.DEFAULT)
   const [rateReversed, setRateReversed] = React.useState<boolean>(false)
   const [refresherTime, setRefresherTime] = React.useState<number>(REFRESHER_INTERVAL)
 
@@ -222,10 +231,12 @@ export const Swap: React.FC<ISwap> = ({
   }, [tokenToIndex, tokenFromIndex, pools.length])
 
   useEffect(() => {
-    const temp: string = amountFrom
-    setAmountFrom(amountTo)
-    setAmountTo(temp)
-    setInputRef(inputRef === inputTarget.FROM ? inputTarget.TO : inputTarget.FROM)
+    if (inputRef !== inputTarget.DEFAULT) {
+      const temp: string = amountFrom
+      setAmountFrom(amountTo)
+      setAmountTo(temp)
+      setInputRef(inputRef === inputTarget.FROM ? inputTarget.TO : inputTarget.FROM)
+    }
   }, [swap])
 
   useEffect(() => {
@@ -417,6 +428,11 @@ export const Swap: React.FC<ISwap> = ({
       <Grid container className={classes.header}>
         <Typography component='h1'>Swap tokens</Typography>
         <Box className={classes.swapControls}>
+          <Button className={classes.slippageButton} onClick={e => handleClickSettings(e)}>
+            <p>
+              Slippage: <span className={classes.slippageAmount}>{slippTolerance}%</span>
+            </p>
+          </Button>
           <Button
             onClick={handleRefresh}
             className={classes.refreshIconBtn}
@@ -441,12 +457,13 @@ export const Swap: React.FC<ISwap> = ({
             setSlippage={setSlippage}
             handleClose={handleCloseSettings}
             anchorEl={anchorEl}
-            defaultSlippage={'1.00'}
+            defaultSlippage={DEFAULT_SWAP_SLIPPAGE}
             initialSlippage={initialSlippage}
           />
         </Grid>
       </Grid>
       <Grid container className={classes.root} direction='column'>
+        <Typography className={classes.swapLabel}>Pay</Typography>
         <Box
           className={classNames(
             classes.exchangeRoot,
@@ -494,6 +511,10 @@ export const Swap: React.FC<ISwap> = ({
             priceLoading={priceFromLoading}
             isBalanceLoading={isBalanceLoading}
             showMaxButton={true}
+            showBlur={
+              getStateMessage() === 'Loading' &&
+              (inputRef === inputTarget.TO || inputRef === inputTarget.DEFAULT)
+            }
           />
         </Box>
         <Box className={classes.tokenComponentTextContainer}>
@@ -527,6 +548,9 @@ export const Swap: React.FC<ISwap> = ({
             </Box>
           </Box>
         </Box>
+        <Typography className={classes.swapLabel} mt={1.5}>
+          Receive
+        </Typography>
         <Box
           className={classNames(
             classes.exchangeRoot,
@@ -573,6 +597,10 @@ export const Swap: React.FC<ISwap> = ({
             priceLoading={priceToLoading}
             isBalanceLoading={isBalanceLoading}
             showMaxButton={false}
+            showBlur={
+              getStateMessage() === 'Loading' &&
+              (inputRef === inputTarget.FROM || inputRef === inputTarget.DEFAULT)
+            }
           />
         </Box>
         <Box className={classes.transactionDetails}>
@@ -646,6 +674,13 @@ export const Swap: React.FC<ISwap> = ({
           slippage={+slippTolerance}
           isLoadingRate={getStateMessage() === 'Loading'}
         />
+        <TokensInfo
+          tokenFrom={tokens[tokenFromIndex!]}
+          tokenTo={tokens[tokenToIndex!]}
+          tokenToPrice={tokenToPriceData?.price}
+          tokenFromPrice={tokenFromPriceData?.price}
+          copyTokenAddressHandler={copyTokenAddressHandler}
+        />
         {walletStatus !== Status.Initialized && getStateMessage() !== 'Loading' ? (
           <ChangeWalletButton
             name='Connect wallet'
@@ -659,7 +694,7 @@ export const Swap: React.FC<ISwap> = ({
             content={getStateMessage()}
             className={
               getStateMessage() === 'Connect a wallet'
-                ? `${classes.swapButton} ${classes.buttonSelectDisabled}`
+                ? `${classes.swapButton}`
                 : getStateMessage() === 'Swap tokens' && progress === 'none'
                   ? `${classes.swapButton} ${classes.ButtonSwapActive}`
                   : classes.swapButton

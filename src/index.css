@@ -1,7 +1,6 @@
 * {
   min-width: 0;
   min-height: 0;
-  max-width: 100%;
 }
 body {
   margin: 0;
@@ -60,5 +59,14 @@ body {
   }
   100% {
     transform: translateY(0%);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
   }
 }

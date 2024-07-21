@@ -1,6 +1,6 @@
 import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import { Swap } from '@components/Swap/Swap'
-import { commonTokensForNetworks } from '@store/consts/static'
+import { commonTokensForNetworks, DEFAULT_SWAP_SLIPPAGE } from '@store/consts/static'
 import { TokenPriceData } from '@store/consts/types'
 import {
   addNewTokenToLocalStorage,
@@ -31,6 +31,7 @@ import SingletonPSP22 from '@store/services/psp22Singleton'
 import { openWalletSelectorModal } from '@utils/web3/selector'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { VariantType } from 'notistack'
 
 export const WrappedSwap = () => {
   const dispatch = useDispatch()
@@ -191,7 +192,7 @@ export const WrappedSwap = () => {
     }
   }, [tokenTo])
 
-  const initialSlippage = localStorage.getItem('INVARIANT_SWAP_SLIPPAGE') ?? '1.00'
+  const initialSlippage = localStorage.getItem('INVARIANT_SWAP_SLIPPAGE') ?? DEFAULT_SWAP_SLIPPAGE
 
   const onSlippageChange = (slippage: string) => {
     localStorage.setItem('INVARIANT_SWAP_SLIPPAGE', slippage)
@@ -253,6 +254,16 @@ export const WrappedSwap = () => {
 
   const simulateSwap = (simulate: Simulate) => {
     dispatch(actions.getSimulateResult(simulate))
+  }
+
+  const copyTokenAddressHandler = (message: string, variant: VariantType) => {
+    dispatch(
+      snackbarsActions.add({
+        message,
+        variant,
+        persist: false
+      })
+    )
   }
 
   return (
@@ -329,6 +340,7 @@ export const WrappedSwap = () => {
       isBalanceLoading={isBalanceLoading}
       simulateResult={swapSimulateResult}
       simulateSwap={simulateSwap}
+      copyTokenAddressHandler={copyTokenAddressHandler}
     />
   )
 }
