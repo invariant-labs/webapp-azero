@@ -37,7 +37,7 @@ import useStyles from './style'
 import { SimulateResult, TokenPriceData } from '@store/consts/types'
 import TokensInfo from './TokensInfo/TokensInfo'
 import { VariantType } from 'notistack'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 export interface Pools {
   tokenX: string
