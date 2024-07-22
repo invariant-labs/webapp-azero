@@ -7,7 +7,12 @@ import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
 import { Box, Button, Grid, Hidden, Typography } from '@mui/material'
 import backIcon from '@static/svg/back-arrow.svg'
 import settingIcon from '@static/svg/settings.svg'
-import { ALL_FEE_TIERS_DATA, PositionTokenBlock, REFRESHER_INTERVAL } from '@store/consts/static'
+import {
+  ALL_FEE_TIERS_DATA,
+  DEFAULT_NEW_POSITION_SLIPPAGE,
+  PositionTokenBlock,
+  REFRESHER_INTERVAL
+} from '@store/consts/static'
 import {
   calcPriceBySqrtPrice,
   calculateConcentrationRange,
@@ -77,8 +82,6 @@ export interface INewPosition {
   poolIndex: number | null
   currentPairReversed: boolean | null
   bestTiers: BestTier[]
-  initialIsDiscreteValue: boolean
-  onDiscreteChange: (val: boolean) => void
   currentPriceSqrt: bigint
   handleAddToken: (address: string) => void
   commonTokens: string[]
@@ -131,8 +134,6 @@ export const NewPosition: React.FC<INewPosition> = ({
   poolIndex,
   currentPairReversed,
   bestTiers,
-  initialIsDiscreteValue,
-  onDiscreteChange,
   handleAddToken,
   commonTokens,
   initialOpeningPositionMethod,
@@ -538,7 +539,7 @@ export const NewPosition: React.FC<INewPosition> = ({
         setSlippage={setSlippage}
         handleClose={handleCloseSettings}
         anchorEl={anchorEl}
-        defaultSlippage={'1.00'}
+        defaultSlippage={DEFAULT_NEW_POSITION_SLIPPAGE}
         initialSlippage={initialSlippage}
         infoText='Slippage tolerance is a pricing difference between the price at the confirmation time and the actual price of the transaction users are willing to accept when initializing position.'
         headerText='Position Transaction Settings'
@@ -722,8 +723,6 @@ export const NewPosition: React.FC<INewPosition> = ({
             xDecimal={xDecimal}
             yDecimal={yDecimal}
             currentPairReversed={currentPairReversed}
-            initialIsDiscreteValue={initialIsDiscreteValue}
-            onDiscreteChange={onDiscreteChange}
             positionOpeningMethod={positionOpeningMethod}
             hasTicksError={hasTicksError}
             reloadHandler={reloadHandler}

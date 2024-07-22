@@ -7,7 +7,8 @@ const useStyles = makeStyles()(() => {
       minHeight: '70vh',
       marginTop: '65px',
       justifyContent: 'center',
-      backgroundColor: 'transparent'
+      backgroundColor: 'transparent',
+      maxWidth: '100%'
     }
   }
 })

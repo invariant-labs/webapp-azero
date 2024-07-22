@@ -38,7 +38,6 @@ export const Primary: Story = {
       { feeValue: 0.5 }
     ],
     handleAddToken: fn(),
-    initialIsDiscreteValue: false,
     initialFee: '0.05',
     initialHideUnknownTokensValue: false,
     initialOpeningPositionMethod: 'concentration',
@@ -48,7 +47,6 @@ export const Primary: Story = {
     isCurrentPoolExisting: true,
     isWaitingForNewPool: false,
     onChangePositionTokens: fn(),
-    onDiscreteChange: fn(),
     onHideUnknownTokensChange: fn(),
     onPositionOpeningMethodChange: fn(),
     onSlippageChange: fn(),
@@ -91,7 +89,6 @@ export const Primary: Story = {
         onPositionOpeningMethodChange={fn()}
         onSlippageChange={fn()}
         onHideUnknownTokensChange={fn()}
-        onDiscreteChange={fn()}
         copyPoolAddressHandler={fn()}
         reloadHandler={fn()}
         setMidPrice={fn()}
@@ -110,7 +107,6 @@ export const Primary: Story = {
         initialFee='0.05'
         initialSlippage='0.01'
         initialOpeningPositionMethod='concentration'
-        initialIsDiscreteValue={false}
         initialHideUnknownTokensValue={false}
         data={[]}
         currentFeeIndex={0}

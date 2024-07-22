@@ -9,7 +9,7 @@ export const useStyles = makeStyles<{ open: boolean }>()((_theme, { open }) => (
     overflow: 'hidden',
     transition: 'max-height 300ms',
     maxHeight: open ? 160 : 0,
-    marginBottom: 16
+    marginBottom: open ? 12 : 0
   },
   innerWrapper: {
     padding: 16,
