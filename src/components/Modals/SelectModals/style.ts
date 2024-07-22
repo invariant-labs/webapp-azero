@@ -20,7 +20,7 @@ const useStyles = makeStyles()((theme: Theme) => {
       borderRadius: 20,
       width: 500,
       [theme.breakpoints.down('sm')]: {
-        width: '100vw'
+        maxWidth: '100vw'
       },
       '& .MuiCheckbox-root.Mui-checked': {
         color: colors.green.button
@@ -125,7 +125,7 @@ const useStyles = makeStyles()((theme: Theme) => {
       background: colors.invariant.component,
       borderTop: `1px solid ${colors.invariant.light}`,
       width: 451,
-      height: 352,
+      height: 400,
       paddingTop: 8
     },
 
@@ -140,7 +140,7 @@ const useStyles = makeStyles()((theme: Theme) => {
       marginBottom: 4,
       borderRadius: 24,
       cursor: 'pointer',
-      padding: '35px 16px ',
+      padding: '32px 16px ',
       '& > p': {
         whiteSpace: 'nowrap'
       },
@@ -152,8 +152,7 @@ const useStyles = makeStyles()((theme: Theme) => {
     },
     tokenName: {
       color: colors.white.main,
-      ...typography.heading3,
-      fontWeight: 500
+      ...typography.heading4
     },
     tokenAddress: {
       backgroundColor: colors.invariant.newDark,

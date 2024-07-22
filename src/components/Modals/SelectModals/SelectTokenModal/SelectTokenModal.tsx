@@ -75,7 +75,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
   const [hideUnknown, setHideUnknown] = useState(initialHideUnknownTokensValue)
 
   const outerRef = useRef<HTMLElement>(null)
-  const listRef = useRef<HTMLElement>(null)
+  const listRef = useRef<HTMLDivElement>(null)
 
   const tokensWithIndexes = useMemo(
     () =>
@@ -210,9 +210,9 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
           </Grid>
           <Box className={classes.tokenList} ref={listRef}>
             <List
-              height={352}
+              height={400}
               width={360}
-              itemSize={74}
+              itemSize={66}
               itemCount={filteredTokens.length}
               outerElementType={CustomScrollbarsVirtualList}
               outerRef={outerRef}>
