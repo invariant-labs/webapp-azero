@@ -168,33 +168,35 @@ const PositionDetails: React.FC<IProps> = ({
           />
         </Grid>
 
-        <SinglePositionPlot
-          data={
-            detailsData.length
-              ? xToY
-                ? detailsData
-                : detailsData.map(tick => ({ ...tick, x: 1 / tick.x })).reverse()
-              : Array(100)
-                  .fill(1)
-                  .map((_e, index) => ({ x: index, y: index, index: BigInt(index) }))
-          }
-          leftRange={xToY ? leftRange : { ...rightRange, x: 1 / rightRange.x }}
-          rightRange={xToY ? rightRange : { ...leftRange, x: 1 / leftRange.x }}
-          midPrice={{
-            ...midPrice,
-            x: midPrice.x ** (xToY ? 1 : -1)
-          }}
-          currentPrice={currentPrice ** (xToY ? 1 : -1)}
-          tokenY={tokenY}
-          tokenX={tokenX}
-          ticksLoading={ticksLoading}
-          tickSpacing={tickSpacing}
-          min={xToY ? min : 1 / max}
-          max={xToY ? max : 1 / min}
-          xToY={xToY}
-          hasTicksError={hasTicksError}
-          reloadHandler={reloadHandler}
-        />
+        <Grid className={classes.positionPlotWrapper}>
+          <SinglePositionPlot
+            data={
+              detailsData.length
+                ? xToY
+                  ? detailsData
+                  : detailsData.map(tick => ({ ...tick, x: 1 / tick.x })).reverse()
+                : Array(100)
+                    .fill(1)
+                    .map((_e, index) => ({ x: index, y: index, index: BigInt(index) }))
+            }
+            leftRange={xToY ? leftRange : { ...rightRange, x: 1 / rightRange.x }}
+            rightRange={xToY ? rightRange : { ...leftRange, x: 1 / leftRange.x }}
+            midPrice={{
+              ...midPrice,
+              x: midPrice.x ** (xToY ? 1 : -1)
+            }}
+            currentPrice={currentPrice ** (xToY ? 1 : -1)}
+            tokenY={tokenY}
+            tokenX={tokenX}
+            ticksLoading={ticksLoading}
+            tickSpacing={tickSpacing}
+            min={xToY ? min : 1 / max}
+            max={xToY ? max : 1 / min}
+            xToY={xToY}
+            hasTicksError={hasTicksError}
+            reloadHandler={reloadHandler}
+          />
+        </Grid>
       </Grid>
     </Grid>
   )

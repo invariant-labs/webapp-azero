@@ -79,5 +79,13 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center'
+  },
+  positionPlotWrapper: {
+    width: '100%',
+    marginTop: 56,
+
+    [theme.breakpoints.down('md')]: {
+      marginTop: 0
+    }
   }
 }))
