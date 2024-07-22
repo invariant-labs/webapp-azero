@@ -16,9 +16,9 @@ export const EmptyPlaceholder: React.FC<IEmptyPlaceholder> = ({ desc, onAction }
 
   return (
     <>
-      <Grid className={classNames(classes.blur, 'noConnectedLayer')} />
-      <Grid className={classNames(classes.container, 'noConnectedLayer')}>
-        <Grid className={classNames(classes.root, 'noConnectedInfo')}>
+      <Grid className={classNames(classes.blur, 'blurLayer')} />
+      <Grid className={classNames(classes.container, 'blurLayer')}>
+        <Grid className={classNames(classes.root, 'blurInfo')}>
           <img className={classes.img} src={icons.empty} alt='Not connected' />
           <Typography className={classes.desc}>It's empty here...</Typography>
           {desc?.length && <Typography className={classes.desc}>{desc}</Typography>}
@@ -28,15 +28,5 @@ export const EmptyPlaceholder: React.FC<IEmptyPlaceholder> = ({ desc, onAction }
         </Grid>
       </Grid>
     </>
-    // <Grid
-    //   container
-    //   direction='column'
-    //   alignItems='center'
-    //   className={classNames(classes.wrapper, className)}
-    //   style={style}>
-    //   <img src={icons.empty} className={classes.image} alt='empty' />
-    //   <Typography className={classes.title}>It's empty here...</Typography>
-    //   <Typography className={classes.desc}>{desc}</Typography>
-    // </Grid>
   )
 }
