@@ -2,7 +2,10 @@ import { makeStyles } from 'tss-react/mui'
 
 export const useStyles = makeStyles()(() => ({
   ring: {
-    cursor: 'pointer'
+    cursor: 'pointer',
+    '&:hover': {
+      filter: 'brightness(1.25)'
+    }
   },
   innerCircle: {
     transition: '0.35s stroke-dashoffset',

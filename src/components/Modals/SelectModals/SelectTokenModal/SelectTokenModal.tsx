@@ -244,7 +244,9 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
                     />
                     <Grid container className={classes.tokenContainer}>
                       <Grid container direction='row' columnGap='6px' alignItems='center'>
-                        <Typography className={classes.tokenName}>{token.symbol} </Typography>
+                        <Typography className={classes.tokenName}>
+                          {token.symbol ? token.symbol : 'Unknown'}{' '}
+                        </Typography>
                         <Grid className={classes.tokenAddress} container direction='column'>
                           <a
                             href={`https://ascan.alephzero.org/testnet/account/${token.assetAddress}`}
@@ -264,7 +266,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
                       </Grid>
 
                       <Typography className={classes.tokenDescrpiption}>
-                        {token.name ? token.name.slice(0, isXs ? 20 : 30) : 'Unknown token'}
+                        {token.name ? token.name.slice(0, isXs ? 20 : 30) : 'Unknown'}
                         {token.name.length > (isXs ? 20 : 30) ? '...' : ''}
                       </Typography>
                     </Grid>

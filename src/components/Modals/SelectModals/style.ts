@@ -5,7 +5,7 @@ import { makeStyles } from 'tss-react/mui'
 const useStyles = makeStyles()((theme: Theme) => {
   return {
     popover: {
-      marginTop: 'calc(50vh - 350px)',
+      marginTop: 'max(calc(50vh - 350px), 0px)',
       marginLeft: 'calc(50vw - 251px)',
       [theme.breakpoints.down('sm')]: {
         display: 'flex',
@@ -213,7 +213,7 @@ const useStyles = makeStyles()((theme: Theme) => {
     },
 
     scrollbarThumb: {
-      background: colors.invariant.pink,
+      backgroundColor: colors.invariant.pink + '!important',
       borderRadius: 10,
       width: 5
     },
@@ -228,9 +228,17 @@ const useStyles = makeStyles()((theme: Theme) => {
     paper: {
       background: 'transparent',
       boxShadow: 'none',
-      maxWidth: 500
+      maxWidth: 500,
+      maxHeight: '100vh',
+      '&::-webkit-scrollbar': {
+        width: 6,
+        background: colors.invariant.component
+      },
+      '&::-webkit-scrollbar-thumb': {
+        background: colors.invariant.light,
+        borderRadius: 6
+      }
     },
-
     clearIcon: {
       minWidth: 12,
       height: 12,

@@ -6,7 +6,7 @@ const useStyles = makeStyles()(theme => {
     wrapper: {
       borderRadius: 10,
       backgroundColor: colors.invariant.component,
-      padding: '16px 24px 8px 24px',
+      padding: '16px 24px 16px 24px',
       flex: '1 1 0%',
       [theme.breakpoints.down('sm')]: {
         padding: '16px 8px  16px 8px'
@@ -26,15 +26,18 @@ const useStyles = makeStyles()(theme => {
       gap: 4
     },
     topInnerWrapper: {
-      minHeight: 283
+      minHeight: 300
+    },
+    bottomInnerWrapper: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 16
     },
     subheader: {
       ...typography.heading4,
-      marginBottom: 14,
       color: colors.white.main
     },
     inputs: {
-      marginBottom: 16,
       flexDirection: 'row',
       gap: 16
     },
@@ -68,6 +71,7 @@ const useStyles = makeStyles()(theme => {
       }
     },
     buttons: {
+      marginTop: 38,
       width: '100%',
       flexDirection: 'row',
       gap: 16,
@@ -77,7 +81,7 @@ const useStyles = makeStyles()(theme => {
       borderRadius: 19,
       padding: 16,
       background:
-        'radial-gradient(286.05% 1397.73% at 101.8% 159.3%, rgba(46, 224, 154, 0.3) 0%, rgba(0, 0, 0, 0) 100%), radial-gradient(235.47% 781.83% at 5.41% 0%, rgba(239, 132, 245, 0.3) 0%, rgba(0, 0, 0, 0) 100%), linear-gradient(0deg, #3A466B, #3A466B)',
+        'linear-gradient(138deg, rgba(110,88,146,1) 0%, rgba(58,69,101,0.9108018207282913) 47%, rgba(53,99,112,1) 100%)',
       marginBottom: 16
     },
     info: {
@@ -106,7 +110,6 @@ const useStyles = makeStyles()(theme => {
     sliderWrapper: {
       paddingTop: 24,
       paddingInline: 8,
-      height: 77,
       position: 'relative'
     }
   }
