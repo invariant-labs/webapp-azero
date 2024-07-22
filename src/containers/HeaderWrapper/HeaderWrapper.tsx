@@ -75,7 +75,7 @@ export const HeaderWrapper: React.FC = () => {
 
         dispatch(
           snackbarsActions.add({
-            message: 'Successfully copied wallet address.',
+            message: 'Wallet address copied.',
             variant: 'success',
             persist: false
           })

@@ -334,7 +334,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
           addNewTokenToLocalStorage(address, currentNetwork)
           dispatch(
             snackbarsActions.add({
-              message: 'Token added to your list',
+              message: 'Token added.',
               variant: 'success',
               persist: false
             })
@@ -343,7 +343,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         .catch(() => {
           dispatch(
             snackbarsActions.add({
-              message: 'Token adding failed',
+              message: 'Token add failed.',
               variant: 'error',
               persist: false
             })
@@ -352,7 +352,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     } else {
       dispatch(
         snackbarsActions.add({
-          message: 'Token already exists on your list',
+          message: 'Token already in list.',
           variant: 'info',
           persist: false
         })
