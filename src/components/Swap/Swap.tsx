@@ -31,6 +31,7 @@ import useStyles from './style'
 import { SimulateResult, TokenPriceData } from '@store/consts/types'
 import TokensInfo from './TokensInfo/TokensInfo'
 import { VariantType } from 'notistack'
+import { useNavigate } from 'react-router-dom'
 
 export interface Pools {
   tokenX: string
@@ -147,6 +148,16 @@ export const Swap: React.FC<ISwap> = ({
   const [refresherTime, setRefresherTime] = React.useState<number>(REFRESHER_INTERVAL)
 
   const timeoutRef = useRef<number>(0)
+
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const tokenFromAddress = tokens[tokenFromIndex ?? -1]?.assetAddress
+    const tokenToAddress = tokens[tokenToIndex ?? -1]?.assetAddress
+    navigate(`/swap/${tokenFromAddress || '-'}/${tokenToAddress || '-'}`, {
+      replace: true
+    })
+  }, [tokenToIndex, tokenFromIndex])
 
   useEffect(() => {
     if (!!tokens.length && tokenFromIndex === null && tokenToIndex === null) {

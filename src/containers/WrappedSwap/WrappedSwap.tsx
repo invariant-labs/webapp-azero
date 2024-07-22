@@ -33,7 +33,12 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { VariantType } from 'notistack'
 
-export const WrappedSwap = () => {
+type Props = {
+  initialTokenFrom: string
+  initialTokenTo: string
+}
+
+export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
   const dispatch = useDispatch()
 
   const walletAddress = useSelector(address)
@@ -86,8 +91,10 @@ export const WrappedSwap = () => {
       )
     }
   }, [isFetchingNewPool])
-  const lastTokenFrom = localStorage.getItem(`INVARIANT_LAST_TOKEN_FROM_${network}`)
-  const lastTokenTo = localStorage.getItem(`INVARIANT_LAST_TOKEN_TO_${network}`)
+
+  const lastTokenFrom =
+    initialTokenFrom || localStorage.getItem(`INVARIANT_LAST_TOKEN_FROM_${network}`)
+  const lastTokenTo = initialTokenTo || localStorage.getItem(`INVARIANT_LAST_TOKEN_TO_${network}`)
 
   const initialTokenFromIndex =
     lastTokenFrom === null
