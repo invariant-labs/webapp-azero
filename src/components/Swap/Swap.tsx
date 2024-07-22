@@ -15,7 +15,13 @@ import {
   DEFAULT_TOKEN_DECIMAL,
   REFRESHER_INTERVAL
 } from '@store/consts/static'
-import { convertBalanceToBigint, printBigint, stringToFixed, trimLeadingZeros } from '@utils/utils'
+import {
+  addressToTicker,
+  convertBalanceToBigint,
+  printBigint,
+  stringToFixed,
+  trimLeadingZeros
+} from '@utils/utils'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { Swap as SwapData } from '@store/reducers/swap'
 import { Status } from '@store/reducers/wallet'
@@ -152,11 +158,14 @@ export const Swap: React.FC<ISwap> = ({
   const navigate = useNavigate()
 
   useEffect(() => {
-    const tokenFromAddress = tokens[tokenFromIndex ?? -1]?.assetAddress
-    const tokenToAddress = tokens[tokenToIndex ?? -1]?.assetAddress
-    navigate(`/swap/${tokenFromAddress || '-'}/${tokenToAddress || '-'}`, {
-      replace: true
-    })
+    const tokenFromAddress = addressToTicker(tokens[tokenFromIndex ?? -1]?.assetAddress)
+    const tokenToAddress = addressToTicker(tokens[tokenToIndex ?? -1]?.assetAddress)
+
+    if (tokenFromAddress || tokenToAddress) {
+      navigate(`/swap/${tokenFromAddress || '-'}/${tokenToAddress || '-'}`, {
+        replace: true
+      })
+    }
   }, [tokenToIndex, tokenFromIndex])
 
   useEffect(() => {

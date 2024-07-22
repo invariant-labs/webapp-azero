@@ -6,7 +6,8 @@ import {
   addNewTokenToLocalStorage,
   getCoinGeckoTokenPrice,
   getMockedTokenPrice,
-  getNewTokenOrThrow
+  getNewTokenOrThrow,
+  tickerToAddress
 } from '@utils/utils'
 import { actions as poolsActions } from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
@@ -93,8 +94,10 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
   }, [isFetchingNewPool])
 
   const lastTokenFrom =
-    initialTokenFrom || localStorage.getItem(`INVARIANT_LAST_TOKEN_FROM_${network}`)
-  const lastTokenTo = initialTokenTo || localStorage.getItem(`INVARIANT_LAST_TOKEN_TO_${network}`)
+    tickerToAddress(initialTokenFrom) ||
+    localStorage.getItem(`INVARIANT_LAST_TOKEN_FROM_${network}`)
+  const lastTokenTo =
+    tickerToAddress(initialTokenTo) || localStorage.getItem(`INVARIANT_LAST_TOKEN_TO_${network}`)
 
   const initialTokenFromIndex =
     lastTokenFrom === null
