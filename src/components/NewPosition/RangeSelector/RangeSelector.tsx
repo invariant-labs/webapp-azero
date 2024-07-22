@@ -416,8 +416,6 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
             </Grid>
           </Grid>
         </Grid>
-      </Grid>
-      <Grid className={classes.innerWrapper}>
         <PriceRangePlot
           className={classes.plot}
           data={data}
