@@ -71,11 +71,11 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
   const isXs = useMediaQuery(theme.breakpoints.down('sm'))
 
   const [value, setValue] = useState<string>('')
-
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [hideUnknown, setHideUnknown] = useState(initialHideUnknownTokensValue)
 
   const outerRef = useRef<HTMLElement>(null)
+  const listRef = useRef<HTMLElement>(null)
 
   const tokensWithIndexes = useMemo(
     () =>
@@ -208,7 +208,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
               label='Hide unknown tokens'
             />
           </Grid>
-          <Box className={classes.tokenList}>
+          <Box className={classes.tokenList} ref={listRef}>
             <List
               height={352}
               width={360}
@@ -226,8 +226,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
                     container
                     style={{
                       ...style,
-                      width: '90%',
-                      height: 40
+                      width: listRef.current ? listRef.current.clientWidth : 'calc(100% - 48px)'
                     }}
                     alignItems='center'
                     wrap='nowrap'

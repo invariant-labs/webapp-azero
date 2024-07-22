@@ -152,7 +152,8 @@ const useStyles = makeStyles()((theme: Theme) => {
     },
     tokenName: {
       color: colors.white.main,
-      ...typography.heading3
+      ...typography.heading3,
+      fontWeight: 500
     },
     tokenAddress: {
       backgroundColor: colors.invariant.newDark,
@@ -168,7 +169,8 @@ const useStyles = makeStyles()((theme: Theme) => {
         textDecoration: 'none',
         '& p': {
           color: colors.invariant.lightGrey,
-          ...typography.caption4
+          ...typography.caption4,
+          letterSpacing: '0.03em'
         }
       }
     },
@@ -208,8 +210,9 @@ const useStyles = makeStyles()((theme: Theme) => {
 
     hideScroll: {
       '& > *:first-of-type': {
-        paddingRight: '30px'
-      }
+        overflow: 'auto !important'
+      },
+      overflow: 'visible !important'
     },
 
     scrollbarThumb: {
@@ -222,8 +225,12 @@ const useStyles = makeStyles()((theme: Theme) => {
       borderRadius: 10,
       height: '98%',
       margin: 5,
-      float: 'right',
-      width: 5
+      width: 5,
+      transform: 'translateX(20px)'
+    },
+    scrollbarView: {
+      padding: 0 + '!important',
+      width: 'calc(100% + 50px)'
     },
     paper: {
       background: 'transparent',
