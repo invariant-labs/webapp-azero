@@ -69,7 +69,7 @@ const SingleToken: React.FC<IProps> = ({ token, tokenPrice, copyTokenAddressHand
         <Typography className={classes.price}>
           {token ? (tokenPrice ? '$' + formatNumber(tokenPrice) : 'No data') : '--'}
         </Typography>
-        <Grid className={classes.tokenAddress}>
+        <Grid className={classes.tokenAddress} onClick={copyToClipboard}>
           <Typography>
             {token
               ? token.assetAddress.slice(0, 4) + '...' + token.assetAddress.slice(-5, -1)
@@ -81,7 +81,6 @@ const SingleToken: React.FC<IProps> = ({ token, tokenPrice, copyTokenAddressHand
             src={icons.copyAddress}
             alt={'Copy address'}
             className={classes.clipboardIcon}
-            onClick={copyToClipboard}
           />
         </Grid>
       </Grid>
