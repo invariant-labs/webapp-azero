@@ -105,24 +105,14 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
     const sorted = list.sort((a, b) => {
       const aBalance = +printBigint(a.balance, a.decimals)
       const bBalance = +printBigint(b.balance, b.decimals)
-      if ((aBalance === 0 && bBalance === 0) || (aBalance > 0 && bBalance > 0)) {
-        if (value.length) {
-          if (
-            a.symbol.toLowerCase().startsWith(value.toLowerCase()) &&
-            !b.symbol.toLowerCase().startsWith(value.toLowerCase())
-          ) {
-            return -1
-          }
-          if (
-            b.symbol.toLowerCase().startsWith(value.toLowerCase()) &&
-            !a.symbol.toLowerCase().startsWith(value.toLowerCase())
-          ) {
-            return 1
-          }
-        }
-        return a.symbol.toLowerCase().localeCompare(b.symbol.toLowerCase())
+
+      if (aBalance > bBalance) {
+        return -1
+      } else if (aBalance < bBalance) {
+        return 1
+      } else {
+        return 0
       }
-      return aBalance === 0 ? 1 : -1
     })
 
     return hideUnknown ? sorted.filter(token => !token.isUnknown) : sorted
