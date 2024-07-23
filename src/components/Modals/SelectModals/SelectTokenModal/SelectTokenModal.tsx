@@ -1,7 +1,7 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import searchIcon from '@static/svg/lupa.svg'
 import { theme } from '@static/theme'
-import React, { forwardRef, useMemo, useRef, useState } from 'react'
+import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
 import { FixedSizeList as List } from 'react-window'
 import CustomScrollbar from '../CustomScrollbar'
 import useStyles from '../style'
@@ -76,6 +76,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
 
   const outerRef = useRef<HTMLElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const tokensWithIndexes = useMemo(
     () =>
@@ -123,6 +124,22 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
     setValue(e.target.value)
   }
 
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout | null = null
+    if (open) {
+      timeoutId = setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus()
+        }
+      }, 100)
+    }
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+    }
+  }, [open])
+
   return (
     <>
       <Popover
@@ -153,6 +170,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
             alignItems='center'>
             <Grid container className={classes.inputControl}>
               <input
+                ref={inputRef}
                 className={classes.selectTokenInput}
                 placeholder='Search token name or address'
                 onChange={searchToken}
