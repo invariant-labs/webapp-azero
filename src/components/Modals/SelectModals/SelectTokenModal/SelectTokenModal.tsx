@@ -1,7 +1,7 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import searchIcon from '@static/svg/lupa.svg'
 import { theme } from '@static/theme'
-import React, { forwardRef, useMemo, useRef, useState } from 'react'
+import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
 import { FixedSizeList as List } from 'react-window'
 import CustomScrollbar from '../CustomScrollbar'
 import useStyles from '../style'
@@ -21,6 +21,7 @@ import {
 import { formatNumber, printBigint } from '@utils/utils'
 import { SwapToken } from '@store/selectors/wallet'
 import Scrollbars from 'rc-scrollbars'
+import icons from '@static/icons'
 
 export interface ISelectTokenModal {
   tokens: SwapToken[]
@@ -70,11 +71,12 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
   const isXs = useMediaQuery(theme.breakpoints.down('sm'))
 
   const [value, setValue] = useState<string>('')
-
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [hideUnknown, setHideUnknown] = useState(initialHideUnknownTokensValue)
 
   const outerRef = useRef<HTMLElement>(null)
+  const listRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const tokensWithIndexes = useMemo(
     () =>
@@ -122,6 +124,22 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
     setValue(e.target.value)
   }
 
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout | null = null
+    if (open) {
+      timeoutId = setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus()
+        }
+      }, 100)
+    }
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+    }
+  }, [open])
+
   return (
     <>
       <Popover
@@ -152,6 +170,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
             alignItems='center'>
             <Grid container className={classes.inputControl}>
               <input
+                ref={inputRef}
                 className={classes.selectTokenInput}
                 placeholder='Search token name or address'
                 onChange={searchToken}
@@ -197,9 +216,9 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
               label='Hide unknown tokens'
             />
           </Grid>
-          <Box className={classes.tokenList}>
+          <Box className={classes.tokenList} ref={listRef}>
             <List
-              height={352}
+              height={400}
               width={360}
               itemSize={66}
               itemCount={filteredTokens.length}
@@ -215,8 +234,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
                     container
                     style={{
                       ...style,
-                      width: '90%',
-                      height: 40
+                      width: listRef.current ? listRef.current.clientWidth : 'calc(100% - 48px)'
                     }}
                     alignItems='center'
                     wrap='nowrap'
@@ -230,11 +248,30 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
                       src={token.logoURI}
                       loading='lazy'
                       alt={token.name + 'logo'}
-                    />{' '}
+                    />
                     <Grid container className={classes.tokenContainer}>
-                      <Typography className={classes.tokenName}>
-                        {token.symbol ? token.symbol : 'Unknown'}
-                      </Typography>
+                      <Grid container direction='row' columnGap='6px' alignItems='center'>
+                        <Typography className={classes.tokenName}>
+                          {token.symbol ? token.symbol : 'Unknown'}{' '}
+                        </Typography>
+                        <Grid className={classes.tokenAddress} container direction='column'>
+                          <a
+                            href={`https://ascan.alephzero.org/testnet/account/${token.assetAddress}`}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            onClick={event => {
+                              event.stopPropagation()
+                            }}>
+                            <Typography>
+                              {token.assetAddress.slice(0, 4) +
+                                '...' +
+                                token.assetAddress.slice(-5, -1)}
+                            </Typography>
+                            <img width={8} height={8} src={icons.newTab} alt={'Token address'} />
+                          </a>
+                        </Grid>
+                      </Grid>
+
                       <Typography className={classes.tokenDescrpiption}>
                         {token.name ? token.name.slice(0, isXs ? 20 : 30) : 'Unknown'}
                         {token.name.length > (isXs ? 20 : 30) ? '...' : ''}
@@ -242,7 +279,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
                     </Grid>
                     {!hideBalances && Number(tokenBalance) > 0 ? (
                       <Typography className={classes.tokenBalanceStatus}>
-                        Balance: {formatNumber(tokenBalance)}
+                        Balance: <span>{formatNumber(tokenBalance)}</span>
                       </Typography>
                     ) : null}
                   </Grid>
