@@ -40,7 +40,7 @@ export const HeaderWrapper: React.FC = () => {
 
   useEffect(() => {
     if (localStorage.getItem('CAN_EAGER_CONNECT') === 'true') {
-      dispatch(walletActions.connect())
+      dispatch(walletActions.connect(true))
     }
   }, [])
 
