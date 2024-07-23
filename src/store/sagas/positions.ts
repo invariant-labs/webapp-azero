@@ -195,7 +195,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
 
     yield put(
       snackbarsActions.add({
-        message: 'Position successfully created',
+        message: 'Position created.',
         variant: 'success',
         persist: false,
         txid: txResult.hash
@@ -233,7 +233,7 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     } else {
       yield put(
         snackbarsActions.add({
-          message: 'Failed to send. Please try again.',
+          message: 'Failed to create position. Please try again.',
           variant: 'error',
           persist: false
         })
@@ -401,7 +401,7 @@ export function* handleClaimFee(action: PayloadAction<HandleClaimFee>) {
     yield put(snackbarsActions.remove(loaderKey))
     yield put(
       snackbarsActions.add({
-        message: 'Fee successfully claimed',
+        message: 'Fee claimed.',
         variant: 'success',
         persist: false,
         txid: txResult.hash
@@ -478,7 +478,7 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
   try {
     yield put(
       snackbarsActions.add({
-        message: 'Removing position...',
+        message: 'Closing position...',
         variant: 'pending',
         persist: true,
         key: loaderKey
@@ -546,7 +546,7 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
     yield put(snackbarsActions.remove(loaderKey))
     yield put(
       snackbarsActions.add({
-        message: 'Position successfully removed',
+        message: 'Position closed.',
         variant: 'success',
         persist: false,
         txid: txResult.hash

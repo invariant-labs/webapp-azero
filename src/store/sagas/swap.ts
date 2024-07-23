@@ -161,7 +161,7 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
 
     yield put(
       snackbarsActions.add({
-        message: 'Tokens swapped successfully.',
+        message: 'Tokens swapped.',
         variant: 'success',
         persist: false,
         txid: txResult.hash
@@ -200,7 +200,7 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
     } else {
       yield put(
         snackbarsActions.add({
-          message: 'Tokens swapping failed. Please try again.',
+          message: 'Tokens swap failed. Please try again.',
           variant: 'error',
           persist: false
         })

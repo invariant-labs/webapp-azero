@@ -111,7 +111,7 @@ export const WrappedSwap = () => {
           addNewTokenToLocalStorage(address, network)
           dispatch(
             snackbarsActions.add({
-              message: 'Token added to your list',
+              message: 'Token added.',
               variant: 'success',
               persist: false
             })
@@ -120,7 +120,7 @@ export const WrappedSwap = () => {
         .catch(() => {
           dispatch(
             snackbarsActions.add({
-              message: 'Token adding failed, check if address is valid and try again',
+              message: 'Token add failed.',
               variant: 'error',
               persist: false
             })
@@ -129,7 +129,7 @@ export const WrappedSwap = () => {
     } else {
       dispatch(
         snackbarsActions.add({
-          message: 'Token already exists on your list',
+          message: 'Token already in list.',
           variant: 'info',
           persist: false
         })
