@@ -253,9 +253,6 @@ export const getCoinGeckoTokenPrice = async (id: string): Promise<number | undef
   let lastQueryTimestamp = 0
   if (cachedLastQueryTimestamp) {
     lastQueryTimestamp = Number(cachedLastQueryTimestamp)
-  } else {
-    lastQueryTimestamp = Date.now()
-    localStorage.setItem('COINGECKO_LAST_QUERY_TIMESTAMP', String(lastQueryTimestamp))
   }
 
   const cachedPriceData = localStorage.getItem('COINGECKO_PRICE_DATA')
@@ -269,6 +266,7 @@ export const getCoinGeckoTokenPrice = async (id: string): Promise<number | undef
       )
       priceData = data
       localStorage.setItem('COINGECKO_PRICE_DATA', JSON.stringify(priceData))
+      localStorage.setItem('COINGECKO_LAST_QUERY_TIMESTAMP', String(Date.now()))
     } catch (e) {
       localStorage.removeItem('COINGECKO_LAST_QUERY_TIMESTAMP')
       localStorage.removeItem('COINGECKO_PRICE_DATA')
