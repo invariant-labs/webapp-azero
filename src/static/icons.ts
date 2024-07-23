@@ -22,6 +22,10 @@ import closeSmallIcon from './svg/closeSmall.svg'
 import successIcon from './svg/successIcon.svg'
 import xIcon from './svg/xCircle.svg'
 import unknownToken from './svg/unknownToken.svg'
+import newTab from './svg/newTab.svg'
+import selectToken from './svg/selectToken.svg'
+import copyAddress from './svg/copy-address.svg'
+import emptyIcon from './svg/empty.svg'
 
 const icons: { [key: string]: string } = {
   clear: clearIcon,
@@ -47,7 +51,11 @@ const icons: { [key: string]: string } = {
   docsIcon: docsIcon,
   successIcon: successIcon,
   XIcon: xIcon,
-  unknownToken: unknownToken
+  unknownToken: unknownToken,
+  newTab: newTab,
+  selectToken: selectToken,
+  copyAddress: copyAddress,
+  empty: emptyIcon
 }
 
 export default icons

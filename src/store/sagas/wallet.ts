@@ -61,7 +61,7 @@ export function* handleAirdrop(): Generator {
   if (!walletAddress) {
     return yield* put(
       snackbarsActions.add({
-        message: 'You have to connect your wallet before claiming the faucet',
+        message: 'Connect your wallet to claim the faucet.',
         variant: 'error',
         persist: false
       })
@@ -141,13 +141,31 @@ export function* handleAirdrop(): Generator {
   }
 }
 
-export function* init(): Generator {
+export function* init(isEagerConnect: boolean): Generator {
   try {
     yield* put(actions.setStatus(Status.Init))
 
     yield* call(connect, 'polkadot-js')
     const accounts = yield* call(getAccounts, 'polkadot-js')
     yield* call([localStorage, localStorage.setItem], 'CAN_EAGER_CONNECT', 'true')
+
+    if (isEagerConnect) {
+      yield* put(
+        snackbarsActions.add({
+          message: 'Wallet reconnected.',
+          variant: 'success',
+          persist: false
+        })
+      )
+    } else {
+      yield* put(
+        snackbarsActions.add({
+          message: 'Wallet connected.',
+          variant: 'success',
+          persist: false
+        })
+      )
+    }
 
     yield* put(actions.setAddress(accounts[0].address))
 
@@ -164,7 +182,7 @@ export const sleep = (ms: number) => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-export function* handleConnect(): Generator {
+export function* handleConnect(action: PayloadAction<boolean>): Generator {
   const walletStatus = yield* select(status)
   if (walletStatus === Status.Initialized) {
     yield* put(
@@ -176,7 +194,7 @@ export function* handleConnect(): Generator {
     )
     return
   }
-  yield* call(init)
+  yield* call(init, action.payload)
 }
 
 export function* handleDisconnect(): Generator {
@@ -186,6 +204,14 @@ export function* handleDisconnect(): Generator {
 
     yield* call(disconnectWallet)
     yield* put(actions.resetState())
+
+    yield* put(
+      snackbarsActions.add({
+        message: 'Wallet disconnected.',
+        variant: 'success',
+        persist: false
+      })
+    )
 
     yield* put(positionsActions.setPositionsList([]))
     yield* put(positionsActions.setPositionsListLength(0n))
@@ -234,6 +260,7 @@ export function* fetchBalances(tokens: string[]): Generator {
 export function* handleReconnect(): Generator {
   yield* call(handleDisconnect)
   yield* call(openWalletSelectorModal)
+  yield* call(handleConnect, { type: actions.connect.type, payload: false })
 }
 
 export function* handleGetBalances(action: PayloadAction<string[]>): Generator {
@@ -252,10 +279,6 @@ export function* airdropSaga(): Generator {
   yield takeLeading(actions.airdrop, handleAirdrop)
 }
 
-export function* initSaga(): Generator {
-  yield takeLeading(actions.initWallet, init)
-}
-
 export function* getBalancesHandler(): Generator {
   yield takeLeading(actions.getBalances, handleGetBalances)
 }
@@ -266,13 +289,8 @@ export function* reconnecthandler(): Generator {
 
 export function* walletSaga(): Generator {
   yield all(
-    [
-      initSaga,
-      airdropSaga,
-      connectHandler,
-      disconnectHandler,
-      getBalancesHandler,
-      reconnecthandler
-    ].map(spawn)
+    [airdropSaga, connectHandler, disconnectHandler, getBalancesHandler, reconnecthandler].map(
+      spawn
+    )
   )
 }

@@ -1,5 +1,4 @@
 import RangeInput from '@components/Inputs/RangeInput/RangeInput'
-import PlotTypeSwitch from '@components/PlotTypeSwitch/PlotTypeSwitch'
 import PriceRangePlot from '@components/PriceRangePlot/PriceRangePlot'
 import { getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
 import { Button, Grid, Tooltip, Typography } from '@mui/material'
@@ -31,8 +30,6 @@ export interface IRangeSelector {
   yDecimal: bigint
   tickSpacing: bigint
   currentPairReversed: boolean | null
-  initialIsDiscreteValue: boolean
-  onDiscreteChange: (val: boolean) => void
   positionOpeningMethod?: PositionOpeningMethod
   poolIndex: number | null
   hasTicksError?: boolean
@@ -70,8 +67,6 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   yDecimal,
   tickSpacing,
   currentPairReversed,
-  initialIsDiscreteValue,
-  onDiscreteChange,
   positionOpeningMethod,
   hasTicksError,
   reloadHandler,
@@ -99,8 +94,6 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
 
   const [plotMin, setPlotMin] = useState(0)
   const [plotMax, setPlotMax] = useState(1)
-
-  const [isPlotDiscrete, setIsPlotDiscrete] = useState(initialIsDiscreteValue)
 
   const [currentMidPrice, setCurrentMidPrice] = useState(midPrice)
   const [triggerReset, setTriggerReset] = useState(false)
@@ -194,15 +187,18 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
       setPlotMin(midPrice.x - initSideDist)
       setPlotMax(midPrice.x + initSideDist)
     } else {
-      setConcentrationIndex(0)
+      const newConcentrationIndex = concentrationArray[concentrationIndex]
+        ? Math.floor(concentrationIndex)
+        : concentrationArray.length - 1
+
+      setConcentrationIndex(newConcentrationIndex)
       const { leftRange, rightRange } = calculateConcentrationRange(
         tickSpacing,
-        concentrationArray[0],
+        concentrationArray[newConcentrationIndex],
         2,
         midPrice.index,
         isXtoY
       )
-
       changeRangeHandler(leftRange, rightRange)
       autoZoomHandler(leftRange, rightRange, true)
     }
@@ -360,6 +356,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
           ? concentrationArray.length - 1
           : concentrationIndex
       setConcentrationIndex(index)
+      console.log('test')
       const { leftRange, rightRange } = calculateConcentrationRange(
         tickSpacing,
         concentrationArray[index],
@@ -373,61 +370,70 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
     }
   }, [midPrice.index, concentrationArray])
 
+  useEffect(() => {
+    if (shouldReversePlot) {
+      return
+    }
+
+    setConcentrationIndex(0)
+    const { leftRange, rightRange } = calculateConcentrationRange(
+      tickSpacing,
+      concentrationArray[0],
+      2,
+      midPrice.index,
+      isXtoY
+    )
+
+    changeRangeHandler(leftRange, rightRange)
+    autoZoomHandler(leftRange, rightRange, true)
+  }, [tokenASymbol, tokenBSymbol])
+
   return (
     <Grid container className={classes.wrapper} direction='column'>
-      <Grid className={classes.headerContainer} container justifyContent='space-between'>
-        <Typography className={classes.header}>Price range</Typography>
-        <PlotTypeSwitch
-          onSwitch={val => {
-            setIsPlotDiscrete(val)
-            onDiscreteChange(val)
-          }}
-          initialValue={isPlotDiscrete ? 1 : 0}
-        />
-      </Grid>
-      <Grid className={classes.infoRow} container justifyContent='flex-end'>
-        <Grid container direction='column' alignItems='flex-end'>
-          <Tooltip
-            title={
-              <>
-                <Typography className={classes.liquidityTitle}>Active liquidity</Typography>
-                <Typography className={classes.liquidityDesc} style={{ marginBottom: 12 }}>
-                  While selecting the price range, note where active liquidity is located. Your
-                  liquidity can be inactive and, as a consequence, not generate profits.
-                </Typography>
-                <Grid
-                  container
-                  direction='row'
-                  wrap='nowrap'
-                  alignItems='center'
-                  style={{ marginBottom: 12 }}>
-                  <Typography className={classes.liquidityDesc}>
-                    The active liquidity range is represented by white, dashed lines in the
-                    liquidity chart. Active liquidity is determined by the maximum price range
-                    resulting from the statistical volume of swaps for the last 7 days.
+      <Grid className={classes.topInnerWrapper}>
+        <Grid className={classes.headerContainer} container justifyContent='space-between'>
+          <Typography className={classes.header}>Price range</Typography>
+          <Grid className={classes.activeLiquidityContainer} container direction='column'>
+            <Tooltip
+              title={
+                <>
+                  <Typography className={classes.liquidityTitle}>Active liquidity</Typography>
+                  <Typography className={classes.liquidityDesc} style={{ marginBottom: 12 }}>
+                    While selecting the price range, note where active liquidity is located. Your
+                    liquidity can be inactive and, as a consequence, not generate profits.
                   </Typography>
-                  <img className={classes.liquidityImg} src={activeLiquidity} alt='Liquidity' />
-                </Grid>
-                <Typography className={classes.liquidityNote}>
-                  Note: active liquidity borders are always aligned to the nearest initialized
-                  ticks.
-                </Typography>
-              </>
-            }
-            placement='bottom'
-            classes={{
-              tooltip: classes.liquidityTooltip
-            }}>
-            <Typography className={classes.activeLiquidity}>
-              Active liquidity <span className={classes.activeLiquidityIcon}>i</span>
-            </Typography>
-          </Tooltip>
-          <Grid>
-            <Typography className={classes.currentPrice}>Current price</Typography>
+                  <Grid
+                    container
+                    direction='row'
+                    wrap='nowrap'
+                    alignItems='center'
+                    style={{ marginBottom: 12 }}>
+                    <Typography className={classes.liquidityDesc}>
+                      The active liquidity range is represented by white, dashed lines in the
+                      liquidity chart. Active liquidity is determined by the maximum price range
+                      resulting from the statistical volume of swaps for the last 7 days.
+                    </Typography>
+                    <img className={classes.liquidityImg} src={activeLiquidity} alt='Liquidity' />
+                  </Grid>
+                  <Typography className={classes.liquidityNote}>
+                    Note: active liquidity borders are always aligned to the nearest initialized
+                    ticks.
+                  </Typography>
+                </>
+              }
+              placement='bottom'
+              classes={{
+                tooltip: classes.liquidityTooltip
+              }}>
+              <Typography className={classes.activeLiquidity}>
+                Active liquidity <span className={classes.activeLiquidityIcon}>i</span>
+              </Typography>
+            </Tooltip>
+            <Grid>
+              <Typography className={classes.currentPrice}>Current price ━━━</Typography>
+            </Grid>
           </Grid>
         </Grid>
-      </Grid>
-      <Grid container className={classes.innerWrapper}>
         <PriceRangePlot
           className={classes.plot}
           data={data}
@@ -450,11 +456,12 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
           tickSpacing={tickSpacing}
           xDecimal={xDecimal}
           yDecimal={yDecimal}
-          isDiscrete={isPlotDiscrete}
           disabled={positionOpeningMethod === 'concentration'}
           hasError={hasTicksError}
           reloadHandler={reloadHandler}
         />
+      </Grid>
+      <Grid container className={classes.innerWrapper}>
         <Typography className={classes.subheader}>Set price range</Typography>
         <Grid container className={classes.inputs}>
           <RangeInput

@@ -22,14 +22,11 @@ export const HeaderWrapper: React.FC = () => {
   useEffect(() => {
     const fetchWallet = async () => {
       const wallet = await getAlephZeroWallet()
-      wallet.addListener('connect', () => {
-        dispatch(walletActions.connect())
-      })
 
       await wallet.canEagerConnect().then(
         async canEagerConnect => {
           if (canEagerConnect) {
-            dispatch(walletActions.connect())
+            dispatch(walletActions.connect(true))
           }
         },
         error => {
@@ -66,7 +63,7 @@ export const HeaderWrapper: React.FC = () => {
         }
       }}
       onConnectWallet={() => {
-        dispatch(walletActions.connect())
+        dispatch(walletActions.connect(false))
       }}
       landing={location.pathname.substring(1)}
       walletConnected={walletStatus === Status.Initialized}
@@ -82,7 +79,7 @@ export const HeaderWrapper: React.FC = () => {
 
         dispatch(
           snackbarsActions.add({
-            message: 'Successfully copied wallet address.',
+            message: 'Wallet address copied.',
             variant: 'success',
             persist: false
           })

@@ -36,9 +36,6 @@ const walletSlice = createSlice({
     resetState() {
       return defaultState
     },
-    initWallet(state) {
-      return state
-    },
     setAddress(state, action: PayloadAction<string>) {
       state.address = action.payload
       return state
@@ -76,7 +73,9 @@ const walletSlice = createSlice({
       return state
     },
     airdrop() {},
-    connect() {},
+    connect(state, _action: PayloadAction<boolean>) {
+      return state
+    },
     disconnect() {},
     reconnect() {}
   }

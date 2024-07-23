@@ -6,6 +6,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   wrapperContainer: {
     width: 1004,
     flexDirection: 'row',
+    maxWidth: '100%',
 
     [theme.breakpoints.down('md')]: {
       flexDirection: 'column'
