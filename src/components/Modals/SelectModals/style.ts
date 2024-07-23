@@ -166,6 +166,10 @@ const useStyles = makeStyles()((theme: Theme) => {
         justifyContent: 'center',
         gap: '12px',
         textDecoration: 'none',
+
+        '&:hover': {
+          filter: 'brightness(1.2)'
+        },
         '& p': {
           color: colors.invariant.lightGrey,
           ...typography.caption4,
