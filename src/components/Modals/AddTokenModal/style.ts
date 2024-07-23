@@ -9,7 +9,8 @@ const useStyles = makeStyles()((theme: Theme) => {
       width: 480,
       height: 140,
       borderRadius: 24,
-      padding: '20px 24px'
+      padding: '20px 24px',
+      maxWidth: '100%'
     },
     popover: {
       marginTop: 'calc(50vh - 350px)',

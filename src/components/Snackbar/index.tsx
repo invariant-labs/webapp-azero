@@ -28,7 +28,7 @@ interface ISnackbarProps {
 }
 
 const Snackbar: React.FC<ISnackbarProps> = ({ maxSnack = 3, children }) => {
-  const isExSmall = useMediaQuery(theme.breakpoints.down('xs'))
+  const isExSmall = useMediaQuery(theme.breakpoints.down('sm'))
 
   return (
     <SnackbarProvider

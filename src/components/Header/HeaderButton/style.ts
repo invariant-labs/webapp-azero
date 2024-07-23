@@ -21,6 +21,9 @@ const useStyles = makeStyles()((theme: Theme) => {
         '& #downIcon': {
           transform: 'rotateX(180deg)'
         }
+      },
+      [theme.breakpoints.down('sm')]: {
+        paddingInline: 6
       }
     },
     label: {
