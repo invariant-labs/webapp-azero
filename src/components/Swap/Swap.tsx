@@ -343,12 +343,12 @@ export const Swap: React.FC<ISwap> = ({
       return 'Insufficient volume'
     }
 
-    return 'Swap tokens'
+    return 'Swap'
   }
   const hasShowRateMessage = () => {
     return (
       getStateMessage() === 'Insufficient balance' ||
-      getStateMessage() === 'Swap tokens' ||
+      getStateMessage() === 'Swap' ||
       getStateMessage() === 'Loading' ||
       getStateMessage() === 'Connect a wallet' ||
       getStateMessage() === 'Insufficient liquidity'
@@ -695,11 +695,11 @@ export const Swap: React.FC<ISwap> = ({
             className={
               getStateMessage() === 'Connect a wallet'
                 ? `${classes.swapButton}`
-                : getStateMessage() === 'Swap tokens' && progress === 'none'
+                : getStateMessage() === 'Swap' && progress === 'none'
                   ? `${classes.swapButton} ${classes.ButtonSwapActive}`
                   : classes.swapButton
             }
-            disabled={getStateMessage() !== 'Swap tokens' || progress !== 'none'}
+            disabled={getStateMessage() !== 'Swap' || progress !== 'none'}
             onClick={() => {
               if (
                 simulateResult.poolKey === null ||

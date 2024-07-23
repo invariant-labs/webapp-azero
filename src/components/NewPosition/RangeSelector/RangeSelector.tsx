@@ -191,15 +191,18 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
       setPlotMin(midPrice.x - initSideDist)
       setPlotMax(midPrice.x + initSideDist)
     } else {
-      setConcentrationIndex(0)
+      const newConcentrationIndex = concentrationArray[concentrationIndex]
+        ? Math.floor(concentrationIndex)
+        : concentrationArray.length - 1
+
+      setConcentrationIndex(newConcentrationIndex)
       const { leftRange, rightRange } = calculateConcentrationRange(
         tickSpacing,
-        concentrationArray[0],
+        concentrationArray[newConcentrationIndex],
         2,
         midPrice.index,
         isXtoY
       )
-
       changeRangeHandler(leftRange, rightRange)
       autoZoomHandler(leftRange, rightRange, true)
     }
@@ -357,6 +360,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
           ? concentrationArray.length - 1
           : concentrationIndex
       setConcentrationIndex(index)
+      console.log('test')
       const { leftRange, rightRange } = calculateConcentrationRange(
         tickSpacing,
         concentrationArray[index],
@@ -369,6 +373,24 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
       autoZoomHandler(leftRange, rightRange, true)
     }
   }, [midPrice.index, concentrationArray])
+
+  useEffect(() => {
+    if (shouldReversePlot) {
+      return
+    }
+
+    setConcentrationIndex(0)
+    const { leftRange, rightRange } = calculateConcentrationRange(
+      tickSpacing,
+      concentrationArray[0],
+      2,
+      midPrice.index,
+      isXtoY
+    )
+
+    changeRangeHandler(leftRange, rightRange)
+    autoZoomHandler(leftRange, rightRange, true)
+  }, [tokenASymbol, tokenBSymbol])
 
   return (
     <Grid container className={classes.wrapper} direction='column'>
