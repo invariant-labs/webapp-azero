@@ -137,10 +137,10 @@ const PoolListItem: React.FC<IProps> = ({
           <Typography>{`$${formatNumbers()(volume.toString())}${showPrefix(volume)}`}</Typography>
           <Typography>{`$${formatNumbers()(TVL.toString())}${showPrefix(TVL)}`}</Typography>
           <Box className={classes.action}>
-            <button className={classes.actionButton} onClick={handleOpenPosition}>
+            <button className={classes.actionButton} onClick={handleOpenSwap}>
               <img width={32} height={32} src={icons.horizontalSwapIcon} alt={'Swap'} />
             </button>
-            <button className={classes.actionButton} onClick={handleOpenSwap}>
+            <button className={classes.actionButton} onClick={handleOpenPosition}>
               <img width={32} height={32} src={icons.plusIcon} alt={'Open'} />
             </button>
           </Box>
