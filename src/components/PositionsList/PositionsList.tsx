@@ -1,7 +1,7 @@
 import { EmptyPlaceholder } from '@components/EmptyPlaceholder/EmptyPlaceholder'
 import { INoConnected, NoConnected } from '@components/NoConnected/NoConnected'
 import { PaginationList } from '@components/PaginationList/PaginationList'
-import { Box, Button, Grid, Hidden, InputAdornment, InputBase, Typography } from '@mui/material'
+import { Button, Grid, InputAdornment, InputBase, Typography } from '@mui/material'
 import loader from '@static/gif/loader.gif'
 import SearchIcon from '@static/svg/lupaDark.svg'
 import refreshIcon from '@static/svg/refresh.svg'
@@ -103,12 +103,10 @@ export const PositionsList: React.FC<IProps> = ({
         justifyContent='space-between'
         alignItems='center'>
         <Grid className={classes.searchRoot}>
-          {/* <Hidden smDown> */}
           <Grid className={classes.titleBar}>
             <Typography className={classes.title}>Your Liquidity Positions</Typography>
             <Typography className={classes.positionsNumber}>{String(length)}</Typography>
           </Grid>
-          {/* </Hidden> */}
           <Grid className={classes.searchWrapper}>
             <InputBase
               type={'text'}
@@ -122,13 +120,6 @@ export const PositionsList: React.FC<IProps> = ({
               onChange={handleChangeInput}
               value={searchValue}
             />
-            {/* <Box className={classes.titleMobileContainer}> */}
-            {/* <Hidden smUp>
-              <Grid className={classes.titleBar}>
-                <Typography className={classes.title}>Your Liquidity Positions</Typography>
-                <Typography className={classes.positionsNumber}>{String(length)}</Typography>
-              </Grid>
-            </Hidden> */}
             <Grid rowGap={1} justifyContent='space-between'>
               <Button
                 disabled={showNoConnected}
@@ -143,7 +134,6 @@ export const PositionsList: React.FC<IProps> = ({
                 <span className={classes.buttonText}>+ Add Position</span>
               </Button>
             </Grid>
-            {/* </Box> */}
           </Grid>
         </Grid>
       </Grid>
