@@ -475,7 +475,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
               color='secondary'
             />
           }
-          label='Only your positions'
+          label='Show only your positions'
           classes={{ label: classes.checkboxLabel }}
         />
       </Grid>
