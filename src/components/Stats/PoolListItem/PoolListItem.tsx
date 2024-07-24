@@ -1,11 +1,12 @@
 import React from 'react'
 import { theme } from '@static/theme'
 import { useStyles } from './style'
-import { Box, Button, Grid, Typography, useMediaQuery } from '@mui/material'
+import { Box, Grid, Typography, useMediaQuery } from '@mui/material'
 import { formatNumbers, showPrefix } from '@utils/utils'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
 import { useNavigate } from 'react-router-dom'
+import icons from '@static/icons'
 
 export enum SortType {
   NAME_ASC,
@@ -69,8 +70,12 @@ const PoolListItem: React.FC<IProps> = ({
   const handleOpenPosition = () => {
     navigate(`/newPosition/${symbolFrom}/${symbolTo}/0_01`)
   }
+
+  const handleOpenSwap = () => {
+    navigate(`/swap/${symbolFrom}/${symbolTo}`)
+  }
   return (
-    <Grid>
+    <Grid maxWidth='100%'>
       {displayType === 'token' ? (
         <Grid
           container
@@ -131,9 +136,14 @@ const PoolListItem: React.FC<IProps> = ({
           <Typography>{fee}%</Typography>
           <Typography>{`$${formatNumbers()(volume.toString())}${showPrefix(volume)}`}</Typography>
           <Typography>{`$${formatNumbers()(TVL.toString())}${showPrefix(TVL)}`}</Typography>
-          <Button className={classes.openPosition} onClick={handleOpenPosition}>
-            Open position
-          </Button>
+          <Box className={classes.action}>
+            <button className={classes.actionButton} onClick={handleOpenPosition}>
+              <img width={32} height={32} src={icons.horizontalSwapIcon} alt={'Swap'} />
+            </button>
+            <button className={classes.actionButton} onClick={handleOpenSwap}>
+              <img width={32} height={32} src={icons.plusIcon} alt={'Open'} />
+            </button>
+          </Box>
         </Grid>
       ) : (
         <Grid container classes={{ container: classes.container, root: classes.header }}>
@@ -224,7 +234,7 @@ const PoolListItem: React.FC<IProps> = ({
               <ArrowDropDownIcon className={classes.icon} />
             ) : null}
           </Typography>
-          <Typography>Action</Typography>
+          <Typography align='right'>Action</Typography>
         </Grid>
       )}
     </Grid>

@@ -5,17 +5,21 @@ export const useStyles = makeStyles()(() => ({
   container: {
     color: colors.white.main,
     display: 'grid',
-    gridTemplateColumns: '5% auto 15% 15%  15% 140px',
+    gridTemplateColumns: '5% auto 15% 15%  15% 80px',
     padding: '18px 0',
-
     backgroundColor: colors.invariant.component,
     borderBottom: `1px solid ${colors.invariant.light}`,
     whiteSpace: 'nowrap',
+    maxWidth: '100%',
+
     '& p': {
       ...typography.heading4,
       display: 'flex',
-      justifyContent: 'start',
+      justifyContent: 'flex-start',
       alignItems: 'center'
+    },
+    '& p:last-child': {
+      justifyContent: 'flex-end'
     },
 
     [theme.breakpoints.down('sm')]: {
@@ -109,18 +113,28 @@ export const useStyles = makeStyles()(() => ({
     color: colors.invariant.text,
     ...typography.caption1
   },
-  openPosition: {
-    width: 140,
+  action: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    gap: 8
+  },
+  actionButton: {
     height: 32,
-    background: colors.invariant.greenLinearGradient,
-    ...typography.body1,
+    background: 'none',
+    width: 32,
+    padding: 0,
+    margin: 0,
+    border: 'none',
+
     color: colors.invariant.black,
     textTransform: 'none',
-    borderRadius: 10,
-    transition: 'filter 0.3s linear',
+
+    transition: 'filter 0.2s linear',
 
     '&:hover': {
-      filter: 'brightness(1.15)'
+      filter: 'brightness(1.2)',
+      cursor: 'pointer'
     }
   }
 }))
