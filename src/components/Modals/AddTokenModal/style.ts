@@ -13,7 +13,7 @@ const useStyles = makeStyles()((theme: Theme) => {
       maxWidth: '100%'
     },
     popover: {
-      marginTop: 'calc(50vh - 350px)',
+      marginTop: 'max(calc(50vh - 350px), 20px)',
       marginLeft: 'calc(50vw - 241px)',
       [theme.breakpoints.down('sm')]: {
         display: 'flex',
