@@ -1117,3 +1117,22 @@ export const validConcentrationMidPriceTick = (
 
   return midPriceTick
 }
+
+export const findClosestIndexByValue = (arr: number[], value: number): number => {
+  const high = arr.length - 1
+
+  if (value < arr[0]) {
+    return 0
+  }
+
+  if (value > arr[high]) {
+    return high
+  }
+
+  for (let i = arr.length - 1; i >= 0; i--) {
+    if (Number(arr[i].toFixed(0)) <= Number(value.toFixed(0))) {
+      return i
+    }
+  }
+  return high
+}

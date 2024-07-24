@@ -8,6 +8,7 @@ import {
   calcPriceByTickIndex,
   calcTicksAmountInRange,
   calculateConcentrationRange,
+  findClosestIndexByValue,
   nearestTickIndex,
   toMaxNumericPlaces
 } from '@utils/utils'
@@ -98,6 +99,8 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   const [currentMidPrice, setCurrentMidPrice] = useState(midPrice)
   const [triggerReset, setTriggerReset] = useState(false)
 
+  const [previousConcentration, setPreviousConcentration] = useState(0)
+
   const isMountedRef = useRef(false)
 
   useEffect(() => {
@@ -187,11 +190,13 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
       setPlotMin(midPrice.x - initSideDist)
       setPlotMax(midPrice.x + initSideDist)
     } else {
-      const newConcentrationIndex = concentrationArray[concentrationIndex]
-        ? Math.floor(concentrationIndex)
-        : concentrationArray.length - 1
+      const newConcentrationIndex = findClosestIndexByValue(
+        concentrationArray,
+        previousConcentration
+      )
 
       setConcentrationIndex(newConcentrationIndex)
+      setPreviousConcentration(concentrationArray[newConcentrationIndex])
       const { leftRange, rightRange } = calculateConcentrationRange(
         tickSpacing,
         concentrationArray[newConcentrationIndex],
@@ -273,6 +278,13 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
       unblockUpdatePriceRange()
     }
   }, [ticksLoading, isMountedRef, midPrice.index, poolKey])
+
+  useEffect(() => {
+    const newConcentrationIndex = findClosestIndexByValue(concentrationArray, previousConcentration)
+
+    setConcentrationIndex(newConcentrationIndex)
+    setPreviousConcentration(concentrationArray[newConcentrationIndex])
+  }, [concentrationArray])
 
   const autoZoomHandler = (left: bigint, right: bigint, canZoomCloser: boolean = false) => {
     const { leftInRange, rightInRange } = getTicksInsideRange(left, right, isXtoY)
@@ -368,7 +380,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
       changeRangeHandler(leftRange, rightRange)
       autoZoomHandler(leftRange, rightRange, true)
     }
-  }, [midPrice.index, concentrationArray])
+  }, [midPrice.index])
 
   useEffect(() => {
     if (shouldReversePlot) {
@@ -549,6 +561,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
               valueIndex={concentrationIndex}
               values={concentrationArray}
               valueChangeHandler={value => {
+                setPreviousConcentration(concentrationArray[value])
                 setConcentrationIndex(value)
                 const { leftRange, rightRange } = calculateConcentrationRange(
                   tickSpacing,
