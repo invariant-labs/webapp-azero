@@ -10,8 +10,18 @@ import infoIcon from '@static/svg/info.svg'
 import refreshIcon from '@static/svg/refresh.svg'
 import settingIcon from '@static/svg/settings.svg'
 import SwapArrows from '@static/svg/swap-arrows.svg'
-import { DEFAULT_TOKEN_DECIMAL, REFRESHER_INTERVAL } from '@store/consts/static'
-import { convertBalanceToBigint, printBigint, stringToFixed, trimLeadingZeros } from '@utils/utils'
+import {
+  DEFAULT_SWAP_SLIPPAGE,
+  DEFAULT_TOKEN_DECIMAL,
+  REFRESHER_INTERVAL
+} from '@store/consts/static'
+import {
+  addressToTicker,
+  convertBalanceToBigint,
+  printBigint,
+  stringToFixed,
+  trimLeadingZeros
+} from '@utils/utils'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { Swap as SwapData } from '@store/reducers/swap'
 import { Status } from '@store/reducers/wallet'
@@ -25,6 +35,9 @@ import ExchangeRate from './ExchangeRate/ExchangeRate'
 import TransactionDetailsBox from './TransactionDetailsBox/TransactionDetailsBox'
 import useStyles from './style'
 import { SimulateResult, TokenPriceData } from '@store/consts/types'
+import TokensInfo from './TokensInfo/TokensInfo'
+import { VariantType } from 'notistack'
+import { useNavigate } from 'react-router-dom'
 
 export interface Pools {
   tokenX: string
@@ -84,6 +97,7 @@ export interface ISwap {
   isBalanceLoading: boolean
   simulateResult: SimulateResult
   simulateSwap: (simulate: Simulate) => void
+  copyTokenAddressHandler: (message: string, variant: VariantType) => void
 }
 
 export const Swap: React.FC<ISwap> = ({
@@ -114,7 +128,8 @@ export const Swap: React.FC<ISwap> = ({
   isBalanceLoading,
   swapData,
   simulateResult,
-  simulateSwap
+  simulateSwap,
+  copyTokenAddressHandler
 }) => {
   const { classes } = useStyles()
   enum inputTarget {
@@ -139,6 +154,19 @@ export const Swap: React.FC<ISwap> = ({
   const [refresherTime, setRefresherTime] = React.useState<number>(REFRESHER_INTERVAL)
 
   const timeoutRef = useRef<number>(0)
+
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const tokenFromAddress = addressToTicker(tokens[tokenFromIndex ?? -1]?.assetAddress)
+    const tokenToAddress = addressToTicker(tokens[tokenToIndex ?? -1]?.assetAddress)
+
+    if (tokenFromAddress || tokenToAddress) {
+      navigate(`/swap/${tokenFromAddress || '-'}/${tokenToAddress || '-'}`, {
+        replace: true
+      })
+    }
+  }, [tokenToIndex, tokenFromIndex])
 
   useEffect(() => {
     if (!!tokens.length && tokenFromIndex === null && tokenToIndex === null) {
@@ -335,12 +363,12 @@ export const Swap: React.FC<ISwap> = ({
       return 'Insufficient volume'
     }
 
-    return 'Swap tokens'
+    return 'Swap'
   }
   const hasShowRateMessage = () => {
     return (
       getStateMessage() === 'Insufficient balance' ||
-      getStateMessage() === 'Swap tokens' ||
+      getStateMessage() === 'Swap' ||
       getStateMessage() === 'Loading' ||
       getStateMessage() === 'Connect a wallet' ||
       getStateMessage() === 'Insufficient liquidity'
@@ -420,6 +448,11 @@ export const Swap: React.FC<ISwap> = ({
       <Grid container className={classes.header}>
         <Typography component='h1'>Swap tokens</Typography>
         <Box className={classes.swapControls}>
+          <Button className={classes.slippageButton} onClick={e => handleClickSettings(e)}>
+            <p>
+              Slippage: <span className={classes.slippageAmount}>{slippTolerance}%</span>
+            </p>
+          </Button>
           <Button
             onClick={handleRefresh}
             className={classes.refreshIconBtn}
@@ -444,12 +477,13 @@ export const Swap: React.FC<ISwap> = ({
             setSlippage={setSlippage}
             handleClose={handleCloseSettings}
             anchorEl={anchorEl}
-            defaultSlippage={'1.00'}
+            defaultSlippage={DEFAULT_SWAP_SLIPPAGE}
             initialSlippage={initialSlippage}
           />
         </Grid>
       </Grid>
       <Grid container className={classes.root} direction='column'>
+        <Typography className={classes.swapLabel}>Pay</Typography>
         <Box
           className={classNames(
             classes.exchangeRoot,
@@ -534,6 +568,9 @@ export const Swap: React.FC<ISwap> = ({
             </Box>
           </Box>
         </Box>
+        <Typography className={classes.swapLabel} mt={1.5}>
+          Receive
+        </Typography>
         <Box
           className={classNames(
             classes.exchangeRoot,
@@ -657,6 +694,13 @@ export const Swap: React.FC<ISwap> = ({
           slippage={+slippTolerance}
           isLoadingRate={getStateMessage() === 'Loading'}
         />
+        <TokensInfo
+          tokenFrom={tokens[tokenFromIndex!]}
+          tokenTo={tokens[tokenToIndex!]}
+          tokenToPrice={tokenToPriceData?.price}
+          tokenFromPrice={tokenFromPriceData?.price}
+          copyTokenAddressHandler={copyTokenAddressHandler}
+        />
         {walletStatus !== Status.Initialized && getStateMessage() !== 'Loading' ? (
           <ChangeWalletButton
             name='Connect wallet'
@@ -670,12 +714,12 @@ export const Swap: React.FC<ISwap> = ({
             content={getStateMessage()}
             className={
               getStateMessage() === 'Connect a wallet'
-                ? `${classes.swapButton} ${classes.buttonSelectDisabled}`
-                : getStateMessage() === 'Swap tokens' && progress === 'none'
+                ? `${classes.swapButton}`
+                : getStateMessage() === 'Swap' && progress === 'none'
                   ? `${classes.swapButton} ${classes.ButtonSwapActive}`
                   : classes.swapButton
             }
-            disabled={getStateMessage() !== 'Swap tokens' || progress !== 'none'}
+            disabled={getStateMessage() !== 'Swap' || progress !== 'none'}
             onClick={() => {
               if (
                 simulateResult.poolKey === null ||

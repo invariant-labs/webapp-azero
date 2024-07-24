@@ -9,6 +9,7 @@ import {
 import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import {
   ALL_FEE_TIERS_DATA,
+  DEFAULT_NEW_POSITION_SLIPPAGE,
   U128MAX,
   bestTiers,
   commonTokensForNetworks
@@ -322,14 +323,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     }
   }, [poolKey])
 
-  const initialIsDiscreteValue = localStorage.getItem('IS_PLOT_DISCRETE')
-    ? localStorage.getItem('IS_PLOT_DISCRETE') === 'true'
-    : true
-
-  const setIsDiscreteValue = (val: boolean) => {
-    localStorage.setItem('IS_PLOT_DISCRETE', val ? 'true' : 'false')
-  }
-
   const addTokenHandler = async (address: string) => {
     const psp22 = SingletonPSP22.getInstance()
 
@@ -341,7 +334,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
           addNewTokenToLocalStorage(address, currentNetwork)
           dispatch(
             snackbarsActions.add({
-              message: 'Token added to your list',
+              message: 'Token added.',
               variant: 'success',
               persist: false
             })
@@ -350,7 +343,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
         .catch(() => {
           dispatch(
             snackbarsActions.add({
-              message: 'Token adding failed',
+              message: 'Token add failed.',
               variant: 'error',
               persist: false
             })
@@ -359,7 +352,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     } else {
       dispatch(
         snackbarsActions.add({
-          message: 'Token already exists on your list',
+          message: 'Token already in list.',
           variant: 'info',
           persist: false
         })
@@ -435,7 +428,8 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     }
   }, [tokenBIndex])
 
-  const initialSlippage = localStorage.getItem('INVARIANT_NEW_POSITION_SLIPPAGE') ?? '1.00'
+  const initialSlippage =
+    localStorage.getItem('INVARIANT_NEW_POSITION_SLIPPAGE') ?? DEFAULT_NEW_POSITION_SLIPPAGE
 
   const onSlippageChange = (slippage: string) => {
     localStorage.setItem('INVARIANT_NEW_POSITION_SLIPPAGE', slippage)
@@ -634,8 +628,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       poolIndex={poolIndex}
       currentPairReversed={currentPairReversed}
       bestTiers={bestTiers[currentNetwork]}
-      initialIsDiscreteValue={initialIsDiscreteValue}
-      onDiscreteChange={setIsDiscreteValue}
       currentPriceSqrt={
         poolsData[poolKey] ? poolsData[poolKey].sqrtPrice : calculateSqrtPrice(midPrice.index)
       }
@@ -700,7 +692,10 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       }}
       showNoConnected={walletStatus !== Status.Initialized}
       noConnectedBlockerProps={{
-        onConnect: openWalletSelectorModal,
+        onConnect: async () => {
+          await openWalletSelectorModal()
+          dispatch(walletActions.connect(false))
+        },
         descCustomText: 'Cannot add any liquidity.'
       }}
       poolKey={poolKey}

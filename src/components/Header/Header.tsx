@@ -55,7 +55,8 @@ export const Header: React.FC<IHeader> = ({
   const routes = ['swap', 'pool', 'stats']
 
   const otherRoutesToHighlight: Record<string, RegExp[]> = {
-    pool: [/^newPosition\/*/, /^position\/*/]
+    pool: [/^newPosition\/*/, /^position\/*/],
+    swap: [/^swap\/*/]
   }
 
   const [activePath, setActive] = useState('swap')
@@ -89,7 +90,11 @@ export const Header: React.FC<IHeader> = ({
             <CardMedia
               className={classes.logo}
               image={icons.LogoTitle}
-              onClick={() => navigate('/swap')}
+              onClick={() => {
+                if (!activePath.startsWith('swap')) {
+                  navigate('/swap')
+                }
+              }}
             />
           </Grid>
         </Grid>
@@ -104,7 +109,11 @@ export const Header: React.FC<IHeader> = ({
               <CardMedia
                 className={classes.logoShort}
                 image={icons.LogoShort}
-                onClick={() => navigate('/swap')}
+                onClick={() => {
+                  if (!activePath.startsWith('swap')) {
+                    navigate('/swap')
+                  }
+                }}
               />
             </Grid>
           </Grid>
@@ -119,7 +128,11 @@ export const Header: React.FC<IHeader> = ({
             <Link key={`path-${path}`} to={`/${path}`} className={classes.link}>
               <NavbarButton
                 name={path}
-                onClick={() => {
+                onClick={e => {
+                  if (path === 'swap' && activePath.startsWith('swap')) {
+                    e.preventDefault()
+                  }
+
                   setActive(path)
                 }}
                 active={

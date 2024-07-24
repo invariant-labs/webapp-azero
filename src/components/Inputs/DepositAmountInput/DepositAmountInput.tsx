@@ -42,7 +42,7 @@ export const DepositAmountInput: React.FC<IProps> = ({
   priceLoading = false,
   isBalanceLoading
 }) => {
-  const { classes } = useStyles()
+  const { classes } = useStyles({ isSelected: !!currency })
 
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -109,7 +109,7 @@ export const DepositAmountInput: React.FC<IProps> = ({
                 <Typography className={classes.currencySymbol}>{currency}</Typography>
               </>
             ) : (
-              <Typography className={classes.noCurrencyText}>Select</Typography>
+              <Typography className={classes.noCurrencyText}>-</Typography>
             )}
           </Grid>
           <Input
@@ -127,6 +127,7 @@ export const DepositAmountInput: React.FC<IProps> = ({
             }}
           />
         </Grid>
+
         <Grid
           container
           justifyContent='space-between'
@@ -139,28 +140,24 @@ export const DepositAmountInput: React.FC<IProps> = ({
             alignItems='center'
             wrap='nowrap'
             onClick={onMaxClick}>
-            {
-              <>
-                <Typography className={classes.caption2}>
-                  Balance:{' '}
-                  {isBalanceLoading ? (
-                    <img src={loadingAnimation} className={classes.loadingBalance} alt='loading' />
-                  ) : (
-                    formatNumber(balanceValue || 0)
-                  )}{' '}
-                  {currency}
-                </Typography>
-                <Button
-                  className={
-                    currency
-                      ? classes.maxButton
-                      : `${classes.maxButton} ${classes.maxButtonNotActive}`
-                  }
-                  onClick={onMaxClick}>
-                  Max
-                </Button>
-              </>
-            }
+            <Typography className={classes.caption2}>
+              Balance:{' '}
+              {isBalanceLoading ? (
+                <img src={loadingAnimation} className={classes.loadingBalance} alt='loading' />
+              ) : balanceValue ? (
+                formatNumber(balanceValue || 0)
+              ) : (
+                <span style={{ marginLeft: '8px' }}>-</span>
+              )}{' '}
+              {currency}
+            </Typography>
+            <Button
+              className={
+                currency ? classes.maxButton : `${classes.maxButton} ${classes.maxButtonNotActive}`
+              }
+              onClick={onMaxClick}>
+              Max
+            </Button>
           </Grid>
           <Grid className={classes.percentages} container alignItems='center' wrap='nowrap'>
             {currency ? (

@@ -241,14 +241,6 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
     return ticksData
   }, [ticksData, ticksLoading, position, position?.tokenX, position?.tokenY])
 
-  const initialIsDiscreteValue = localStorage.getItem('IS_PLOT_DISCRETE')
-    ? localStorage.getItem('IS_PLOT_DISCRETE') === 'true'
-    : true
-
-  const setIsDiscreteValue = (val: boolean) => {
-    localStorage.setItem('IS_PLOT_DISCRETE', val ? 'true' : 'false')
-  }
-
   const [tokenXPriceData, setTokenXPriceData] = useState<TokenPriceData | undefined>(undefined)
   const [tokenYPriceData, setTokenYPriceData] = useState<TokenPriceData | undefined>(undefined)
 
@@ -395,8 +387,6 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
         fee={position.poolKey.feeTier.fee}
         min={min}
         max={max}
-        initialIsDiscreteValue={initialIsDiscreteValue}
-        onDiscreteChange={setIsDiscreteValue}
         showFeesLoader={showFeesLoader}
         hasTicksError={hasTicksError}
         reloadHandler={() => {

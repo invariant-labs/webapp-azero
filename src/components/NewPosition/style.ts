@@ -4,7 +4,8 @@ import { makeStyles } from 'tss-react/mui'
 const useStyles = makeStyles()(theme => {
   return {
     wrapper: {
-      width: 952
+      width: 952,
+      maxWidth: '100%'
     },
     headerContainer: {
       columnGap: 24
@@ -43,7 +44,7 @@ const useStyles = makeStyles()(theme => {
       position: 'relative',
       flexDirection: 'row',
 
-      '& .noConnectedLayer': {
+      '& .blurLayer': {
         height: '100%'
       },
 
@@ -51,7 +52,7 @@ const useStyles = makeStyles()(theme => {
         flexDirection: 'column',
         minWidth: 0,
 
-        '& .noConnectedInfo': {
+        '& .blurInfo': {
           justifyContent: 'flex-start',
           paddingTop: 60
         }

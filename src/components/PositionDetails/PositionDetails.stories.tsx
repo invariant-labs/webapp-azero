@@ -21,7 +21,6 @@ type Story = StoryObj<typeof meta>
 export const Primary: Story = {
   args: {
     currentPrice: 10000 as any,
-    initialIsDiscreteValue: false,
     leftRange: {
       index: 2 as any,
       x: 23 as any
@@ -36,7 +35,6 @@ export const Primary: Story = {
       index: 2 as any,
       x: 45354 as any
     },
-    onDiscreteChange: fn(),
     reloadHandler: fn(),
     ticksLoading: false,
     tickSpacing: 1 as any,
