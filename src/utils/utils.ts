@@ -4,6 +4,7 @@ import {
   Network,
   PSP22,
   PoolKey,
+  Position,
   Tick,
   Tickmap,
   calculateSqrtPrice,
@@ -1116,4 +1117,52 @@ export const validConcentrationMidPriceTick = (
   }
 
   return midPriceTick
+}
+
+type LiquidityTickWithoutIndex = Omit<LiquidityTick, 'index'>
+
+export const getLiquidityTicksByPositionsList = (
+  poolKey: PoolKey,
+  positions: Position[]
+): LiquidityTick[] => {
+  const ticks: Record<number, LiquidityTickWithoutIndex> = {}
+
+  positions.forEach(position => {
+    if (poolKeyToString(position.poolKey) === poolKeyToString(poolKey)) {
+      updateTick(ticks, Number(position.lowerTickIndex), position.liquidity, true)
+      updateTick(ticks, Number(position.upperTickIndex), position.liquidity, false)
+    }
+  })
+
+  return Object.entries(ticks).map(([index, { liquidityChange, sign }]) => ({
+    index: BigInt(index),
+    liquidityChange,
+    sign
+  }))
+}
+
+export const updateTick = (
+  ticks: Record<number, LiquidityTickWithoutIndex>,
+  tickIndex: number,
+  positionLiquidity: bigint,
+  isLowerTick: boolean
+) => {
+  if (!ticks[tickIndex]) {
+    ticks[tickIndex] = {
+      liquidityChange: positionLiquidity,
+      sign: isLowerTick
+    }
+  }
+
+  const tick = ticks[tickIndex]
+
+  if (tick.sign === isLowerTick) {
+    tick.liquidityChange += positionLiquidity
+  } else {
+    tick.liquidityChange -= positionLiquidity
+    if (tick.liquidityChange < 0) {
+      tick.liquidityChange = -tick.liquidityChange
+      tick.sign = isLowerTick
+    }
+  }
 }

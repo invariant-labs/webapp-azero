@@ -20,6 +20,7 @@ import {
   createPlaceholderLiquidityPlot,
   deserializeTickmap,
   ensureError,
+  getLiquidityTicksByPositionsList,
   isErrorMessage,
   poolKeyToString
 } from '@utils/utils'
@@ -306,61 +307,7 @@ export function* handleGetCurrentPlotTicks(action: PayloadAction<GetCurrentTicks
       yield* call(handleGetRemainingPositions)
       const { list } = yield* select(positionsList)
 
-      const ticks: { [key: number]: { liquidityChange: bigint; sign: boolean } } = {}
-
-      list.forEach(position => {
-        if (poolKeyToString(position.poolKey) !== poolKeyToString(poolKey)) {
-          return
-        }
-
-        if (!ticks[Number(position.lowerTickIndex)]) {
-          ticks[Number(position.lowerTickIndex)] = {
-            liquidityChange: position.liquidity,
-            sign: true
-          }
-        }
-
-        if (!ticks[Number(position.upperTickIndex)]) {
-          ticks[Number(position.upperTickIndex)] = {
-            liquidityChange: position.liquidity,
-            sign: false
-          }
-        }
-
-        if (ticks[Number(position.lowerTickIndex)].sign) {
-          ticks[Number(position.lowerTickIndex)].liquidityChange += position.liquidity
-        } else {
-          if (ticks[Number(position.lowerTickIndex)].liquidityChange - position.liquidity < 0) {
-            ticks[Number(position.lowerTickIndex)] = {
-              liquidityChange:
-                ticks[Number(position.lowerTickIndex)].liquidityChange - position.liquidity,
-              sign: true
-            }
-          } else {
-            ticks[Number(position.lowerTickIndex)].liquidityChange - position.liquidity
-          }
-        }
-
-        if (!ticks[Number(position.upperTickIndex)].sign) {
-          ticks[Number(position.upperTickIndex)].liquidityChange += position.liquidity
-        } else {
-          if (ticks[Number(position.upperTickIndex)].liquidityChange - position.liquidity < 0) {
-            ticks[Number(position.upperTickIndex)] = {
-              liquidityChange:
-                ticks[Number(position.upperTickIndex)].liquidityChange - position.liquidity,
-              sign: false
-            }
-          } else {
-            ticks[Number(position.upperTickIndex)].liquidityChange - position.liquidity
-          }
-        }
-      })
-
-      rawTicks = Object.entries(ticks).map(([index, { liquidityChange, sign }]) => ({
-        index: BigInt(index),
-        liquidityChange,
-        sign
-      }))
+      rawTicks = getLiquidityTicksByPositionsList(poolKey, list)
     } else {
       rawTicks = yield* call(
         [invariant, invariant.getAllLiquidityTicks],
