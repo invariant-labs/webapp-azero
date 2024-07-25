@@ -19,6 +19,8 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     width: 500,
     position: 'relative',
     paddingBottom: 9,
+    rowGap: 8,
+
     '& h1': {
       ...typography.heading4,
       color: colors.white.main
@@ -205,7 +207,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     paddingInline: 15,
     borderRadius: '10px',
     alignItems: 'center',
-    height: 32
+    height: 34
   },
 
   transactionDetailsHeader: {
@@ -230,6 +232,12 @@ export const useStyles = makeStyles()((theme: Theme) => ({
       flexDirection: 'row-reverse',
       columnGap: 8,
       marginLeft: 0
+    },
+
+    '& svg ': {
+      height: 32 + '!important',
+      width: 20,
+      minWidth: '100%'
     }
   },
   swapButton: {

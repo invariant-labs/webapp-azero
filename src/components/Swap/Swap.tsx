@@ -646,7 +646,6 @@ export const Swap: React.FC<ISwap> = ({
             <Grid className={classes.transactionDetailsWrapper}>
               <Typography className={classes.transactionDetailsHeader}>
                 {detailsOpen && canShowDetails ? 'Hide' : 'Show'} transaction details
-                <CardMedia image={infoIcon} className={classes.infoIcon} />
               </Typography>
             </Grid>
           </button>
@@ -654,13 +653,19 @@ export const Swap: React.FC<ISwap> = ({
             {tokenFromIndex !== null &&
               tokenToIndex !== null &&
               tokenFromIndex !== tokenToIndex && (
-                <Box width={20} height={20}>
+                <Grid
+                  container
+                  alignItems='center'
+                  justifyContent='center'
+                  width={20}
+                  height={34}
+                  minWidth='fit-content'>
                   <Refresher
                     currentIndex={refresherTime}
                     maxIndex={REFRESHER_INTERVAL}
                     onClick={handleRefresh}
                   />
-                </Box>
+                </Grid>
               )}
 
             {canShowDetails ? (
