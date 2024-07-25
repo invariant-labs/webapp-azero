@@ -20,7 +20,8 @@ const useStyles = makeStyles()((theme: Theme) => {
       borderRadius: 20,
       width: 500,
       [theme.breakpoints.down('sm')]: {
-        maxWidth: '100vw'
+        maxWidth: '100vw',
+        padding: '16px 8px '
       },
       '& .MuiCheckbox-root.Mui-checked': {
         color: colors.green.button
@@ -126,12 +127,17 @@ const useStyles = makeStyles()((theme: Theme) => {
       borderTop: `1px solid ${colors.invariant.light}`,
       width: 451,
       height: 400,
-      paddingTop: 8
+      paddingTop: 8,
+      [theme.breakpoints.down('sm')]: {
+        flexDirection: 'column',
+        width: 501
+      }
     },
 
     tokenContainer: {
       display: 'flex',
-      flexDirection: 'column'
+      flexDirection: 'column',
+      minWidth: 'min-content'
     },
 
     tokenItem: {
@@ -140,7 +146,8 @@ const useStyles = makeStyles()((theme: Theme) => {
       marginBottom: 4,
       borderRadius: 24,
       cursor: 'pointer',
-      padding: '32px 16px ',
+      padding: '0 16px ',
+
       '& > p': {
         whiteSpace: 'nowrap'
       },
@@ -184,12 +191,13 @@ const useStyles = makeStyles()((theme: Theme) => {
       whiteSpace: 'nowrap'
     },
     tokenBalanceStatus: {
-      filter: 'brightness(0.8)',
       color: colors.invariant.textGrey,
-      ...typography.body2,
-      minWidth: 'auto',
+      maxHeight: 40,
+      '& p': {
+        ...typography.body2
+      },
 
-      '& span': {
+      '& p:last-child': {
         color: colors.invariant.text
       }
     },
