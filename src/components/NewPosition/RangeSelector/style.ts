@@ -29,7 +29,8 @@ const useStyles = makeStyles()(theme => {
       gap: 16
     },
     topInnerWrapper: {
-      minHeight: 300
+      minHeight: 300,
+      maxWidth: '100%'
     },
     plot: {
       width: '100%',

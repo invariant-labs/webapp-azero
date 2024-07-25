@@ -34,14 +34,9 @@ export const AddTokenModal: React.FC<IProps> = ({ open, handleClose, addToken })
             {'\u2715'}
           </Button>
         </Grid>
-        <Grid
-          className={classes.lowerRow}
-          container
-          direction='row'
-          justifyContent='space-between'
-          wrap='nowrap'>
+        <Grid container direction='row' justifyContent='space-between' wrap='nowrap'>
           <Input
-            className={classes.input}
+            classes={{ input: classes.input }}
             placeholder='Token address'
             onChange={e => setAddress(e.target.value)}
             value={address}

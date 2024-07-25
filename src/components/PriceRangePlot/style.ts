@@ -5,6 +5,7 @@ import { makeStyles } from 'tss-react/mui'
 export const useStyles = makeStyles()((theme: Theme) => ({
   container: {
     height: '100%',
+    maxWidth: '100%',
     position: 'relative',
     '& g > text': {
       stroke: 'none',

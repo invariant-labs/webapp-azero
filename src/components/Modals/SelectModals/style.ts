@@ -21,7 +21,7 @@ const useStyles = makeStyles()((theme: Theme) => {
       width: 500,
       [theme.breakpoints.down('sm')]: {
         maxWidth: '100vw',
-        padding: '16px 8px '
+        padding: '20px 16px'
       },
       '& .MuiCheckbox-root.Mui-checked': {
         color: colors.green.button
@@ -67,7 +67,7 @@ const useStyles = makeStyles()((theme: Theme) => {
       border: `1px solid ${colors.invariant.newDark}`,
       borderColor: colors.invariant.newDark,
       borderRadius: 15,
-      padding: '18px 10px 17px 10px',
+      padding: '13px 44px 13px 10px',
       whiteSpace: 'nowrap',
       overflow: 'hidden',
       textOverflow: 'ellipsis',
@@ -86,7 +86,7 @@ const useStyles = makeStyles()((theme: Theme) => {
       width: 24,
       height: 26,
       right: '12px',
-      top: '18px'
+      top: '14px'
     },
     commonTokensHeader: {
       ...typography.body2
@@ -355,7 +355,8 @@ const useStyles = makeStyles()((theme: Theme) => {
     },
     addIcon: {
       marginLeft: 10,
-      cursor: 'pointer'
+      cursor: 'pointer',
+      fontSize: 28
     }
   }
 })
