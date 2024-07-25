@@ -69,7 +69,16 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const shouldNotUpdatePriceRange = useSelector(shouldNotUpdateRange)
 
   const { success, inProgress } = useSelector(initPosition)
-  const { data: ticksData, loading: ticksLoading, hasError: hasTicksError } = useSelector(plotTicks)
+
+  const [onlyUserPositions, setOnlyUserPositions] = useState(false)
+  const {
+    allData,
+    userData,
+    loading: ticksLoading,
+    hasError: hasTicksError
+  } = useSelector(plotTicks)
+  const ticksData = onlyUserPositions ? userData : allData
+
   const isFetchingNewPool = useSelector(isLoadingLatestPoolsForTransaction)
   const currentNetwork = useSelector(networkType)
 
@@ -145,8 +154,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
           isXtoY:
             allPools[poolIndex].poolKey.tokenX ===
             tokens[currentPairReversed === true ? tokenBIndex : tokenAIndex].assetAddress,
-          disableLoading: true,
-          onlyUserPositions
+          disableLoading: true
         })
       )
     }
@@ -247,8 +255,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
           positionsActions.getCurrentPlotTicks({
             poolKey: allPoolKeys[poolKey],
             isXtoY,
-            fetchTicksAndTickmap: true,
-            onlyUserPositions
+            fetchTicksAndTickmap: true
           })
         )
       }
@@ -525,28 +532,12 @@ export const NewPositionWrapper: React.FC<IProps> = ({
             isXtoY:
               allPools[poolIndex].poolKey.tokenX ===
               tokens[currentPairReversed === true ? tokenBIndex : tokenAIndex].assetAddress,
-            fetchTicksAndTickmap: true,
-            onlyUserPositions
+            fetchTicksAndTickmap: true
           })
         )
       }
     }
   }
-
-  const [onlyUserPositions, setOnlyUserPositions] = useState(false)
-
-  useEffect(() => {
-    if (poolKey !== '') {
-      dispatch(
-        positionsActions.getCurrentPlotTicks({
-          poolKey: allPoolKeys[poolKey],
-          isXtoY,
-          fetchTicksAndTickmap: true,
-          onlyUserPositions
-        })
-      )
-    }
-  }, [onlyUserPositions])
 
   return (
     <NewPosition
@@ -603,8 +594,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
             dispatch(
               positionsActions.getCurrentPlotTicks({
                 poolKey: allPoolKeys[poolKey],
-                isXtoY: allPoolKeys[poolKey].tokenX === tokens[tokenAIndex].assetAddress.toString(),
-                onlyUserPositions
+                isXtoY: allPoolKeys[poolKey].tokenX === tokens[tokenAIndex].assetAddress.toString()
               })
             )
           } else if (
@@ -668,8 +658,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
               poolKey: allPoolKeys[poolKey],
               isXtoY:
                 allPools[poolIndex].poolKey.tokenX ===
-                tokens[currentPairReversed === true ? tokenBIndex : tokenAIndex].assetAddress,
-              onlyUserPositions
+                tokens[currentPairReversed === true ? tokenBIndex : tokenAIndex].assetAddress
             })
           )
         }

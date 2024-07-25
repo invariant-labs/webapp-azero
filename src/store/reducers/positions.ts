@@ -19,7 +19,8 @@ export type TickPlotPositionData = Omit<PlotTickData, 'y'>
 export type InitMidPrice = TickPlotPositionData & { sqrtPrice: bigint }
 
 export interface PlotTicks {
-  data: PlotTickData[]
+  allData: PlotTickData[]
+  userData: PlotTickData[]
   loading: boolean
   hasError?: boolean
 }
@@ -58,7 +59,7 @@ export interface GetCurrentTicksData {
   isXtoY: boolean
   fetchTicksAndTickmap?: boolean
   disableLoading?: boolean
-  onlyUserPositions?: boolean
+  onlyUserPositionsEnabled?: boolean
 }
 
 export interface ClosePositionData {
@@ -89,7 +90,8 @@ export interface HandleClaimFee {
 export const defaultState: IPositionsStore = {
   lastPage: 1,
   plotTicks: {
-    data: [],
+    allData: [],
+    userData: [],
     loading: false
   },
   positionsList: {
@@ -128,14 +130,19 @@ const positionsSlice = createSlice({
       state.initPosition.success = action.payload
       return state
     },
-    setPlotTicks(state, action: PayloadAction<PlotTickData[]>) {
-      state.plotTicks.data = action.payload
+    setPlotTicks(
+      state,
+      action: PayloadAction<{ allPlotTicks: PlotTickData[]; userPlotTicks: PlotTickData[] }>
+    ) {
+      state.plotTicks.allData = action.payload.allPlotTicks
+      state.plotTicks.userData = action.payload.userPlotTicks
       state.plotTicks.loading = false
       state.plotTicks.hasError = false
       return state
     },
     setErrorPlotTicks(state, action: PayloadAction<PlotTickData[]>) {
-      state.plotTicks.data = action.payload
+      state.plotTicks.allData = action.payload
+      state.plotTicks.userData = action.payload
       state.plotTicks.loading = false
       state.plotTicks.hasError = true
       return state
