@@ -411,6 +411,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
           <Typography className={classes.header}>Price range</Typography>
           <Grid className={classes.activeLiquidityContainer} container direction='column'>
             <Tooltip
+              enterTouchDelay={0}
               title={
                 <>
                   <Typography className={classes.liquidityTitle}>Active liquidity</Typography>

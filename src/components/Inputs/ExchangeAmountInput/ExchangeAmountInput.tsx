@@ -191,6 +191,7 @@ export const AmountInput: React.FC<IProps> = ({
                 </>
               ) : (
                 <Tooltip
+                  enterTouchDelay={0}
                   title='Cannot fetch price of token'
                   placement='bottom'
                   classes={{

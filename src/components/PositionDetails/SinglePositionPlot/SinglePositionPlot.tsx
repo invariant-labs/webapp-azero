@@ -142,6 +142,7 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
         <Typography className={classes.header}>Price range</Typography>
         <Grid>
           <Tooltip
+            enterTouchDelay={0}
             title={
               <>
                 <Typography className={classes.liquidityTitle}>Active liquidity</Typography>
