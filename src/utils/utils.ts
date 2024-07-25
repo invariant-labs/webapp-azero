@@ -1119,50 +1119,35 @@ export const validConcentrationMidPriceTick = (
   return midPriceTick
 }
 
-type LiquidityTickWithoutIndex = Omit<LiquidityTick, 'index'>
-
 export const getLiquidityTicksByPositionsList = (
   poolKey: PoolKey,
   positions: Position[]
 ): LiquidityTick[] => {
-  const ticks: Record<number, LiquidityTickWithoutIndex> = {}
+  const liquidityChanges: Record<number, bigint> = {}
 
   positions.forEach(position => {
     if (poolKeyToString(position.poolKey) === poolKeyToString(poolKey)) {
-      updateTick(ticks, Number(position.lowerTickIndex), position.liquidity, true)
-      updateTick(ticks, Number(position.upperTickIndex), position.liquidity, false)
+      const lowerTickIndex = Number(position.lowerTickIndex)
+      const upperTickIndex = Number(position.upperTickIndex)
+
+      liquidityChanges[lowerTickIndex] =
+        (liquidityChanges[lowerTickIndex] ?? 0n) + position.liquidity
+      liquidityChanges[upperTickIndex] =
+        (liquidityChanges[upperTickIndex] ?? 0n) - position.liquidity
     }
   })
 
-  return Object.entries(ticks).map(([index, { liquidityChange, sign }]) => ({
-    index: BigInt(index),
-    liquidityChange,
-    sign
-  }))
-}
+  const ticks: LiquidityTick[] = []
 
-export const updateTick = (
-  ticks: Record<number, LiquidityTickWithoutIndex>,
-  tickIndex: number,
-  positionLiquidity: bigint,
-  isLowerTick: boolean
-) => {
-  if (!ticks[tickIndex]) {
-    ticks[tickIndex] = {
-      liquidityChange: positionLiquidity,
-      sign: isLowerTick
+  Object.entries(liquidityChanges).forEach(([tickIndex, liquidityChangeTotal]) => {
+    const index = BigInt(tickIndex)
+    const [liquidityChange, sign] =
+      liquidityChangeTotal > 0n ? [liquidityChangeTotal, true] : [-liquidityChangeTotal, false]
+
+    if (liquidityChange !== 0n) {
+      ticks.push({ index, liquidityChange, sign })
     }
-  }
+  })
 
-  const tick = ticks[tickIndex]
-
-  if (tick.sign === isLowerTick) {
-    tick.liquidityChange += positionLiquidity
-  } else {
-    tick.liquidityChange -= positionLiquidity
-    if (tick.liquidityChange < 0) {
-      tick.liquidityChange = -tick.liquidityChange
-      tick.sign = isLowerTick
-    }
-  }
+  return ticks
 }
