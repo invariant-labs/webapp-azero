@@ -24,6 +24,7 @@ interface IProp {
   showFeesLoader?: boolean
   userHasStakes?: boolean
   isBalanceLoading: boolean
+  isActive: boolean
 }
 
 const SinglePositionInfo: React.FC<IProp> = ({
@@ -38,7 +39,8 @@ const SinglePositionInfo: React.FC<IProp> = ({
   swapHandler,
   showFeesLoader = false,
   userHasStakes = false,
-  isBalanceLoading
+  isBalanceLoading,
+  isActive
 }) => {
   const navigate = useNavigate()
 
@@ -90,7 +92,12 @@ const SinglePositionInfo: React.FC<IProp> = ({
             <Typography className={classes.name}>{xToY ? tokenY.name : tokenX.name}</Typography>
           </Grid>
           <Grid className={classes.rangeGrid}>
-            <Typography className={classNames(classes.text, classes.feeText)}>
+            <Typography
+              className={classNames(
+                classes.text,
+                classes.feeText,
+                isActive ? classes.active : null
+              )}>
               {fee.toString()}% fee
             </Typography>
           </Grid>

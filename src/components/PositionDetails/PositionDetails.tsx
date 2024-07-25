@@ -82,6 +82,8 @@ const PositionDetails: React.FC<IProps> = ({
   )
   const [refresherTime, setRefresherTime] = useState<number>(REFRESHER_INTERVAL)
 
+  const isActive = midPrice.x >= min && midPrice.x <= max
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (refresherTime > 0) {
@@ -138,6 +140,7 @@ const PositionDetails: React.FC<IProps> = ({
           showFeesLoader={showFeesLoader}
           userHasStakes={userHasStakes}
           isBalanceLoading={isBalanceLoading}
+          isActive={isActive}
         />
       </Grid>
 

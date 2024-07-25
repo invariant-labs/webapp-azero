@@ -334,6 +334,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     padding: '0 10px 0 20px',
     width: 15,
     height: 15
+  },
+  active: {
+    color: colors.invariant.green,
+    outline: `1px solid ${colors.invariant.green}`
   }
 }))
 
