@@ -99,7 +99,7 @@ const PositionDetails: React.FC<IProps> = ({
     <Grid container className={classes.wrapperContainer} wrap='nowrap'>
       <Grid className={classes.positionDetails} container item direction='column'>
         <Grid className={classes.backContainer} container>
-          <Link to='/pool' style={{ textDecoration: 'none' }}>
+          <Link to='/liquidity' style={{ textDecoration: 'none' }}>
             <Grid className={classes.back} container item alignItems='center'>
               <img className={classes.backIcon} src={backIcon} alt='Back' />
               <Typography className={classes.backText}>Back to Liquidity Positions List</Typography>

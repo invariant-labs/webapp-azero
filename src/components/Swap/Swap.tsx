@@ -162,7 +162,7 @@ export const Swap: React.FC<ISwap> = ({
     const tokenToAddress = addressToTicker(tokens[tokenToIndex ?? -1]?.assetAddress)
 
     if (tokenFromAddress || tokenToAddress) {
-      navigate(`/swap/${tokenFromAddress || '-'}/${tokenToAddress || '-'}`, {
+      navigate(`/exchange/${tokenFromAddress || '-'}/${tokenToAddress || '-'}`, {
         replace: true
       })
     }
@@ -363,12 +363,12 @@ export const Swap: React.FC<ISwap> = ({
       return 'Insufficient volume'
     }
 
-    return 'Swap'
+    return 'Exchange'
   }
   const hasShowRateMessage = () => {
     return (
       getStateMessage() === 'Insufficient balance' ||
-      getStateMessage() === 'Swap' ||
+      getStateMessage() === 'Exchange' ||
       getStateMessage() === 'Loading' ||
       getStateMessage() === 'Connect a wallet' ||
       getStateMessage() === 'Insufficient liquidity'
@@ -446,7 +446,7 @@ export const Swap: React.FC<ISwap> = ({
   return (
     <Grid container className={classes.swapWrapper} alignItems='center'>
       <Grid container className={classes.header}>
-        <Typography component='h1'>Swap tokens</Typography>
+        <Typography component='h1'>Exchange tokens</Typography>
         <Box className={classes.swapControls}>
           <Button className={classes.slippageButton} onClick={e => handleClickSettings(e)}>
             <p>
@@ -718,11 +718,11 @@ export const Swap: React.FC<ISwap> = ({
             className={
               getStateMessage() === 'Connect a wallet'
                 ? `${classes.swapButton}`
-                : getStateMessage() === 'Swap' && progress === 'none'
+                : getStateMessage() === 'Exchange' && progress === 'none'
                   ? `${classes.swapButton} ${classes.ButtonSwapActive}`
                   : classes.swapButton
             }
-            disabled={getStateMessage() !== 'Swap' || progress !== 'none'}
+            disabled={getStateMessage() !== 'Exchange' || progress !== 'none'}
             onClick={() => {
               if (
                 simulateResult.poolKey === null ||

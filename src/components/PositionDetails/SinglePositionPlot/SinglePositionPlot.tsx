@@ -158,7 +158,7 @@ const SinglePositionPlot: React.FC<ISinglePositionPlot> = ({
                   <Typography className={classes.liquidityDesc}>
                     The active liquidity range is represented by white, dashed lines in the
                     liquidity chart. Active liquidity is determined by the maximum price range
-                    resulting from the statistical volume of swaps for the last 7 days.
+                    resulting from the statistical volume of exchanges for the last 7 days.
                   </Typography>
                   <img className={classes.liquidityImg} src={activeLiquidity} alt='Liquidity' />
                 </Grid>

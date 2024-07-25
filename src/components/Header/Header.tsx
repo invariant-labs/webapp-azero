@@ -52,14 +52,14 @@ export const Header: React.FC<IHeader> = ({
 
   const isXsDown = useMediaQuery(theme.breakpoints.down('sm'))
 
-  const routes = ['swap', 'pool', 'stats']
+  const routes = ['exchange', 'liquidity', 'statistics']
 
   const otherRoutesToHighlight: Record<string, RegExp[]> = {
     pool: [/^newPosition\/*/, /^position\/*/],
-    swap: [/^swap\/*/]
+    exchange: [/^exchange\/*/]
   }
 
-  const [activePath, setActive] = useState('swap')
+  const [activePath, setActive] = useState('exchange')
 
   const [routesModalOpen, setRoutesModalOpen] = useState(false)
   const [testnetRpcsOpen, setTestnetRpcsOpen] = useState(false)
@@ -91,8 +91,8 @@ export const Header: React.FC<IHeader> = ({
               className={classes.logo}
               image={icons.LogoTitle}
               onClick={() => {
-                if (!activePath.startsWith('swap')) {
-                  navigate('/swap')
+                if (!activePath.startsWith('exchange')) {
+                  navigate('/exchange')
                 }
               }}
             />
@@ -110,8 +110,8 @@ export const Header: React.FC<IHeader> = ({
                 className={classes.logoShort}
                 image={icons.LogoShort}
                 onClick={() => {
-                  if (!activePath.startsWith('swap')) {
-                    navigate('/swap')
+                  if (!activePath.startsWith('exchange')) {
+                    navigate('/exchange')
                   }
                 }}
               />
@@ -129,7 +129,7 @@ export const Header: React.FC<IHeader> = ({
               <NavbarButton
                 name={path}
                 onClick={e => {
-                  if (path === 'swap' && activePath.startsWith('swap')) {
+                  if (path === 'exchange' && activePath.startsWith('exchange')) {
                     e.preventDefault()
                   }
 
