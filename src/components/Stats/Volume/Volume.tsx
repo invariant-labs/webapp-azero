@@ -1,13 +1,13 @@
 import React from 'react'
 import { ResponsiveBar } from '@nivo/bar'
 import classNames from 'classnames'
-import { colors, theme } from '@static/theme'
+import { colors, theme, typography } from '@static/theme'
 import { linearGradientDef } from '@nivo/core'
 import { useStyles } from './style'
 import { TimeData } from '@store/reducers/stats'
 import { Grid, Typography, useMediaQuery } from '@mui/material'
 import { Box } from '@mui/system'
-import { formatNumbers, showPrefix } from '@utils/utils'
+import { formatNumber, formatNumbers, showPrefix } from '@utils/utils'
 
 interface StatsInterface {
   percentVolume: number
@@ -28,7 +28,7 @@ const Volume: React.FC<StatsInterface> = ({ percentVolume, volume, data, classNa
       ticks: { line: { stroke: colors.invariant.component }, text: { fill: '#A9B6BF' } },
       legend: { text: { stroke: 'transparent' } }
     },
-    grid: { line: { stroke: 'transparent' } }
+    grid: { line: { stroke: colors.invariant.light } }
   }
 
   const isLower = percentVolume < 0
@@ -62,7 +62,7 @@ const Volume: React.FC<StatsInterface> = ({ percentVolume, volume, data, classNa
       </Box>
       <div className={classes.barContainer}>
         <ResponsiveBar
-          margin={{ top: 30, bottom: 30, left: 0 }}
+          margin={{ top: 30, bottom: 30, left: 30 }}
           data={data as Array<{ timestamp: number; value: number }>}
           keys={['value']}
           indexBy='timestamp'
@@ -84,10 +84,28 @@ const Volume: React.FC<StatsInterface> = ({ percentVolume, volume, data, classNa
                 : ''
             }
           }}
+          axisLeft={{
+            tickSize: 0,
+            tickPadding: 2,
+            tickRotation: 0,
+            tickValues: 5,
+            renderTick: ({ x, y, value }) => (
+              <g transform={`translate(${x - 30},${y + 4})`}>
+                {' '}
+                <text
+                  style={{ fill: colors.invariant.textGrey, ...typography.tiny2 }}
+                  textAnchor='start'
+                  dominantBaseline='center'>
+                  {formatNumber(value, true)}
+                </text>
+              </g>
+            )
+          }}
+          gridYValues={5}
           theme={Theme}
           groupMode='grouped'
           enableLabel={false}
-          enableGridY={false}
+          enableGridY={true}
           innerPadding={isXsDown ? 1 : 2}
           isInteractive
           padding={0.03}
