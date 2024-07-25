@@ -71,7 +71,12 @@ const SinglePositionInfo: React.FC<IProp> = ({
             src={xToY ? tokenX.icon : tokenY.icon}
             alt={xToY ? tokenX.name : tokenY.name}
           />
-          <img className={classes.arrowIcon} src={icons.ArrowIcon} alt={'Arrow'} />
+          <img
+            className={classes.arrowIcon}
+            src={icons.ArrowIcon}
+            alt={'Arrow'}
+            onClick={swapHandler}
+          />
           <img
             className={classes.icon}
             src={xToY ? tokenY.icon : tokenX.icon}
