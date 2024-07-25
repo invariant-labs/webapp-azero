@@ -67,7 +67,7 @@ const useStyles = makeStyles()((theme: Theme) => {
       border: `1px solid ${colors.invariant.newDark}`,
       borderColor: colors.invariant.newDark,
       borderRadius: 15,
-      padding: '13px 44px 13px 10px',
+      padding: '13px 44px 13px 10px !important',
       whiteSpace: 'nowrap',
       overflow: 'hidden',
       textOverflow: 'ellipsis',
