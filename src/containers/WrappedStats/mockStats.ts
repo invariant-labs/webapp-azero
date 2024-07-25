@@ -31,8 +31,8 @@ export const poolsList = Array(40)
         address: '5Dvb5E8zKU4E9c7YxfNL5VC8YQj4VAFUTCGYY9ayFLnnY3UA',
         chainId: 101,
         decimals: 6,
-        name: 'UST (Portal)',
-        symbol: 'UST',
+        name: 'BTC (Portal)',
+        symbol: 'BTC',
         logoURI:
           'https://raw.githubusercontent.com/wormhole-foundation/wormhole-token-list/main/assets/UST_wh.png',
         tags: ['wormhole', 'old-registry'],

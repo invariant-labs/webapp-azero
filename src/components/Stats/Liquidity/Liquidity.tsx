@@ -2,11 +2,11 @@ import React from 'react'
 import { ResponsiveLine } from '@nivo/line'
 import { linearGradientDef } from '@nivo/core'
 import classNames from 'classnames'
-import { colors } from '@static/theme'
+import { colors, typography } from '@static/theme'
 import { useStyles } from './style'
 import { TimeData } from '@store/reducers/stats'
 import { Grid, Typography } from '@mui/material'
-import { formatNumbers, showPrefix } from '@utils/utils'
+import { formatNumber, formatNumbers, showPrefix } from '@utils/utils'
 
 interface LiquidityInterface {
   liquidityPercent: number
@@ -66,7 +66,7 @@ const Liquidity: React.FC<LiquidityInterface> = ({
               }))
             }
           ]}
-          margin={{ top: 24, bottom: 24, left: 24, right: 24 }}
+          margin={{ top: 24, bottom: 24, left: 30, right: 24 }}
           xScale={{
             type: 'time',
             format: '%d/%m/%Y',
@@ -81,14 +81,31 @@ const Liquidity: React.FC<LiquidityInterface> = ({
               data.length >= 24 ? 'every 4 days' : data.length >= 8 ? 'every 2 days' : 'every day',
             format: '%d/%m'
           }}
+          axisLeft={{
+            tickSize: 0,
+            tickPadding: 2,
+            tickRotation: 0,
+            tickValues: 5,
+            renderTick: ({ x, y, value }) => (
+              <g transform={`translate(${x - 30},${y + 4})`}>
+                {' '}
+                <text
+                  style={{ fill: colors.invariant.textGrey, ...typography.tiny2 }}
+                  textAnchor='start'
+                  dominantBaseline='center'>
+                  {formatNumber(value, true)}
+                </text>
+              </g>
+            )
+          }}
+          gridYValues={5}
           legends={[]}
           axisTop={null}
           axisRight={null}
-          axisLeft={null}
           curve={'monotoneX'}
           role='aplication'
           enableGridX={false}
-          enableGridY={false}
+          enableGridY={true}
           enablePoints={false}
           enableArea={true}
           isInteractive
@@ -108,7 +125,8 @@ const Liquidity: React.FC<LiquidityInterface> = ({
                 strokeWidth: 1,
                 strokeDasharray: 'solid'
               }
-            }
+            },
+            grid: { line: { stroke: colors.invariant.light } }
           }}
           lineWidth={1}
           defs={[
