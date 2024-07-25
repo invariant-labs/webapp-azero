@@ -624,55 +624,58 @@ export const Swap: React.FC<ISwap> = ({
           />
         </Box>
         <Box className={classes.transactionDetails}>
-          <Grid className={classes.exchangeRateContainer}>
-            <button
-              onClick={
-                tokenFromIndex !== null &&
-                tokenToIndex !== null &&
-                hasShowRateMessage() &&
-                amountFrom !== '' &&
-                amountTo !== ''
-                  ? handleOpenTransactionDetails
-                  : undefined
-              }
-              className={
-                tokenFromIndex !== null &&
-                tokenToIndex !== null &&
-                hasShowRateMessage() &&
-                amountFrom !== '' &&
-                amountTo !== ''
-                  ? classes.HiddenTransactionButton
-                  : classes.transactionDetailDisabled
-              }>
-              <Grid className={classes.transactionDetailsWrapper}>
-                <Typography className={classes.transactionDetailsHeader}>
-                  {detailsOpen && canShowDetails ? 'Hide' : 'Show'} transaction details
-                </Typography>
+          <button
+            onClick={
+              tokenFromIndex !== null &&
+              tokenToIndex !== null &&
+              hasShowRateMessage() &&
+              amountFrom !== '' &&
+              amountTo !== ''
+                ? handleOpenTransactionDetails
+                : undefined
+            }
+            className={
+              tokenFromIndex !== null &&
+              tokenToIndex !== null &&
+              hasShowRateMessage() &&
+              amountFrom !== '' &&
+              amountTo !== ''
+                ? classes.HiddenTransactionButton
+                : classes.transactionDetailDisabled
+            }>
+            <Grid className={classes.transactionDetailsWrapper}>
+              <Typography className={classes.transactionDetailsHeader}>
+                {detailsOpen && canShowDetails ? 'Hide' : 'Show'} transaction details
                 <CardMedia image={infoIcon} className={classes.infoIcon} />
-              </Grid>
-            </button>
+              </Typography>
+            </Grid>
+          </button>
+          <Box className={classes.revertWrapper}>
             {tokenFromIndex !== null &&
               tokenToIndex !== null &&
               tokenFromIndex !== tokenToIndex && (
-                <Refresher
-                  currentIndex={refresherTime}
-                  maxIndex={REFRESHER_INTERVAL}
-                  onClick={handleRefresh}
-                />
+                <Box width={20} height={20}>
+                  <Refresher
+                    currentIndex={refresherTime}
+                    maxIndex={REFRESHER_INTERVAL}
+                    onClick={handleRefresh}
+                  />
+                </Box>
               )}
-          </Grid>
-          {canShowDetails ? (
-            <ExchangeRate
-              onClick={() => setRateReversed(!rateReversed)}
-              tokenFromSymbol={tokens[rateReversed ? tokenToIndex : tokenFromIndex].symbol}
-              tokenToSymbol={tokens[rateReversed ? tokenFromIndex : tokenToIndex].symbol}
-              amount={rateReversed ? 1 / swapRate : swapRate}
-              tokenToDecimals={Number(
-                tokens[rateReversed ? tokenFromIndex : tokenToIndex].decimals
-              )}
-              loading={getStateMessage() === 'Loading'}
-            />
-          ) : null}
+
+            {canShowDetails ? (
+              <ExchangeRate
+                onClick={() => setRateReversed(!rateReversed)}
+                tokenFromSymbol={tokens[rateReversed ? tokenToIndex : tokenFromIndex].symbol}
+                tokenToSymbol={tokens[rateReversed ? tokenFromIndex : tokenToIndex].symbol}
+                amount={rateReversed ? 1 / swapRate : swapRate}
+                tokenToDecimals={Number(
+                  tokens[rateReversed ? tokenFromIndex : tokenToIndex].decimals
+                )}
+                loading={getStateMessage() === 'Loading'}
+              />
+            ) : null}
+          </Box>
         </Box>
         <TransactionDetailsBox
           open={getStateMessage() !== 'Loading' ? detailsOpen && canShowDetails : prevOpenState}
