@@ -502,31 +502,36 @@ export const NewPosition: React.FC<INewPosition> = ({
         <Grid container item alignItems='center' className={classes.options}>
           {poolKey !== '' ? (
             <MarketIdLabel
-              displayLength={9}
+              displayLength={4}
               marketId={poolKey}
               copyPoolAddressHandler={copyPoolAddressHandler}
             />
           ) : null}
-          <Hidden mdDown>
-            <ConcentrationTypeSwitch
-              onSwitch={val => {
-                if (val) {
-                  setPositionOpeningMethod('concentration')
-                  onPositionOpeningMethodChange('concentration')
-                } else {
-                  setPositionOpeningMethod('range')
-                  onPositionOpeningMethodChange('range')
-                }
-              }}
-              className={classes.switch}
-              currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
-            />
-          </Hidden>
-          {poolKey !== '' && (
-            <Button onClick={handleClickSettings} className={classes.settingsIconBtn} disableRipple>
-              <img src={settingIcon} className={classes.settingsIcon} alt='settings' />
-            </Button>
-          )}
+          <Grid className={classes.optionsWrapper}>
+            <Hidden mdDown>
+              <ConcentrationTypeSwitch
+                onSwitch={val => {
+                  if (val) {
+                    setPositionOpeningMethod('concentration')
+                    onPositionOpeningMethodChange('concentration')
+                  } else {
+                    setPositionOpeningMethod('range')
+                    onPositionOpeningMethodChange('range')
+                  }
+                }}
+                className={classes.switch}
+                currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
+              />
+            </Hidden>
+            {poolKey !== '' && (
+              <Button
+                onClick={handleClickSettings}
+                className={classes.settingsIconBtn}
+                disableRipple>
+                <img src={settingIcon} className={classes.settingsIcon} alt='settings' />
+              </Button>
+            )}
+          </Grid>
         </Grid>
       </Grid>
 

@@ -855,7 +855,11 @@ export const createLiquidityPlot = (
   return isXtoY ? ticksData : ticksData.reverse()
 }
 
-export const formatNumber = (number: number | bigint | string, noDecimals?: boolean): string => {
+export const formatNumber = (
+  number: number | bigint | string,
+  noDecimals?: boolean,
+  decimalsAfterDot: number = 3
+): string => {
   const numberAsNumber = Number(number)
   const isNegative = numberAsNumber < 0
   const absNumberAsString = numberToString(Math.abs(numberAsNumber))
@@ -897,19 +901,23 @@ export const formatNumber = (number: number | bigint | string, noDecimals?: bool
           FormatConfig.DecimalsAfterDot
         )
     formattedNumber = beforeDot.slice(0, -FormatConfig.KDecimals) + formattedDecimals + 'K'
-  } else if (afterDot && countLeadingZeros(afterDot) <= 3) {
-    const roundedNumber = numberAsNumber.toFixed(countLeadingZeros(afterDot) + 4).slice(0, -1)
+  } else if (afterDot && countLeadingZeros(afterDot) <= decimalsAfterDot) {
+    const roundedNumber = numberAsNumber
+      .toFixed(countLeadingZeros(afterDot) + decimalsAfterDot + 1)
+      .slice(0, -1)
     formattedNumber = trimZeros(roundedNumber)
   } else {
     const leadingZeros = afterDot ? countLeadingZeros(afterDot) : 0
 
     const parsedAfterDot =
-      String(parseInt(afterDot)).length > 3 ? String(parseInt(afterDot)).slice(0, 3) : afterDot
+      String(parseInt(afterDot)).length > decimalsAfterDot
+        ? String(parseInt(afterDot)).slice(0, decimalsAfterDot)
+        : afterDot
     formattedNumber = trimZeros(
       beforeDot +
         '.' +
         (parsedAfterDot
-          ? leadingZeros > 3
+          ? leadingZeros > decimalsAfterDot
             ? '0' + printSubNumber(leadingZeros) + parseInt(parsedAfterDot)
             : parsedAfterDot
           : '')
