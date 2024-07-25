@@ -101,6 +101,8 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
 
   const [previousConcentration, setPreviousConcentration] = useState(0)
 
+  const [cachedConcentrationArray, setCachedConcentrationArray] = useState(concentrationArray)
+
   const isMountedRef = useRef(false)
 
   useEffect(() => {
@@ -191,15 +193,15 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
       setPlotMax(midPrice.x + initSideDist)
     } else {
       const newConcentrationIndex = findClosestIndexByValue(
-        concentrationArray,
+        cachedConcentrationArray,
         previousConcentration
       )
 
       setConcentrationIndex(newConcentrationIndex)
-      setPreviousConcentration(concentrationArray[newConcentrationIndex])
+      setPreviousConcentration(cachedConcentrationArray[newConcentrationIndex])
       const { leftRange, rightRange } = calculateConcentrationRange(
         tickSpacing,
-        concentrationArray[newConcentrationIndex],
+        cachedConcentrationArray[newConcentrationIndex],
         2,
         midPrice.index,
         isXtoY
@@ -280,6 +282,8 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   }, [ticksLoading, isMountedRef, midPrice.index, poolKey])
 
   useEffect(() => {
+    setCachedConcentrationArray(concentrationArray)
+
     const newConcentrationIndex = findClosestIndexByValue(concentrationArray, previousConcentration)
 
     setConcentrationIndex(newConcentrationIndex)
@@ -348,7 +352,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
       setConcentrationIndex(0)
       const { leftRange, rightRange } = calculateConcentrationRange(
         tickSpacing,
-        concentrationArray[0],
+        cachedConcentrationArray[0],
         2,
         midPrice.index,
         isXtoY
@@ -364,14 +368,14 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   useEffect(() => {
     if (positionOpeningMethod === 'concentration' && !ticksLoading && isMountedRef.current) {
       const index =
-        concentrationIndex > concentrationArray.length - 1
-          ? concentrationArray.length - 1
+        concentrationIndex > cachedConcentrationArray.length - 1
+          ? cachedConcentrationArray.length - 1
           : concentrationIndex
       setConcentrationIndex(index)
       console.log('test')
       const { leftRange, rightRange } = calculateConcentrationRange(
         tickSpacing,
-        concentrationArray[index],
+        cachedConcentrationArray[index],
         2,
         midPrice.index,
         isXtoY
@@ -390,7 +394,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
     setConcentrationIndex(0)
     const { leftRange, rightRange } = calculateConcentrationRange(
       tickSpacing,
-      concentrationArray[0],
+      cachedConcentrationArray[0],
       2,
       midPrice.index,
       isXtoY
@@ -559,13 +563,13 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
           <Grid container className={classes.sliderWrapper}>
             <ConcentrationSlider
               valueIndex={concentrationIndex}
-              values={concentrationArray}
+              values={cachedConcentrationArray}
               valueChangeHandler={value => {
-                setPreviousConcentration(concentrationArray[value])
+                setPreviousConcentration(cachedConcentrationArray[value])
                 setConcentrationIndex(value)
                 const { leftRange, rightRange } = calculateConcentrationRange(
                   tickSpacing,
-                  concentrationArray[value],
+                  cachedConcentrationArray[value],
                   2,
                   midPrice.index,
                   isXtoY
