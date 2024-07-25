@@ -47,10 +47,13 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     border: 'none',
     minWidth: 'auto',
     color: colors.invariant.lightHover,
-    padding: 'none',
+    padding: 0,
     '&:hover': {
       filter: 'brightness(1.15)',
       cursor: 'pointer'
+    },
+    '@media (max-width: 400px)': {
+      width: '100%'
     }
   },
 
@@ -58,7 +61,11 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     background: 'none !important',
     border: 'none',
     minWidth: 'auto',
-    color: colors.invariant.lightHover
+    padding: 0,
+    color: colors.invariant.lightHover,
+    '@media (max-width: 400px)': {
+      width: '100%'
+    }
   },
 
   swapControls: {
@@ -177,13 +184,19 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   transactionDetails: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    flexFlow: 'row nowrap',
+    justifyContent: 'flex-start',
+    flexFlow: 'row',
+    flexWrap: 'wrap',
     marginTop: 24,
     marginBottom: 12,
     position: 'relative',
     cursor: 'default',
-    filter: 'brightness(0.9)'
+    filter: 'brightness(0.9)',
+    width: '100%',
+    '@media (max-width: 400px)': {
+      flexDirection: 'column-reverse',
+      gap: 4
+    }
   },
   transactionDetailsWrapper: {
     display: 'flex',
@@ -200,11 +213,25 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     whiteSpace: 'nowrap',
     pointerEvents: 'none',
     color: colors.invariant.lightGrey,
-    [theme.breakpoints.down('sm')]: {
-      ...typography.tiny2
+
+    '@media (max-width: 400px)': {
+      flex: 1
     }
   },
-
+  revertWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginLeft: 8,
+    flex: 1,
+    '@media (max-width: 400px)': {
+      width: '100%',
+      flex: 'auto',
+      flexDirection: 'row-reverse',
+      columnGap: 8,
+      marginLeft: 0
+    }
+  },
   swapButton: {
     width: '100%',
     height: 48
@@ -223,12 +250,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     padding: '5px 15px 5px 15px'
   },
 
-  transactionBottom: {
-    // marginTop: 10,
-    // [theme.breakpoints.down('sm')]: {
-    //   marginTop: 36
-    // }
-  },
+  transactionBottom: {},
 
   transtactionData: {
     border: `1px solid ${colors.invariant.light}`,
@@ -247,10 +269,11 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     }
   },
   infoIcon: {
+    display: 'inline-block',
     width: 10,
     height: 10,
     marginLeft: 4,
-    marginBottom: 2,
+
     filter: 'brightness(0.8)',
     pointerEvents: 'none'
   },
@@ -258,7 +281,8 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 8
+    gap: 8,
+    flexWrap: 'wrap'
   },
   slippageButton: {
     height: 27,

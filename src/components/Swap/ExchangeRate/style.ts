@@ -1,4 +1,4 @@
-import { colors, theme, typography } from '@static/theme'
+import { colors, typography } from '@static/theme'
 import { makeStyles } from 'tss-react/mui'
 
 export const useStyles = makeStyles()(() => ({
@@ -8,11 +8,7 @@ export const useStyles = makeStyles()(() => ({
     justifyContent: 'center',
     whiteSpace: 'nowrap',
     textOverflow: 'ellipsis',
-    overflow: 'hidden',
-
-    [theme.breakpoints.down('sm')]: {
-      ...typography.tiny2
-    }
+    overflow: 'hidden'
   },
   loadingContainer: {
     width: 20,
@@ -36,6 +32,9 @@ export const useStyles = makeStyles()(() => ({
     display: 'flex',
     '&:hover': {
       borderColor: colors.invariant.lightHover
+    },
+    '@media (max-width: 400px)': {
+      width: '100%'
     }
   }
 }))

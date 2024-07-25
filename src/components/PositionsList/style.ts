@@ -154,5 +154,11 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     '&:hover': {
       filter: 'brightness(1.5)'
     }
+  },
+  titleMobileContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+
+    alignItems: 'center'
   }
 }))

@@ -234,7 +234,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
                     container
                     style={{
                       ...style,
-                      width: listRef.current ? listRef.current.clientWidth : 'calc(100% - 48px)'
+                      width: listRef.current ? listRef.current.clientWidth : 'calc(100% - 50px)'
                     }}
                     alignItems='center'
                     wrap='nowrap'
