@@ -4,7 +4,7 @@ import SinglePositionPlot from '@components/PositionDetails/SinglePositionPlot/S
 import { TickPlotPositionData } from '@components/PriceRangePlot/PriceRangePlot'
 import Refresher from '@components/Refresher/Refresher'
 import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
-import { Box, Button, Grid, Typography } from '@mui/material'
+import { Box, Button, Grid, Hidden, Typography } from '@mui/material'
 import backIcon from '@static/svg/back-arrow.svg'
 import { REFRESHER_INTERVAL } from '@store/consts/static'
 import { addressToTicker, initialXtoY, parseFeeToPathFee, printBigint } from '@utils/utils'
@@ -105,14 +105,18 @@ const PositionDetails: React.FC<IProps> = ({
               <Typography className={classes.backText}>Back to Liquidity Positions List</Typography>
             </Grid>
           </Link>
-          <Refresher
-            currentIndex={refresherTime}
-            maxIndex={REFRESHER_INTERVAL}
-            onClick={() => {
-              onRefresh()
-              setRefresherTime(REFRESHER_INTERVAL)
-            }}
-          />
+          <Hidden mdUp>
+            <Box mr={1}>
+              <Refresher
+                currentIndex={refresherTime}
+                maxIndex={REFRESHER_INTERVAL}
+                onClick={() => {
+                  onRefresh()
+                  setRefresherTime(REFRESHER_INTERVAL)
+                }}
+              />
+            </Box>
+          </Hidden>
         </Grid>
 
         <SinglePositionInfo
@@ -138,37 +142,48 @@ const PositionDetails: React.FC<IProps> = ({
         alignItems='flex-end'
         className={classes.right}
         wrap='nowrap'>
-        <Grid
-          container
-          item
-          direction='row'
-          alignItems='flex-end'
-          style={{ paddingLeft: 20, flexDirection: 'row-reverse' }}
-          className={classes.right}
-          wrap='nowrap'>
-          <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-            <Button
-              className={classes.button}
-              variant='contained'
+        <Hidden mdDown>
+          <Box mt={2}>
+            <Refresher
+              currentIndex={refresherTime}
+              maxIndex={REFRESHER_INTERVAL}
               onClick={() => {
-                const parsedFee = parseFeeToPathFee(fee)
-                const address1 = addressToTicker(tokenXAddress.toString())
-                const address2 = addressToTicker(tokenYAddress.toString())
-
-                navigate(`/newPosition/${address1}/${address2}/${parsedFee}`)
-              }}>
-              <span className={classes.buttonText}>+ Add Liquidity</span>
-            </Button>
+                onRefresh()
+                setRefresherTime(REFRESHER_INTERVAL)
+              }}
+            />
           </Box>
-          <MarketIdLabel
-            marketId={poolAddress.toString()}
-            displayLength={9}
-            copyPoolAddressHandler={copyPoolAddressHandler}
-            style={{ paddingBottom: 20, paddingRight: 10 }}
-          />
-        </Grid>
-
+        </Hidden>
         <Grid className={classes.positionPlotWrapper}>
+          <Grid
+            container
+            item
+            direction='row'
+            alignItems='flex-end'
+            style={{ paddingLeft: 20, flexDirection: 'row-reverse' }}
+            className={classes.rightHeaderWrapper}
+            wrap='nowrap'>
+            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+              <Button
+                className={classes.button}
+                variant='contained'
+                onClick={() => {
+                  const parsedFee = parseFeeToPathFee(fee)
+                  const address1 = addressToTicker(tokenXAddress.toString())
+                  const address2 = addressToTicker(tokenYAddress.toString())
+
+                  navigate(`/newPosition/${address1}/${address2}/${parsedFee}`)
+                }}>
+                <span className={classes.buttonText}>+ Add Liquidity</span>
+              </Button>
+            </Box>
+            <MarketIdLabel
+              marketId={poolAddress.toString()}
+              displayLength={9}
+              copyPoolAddressHandler={copyPoolAddressHandler}
+              style={{ paddingBottom: 20, paddingRight: 10 }}
+            />
+          </Grid>
           <SinglePositionPlot
             data={
               detailsData.length
