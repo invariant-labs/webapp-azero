@@ -4,6 +4,7 @@ import {
   Network,
   PSP22,
   PoolKey,
+  Position,
   Tick,
   Tickmap,
   calculateSqrtPrice,
@@ -1116,6 +1117,39 @@ export const validConcentrationMidPriceTick = (
   }
 
   return midPriceTick
+}
+
+export const getLiquidityTicksByPositionsList = (
+  poolKey: PoolKey,
+  positions: Position[]
+): LiquidityTick[] => {
+  const liquidityChanges: Record<number, bigint> = {}
+
+  positions.forEach(position => {
+    if (poolKeyToString(position.poolKey) === poolKeyToString(poolKey)) {
+      const lowerTickIndex = Number(position.lowerTickIndex)
+      const upperTickIndex = Number(position.upperTickIndex)
+
+      liquidityChanges[lowerTickIndex] =
+        (liquidityChanges[lowerTickIndex] ?? 0n) + position.liquidity
+      liquidityChanges[upperTickIndex] =
+        (liquidityChanges[upperTickIndex] ?? 0n) - position.liquidity
+    }
+  })
+
+  const ticks: LiquidityTick[] = []
+
+  Object.entries(liquidityChanges).forEach(([tickIndex, liquidityChangeTotal]) => {
+    const index = BigInt(tickIndex)
+    const [liquidityChange, sign] =
+      liquidityChangeTotal > 0n ? [liquidityChangeTotal, true] : [-liquidityChangeTotal, false]
+
+    if (liquidityChange !== 0n) {
+      ticks.push({ index, liquidityChange, sign })
+    }
+  })
+
+  return ticks
 }
 
 export const findClosestIndexByValue = (arr: number[], value: number): number => {

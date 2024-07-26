@@ -26,7 +26,8 @@ const useStyles = makeStyles()(theme => {
       gap: 4
     },
     topInnerWrapper: {
-      minHeight: 300
+      minHeight: 300,
+      maxWidth: '100%'
     },
     bottomInnerWrapper: {
       display: 'flex',
@@ -110,7 +111,11 @@ const useStyles = makeStyles()(theme => {
     sliderWrapper: {
       paddingTop: 24,
       paddingInline: 8,
-      position: 'relative'
+      position: 'relative',
+
+      [theme.breakpoints.down('sm')]: {
+        paddingBottom: 24
+      }
     }
   }
 })
