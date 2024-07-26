@@ -603,7 +603,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
             />
           </Grid>
         ) : (
-          <Grid container className={classes.buttons}>
+          <Grid container className={classes.buttons} justifyContent='center' alignItems='center'>
             <Button className={classes.button} onClick={resetPlot}>
               Reset range
             </Button>
