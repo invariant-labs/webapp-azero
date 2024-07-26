@@ -1,4 +1,4 @@
-import { Invariant, Pool, Position, PSP22, sendTx } from '@invariant-labs/a0-sdk'
+import { Pool, Position, sendTx, Invariant, PSP22 } from '@invariant-labs/a0-sdk'
 import { Signer } from '@polkadot/api/types'
 import { PayloadAction } from '@reduxjs/toolkit'
 import {
@@ -20,6 +20,7 @@ import {
   createPlaceholderLiquidityPlot,
   deserializeTickmap,
   ensureError,
+  getLiquidityTicksByPositionsList,
   isErrorMessage,
   poolKeyToString
 } from '@utils/utils'
@@ -296,35 +297,43 @@ export function* handleGetCurrentPlotTicks(action: PayloadAction<GetCurrentTicks
         xDecimal,
         yDecimal
       )
-      yield* put(actions.setPlotTicks(data))
+      yield* put(actions.setPlotTicks({ allPlotTicks: data, userPlotTicks: data }))
       return
     }
 
-    const rawTicks = yield* call(
+    const allRawTicks = yield* call(
       [invariant, invariant.getAllLiquidityTicks],
       poolKey,
       deserializeTickmap(allTickmaps[poolKeyToString(poolKey)])
     )
-    if (rawTicks.length === 0) {
-      const data = createPlaceholderLiquidityPlot(
-        action.payload.isXtoY,
-        0,
-        poolKey.feeTier.tickSpacing,
-        xDecimal,
-        yDecimal
-      )
-      yield* put(actions.setPlotTicks(data))
-      return
-    }
 
-    const ticksData = createLiquidityPlot(
-      rawTicks,
-      poolKey.feeTier.tickSpacing,
-      isXtoY,
-      xDecimal,
-      yDecimal
-    )
-    yield put(actions.setPlotTicks(ticksData))
+    const allPlotTicks =
+      allRawTicks.length === 0
+        ? createPlaceholderLiquidityPlot(
+            action.payload.isXtoY,
+            0,
+            poolKey.feeTier.tickSpacing,
+            xDecimal,
+            yDecimal
+          )
+        : createLiquidityPlot(allRawTicks, poolKey.feeTier.tickSpacing, isXtoY, xDecimal, yDecimal)
+
+    yield* call(handleGetRemainingPositions)
+    const { list } = yield* select(positionsList)
+    const userRawTicks = getLiquidityTicksByPositionsList(poolKey, list)
+
+    const userPlotTicks =
+      userRawTicks.length === 0
+        ? createPlaceholderLiquidityPlot(
+            action.payload.isXtoY,
+            0,
+            poolKey.feeTier.tickSpacing,
+            xDecimal,
+            yDecimal
+          )
+        : createLiquidityPlot(userRawTicks, poolKey.feeTier.tickSpacing, isXtoY, xDecimal, yDecimal)
+
+    yield* put(actions.setPlotTicks({ allPlotTicks, userPlotTicks }))
   } catch (error) {
     console.log(error)
     const data = createPlaceholderLiquidityPlot(
