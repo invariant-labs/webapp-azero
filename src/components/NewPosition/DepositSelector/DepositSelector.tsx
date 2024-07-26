@@ -365,7 +365,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
             onAddLiquidity()
           }
         }}
-        disabled={getButtonMessage() !== 'Add Liquidity'}
+        disabled={getButtonMessage() !== 'Add Position'}
         content={getButtonMessage()}
         progress={progress}
       />

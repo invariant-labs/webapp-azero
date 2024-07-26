@@ -116,7 +116,7 @@ const SinglePositionInfo: React.FC<IProp> = ({
 
                 navigate(`/newPosition/${address1}/${address2}/${fee}`)
               }}>
-              <span className={classes.buttonText}>+ Add Liquidity</span>
+              <span className={classes.buttonText}>+ Add Position</span>
             </Button>
           </Hidden>
         </Grid>
