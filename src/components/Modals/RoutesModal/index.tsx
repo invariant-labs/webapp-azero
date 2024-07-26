@@ -2,7 +2,6 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import useStyles from './style'
 import { Grid, Popover, Typography } from '@mui/material'
-import { swap } from '@store/selectors/swap'
 
 export interface IRoutesModal {
   routes: string[]
