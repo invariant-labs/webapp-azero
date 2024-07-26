@@ -23,6 +23,13 @@ const useStyles = makeStyles()((theme: Theme) => {
         maxWidth: '100vw',
         padding: '20px 16px'
       },
+      '.MuiFormControlLabel-label': {
+        color: colors.invariant.lightGrey,
+        transform: 'translateY(1.5px)'
+      },
+      '& .MuiCheckbox-root': {
+        color: colors.invariant.lightGrey
+      },
       '& .MuiCheckbox-root.Mui-checked': {
         color: colors.green.button
       }
