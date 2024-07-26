@@ -1,6 +1,6 @@
 import Header from '@components/Header/Header'
 import { Network } from '@invariant-labs/a0-sdk'
-import { AlephZeroNetworks } from '@store/consts/static'
+import { AlephZeroNetworks, CHAINS } from '@store/consts/static'
 import { actions } from '@store/reducers/connection'
 import { Status, actions as walletActions } from '@store/reducers/wallet'
 import { networkType, rpcAddress } from '@store/selectors/connection'
@@ -11,6 +11,7 @@ import React, { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
+import { Chain } from '@store/consts/types'
 
 export const HeaderWrapper: React.FC = () => {
   const dispatch = useDispatch()
@@ -44,6 +45,8 @@ export const HeaderWrapper: React.FC = () => {
 
     return lastRPC === null ? AlephZeroNetworks.TEST : lastRPC
   }, [])
+
+  const activeChain = CHAINS.find(chain => chain.name === Chain.AlephZero) ?? CHAINS[0]
 
   return (
     <Header
@@ -83,6 +86,12 @@ export const HeaderWrapper: React.FC = () => {
       }}
       onChangeWallet={() => {
         dispatch(walletActions.reconnect())
+      }}
+      activeChain={activeChain}
+      onChainSelect={chain => {
+        if (chain.name !== activeChain.name) {
+          window.location.replace(chain.address)
+        }
       }}
     />
   )
