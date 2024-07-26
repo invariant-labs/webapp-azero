@@ -100,6 +100,7 @@ const PoolListItem: React.FC<IProps> = ({
               {`${apy > 1000 ? '>1000' : apy.toFixed(2)}%`}
               <Tooltip
                 enterTouchDelay={0}
+                leaveTouchDelay={Number.MAX_SAFE_INTEGER}
                 title={
                   <>
                     <Typography className={classes.liquidityTitle}>Pool APY</Typography>

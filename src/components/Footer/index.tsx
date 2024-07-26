@@ -45,6 +45,7 @@ export const Footer = () => {
       <Grid className={classes.footerItem}>
         <Tooltip
           enterTouchDelay={0}
+          leaveTouchDelay={Number.MAX_SAFE_INTEGER}
           classes={{ tooltip: classes.tooltip }}
           title='Github'
           placement='top'
@@ -57,6 +58,7 @@ export const Footer = () => {
       <Grid className={classes.footerItem}>
         <Tooltip
           enterTouchDelay={0}
+          leaveTouchDelay={Number.MAX_SAFE_INTEGER}
           classes={{ tooltip: classes.tooltip }}
           title='Telegram'
           placement='top'
@@ -69,6 +71,7 @@ export const Footer = () => {
       <Grid className={classes.footerItem}>
         <Tooltip
           enterTouchDelay={0}
+          leaveTouchDelay={Number.MAX_SAFE_INTEGER}
           classes={{ tooltip: classes.tooltip }}
           title='X'
           placement='top'
@@ -81,6 +84,7 @@ export const Footer = () => {
       <Grid className={classes.footerItem}>
         <Tooltip
           enterTouchDelay={0}
+          leaveTouchDelay={Number.MAX_SAFE_INTEGER}
           classes={{ tooltip: classes.tooltip }}
           title='Discord'
           placement='top'
@@ -93,6 +97,7 @@ export const Footer = () => {
       <Grid className={classes.footerItem}>
         <Tooltip
           enterTouchDelay={0}
+          leaveTouchDelay={Number.MAX_SAFE_INTEGER}
           classes={{ tooltip: classes.tooltip }}
           title='Medium'
           placement='top'
@@ -105,6 +110,7 @@ export const Footer = () => {
       <Grid className={classes.footerItem}>
         <Tooltip
           enterTouchDelay={0}
+          leaveTouchDelay={Number.MAX_SAFE_INTEGER}
           classes={{ tooltip: classes.tooltip }}
           title='Docs'
           placement='top'

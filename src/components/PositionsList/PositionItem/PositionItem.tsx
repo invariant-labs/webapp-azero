@@ -50,6 +50,7 @@ export const PositionItem: React.FC<IPositionItem> = ({
     () => (
       <Tooltip
         enterTouchDelay={0}
+        leaveTouchDelay={Number.MAX_SAFE_INTEGER}
         onClick={e => e.stopPropagation()}
         title={
           isActive
