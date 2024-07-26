@@ -64,10 +64,15 @@ const useStyles = makeStyles()(theme => {
       backgroundColor: colors.invariant.light,
       borderRadius: 11,
 
+      '&:hover': {
+        '@media (hover: none)': {
+          backgroundColor: colors.invariant.light
+        }
+      },
+
       [theme.breakpoints.down('md')]: {
         '&:first-of-type': {
-          marginRight: 0,
-          marginBottom: 8
+          marginRight: 0
         }
       }
     },
