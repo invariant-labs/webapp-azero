@@ -411,9 +411,11 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
         <Grid className={classes.headerContainer} container justifyContent='space-between'>
           <Grid>
             <Typography className={classes.header}>Price range</Typography>
-            <Typography className={classes.currentPrice}>
-              {formatNumber(midPrice.x, false, 4)} {tokenBSymbol} per {tokenASymbol}
-            </Typography>
+            {poolKey !== '' && (
+              <Typography className={classes.currentPrice}>
+                {formatNumber(midPrice.x, false, 4)} {tokenBSymbol} per {tokenASymbol}
+              </Typography>
+            )}
           </Grid>
           <Grid className={classes.activeLiquidityContainer} container direction='column'>
             <Tooltip
