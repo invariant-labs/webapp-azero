@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import useStyles from './style'
 import { Grid, Popover, Typography } from '@mui/material'
+import { swap } from '@store/selectors/swap'
 
 export interface IRoutesModal {
   routes: string[]
@@ -26,7 +27,8 @@ export const RoutesModal: React.FC<IRoutesModal> = ({
   const { classes } = useStyles()
 
   const otherRoutesToHighlight: Record<string, RegExp[]> = {
-    pool: [/^newPosition\/*/, /^position\/*/]
+    pool: [/^newPosition\/*/, /^position\/*/],
+    swap: [/^swap\/*/]
   }
 
   return (
