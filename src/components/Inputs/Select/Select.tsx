@@ -7,7 +7,6 @@ import { Button } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import SelectTokenModal from '@components/Modals/SelectModals/SelectTokenModal/SelectTokenModal'
 import { SwapToken } from '@store/selectors/wallet'
-import { useLocation, useNavigate } from 'react-router-dom'
 
 export interface ISelectModal {
   name?: string
