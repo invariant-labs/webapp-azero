@@ -186,23 +186,36 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   transactionDetails: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     flexFlow: 'row',
     flexWrap: 'wrap',
     marginTop: 24,
     marginBottom: 12,
-    position: 'relative',
     cursor: 'default',
     filter: 'brightness(0.9)',
     width: '100%',
-    '@media (max-width: 400px)': {
+    [theme.breakpoints.down('sm')]: {
       flexDirection: 'column-reverse',
       gap: 4
+    }
+  },
+  transactionDetailsInner: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    [theme.breakpoints.down('sm')]: {
+      width: '100%'
+    }
+  },
+  transactionDetailsButton: {
+    [theme.breakpoints.down('sm')]: {
+      flexGrow: 1
     }
   },
   transactionDetailsWrapper: {
     display: 'flex',
     flexDirection: 'row',
+    justifyContent: 'center',
     backgroundColor: colors.invariant.light,
     paddingInline: 15,
     borderRadius: '10px',
@@ -214,24 +227,15 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     ...typography.caption2,
     whiteSpace: 'nowrap',
     pointerEvents: 'none',
-    color: colors.invariant.lightGrey,
-
-    '@media (max-width: 400px)': {
-      flex: 1
-    }
+    color: colors.invariant.lightGrey
   },
-  revertWrapper: {
+
+  exchangeRateWrapper: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginLeft: 8,
-    flex: 1,
-    '@media (max-width: 400px)': {
-      width: '100%',
-      flex: 'auto',
-      flexDirection: 'row-reverse',
-      columnGap: 8,
-      marginLeft: 0
+    [theme.breakpoints.down('sm')]: {
+      width: '100%'
     },
 
     '& svg ': {

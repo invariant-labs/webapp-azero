@@ -623,32 +623,33 @@ export const Swap: React.FC<ISwap> = ({
           />
         </Box>
         <Box className={classes.transactionDetails}>
-          <button
-            onClick={
-              tokenFromIndex !== null &&
-              tokenToIndex !== null &&
-              hasShowRateMessage() &&
-              amountFrom !== '' &&
-              amountTo !== ''
-                ? handleOpenTransactionDetails
-                : undefined
-            }
-            className={
-              tokenFromIndex !== null &&
-              tokenToIndex !== null &&
-              hasShowRateMessage() &&
-              amountFrom !== '' &&
-              amountTo !== ''
-                ? classes.HiddenTransactionButton
-                : classes.transactionDetailDisabled
-            }>
-            <Grid className={classes.transactionDetailsWrapper}>
-              <Typography className={classes.transactionDetailsHeader}>
-                {detailsOpen && canShowDetails ? 'Hide' : 'Show'} transaction details
-              </Typography>
-            </Grid>
-          </button>
-          <Box className={classes.revertWrapper}>
+          <Box className={classes.transactionDetailsInner}>
+            <button
+              onClick={
+                tokenFromIndex !== null &&
+                tokenToIndex !== null &&
+                hasShowRateMessage() &&
+                amountFrom !== '' &&
+                amountTo !== ''
+                  ? handleOpenTransactionDetails
+                  : undefined
+              }
+              className={classNames(
+                tokenFromIndex !== null &&
+                  tokenToIndex !== null &&
+                  hasShowRateMessage() &&
+                  amountFrom !== '' &&
+                  amountTo !== ''
+                  ? classes.HiddenTransactionButton
+                  : classes.transactionDetailDisabled,
+                classes.transactionDetailsButton
+              )}>
+              <Grid className={classes.transactionDetailsWrapper}>
+                <Typography className={classes.transactionDetailsHeader}>
+                  {detailsOpen && canShowDetails ? 'Hide' : 'Show'} transaction details
+                </Typography>
+              </Grid>
+            </button>
             {tokenFromIndex !== null &&
               tokenToIndex !== null &&
               tokenFromIndex !== tokenToIndex && (
@@ -658,7 +659,8 @@ export const Swap: React.FC<ISwap> = ({
                   justifyContent='center'
                   width={20}
                   height={34}
-                  minWidth='fit-content'>
+                  minWidth='fit-content'
+                  ml={1}>
                   <Refresher
                     currentIndex={refresherTime}
                     maxIndex={REFRESHER_INTERVAL}
@@ -666,8 +668,9 @@ export const Swap: React.FC<ISwap> = ({
                   />
                 </Grid>
               )}
-
-            {canShowDetails ? (
+          </Box>
+          {canShowDetails ? (
+            <Box className={classes.exchangeRateWrapper}>
               <ExchangeRate
                 onClick={() => setRateReversed(!rateReversed)}
                 tokenFromSymbol={tokens[rateReversed ? tokenToIndex : tokenFromIndex].symbol}
@@ -678,8 +681,8 @@ export const Swap: React.FC<ISwap> = ({
                 )}
                 loading={getStateMessage() === 'Loading'}
               />
-            ) : null}
-          </Box>
+            </Box>
+          ) : null}
         </Box>
         <TransactionDetailsBox
           open={getStateMessage() !== 'Loading' ? detailsOpen && canShowDetails : prevOpenState}
