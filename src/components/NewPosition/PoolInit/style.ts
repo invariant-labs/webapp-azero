@@ -26,7 +26,8 @@ const useStyles = makeStyles()(theme => {
       gap: 4
     },
     topInnerWrapper: {
-      minHeight: 300
+      minHeight: 300,
+      maxWidth: '100%'
     },
     bottomInnerWrapper: {
       display: 'flex',
