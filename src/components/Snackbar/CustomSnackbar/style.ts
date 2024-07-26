@@ -137,7 +137,6 @@ export const StyledDetails = styled('button')({
   [theme.breakpoints.down('sm')]: {
     width: 36,
     height: 16,
-    fontSize: 9,
     lineHeight: '14px',
     marginTop: 2,
     marginRight: 8,

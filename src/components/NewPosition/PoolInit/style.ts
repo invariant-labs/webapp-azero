@@ -111,7 +111,11 @@ const useStyles = makeStyles()(theme => {
     sliderWrapper: {
       paddingTop: 24,
       paddingInline: 8,
-      position: 'relative'
+      position: 'relative',
+
+      [theme.breakpoints.down('sm')]: {
+        paddingBottom: 24
+      }
     }
   }
 })

@@ -48,7 +48,11 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   const currentNetwork = useSelector(networkType)
   const position = useSelector(singlePositionData(id))
   const isLoadingList = useSelector(isLoadingPositionsList)
-  const { data: ticksData, loading: ticksLoading, hasError: hasTicksError } = useSelector(plotTicks)
+  const {
+    allData: ticksData,
+    loading: ticksLoading,
+    hasError: hasTicksError
+  } = useSelector(plotTicks)
   const allTickMaps = useSelector(tickMaps)
   const {
     lowerTick,

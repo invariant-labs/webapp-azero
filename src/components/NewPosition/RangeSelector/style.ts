@@ -111,7 +111,11 @@ const useStyles = makeStyles()(theme => {
     sliderWrapper: {
       paddingTop: 24,
       paddingInline: 8,
-      position: 'relative'
+      position: 'relative',
+
+      [theme.breakpoints.down('sm')]: {
+        paddingBottom: 24
+      }
     },
     warningWrapper: {
       position: 'absolute',
@@ -214,6 +218,11 @@ const useStyles = makeStyles()(theme => {
       color: colors.invariant.yellow,
       ...typography.caption2,
       textAlign: 'right'
+    },
+    checkboxLabel: {
+      color: colors.invariant.textGrey,
+      fontSize: 14,
+      fontWeight: 'normal'
     },
     activeLiquidityContainer: {
       width: 'auto'
