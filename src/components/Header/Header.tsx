@@ -104,13 +104,8 @@ export const Header: React.FC<IHeader> = ({
             }}
           />
         </Grid>
-        <Box>
-          <Grid
-            container
-            item
-            className={classes.leftSide}
-            justifyContent='flex-start'
-            sx={{ display: { xs: 'block', md: 'none' } }}>
+        <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+          <Grid container item className={classes.leftSide} justifyContent='flex-start'>
             <Grid container>
               <CardMedia
                 className={classes.logoShort}

@@ -79,8 +79,8 @@ const useStyles = makeStyles()((theme: Theme) => {
         gap: 4
       },
 
-      [theme.breakpoints.up('xl')]: {
-        flex: '1 1 0%'
+      [theme.breakpoints.up(1600)]: {
+        width: 600
       }
     },
     buttonsLgConnected: {
@@ -98,6 +98,9 @@ const useStyles = makeStyles()((theme: Theme) => {
       transition: 'filter 300ms'
     },
     menuButton: {
+      width: 142,
+      display: 'flex',
+      justifyContent: 'flex-end',
       borderRadius: 10,
       paddingInline: 6,
       paddingBlock: 1,
@@ -109,13 +112,21 @@ const useStyles = makeStyles()((theme: Theme) => {
       },
       '&:hover $menu': {
         filter: 'brightness(2)'
+      },
+
+      [theme.breakpoints.down('md')]: {
+        width: 40
       }
     },
     leftSide: {
       width: 'auto',
 
-      [theme.breakpoints.up('xl')]: {
+      [theme.breakpoints.up(1600)]: {
         flex: '1 1 0%'
+      },
+
+      [theme.breakpoints.up(1600)]: {
+        width: 600
       }
     }
   }
