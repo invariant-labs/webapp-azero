@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import icons from '@static/icons'
 import classNames from 'classnames'
 import useStyles from './style'
@@ -7,6 +7,7 @@ import { Button } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import SelectTokenModal from '@components/Modals/SelectModals/SelectTokenModal/SelectTokenModal'
 import { SwapToken } from '@store/selectors/wallet'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 export interface ISelectModal {
   name?: string
@@ -51,6 +52,12 @@ export const Select: React.FC<ISelectModal> = ({
     unblurContent()
     setOpen(false)
   }
+
+  useEffect(() => {
+    return () => {
+      unblurContent()
+    }
+  }, [])
 
   const displayName = !current ? name : current.symbol
 
@@ -97,4 +104,5 @@ export const Select: React.FC<ISelectModal> = ({
     </>
   )
 }
+
 export default Select
