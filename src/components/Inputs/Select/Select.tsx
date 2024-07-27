@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import icons from '@static/icons'
 import classNames from 'classnames'
 import useStyles from './style'
@@ -52,6 +52,12 @@ export const Select: React.FC<ISelectModal> = ({
     setOpen(false)
   }
 
+  useEffect(() => {
+    return () => {
+      unblurContent()
+    }
+  }, [])
+
   const displayName = !current ? name : current.symbol
 
   return (
@@ -97,4 +103,5 @@ export const Select: React.FC<ISelectModal> = ({
     </>
   )
 }
+
 export default Select
