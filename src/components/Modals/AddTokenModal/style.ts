@@ -7,12 +7,16 @@ const useStyles = makeStyles()((theme: Theme) => {
     root: {
       background: colors.invariant.component,
       width: 480,
-      height: 140,
       borderRadius: 24,
-      padding: '20px 24px'
+      padding: '20px 24px',
+      maxWidth: '100%',
+
+      [theme.breakpoints.down('sm')]: {
+        padding: '20px 16px '
+      }
     },
     popover: {
-      marginTop: 'calc(50vh - 350px)',
+      marginTop: 'max(calc(50vh - 350px), 20px)',
       marginLeft: 'calc(50vw - 241px)',
       [theme.breakpoints.down('sm')]: {
         display: 'flex',
@@ -25,10 +29,12 @@ const useStyles = makeStyles()((theme: Theme) => {
       boxShadow: 'none'
     },
     upperRow: {
-      height: 20
-    },
-    lowerRow: {
-      height: 60
+      flexWrap: 'nowrap',
+      marginBottom: 20,
+      '& p': {
+        ...typography.heading4,
+        color: colors.white.main
+      }
     },
     title: {
       ...typography.heading4,
@@ -48,10 +54,9 @@ const useStyles = makeStyles()((theme: Theme) => {
     input: {
       backgroundColor: colors.invariant.newDark,
       width: '100%',
-      height: 60,
       color: colors.white.main,
       borderRadius: 20,
-      padding: '7px 10px 6px',
+      padding: '12px 10px',
       ...typography.heading4,
       fontWeight: 400,
       marginRight: 16,
@@ -66,9 +71,8 @@ const useStyles = makeStyles()((theme: Theme) => {
     },
     add: {
       minWidth: 82,
-      height: 60,
       background: colors.invariant.greenLinearGradient,
-      ...typography.heading3,
+      ...typography.heading4,
       color: colors.invariant.black,
       textTransform: 'none',
       borderRadius: 18,

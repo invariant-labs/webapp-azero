@@ -20,7 +20,15 @@ const useStyles = makeStyles()((theme: Theme) => {
       borderRadius: 20,
       width: 500,
       [theme.breakpoints.down('sm')]: {
-        width: '100vw'
+        maxWidth: '100vw',
+        padding: '20px 16px'
+      },
+      '.MuiFormControlLabel-label': {
+        color: colors.invariant.lightGrey,
+        transform: 'translateY(1.5px)'
+      },
+      '& .MuiCheckbox-root': {
+        color: colors.invariant.lightGrey
       },
       '& .MuiCheckbox-root.Mui-checked': {
         color: colors.green.button
@@ -60,14 +68,13 @@ const useStyles = makeStyles()((theme: Theme) => {
     selectTokenInput: {
       backgroundColor: colors.invariant.newDark,
       width: '100%',
-      fontSize: 16,
-      fontWeight: 600,
+      ...typography.body3,
       position: 'relative',
       color: 'white',
       border: `1px solid ${colors.invariant.newDark}`,
       borderColor: colors.invariant.newDark,
       borderRadius: 15,
-      padding: '18px 10px 17px 10px',
+      padding: '13px 44px 13px 10px !important',
       whiteSpace: 'nowrap',
       overflow: 'hidden',
       textOverflow: 'ellipsis',
@@ -75,7 +82,7 @@ const useStyles = makeStyles()((theme: Theme) => {
 
       '&::placeholder': {
         color: colors.invariant.light,
-        ...typography.body1
+        ...typography.body3
       },
       '&:focus': {
         outline: 'none'
@@ -102,13 +109,13 @@ const useStyles = makeStyles()((theme: Theme) => {
       cursor: 'pointer',
       justifyContent: 'center',
       alignItems: 'center',
-      background: colors.invariant.dark,
+      background: colors.invariant.newDark,
       borderRadius: 12,
-      padding: '6px 11px',
+      padding: '8px 12px',
       marginRight: 6,
       marginBottom: 8,
       '& p': {
-        ...typography.heading4,
+        ...typography.body3,
         fontWeight: 400
       },
 
@@ -126,22 +133,28 @@ const useStyles = makeStyles()((theme: Theme) => {
       background: colors.invariant.component,
       borderTop: `1px solid ${colors.invariant.light}`,
       width: 451,
-      height: 352,
-      paddingTop: 20
+      height: 400,
+      paddingTop: 8,
+      [theme.breakpoints.down('sm')]: {
+        flexDirection: 'column',
+        width: 501
+      }
     },
 
     tokenContainer: {
       display: 'flex',
-      flexDirection: 'column'
+      flexDirection: 'column',
+      minWidth: 'min-content'
     },
 
     tokenItem: {
       display: 'flex',
       justifyContent: 'space-between',
-      margin: '0 0 2px 0',
-      borderRadius: 10,
+      marginBottom: 4,
+      borderRadius: 24,
       cursor: 'pointer',
-      padding: 12,
+      padding: '0 16px ',
+
       '& > p': {
         whiteSpace: 'nowrap'
       },
@@ -153,20 +166,47 @@ const useStyles = makeStyles()((theme: Theme) => {
     },
     tokenName: {
       color: colors.white.main,
-      ...typography.heading4,
-      lineHeight: '20px'
+      ...typography.heading4
+    },
+    tokenAddress: {
+      backgroundColor: colors.invariant.newDark,
+      borderRadius: 4,
+      padding: '2px 4px',
+      width: 'min-content',
+      height: 'min-content',
+      '& a': {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '12px',
+        textDecoration: 'none',
+
+        '&:hover': {
+          filter: 'brightness(1.2)'
+        },
+        '& p': {
+          color: colors.invariant.lightGrey,
+          ...typography.caption4,
+          letterSpacing: '0.03em'
+        }
+      }
     },
     tokenDescrpiption: {
-      color: colors.invariant.lightGrey,
-      ...typography.caption4,
+      color: colors.invariant.textGrey,
+      ...typography.caption2,
       lineHeight: '16px',
       whiteSpace: 'nowrap'
     },
     tokenBalanceStatus: {
-      filter: 'brightness(0.8)',
-      color: colors.invariant.lightGrey,
-      ...typography.caption2,
-      minWidth: 'auto'
+      color: colors.invariant.textGrey,
+      maxHeight: 40,
+      '& p': {
+        ...typography.body2
+      },
+
+      '& p:last-child': {
+        color: colors.invariant.text
+      }
     },
 
     tokenIcon: {
@@ -188,8 +228,9 @@ const useStyles = makeStyles()((theme: Theme) => {
 
     hideScroll: {
       '& > *:first-of-type': {
-        paddingRight: '30px'
-      }
+        overflow: 'auto !important'
+      },
+      overflow: 'visible !important'
     },
 
     scrollbarThumb: {
@@ -202,8 +243,12 @@ const useStyles = makeStyles()((theme: Theme) => {
       borderRadius: 10,
       height: '98%',
       margin: 5,
-      float: 'right',
-      width: 5
+      width: 5,
+      transform: 'translateX(20px)'
+    },
+    scrollbarView: {
+      padding: 0 + '!important',
+      width: 'calc(100% + 50px)'
     },
     paper: {
       background: 'transparent',
@@ -317,7 +362,8 @@ const useStyles = makeStyles()((theme: Theme) => {
     },
     addIcon: {
       marginLeft: 10,
-      cursor: 'pointer'
+      cursor: 'pointer',
+      fontSize: 28
     }
   }
 })

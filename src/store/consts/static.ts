@@ -8,7 +8,14 @@ import {
   TESTNET_WAZERO_ADDRESS
 } from '@invariant-labs/a0-sdk'
 import { Keyring } from '@polkadot/api'
-import { BestTier, FormatNumberThreshold, PrefixConfig, Token, TokenPriceData } from './types'
+import {
+  BestTier,
+  Chain,
+  FormatNumberThreshold,
+  PrefixConfig,
+  Token,
+  TokenPriceData
+} from './types'
 import { testnetBestTiersCreator } from '@utils/utils'
 import { POSITIONS_ENTRIES_LIMIT } from '@invariant-labs/a0-sdk/target/consts'
 
@@ -281,3 +288,8 @@ export const MINIMAL_POOL_INIT_PRICE = 0.00000001
 
 export const DEFAULT_SWAP_SLIPPAGE = '0.50'
 export const DEFAULT_NEW_POSITION_SLIPPAGE = '0.50'
+
+export const CHAINS = [
+  { name: Chain.Solana, address: 'https://invariant.app/swap' },
+  { name: Chain.AlephZero, address: 'https://azero.invariant.app/swap' }
+]

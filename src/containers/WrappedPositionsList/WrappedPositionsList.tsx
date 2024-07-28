@@ -9,6 +9,7 @@ import {
   calcPriceBySqrtPrice
 } from '@utils/utils'
 import { actions } from '@store/reducers/positions'
+import { actions as walletActions } from '@store/reducers/wallet'
 import { Status } from '@store/reducers/wallet'
 import {
   isLoadingPositionsList,
@@ -158,7 +159,10 @@ export const WrappedPositionsList: React.FC = () => {
       showNoConnected={walletStatus !== Status.Initialized}
       itemsPerPage={POSITIONS_PER_PAGE}
       noConnectedBlockerProps={{
-        onConnect: openWalletSelectorModal,
+        onConnect: async () => {
+          await openWalletSelectorModal()
+          dispatch(walletActions.connect(false))
+        },
         descCustomText: 'You have no positions.'
       }}
       pageChanged={page => {

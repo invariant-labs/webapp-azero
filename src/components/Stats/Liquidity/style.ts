@@ -7,6 +7,7 @@ export const useStyles = makeStyles()(() => ({
     color: 'white',
     borderRadius: 24,
     paddingBlock: 24,
+    paddingLeft: 24,
     boxSizing: 'border-box'
   },
   liquidityContainer: {
@@ -45,14 +46,13 @@ export const useStyles = makeStyles()(() => ({
     minWidth: 'auto'
   },
   volumeStatusColor: {
-    height: 20,
     minWidth: 'auto',
     padding: '5px 15px 5px 15px',
     borderRadius: 6
   },
 
   volumeStatusHeader: {
-    ...typography.body1,
+    ...typography.caption3,
     filter: 'brightness(1.2)'
   },
 

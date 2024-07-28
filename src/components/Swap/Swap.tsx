@@ -5,8 +5,7 @@ import Slippage from '@components/Modals/Slippage/Slippage'
 import Refresher from '@components/Refresher/Refresher'
 import { PoolKey, Price } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
-import { Box, Button, CardMedia, Grid, Typography } from '@mui/material'
-import infoIcon from '@static/svg/info.svg'
+import { Box, Button, Grid, Typography } from '@mui/material'
 import refreshIcon from '@static/svg/refresh.svg'
 import settingIcon from '@static/svg/settings.svg'
 import SwapArrows from '@static/svg/swap-arrows.svg'
@@ -15,7 +14,13 @@ import {
   DEFAULT_TOKEN_DECIMAL,
   REFRESHER_INTERVAL
 } from '@store/consts/static'
-import { convertBalanceToBigint, printBigint, stringToFixed, trimLeadingZeros } from '@utils/utils'
+import {
+  addressToTicker,
+  convertBalanceToBigint,
+  printBigint,
+  stringToFixed,
+  trimLeadingZeros
+} from '@utils/utils'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { Swap as SwapData } from '@store/reducers/swap'
 import { Status } from '@store/reducers/wallet'
@@ -31,6 +36,7 @@ import useStyles from './style'
 import { SimulateResult, TokenPriceData } from '@store/consts/types'
 import TokensInfo from './TokensInfo/TokensInfo'
 import { VariantType } from 'notistack'
+import { useNavigate } from 'react-router-dom'
 
 export interface Pools {
   tokenX: string
@@ -147,6 +153,19 @@ export const Swap: React.FC<ISwap> = ({
   const [refresherTime, setRefresherTime] = React.useState<number>(REFRESHER_INTERVAL)
 
   const timeoutRef = useRef<number>(0)
+
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const tokenFromAddress = addressToTicker(tokens[tokenFromIndex ?? -1]?.assetAddress)
+    const tokenToAddress = addressToTicker(tokens[tokenToIndex ?? -1]?.assetAddress)
+
+    if (tokenFromAddress || tokenToAddress) {
+      navigate(`/swap/${tokenFromAddress || '-'}/${tokenToAddress || '-'}`, {
+        replace: true
+      })
+    }
+  }, [tokenToIndex, tokenFromIndex])
 
   useEffect(() => {
     if (!!tokens.length && tokenFromIndex === null && tokenToIndex === null) {
@@ -343,12 +362,12 @@ export const Swap: React.FC<ISwap> = ({
       return 'Insufficient volume'
     }
 
-    return 'Swap tokens'
+    return 'Swap'
   }
   const hasShowRateMessage = () => {
     return (
       getStateMessage() === 'Insufficient balance' ||
-      getStateMessage() === 'Swap tokens' ||
+      getStateMessage() === 'Swap' ||
       getStateMessage() === 'Loading' ||
       getStateMessage() === 'Connect a wallet' ||
       getStateMessage() === 'Insufficient liquidity'
@@ -604,7 +623,7 @@ export const Swap: React.FC<ISwap> = ({
           />
         </Box>
         <Box className={classes.transactionDetails}>
-          <Grid className={classes.exchangeRateContainer}>
+          <Box className={classes.transactionDetailsInner}>
             <button
               onClick={
                 tokenFromIndex !== null &&
@@ -615,43 +634,54 @@ export const Swap: React.FC<ISwap> = ({
                   ? handleOpenTransactionDetails
                   : undefined
               }
-              className={
+              className={classNames(
                 tokenFromIndex !== null &&
-                tokenToIndex !== null &&
-                hasShowRateMessage() &&
-                amountFrom !== '' &&
-                amountTo !== ''
+                  tokenToIndex !== null &&
+                  hasShowRateMessage() &&
+                  amountFrom !== '' &&
+                  amountTo !== ''
                   ? classes.HiddenTransactionButton
-                  : classes.transactionDetailDisabled
-              }>
+                  : classes.transactionDetailDisabled,
+                classes.transactionDetailsButton
+              )}>
               <Grid className={classes.transactionDetailsWrapper}>
                 <Typography className={classes.transactionDetailsHeader}>
                   {detailsOpen && canShowDetails ? 'Hide' : 'Show'} transaction details
                 </Typography>
-                <CardMedia image={infoIcon} className={classes.infoIcon} />
               </Grid>
             </button>
             {tokenFromIndex !== null &&
               tokenToIndex !== null &&
               tokenFromIndex !== tokenToIndex && (
-                <Refresher
-                  currentIndex={refresherTime}
-                  maxIndex={REFRESHER_INTERVAL}
-                  onClick={handleRefresh}
-                />
+                <Grid
+                  container
+                  alignItems='center'
+                  justifyContent='center'
+                  width={20}
+                  height={34}
+                  minWidth='fit-content'
+                  ml={1}>
+                  <Refresher
+                    currentIndex={refresherTime}
+                    maxIndex={REFRESHER_INTERVAL}
+                    onClick={handleRefresh}
+                  />
+                </Grid>
               )}
-          </Grid>
+          </Box>
           {canShowDetails ? (
-            <ExchangeRate
-              onClick={() => setRateReversed(!rateReversed)}
-              tokenFromSymbol={tokens[rateReversed ? tokenToIndex : tokenFromIndex].symbol}
-              tokenToSymbol={tokens[rateReversed ? tokenFromIndex : tokenToIndex].symbol}
-              amount={rateReversed ? 1 / swapRate : swapRate}
-              tokenToDecimals={Number(
-                tokens[rateReversed ? tokenFromIndex : tokenToIndex].decimals
-              )}
-              loading={getStateMessage() === 'Loading'}
-            />
+            <Box className={classes.exchangeRateWrapper}>
+              <ExchangeRate
+                onClick={() => setRateReversed(!rateReversed)}
+                tokenFromSymbol={tokens[rateReversed ? tokenToIndex : tokenFromIndex].symbol}
+                tokenToSymbol={tokens[rateReversed ? tokenFromIndex : tokenToIndex].symbol}
+                amount={rateReversed ? 1 / swapRate : swapRate}
+                tokenToDecimals={Number(
+                  tokens[rateReversed ? tokenFromIndex : tokenToIndex].decimals
+                )}
+                loading={getStateMessage() === 'Loading'}
+              />
+            </Box>
           ) : null}
         </Box>
         <TransactionDetailsBox
@@ -695,11 +725,11 @@ export const Swap: React.FC<ISwap> = ({
             className={
               getStateMessage() === 'Connect a wallet'
                 ? `${classes.swapButton}`
-                : getStateMessage() === 'Swap tokens' && progress === 'none'
+                : getStateMessage() === 'Swap' && progress === 'none'
                   ? `${classes.swapButton} ${classes.ButtonSwapActive}`
                   : classes.swapButton
             }
-            disabled={getStateMessage() !== 'Swap tokens' || progress !== 'none'}
+            disabled={getStateMessage() !== 'Swap' || progress !== 'none'}
             onClick={() => {
               if (
                 simulateResult.poolKey === null ||

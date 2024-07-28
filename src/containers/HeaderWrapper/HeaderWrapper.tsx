@@ -1,6 +1,6 @@
 import Header from '@components/Header/Header'
 import { Network } from '@invariant-labs/a0-sdk'
-import { AlephZeroNetworks } from '@store/consts/static'
+import { AlephZeroNetworks, CHAINS } from '@store/consts/static'
 import { actions } from '@store/reducers/connection'
 import { Status, actions as walletActions } from '@store/reducers/wallet'
 import { networkType, rpcAddress } from '@store/selectors/connection'
@@ -11,6 +11,7 @@ import React, { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
+import { Chain } from '@store/consts/types'
 
 export const HeaderWrapper: React.FC = () => {
   const dispatch = useDispatch()
@@ -23,14 +24,11 @@ export const HeaderWrapper: React.FC = () => {
   useEffect(() => {
     const fetchWallet = async () => {
       const wallet = await getAlephZeroWallet()
-      wallet.addListener('connect', () => {
-        dispatch(walletActions.connect())
-      })
 
       await wallet.canEagerConnect().then(
         async canEagerConnect => {
           if (canEagerConnect) {
-            dispatch(walletActions.connect())
+            dispatch(walletActions.connect(true))
           }
         },
         error => {
@@ -48,6 +46,8 @@ export const HeaderWrapper: React.FC = () => {
     return lastRPC === null ? AlephZeroNetworks.TEST : lastRPC
   }, [])
 
+  const activeChain = CHAINS.find(chain => chain.name === Chain.AlephZero) ?? CHAINS[0]
+
   return (
     <Header
       address={walletAddress}
@@ -60,7 +60,10 @@ export const HeaderWrapper: React.FC = () => {
           dispatch(actions.setNetwork({ networkType: network, rpcAddress, rpcName }))
         }
       }}
-      onConnectWallet={openWalletSelectorModal}
+      onConnectWallet={async () => {
+        await openWalletSelectorModal()
+        dispatch(walletActions.connect(false))
+      }}
       landing={location.pathname.substring(1)}
       walletConnected={walletStatus === Status.Initialized}
       onDisconnectWallet={() => {
@@ -75,7 +78,7 @@ export const HeaderWrapper: React.FC = () => {
 
         dispatch(
           snackbarsActions.add({
-            message: 'Successfully copied wallet address.',
+            message: 'Wallet address copied.',
             variant: 'success',
             persist: false
           })
@@ -83,6 +86,12 @@ export const HeaderWrapper: React.FC = () => {
       }}
       onChangeWallet={() => {
         dispatch(walletActions.reconnect())
+      }}
+      activeChain={activeChain}
+      onChainSelect={chain => {
+        if (chain.name !== activeChain.name) {
+          window.location.replace(chain.address)
+        }
       }}
     />
   )

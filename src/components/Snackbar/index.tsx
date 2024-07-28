@@ -28,17 +28,13 @@ interface ISnackbarProps {
 }
 
 const Snackbar: React.FC<ISnackbarProps> = ({ maxSnack = 3, children }) => {
-  const isExSmall = useMediaQuery(theme.breakpoints.down('xs'))
+  const isExSmall = useMediaQuery(theme.breakpoints.down('sm'))
 
   return (
     <SnackbarProvider
       dense
       maxSnack={isExSmall ? 5 : maxSnack}
-      anchorOrigin={
-        isExSmall
-          ? { vertical: 'top', horizontal: 'left' }
-          : { vertical: 'bottom', horizontal: 'left' }
-      }
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
       Components={{
         success: CustomSnackbar,
         error: CustomSnackbar,
