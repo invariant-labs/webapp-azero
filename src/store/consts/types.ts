@@ -67,3 +67,13 @@ export interface BestTier {
   tokenY: string
   bestTierIndex: number
 }
+
+export interface ISelectChain {
+  name: Chain
+  address: string
+}
+
+export enum Chain {
+  Solana = 'Solana',
+  AlephZero = 'Aleph Zero'
+}
