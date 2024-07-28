@@ -44,7 +44,7 @@ const useStyles = makeStyles()(theme => {
       position: 'relative',
       flexDirection: 'row',
 
-      '& .noConnectedLayer': {
+      '& .blurLayer': {
         height: '100%'
       },
 
@@ -52,7 +52,7 @@ const useStyles = makeStyles()(theme => {
         flexDirection: 'column',
         minWidth: 0,
 
-        '& .noConnectedInfo': {
+        '& .blurInfo': {
           justifyContent: 'flex-start',
           paddingTop: 60
         }

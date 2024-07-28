@@ -55,6 +55,10 @@ export const useStyles = makeStyles<{ isToken: boolean }>()((_theme, { isToken }
     flexWrap: 'nowrap',
     alignItems: 'center',
     columnGap: 4,
+    cursor: isToken ? 'pointer' : 'default',
+    '&:hover': {
+      filter: isToken ? 'brightness(1.2)' : 'none'
+    },
 
     '& p': {
       color: colors.invariant.textGrey,
@@ -85,11 +89,7 @@ export const useStyles = makeStyles<{ isToken: boolean }>()((_theme, { isToken }
   clipboardIcon: {
     display: 'inline-block',
     height: 10,
-    color: colors.invariant.textGrey,
-    cursor: isToken ? 'pointer' : 'default',
-    '&:hover': {
-      filter: isToken ? 'brightness(1.2)' : 'none'
-    }
+    color: colors.invariant.textGrey
   },
   link: {
     maxHeight: 8,

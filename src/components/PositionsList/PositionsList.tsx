@@ -159,6 +159,7 @@ export const PositionsList: React.FC<IProps> = ({
           <EmptyPlaceholder
             desc='Add your first position by pressing the button and start earning!'
             className={classes.placeholder}
+            onAction={onAddPositionClick}
           />
         )}
       </Grid>

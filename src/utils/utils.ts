@@ -4,6 +4,7 @@ import {
   Network,
   PSP22,
   PoolKey,
+  Position,
   Tick,
   Tickmap,
   calculateSqrtPrice,
@@ -253,9 +254,6 @@ export const getCoinGeckoTokenPrice = async (id: string): Promise<number | undef
   let lastQueryTimestamp = 0
   if (cachedLastQueryTimestamp) {
     lastQueryTimestamp = Number(cachedLastQueryTimestamp)
-  } else {
-    lastQueryTimestamp = Date.now()
-    localStorage.setItem('COINGECKO_LAST_QUERY_TIMESTAMP', String(lastQueryTimestamp))
   }
 
   const cachedPriceData = localStorage.getItem('COINGECKO_PRICE_DATA')
@@ -269,6 +267,7 @@ export const getCoinGeckoTokenPrice = async (id: string): Promise<number | undef
       )
       priceData = data
       localStorage.setItem('COINGECKO_PRICE_DATA', JSON.stringify(priceData))
+      localStorage.setItem('COINGECKO_LAST_QUERY_TIMESTAMP', String(Date.now()))
     } catch (e) {
       localStorage.removeItem('COINGECKO_LAST_QUERY_TIMESTAMP')
       localStorage.removeItem('COINGECKO_PRICE_DATA')
@@ -857,7 +856,7 @@ export const createLiquidityPlot = (
   return isXtoY ? ticksData : ticksData.reverse()
 }
 
-export const formatNumber = (number: number | bigint | string): string => {
+export const formatNumber = (number: number | bigint | string, noDecimals?: boolean): string => {
   const numberAsNumber = Number(number)
   const isNegative = numberAsNumber < 0
   const absNumberAsString = numberToString(Math.abs(numberAsNumber))
@@ -871,32 +870,34 @@ export const formatNumber = (number: number | bigint | string): string => {
   let formattedNumber
 
   if (Math.abs(numberAsNumber) > FormatConfig.B) {
+    const formattedDecimals = noDecimals
+      ? ''
+      : (FormatConfig.DecimalsAfterDot ? '.' : '') +
+        (beforeDot.slice(-FormatConfig.BDecimals) + (afterDot ? afterDot : '')).slice(
+          0,
+          FormatConfig.DecimalsAfterDot
+        )
     formattedNumber =
-      beforeDot.slice(0, -FormatConfig.BDecimals) +
-      (FormatConfig.DecimalsAfterDot ? '.' : '') +
-      (beforeDot.slice(-FormatConfig.BDecimals) + (afterDot ? afterDot : '')).slice(
-        0,
-        FormatConfig.DecimalsAfterDot
-      ) +
-      'B'
+      beforeDot.slice(0, -FormatConfig.BDecimals) + !noDecimals ? formattedDecimals : '' + 'B'
   } else if (Math.abs(numberAsNumber) > FormatConfig.M) {
-    formattedNumber =
-      beforeDot.slice(0, -FormatConfig.MDecimals) +
-      (FormatConfig.DecimalsAfterDot ? '.' : '') +
-      (beforeDot.slice(-FormatConfig.MDecimals) + (afterDot ? afterDot : '')).slice(
-        0,
-        FormatConfig.DecimalsAfterDot
-      ) +
-      'M'
+    const formattedDecimals = noDecimals
+      ? ''
+      : (FormatConfig.DecimalsAfterDot ? '.' : '') +
+        (beforeDot.slice(-FormatConfig.MDecimals) + (afterDot ? afterDot : '')).slice(
+          0,
+          FormatConfig.DecimalsAfterDot
+        )
+
+    formattedNumber = beforeDot.slice(0, -FormatConfig.MDecimals) + formattedDecimals + 'M'
   } else if (Math.abs(numberAsNumber) > FormatConfig.K) {
-    formattedNumber =
-      beforeDot.slice(0, -FormatConfig.KDecimals) +
-      (FormatConfig.DecimalsAfterDot ? '.' : '') +
-      (beforeDot.slice(-FormatConfig.KDecimals) + (afterDot ? afterDot : '')).slice(
-        0,
-        FormatConfig.DecimalsAfterDot
-      ) +
-      'K'
+    const formattedDecimals = noDecimals
+      ? ''
+      : (FormatConfig.DecimalsAfterDot ? '.' : '') +
+        (beforeDot.slice(-FormatConfig.KDecimals) + (afterDot ? afterDot : '')).slice(
+          0,
+          FormatConfig.DecimalsAfterDot
+        )
+    formattedNumber = beforeDot.slice(0, -FormatConfig.KDecimals) + formattedDecimals + 'K'
   } else if (afterDot && countLeadingZeros(afterDot) <= 3) {
     const roundedNumber = numberAsNumber.toFixed(countLeadingZeros(afterDot) + 4).slice(0, -1)
     formattedNumber = trimZeros(roundedNumber)
@@ -1116,4 +1117,56 @@ export const validConcentrationMidPriceTick = (
   }
 
   return midPriceTick
+}
+
+export const getLiquidityTicksByPositionsList = (
+  poolKey: PoolKey,
+  positions: Position[]
+): LiquidityTick[] => {
+  const liquidityChanges: Record<number, bigint> = {}
+
+  positions.forEach(position => {
+    if (poolKeyToString(position.poolKey) === poolKeyToString(poolKey)) {
+      const lowerTickIndex = Number(position.lowerTickIndex)
+      const upperTickIndex = Number(position.upperTickIndex)
+
+      liquidityChanges[lowerTickIndex] =
+        (liquidityChanges[lowerTickIndex] ?? 0n) + position.liquidity
+      liquidityChanges[upperTickIndex] =
+        (liquidityChanges[upperTickIndex] ?? 0n) - position.liquidity
+    }
+  })
+
+  const ticks: LiquidityTick[] = []
+
+  Object.entries(liquidityChanges).forEach(([tickIndex, liquidityChangeTotal]) => {
+    const index = BigInt(tickIndex)
+    const [liquidityChange, sign] =
+      liquidityChangeTotal > 0n ? [liquidityChangeTotal, true] : [-liquidityChangeTotal, false]
+
+    if (liquidityChange !== 0n) {
+      ticks.push({ index, liquidityChange, sign })
+    }
+  })
+
+  return ticks
+}
+
+export const findClosestIndexByValue = (arr: number[], value: number): number => {
+  const high = arr.length - 1
+
+  if (value < arr[0]) {
+    return 0
+  }
+
+  if (value > arr[high]) {
+    return high
+  }
+
+  for (let i = arr.length - 1; i >= 0; i--) {
+    if (Number(arr[i].toFixed(0)) <= Number(value.toFixed(0))) {
+      return i
+    }
+  }
+  return high
 }

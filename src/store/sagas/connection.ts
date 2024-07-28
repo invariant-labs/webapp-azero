@@ -81,20 +81,20 @@ export function* initConnection(): Generator {
 
     yield* put(
       snackbarsActions.add({
-        message: 'Aleph-Zero network connected.',
+        message: 'Aleph Zero network connected.',
         variant: 'success',
         persist: false
       })
     )
 
-    console.log('Aleph-Zero network connected.')
+    console.log('Aleph Zero network connected.')
     yield* put(actions.setStatus(Status.Initialized))
   } catch (error) {
     console.log(error)
     yield* put(actions.setStatus(Status.Error))
     yield put(
       snackbarsActions.add({
-        message: 'Failed to connect to Aleph-Zero network',
+        message: 'Failed to connect to Aleph Zero network.',
         variant: 'error',
         persist: false
       })

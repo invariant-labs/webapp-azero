@@ -8,11 +8,7 @@ export const useStyles = makeStyles()(() => ({
     justifyContent: 'center',
     whiteSpace: 'nowrap',
     textOverflow: 'ellipsis',
-    overflow: 'hidden',
-
-    [theme.breakpoints.down('sm')]: {
-      ...typography.tiny2
-    }
+    overflow: 'hidden'
   },
   loadingContainer: {
     width: 20,
@@ -36,6 +32,10 @@ export const useStyles = makeStyles()(() => ({
     display: 'flex',
     '&:hover': {
       borderColor: colors.invariant.lightHover
+    },
+    [theme.breakpoints.down('sm')]: {
+      width: '100%',
+      flex: 1
     }
   }
 }))

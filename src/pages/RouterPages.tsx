@@ -9,7 +9,7 @@ import SwapPage from './SwapPage'
 export const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<RootPage />}>
-      <Route path='/swap' element={<SwapPage />} />
+      <Route path='/swap/:item1?/:item2?' element={<SwapPage />} />
       <Route path='/pool' element={<ListPage />} />
       <Route path='/stats' element={<StatsPage />} />
       <Route path='/newPosition/:item1?/:item2?/:item3?' element={<NewPositionPage />} />
