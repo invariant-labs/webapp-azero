@@ -20,7 +20,15 @@ const useStyles = makeStyles()((theme: Theme) => {
       borderRadius: 20,
       width: 500,
       [theme.breakpoints.down('sm')]: {
-        maxWidth: '100vw'
+        maxWidth: '100vw',
+        padding: '20px 16px'
+      },
+      '.MuiFormControlLabel-label': {
+        color: colors.invariant.lightGrey,
+        transform: 'translateY(1.5px)'
+      },
+      '& .MuiCheckbox-root': {
+        color: colors.invariant.lightGrey
       },
       '& .MuiCheckbox-root.Mui-checked': {
         color: colors.green.button
@@ -66,7 +74,7 @@ const useStyles = makeStyles()((theme: Theme) => {
       border: `1px solid ${colors.invariant.newDark}`,
       borderColor: colors.invariant.newDark,
       borderRadius: 15,
-      padding: '18px 10px 17px 10px',
+      padding: '13px 44px 13px 10px !important',
       whiteSpace: 'nowrap',
       overflow: 'hidden',
       textOverflow: 'ellipsis',
@@ -85,7 +93,7 @@ const useStyles = makeStyles()((theme: Theme) => {
       width: 24,
       height: 26,
       right: '12px',
-      top: '18px'
+      top: '14px'
     },
     commonTokensHeader: {
       ...typography.body2
@@ -126,12 +134,17 @@ const useStyles = makeStyles()((theme: Theme) => {
       borderTop: `1px solid ${colors.invariant.light}`,
       width: 451,
       height: 400,
-      paddingTop: 8
+      paddingTop: 8,
+      [theme.breakpoints.down('sm')]: {
+        flexDirection: 'column',
+        width: 501
+      }
     },
 
     tokenContainer: {
       display: 'flex',
-      flexDirection: 'column'
+      flexDirection: 'column',
+      minWidth: 'min-content'
     },
 
     tokenItem: {
@@ -140,7 +153,8 @@ const useStyles = makeStyles()((theme: Theme) => {
       marginBottom: 4,
       borderRadius: 24,
       cursor: 'pointer',
-      padding: '32px 16px ',
+      padding: '0 16px ',
+
       '& > p': {
         whiteSpace: 'nowrap'
       },
@@ -184,12 +198,13 @@ const useStyles = makeStyles()((theme: Theme) => {
       whiteSpace: 'nowrap'
     },
     tokenBalanceStatus: {
-      filter: 'brightness(0.8)',
       color: colors.invariant.textGrey,
-      ...typography.body2,
-      minWidth: 'auto',
+      maxHeight: 40,
+      '& p': {
+        ...typography.body2
+      },
 
-      '& span': {
+      '& p:last-child': {
         color: colors.invariant.text
       }
     },
@@ -347,7 +362,8 @@ const useStyles = makeStyles()((theme: Theme) => {
     },
     addIcon: {
       marginLeft: 10,
-      cursor: 'pointer'
+      cursor: 'pointer',
+      fontSize: 28
     }
   }
 })

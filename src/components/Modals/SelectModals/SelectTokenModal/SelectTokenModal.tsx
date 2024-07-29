@@ -75,7 +75,6 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
   const [hideUnknown, setHideUnknown] = useState(initialHideUnknownTokensValue)
 
   const outerRef = useRef<HTMLElement>(null)
-  const listRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const tokensWithIndexes = useMemo(
@@ -216,7 +215,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
               label='Hide unknown tokens'
             />
           </Grid>
-          <Box className={classes.tokenList} ref={listRef}>
+          <Box className={classes.tokenList}>
             <List
               height={400}
               width={360}
@@ -234,7 +233,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
                     container
                     style={{
                       ...style,
-                      width: listRef.current ? listRef.current.clientWidth : 'calc(100% - 50px)'
+                      width: 'calc(100% - 50px)'
                     }}
                     alignItems='center'
                     wrap='nowrap'
@@ -250,7 +249,12 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
                       alt={token.name + 'logo'}
                     />
                     <Grid container className={classes.tokenContainer}>
-                      <Grid container direction='row' columnGap='6px' alignItems='center'>
+                      <Grid
+                        container
+                        direction='row'
+                        columnGap='6px'
+                        alignItems='center'
+                        wrap='nowrap'>
                         <Typography className={classes.tokenName}>
                           {token.symbol ? token.symbol : 'Unknown'}{' '}
                         </Typography>
@@ -277,11 +281,18 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
                         {token.name.length > (isXs ? 20 : 30) ? '...' : ''}
                       </Typography>
                     </Grid>
-                    {!hideBalances && Number(tokenBalance) > 0 ? (
-                      <Typography className={classes.tokenBalanceStatus}>
-                        Balance: <span>{formatNumber(tokenBalance)}</span>
-                      </Typography>
-                    ) : null}
+                    <Grid
+                      container
+                      justifyContent='flex-end'
+                      wrap='wrap'
+                      className={classes.tokenBalanceStatus}>
+                      {!hideBalances && Number(tokenBalance) > 0 ? (
+                        <>
+                          <Typography>Balance:</Typography>
+                          <Typography>&nbsp; {formatNumber(tokenBalance)}</Typography>
+                        </>
+                      ) : null}
+                    </Grid>
                   </Grid>
                 )
               }}

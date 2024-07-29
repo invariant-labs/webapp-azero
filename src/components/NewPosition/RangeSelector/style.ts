@@ -29,7 +29,8 @@ const useStyles = makeStyles()(theme => {
       gap: 16
     },
     topInnerWrapper: {
-      minHeight: 300
+      minHeight: 300,
+      maxWidth: '100%'
     },
     plot: {
       width: '100%',
@@ -65,10 +66,15 @@ const useStyles = makeStyles()(theme => {
       backgroundColor: colors.invariant.light,
       borderRadius: 11,
 
+      '&:hover': {
+        '@media (hover: none)': {
+          backgroundColor: colors.invariant.light
+        }
+      },
+
       [theme.breakpoints.down('md')]: {
         '&:first-of-type': {
-          marginRight: 0,
-          marginBottom: 8
+          marginRight: 0
         }
       }
     },
@@ -110,7 +116,11 @@ const useStyles = makeStyles()(theme => {
     sliderWrapper: {
       paddingTop: 24,
       paddingInline: 8,
-      position: 'relative'
+      position: 'relative',
+
+      [theme.breakpoints.down('sm')]: {
+        paddingBottom: 24
+      }
     },
     warningWrapper: {
       position: 'absolute',
@@ -214,6 +224,11 @@ const useStyles = makeStyles()(theme => {
       color: colors.invariant.yellow,
       ...typography.caption2,
       textAlign: 'right'
+    },
+    checkboxLabel: {
+      color: colors.invariant.textGrey,
+      fontSize: 14,
+      fontWeight: 'normal'
     },
     activeLiquidityContainer: {
       width: 'auto'

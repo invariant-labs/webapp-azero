@@ -26,7 +26,8 @@ const useStyles = makeStyles()(theme => {
       gap: 4
     },
     topInnerWrapper: {
-      minHeight: 300
+      minHeight: 300,
+      maxWidth: '100%'
     },
     bottomInnerWrapper: {
       display: 'flex',
@@ -63,10 +64,15 @@ const useStyles = makeStyles()(theme => {
       backgroundColor: colors.invariant.light,
       borderRadius: 11,
 
+      '&:hover': {
+        '@media (hover: none)': {
+          backgroundColor: colors.invariant.light
+        }
+      },
+
       [theme.breakpoints.down('md')]: {
         '&:first-of-type': {
-          marginRight: 0,
-          marginBottom: 8
+          marginRight: 0
         }
       }
     },
@@ -110,7 +116,11 @@ const useStyles = makeStyles()(theme => {
     sliderWrapper: {
       paddingTop: 24,
       paddingInline: 8,
-      position: 'relative'
+      position: 'relative',
+
+      [theme.breakpoints.down('sm')]: {
+        paddingBottom: 24
+      }
     }
   }
 })
