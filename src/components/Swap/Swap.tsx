@@ -440,6 +440,11 @@ export const Swap: React.FC<ISwap> = ({
 
   useEffect(() => {
     setRefresherTime(REFRESHER_INTERVAL)
+
+    if (tokenFromIndex === tokenToIndex) {
+      setAmountFrom('')
+      setAmountTo('')
+    }
   }, [tokenFromIndex, tokenToIndex])
 
   return (
@@ -517,9 +522,7 @@ export const Swap: React.FC<ISwap> = ({
             tokens={tokens}
             current={tokenFromIndex !== null ? tokens[tokenFromIndex] : null}
             onSelect={setTokenFromIndex}
-            disabled={
-              tokenFromIndex === null || tokenToIndex === null || tokenFromIndex === tokenToIndex
-            }
+            disabled={tokenFromIndex === tokenToIndex || tokenFromIndex !== null}
             hideBalances={walletStatus !== Status.Initialized}
             handleAddToken={handleAddToken}
             commonTokens={commonTokens}
@@ -603,9 +606,7 @@ export const Swap: React.FC<ISwap> = ({
             tokens={tokens}
             current={tokenToIndex !== null ? tokens[tokenToIndex] : null}
             onSelect={setTokenToIndex}
-            disabled={
-              tokenFromIndex === null || tokenToIndex === null || tokenFromIndex === tokenToIndex
-            }
+            disabled={tokenFromIndex === tokenToIndex || tokenToIndex === null}
             hideBalances={walletStatus !== Status.Initialized}
             handleAddToken={handleAddToken}
             commonTokens={commonTokens}
