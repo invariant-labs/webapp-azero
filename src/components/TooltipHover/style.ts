@@ -12,7 +12,10 @@ const useStyles = makeStyles()(() => {
       height: 24,
       width: 59,
       padding: 0,
-      textAlign: 'center'
+      textAlign: 'center',
+      position: 'absolute',
+      transform: 'translate(-50%, -50%)',
+      top: -16
     }
   }
 })
