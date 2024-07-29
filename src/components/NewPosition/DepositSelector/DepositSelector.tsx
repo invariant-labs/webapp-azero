@@ -174,7 +174,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
       !tokenBInputState.blocked &&
       +tokenBInputState.value === 0
     ) {
-      return 'Add amount to deposit'
+      return 'Add tokens to position'
     }
 
     return 'Add Position'
