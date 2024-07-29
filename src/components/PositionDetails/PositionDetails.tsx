@@ -15,6 +15,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { ILiquidityToken } from './SinglePositionInfo/consts'
 import { useStyles } from './style'
 import { TokenPriceData } from '@store/consts/types'
+import { TooltipHover } from '@components/TooltipHover/TooltipHover'
 
 interface IProps {
   tokenXAddress: string
@@ -105,14 +106,18 @@ const PositionDetails: React.FC<IProps> = ({
               <Typography className={classes.backText}>Back to Liquidity Positions List</Typography>
             </Grid>
           </Link>
-          <Refresher
-            currentIndex={refresherTime}
-            maxIndex={REFRESHER_INTERVAL}
-            onClick={() => {
-              onRefresh()
-              setRefresherTime(REFRESHER_INTERVAL)
-            }}
-          />
+          <TooltipHover text='Refresh'>
+            <Box>
+              <Refresher
+                currentIndex={refresherTime}
+                maxIndex={REFRESHER_INTERVAL}
+                onClick={() => {
+                  onRefresh()
+                  setRefresherTime(REFRESHER_INTERVAL)
+                }}
+              />
+            </Box>
+          </TooltipHover>
         </Grid>
 
         <SinglePositionInfo

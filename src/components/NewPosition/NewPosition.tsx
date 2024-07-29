@@ -37,6 +37,7 @@ import RangeSelector from './RangeSelector/RangeSelector'
 import useStyles from './style'
 import { BestTier, PositionOpeningMethod, TokenPriceData } from '@store/consts/types'
 import { getConcentrationArray } from '@invariant-labs/a0-sdk/target/utils'
+import { TooltipHover } from '@components/TooltipHover/TooltipHover'
 
 export interface INewPosition {
   initialTokenFrom: string
@@ -493,14 +494,18 @@ export const NewPosition: React.FC<INewPosition> = ({
         <Box className={classes.titleContainer}>
           <Typography className={classes.title}>Add new liquidity position</Typography>
           {poolKey !== '' && tokenAIndex !== tokenBIndex && (
-            <Refresher
-              currentIndex={refresherTime}
-              maxIndex={REFRESHER_INTERVAL}
-              onClick={() => {
-                onRefresh()
-                setRefresherTime(REFRESHER_INTERVAL)
-              }}
-            />
+            <TooltipHover text='Refresh'>
+              <Box>
+                <Refresher
+                  currentIndex={refresherTime}
+                  maxIndex={REFRESHER_INTERVAL}
+                  onClick={() => {
+                    onRefresh()
+                    setRefresherTime(REFRESHER_INTERVAL)
+                  }}
+                />
+              </Box>
+            </TooltipHover>
           )}
         </Box>
         <Grid container item alignItems='center' className={classes.options}>
@@ -527,9 +532,14 @@ export const NewPosition: React.FC<INewPosition> = ({
             />
           </Hidden>
           {poolKey !== '' && (
-            <Button onClick={handleClickSettings} className={classes.settingsIconBtn} disableRipple>
-              <img src={settingIcon} className={classes.settingsIcon} alt='settings' />
-            </Button>
+            <TooltipHover text='Settings'>
+              <Button
+                onClick={handleClickSettings}
+                className={classes.settingsIconBtn}
+                disableRipple>
+                <img src={settingIcon} className={classes.settingsIcon} alt='settings' />
+              </Button>
+            </TooltipHover>
           )}
         </Grid>
       </Grid>

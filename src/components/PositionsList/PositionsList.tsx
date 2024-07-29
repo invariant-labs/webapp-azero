@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom'
 import { IPositionItem, PositionItem } from './PositionItem/PositionItem'
 import { useStyles } from './style'
 import { POSITIONS_PER_QUERY } from '@store/consts/static'
+import { TooltipHover } from '@components/TooltipHover/TooltipHover'
 
 interface IProps {
   initialPage: number
@@ -121,12 +122,14 @@ export const PositionsList: React.FC<IProps> = ({
               value={searchValue}
             />
             <Grid rowGap={1} justifyContent='space-between'>
-              <Button
-                disabled={showNoConnected}
-                onClick={showNoConnected ? () => {} : handleRefresh}
-                className={classes.refreshIconBtn}>
-                <img src={refreshIcon} className={classes.refreshIcon} alt='Refresh' />
-              </Button>
+              <TooltipHover text='Refresh'>
+                <Button
+                  disabled={showNoConnected}
+                  onClick={showNoConnected ? () => {} : handleRefresh}
+                  className={classes.refreshIconBtn}>
+                  <img src={refreshIcon} className={classes.refreshIcon} alt='Refresh' />
+                </Button>
+              </TooltipHover>
               <Button
                 className={showNoConnected ? classes.buttonSelectDisabled : classes.button}
                 variant='contained'

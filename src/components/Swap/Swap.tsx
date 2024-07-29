@@ -37,6 +37,7 @@ import { SimulateResult, TokenPriceData } from '@store/consts/types'
 import TokensInfo from './TokensInfo/TokensInfo'
 import { VariantType } from 'notistack'
 import { useNavigate } from 'react-router-dom'
+import { TooltipHover } from '@components/TooltipHover/TooltipHover'
 
 export interface Pools {
   tokenX: string
@@ -452,23 +453,27 @@ export const Swap: React.FC<ISwap> = ({
               Slippage: <span className={classes.slippageAmount}>{slippTolerance}%</span>
             </p>
           </Button>
-          <Button
-            onClick={handleRefresh}
-            className={classes.refreshIconBtn}
-            disabled={
-              priceFromLoading ||
-              priceToLoading ||
-              isBalanceLoading ||
-              getStateMessage() === 'Loading' ||
-              tokenFromIndex === null ||
-              tokenToIndex === null ||
-              tokenFromIndex === tokenToIndex
-            }>
-            <img src={refreshIcon} className={classes.refreshIcon} alt='Refresh' />
-          </Button>
-          <Button onClick={handleClickSettings} className={classes.settingsIconBtn}>
-            <img src={settingIcon} className={classes.settingsIcon} alt='Settings' />
-          </Button>
+          <TooltipHover text='Refresh'>
+            <Button
+              onClick={handleRefresh}
+              className={classes.refreshIconBtn}
+              disabled={
+                priceFromLoading ||
+                priceToLoading ||
+                isBalanceLoading ||
+                getStateMessage() === 'Loading' ||
+                tokenFromIndex === null ||
+                tokenToIndex === null ||
+                tokenFromIndex === tokenToIndex
+              }>
+              <img src={refreshIcon} className={classes.refreshIcon} alt='Refresh' />
+            </Button>
+          </TooltipHover>
+          <TooltipHover text='Settings'>
+            <Button onClick={handleClickSettings} className={classes.settingsIconBtn}>
+              <img src={settingIcon} className={classes.settingsIcon} alt='Settings' />
+            </Button>
+          </TooltipHover>
         </Box>
         <Grid className={classes.slippage}>
           <Slippage
@@ -653,20 +658,22 @@ export const Swap: React.FC<ISwap> = ({
             {tokenFromIndex !== null &&
               tokenToIndex !== null &&
               tokenFromIndex !== tokenToIndex && (
-                <Grid
-                  container
-                  alignItems='center'
-                  justifyContent='center'
-                  width={20}
-                  height={34}
-                  minWidth='fit-content'
-                  ml={1}>
-                  <Refresher
-                    currentIndex={refresherTime}
-                    maxIndex={REFRESHER_INTERVAL}
-                    onClick={handleRefresh}
-                  />
-                </Grid>
+                <TooltipHover text='Refresh'>
+                  <Grid
+                    container
+                    alignItems='center'
+                    justifyContent='center'
+                    width={20}
+                    height={34}
+                    minWidth='fit-content'
+                    ml={1}>
+                    <Refresher
+                      currentIndex={refresherTime}
+                      maxIndex={REFRESHER_INTERVAL}
+                      onClick={handleRefresh}
+                    />
+                  </Grid>
+                </TooltipHover>
               )}
           </Box>
           {canShowDetails ? (

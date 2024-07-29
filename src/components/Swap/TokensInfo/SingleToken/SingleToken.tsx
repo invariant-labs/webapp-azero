@@ -5,6 +5,7 @@ import { SwapToken } from '@store/selectors/wallet'
 import icons from '@static/icons'
 import { formatNumber } from '@utils/utils'
 import { VariantType } from 'notistack'
+import { TooltipHover } from '@components/TooltipHover/TooltipHover'
 interface IProps {
   token?: SwapToken
   tokenPrice?: number
@@ -69,20 +70,22 @@ const SingleToken: React.FC<IProps> = ({ token, tokenPrice, copyTokenAddressHand
         <Typography className={classes.price}>
           {token ? (tokenPrice ? '$' + formatNumber(tokenPrice) : 'No data') : '--'}
         </Typography>
-        <Grid className={classes.tokenAddress} onClick={copyToClipboard}>
-          <Typography>
-            {token
-              ? token.assetAddress.slice(0, 4) + '...' + token.assetAddress.slice(-5, -1)
-              : '--'}
-          </Typography>
-          <img
-            width={8}
-            height={8}
-            src={icons.copyAddress}
-            alt={'Copy address'}
-            className={classes.clipboardIcon}
-          />
-        </Grid>
+        <TooltipHover text='Copy'>
+          <Grid className={classes.tokenAddress} onClick={copyToClipboard}>
+            <Typography>
+              {token
+                ? token.assetAddress.slice(0, 4) + '...' + token.assetAddress.slice(-5, -1)
+                : '--'}
+            </Typography>
+            <img
+              width={8}
+              height={8}
+              src={icons.copyAddress}
+              alt={'Copy address'}
+              className={classes.clipboardIcon}
+            />
+          </Grid>
+        </TooltipHover>
       </Grid>
     </Grid>
   )
