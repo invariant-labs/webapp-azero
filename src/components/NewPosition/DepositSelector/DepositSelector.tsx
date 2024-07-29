@@ -157,7 +157,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
       convertBalanceToBigint(tokenAInputState.value, tokens[tokenAIndex].decimals) >
         tokens[tokenAIndex].balance
     ) {
-      return 'Not enough token A'
+      return `Not enough ${tokens[tokenAIndex].symbol}`
     }
 
     if (
@@ -165,7 +165,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
       convertBalanceToBigint(tokenBInputState.value, tokens[tokenBIndex].decimals) >
         tokens[tokenBIndex].balance
     ) {
-      return 'Not enough token B'
+      return `Not enough ${tokens[tokenBIndex].symbol}`
     }
 
     if (
@@ -174,10 +174,10 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
       !tokenBInputState.blocked &&
       +tokenBInputState.value === 0
     ) {
-      return 'Liquidity must be greater than 0'
+      return 'Add amount to deposit'
     }
 
-    return 'Add Liquidity'
+    return 'Add Position'
   }, [
     tokenAIndex,
     tokenBIndex,

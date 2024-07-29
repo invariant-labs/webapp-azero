@@ -62,7 +62,7 @@ export const Header: React.FC<IHeader> = ({
   const routes = ['exchange', 'liquidity', 'statistics']
 
   const otherRoutesToHighlight: Record<string, RegExp[]> = {
-    pool: [/^newPosition\/*/, /^position\/*/],
+    liquidity: [/^newPosition\/*/, /^position\/*/],
     exchange: [/^exchange\/*/]
   }
 

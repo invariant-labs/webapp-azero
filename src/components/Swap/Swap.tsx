@@ -341,7 +341,7 @@ export const Swap: React.FC<ISwap> = ({
     }
 
     if (!getIsXToY(tokens[tokenFromIndex].assetAddress, tokens[tokenToIndex].assetAddress)) {
-      return 'No route found'
+      return "Pool doesn't exist."
     }
 
     if (isInsufficientLiquidityError) {
