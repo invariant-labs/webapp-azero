@@ -82,7 +82,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   },
   positionPlotWrapper: {
     width: '100%',
-    marginTop: 8,
+    marginTop: 30,
 
     [theme.breakpoints.down('md')]: {
       marginTop: 0

@@ -142,26 +142,15 @@ const PositionDetails: React.FC<IProps> = ({
         alignItems='flex-end'
         className={classes.right}
         wrap='nowrap'>
-        <Hidden mdDown>
-          <Box mt={2}>
-            <Refresher
-              currentIndex={refresherTime}
-              maxIndex={REFRESHER_INTERVAL}
-              onClick={() => {
-                onRefresh()
-                setRefresherTime(REFRESHER_INTERVAL)
-              }}
-            />
-          </Box>
-        </Hidden>
         <Grid className={classes.positionPlotWrapper}>
           <Grid
             container
             item
             direction='row'
-            alignItems='flex-end'
-            style={{ paddingLeft: 20, flexDirection: 'row-reverse' }}
+            alignItems='center'
+            flexDirection='row-reverse'
             className={classes.rightHeaderWrapper}
+            mt='22px'
             wrap='nowrap'>
             <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
               <Button
@@ -181,8 +170,20 @@ const PositionDetails: React.FC<IProps> = ({
               marketId={poolAddress.toString()}
               displayLength={9}
               copyPoolAddressHandler={copyPoolAddressHandler}
-              style={{ paddingBottom: 20, paddingRight: 10 }}
+              style={{ paddingBottom: 5, paddingRight: 10 }}
             />
+            <Hidden mdDown>
+              <Box ml={1} mr='auto'>
+                <Refresher
+                  currentIndex={refresherTime}
+                  maxIndex={REFRESHER_INTERVAL}
+                  onClick={() => {
+                    onRefresh()
+                    setRefresherTime(REFRESHER_INTERVAL)
+                  }}
+                />
+              </Box>
+            </Hidden>
           </Grid>
           <SinglePositionPlot
             data={
