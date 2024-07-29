@@ -138,11 +138,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   },
 
   amountInputUp: {
-    animation: 'slide-up 300ms linear',
-
-    [theme.breakpoints.down('sm')]: {
-      animation: 'slide-up-xs 300ms linear'
-    }
+    animation: 'slide-up 300ms linear'
   },
 
   swapArrowBox: {
