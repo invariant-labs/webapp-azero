@@ -86,7 +86,7 @@ const useStyles = makeStyles()((theme: Theme) => {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      border: `1px solid ${colors.invariant.light}`,
+      backgroundColor: colors.invariant.component,
       borderRadius: 14,
       width: 'auto'
     },

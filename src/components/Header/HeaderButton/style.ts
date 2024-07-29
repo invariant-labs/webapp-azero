@@ -8,15 +8,14 @@ const useStyles = makeStyles()((theme: Theme) => {
       background: 'transparent',
       color: colors.white.main,
       paddingInline: 12,
-      borderRadius: 10,
+      borderRadius: 14,
       textTransform: 'none',
       ...typography.body1,
       lineHeight: '22px',
       height: 40,
       boxShadow: 'none',
       '&:hover': {
-        background: 'none',
-        boxShadow: 'none'
+        background: colors.invariant.light
       },
       '&:active': {
         '& #downIcon': {
