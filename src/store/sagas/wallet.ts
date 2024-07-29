@@ -60,7 +60,7 @@ export function* handleAirdrop(): Generator {
   if (!walletAddress) {
     return yield* put(
       snackbarsActions.add({
-        message: 'Connect your wallet to claim the faucet.',
+        message: 'Connect wallet to claim the faucet.',
         variant: 'error',
         persist: false
       })

@@ -59,6 +59,7 @@ export interface IDepositSelector {
   positionOpeningMethod: PositionOpeningMethod
   isBalanceLoading: boolean
   isGetLiquidityError: boolean
+  ticksLoading: boolean
 }
 
 export const DepositSelector: React.FC<IDepositSelector> = ({
@@ -90,7 +91,8 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
   minimumSliderIndex,
   positionOpeningMethod,
   isBalanceLoading,
-  isGetLiquidityError
+  isGetLiquidityError,
+  ticksLoading
 }) => {
   const { classes } = useStyles()
 
@@ -157,7 +159,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
       convertBalanceToBigint(tokenAInputState.value, tokens[tokenAIndex].decimals) >
         tokens[tokenAIndex].balance
     ) {
-      return 'Not enough token A'
+      return `Not enough ${tokens[tokenAIndex].symbol}`
     }
 
     if (
@@ -165,7 +167,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
       convertBalanceToBigint(tokenBInputState.value, tokens[tokenBIndex].decimals) >
         tokens[tokenBIndex].balance
     ) {
-      return 'Not enough token B'
+      return `Not enough ${tokens[tokenBIndex].symbol}`
     }
 
     if (
@@ -174,10 +176,10 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
       !tokenBInputState.blocked &&
       +tokenBInputState.value === 0
     ) {
-      return 'Liquidity must be greater than 0'
+      return 'Add tokens to position'
     }
 
-    return 'Add Liquidity'
+    return 'Add Position'
   }, [
     tokenAIndex,
     tokenBIndex,
@@ -241,6 +243,10 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
             src={SwapList}
             alt='Arrow'
             onClick={() => {
+              if (ticksLoading) {
+                return
+              }
+
               if (!tokenBInputState.blocked) {
                 tokenAInputState.setValue(tokenBInputState.value)
               } else {
@@ -365,7 +371,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
             onAddLiquidity()
           }
         }}
-        disabled={getButtonMessage() !== 'Add Liquidity'}
+        disabled={getButtonMessage() !== 'Add Position'}
         content={getButtonMessage()}
         progress={progress}
       />

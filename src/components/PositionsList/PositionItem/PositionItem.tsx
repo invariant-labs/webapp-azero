@@ -49,6 +49,9 @@ export const PositionItem: React.FC<IPositionItem> = ({
   const feeFragment = useMemo(
     () => (
       <Tooltip
+        enterTouchDelay={0}
+        leaveTouchDelay={Number.MAX_SAFE_INTEGER}
+        onClick={e => e.stopPropagation()}
         title={
           isActive
             ? 'Position active. Current price is inside range'

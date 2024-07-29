@@ -478,10 +478,10 @@ export const NewPosition: React.FC<INewPosition> = ({
 
   return (
     <Grid container className={classes.wrapper} direction='column'>
-      <Link to='/pool' style={{ textDecoration: 'none', maxWidth: 'fit-content' }}>
+      <Link to='/liquidity' style={{ textDecoration: 'none', maxWidth: 'fit-content' }}>
         <Grid className={classes.back} container item alignItems='center'>
           <img className={classes.backIcon} src={backIcon} alt='back' />
-          <Typography className={classes.backText}>Back to Liquidity Positions List</Typography>
+          <Typography className={classes.backText}>Positions</Typography>
         </Grid>
       </Link>
 
@@ -491,7 +491,7 @@ export const NewPosition: React.FC<INewPosition> = ({
         alignItems='center'
         className={classes.headerContainer}>
         <Box className={classes.titleContainer}>
-          <Typography className={classes.title}>Add new liquidity position</Typography>
+          <Typography className={classes.title}>Add new position</Typography>
           {poolKey !== '' && tokenAIndex !== tokenBIndex && (
             <Refresher
               currentIndex={refresherTime}
@@ -506,31 +506,38 @@ export const NewPosition: React.FC<INewPosition> = ({
         <Grid container item alignItems='center' className={classes.options}>
           {poolKey !== '' ? (
             <MarketIdLabel
-              displayLength={9}
+              displayLength={4}
               marketId={poolKey}
               copyPoolAddressHandler={copyPoolAddressHandler}
             />
           ) : null}
-          <Hidden mdDown>
-            <ConcentrationTypeSwitch
-              onSwitch={val => {
-                if (val) {
-                  setPositionOpeningMethod('concentration')
-                  onPositionOpeningMethodChange('concentration')
-                } else {
-                  setPositionOpeningMethod('range')
-                  onPositionOpeningMethodChange('range')
-                }
-              }}
-              className={classes.switch}
-              currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
-            />
-          </Hidden>
-          {poolKey !== '' && (
-            <Button onClick={handleClickSettings} className={classes.settingsIconBtn} disableRipple>
-              <img src={settingIcon} className={classes.settingsIcon} alt='settings' />
-            </Button>
-          )}
+          <Grid className={classes.optionsWrapper}>
+            <Hidden mdDown>
+              {poolKey !== '' && (
+                <ConcentrationTypeSwitch
+                  onSwitch={val => {
+                    if (val) {
+                      setPositionOpeningMethod('concentration')
+                      onPositionOpeningMethodChange('concentration')
+                    } else {
+                      setPositionOpeningMethod('range')
+                      onPositionOpeningMethodChange('range')
+                    }
+                  }}
+                  className={classes.switch}
+                  currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
+                />
+              )}
+            </Hidden>
+            {poolKey !== '' && (
+              <Button
+                onClick={handleClickSettings}
+                className={classes.settingsIconBtn}
+                disableRipple>
+                <img src={settingIcon} className={classes.settingsIcon} alt='settings' />
+              </Button>
+            )}
+          </Grid>
         </Grid>
       </Grid>
 
@@ -671,22 +678,25 @@ export const NewPosition: React.FC<INewPosition> = ({
           positionOpeningMethod={positionOpeningMethod}
           isBalanceLoading={isBalanceLoading}
           isGetLiquidityError={isGetLiquidityError}
+          ticksLoading={ticksLoading}
         />
         <Hidden mdUp>
           <Grid container justifyContent='end' mb={2}>
-            <ConcentrationTypeSwitch
-              onSwitch={val => {
-                if (val) {
-                  setPositionOpeningMethod('concentration')
-                  onPositionOpeningMethodChange('concentration')
-                } else {
-                  setPositionOpeningMethod('range')
-                  onPositionOpeningMethodChange('range')
-                }
-              }}
-              className={classes.switch}
-              currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
-            />
+            {poolKey !== '' && (
+              <ConcentrationTypeSwitch
+                onSwitch={val => {
+                  if (val) {
+                    setPositionOpeningMethod('concentration')
+                    onPositionOpeningMethodChange('concentration')
+                  } else {
+                    setPositionOpeningMethod('range')
+                    onPositionOpeningMethodChange('range')
+                  }
+                }}
+                className={classes.switch}
+                currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
+              />
+            )}
           </Grid>
         </Hidden>
         {isCurrentPoolExisting ||

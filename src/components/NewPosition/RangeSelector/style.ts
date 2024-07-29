@@ -107,8 +107,9 @@ const useStyles = makeStyles()(theme => {
       zIndex: 99
     },
     buttons: {
-      marginTop: 38,
+      marginTop: 4,
       width: '100%',
+      height: 70,
       flexDirection: 'row',
       gap: 16,
       alignItems: 'center'
@@ -165,6 +166,7 @@ const useStyles = makeStyles()(theme => {
       marginBottom: 16
     },
     activeLiquidity: {
+      height: 24,
       color: colors.invariant.text,
       ...typography.caption2,
       display: 'flex',
@@ -185,7 +187,8 @@ const useStyles = makeStyles()(theme => {
       textAlign: 'center',
       boxSizing: 'border-box',
       paddingTop: 3,
-      cursor: 'default'
+      cursor: 'default',
+      userSelect: 'none'
     },
     liquidityTooltip: {
       background: colors.invariant.component,

@@ -104,7 +104,7 @@ export const PositionsList: React.FC<IProps> = ({
         alignItems='center'>
         <Grid className={classes.searchRoot}>
           <Grid className={classes.titleBar}>
-            <Typography className={classes.title}>Your Liquidity Positions</Typography>
+            <Typography className={classes.title}>Your Positions</Typography>
             <Typography className={classes.positionsNumber}>{String(length)}</Typography>
           </Grid>
           <Grid className={classes.searchWrapper}>

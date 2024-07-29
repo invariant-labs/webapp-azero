@@ -117,7 +117,7 @@ const Slippage: React.FC<Props> = ({
         }}>
         <Grid container className={classes.detailsWrapper}>
           <Grid container justifyContent='space-between' style={{ marginBottom: 6 }}>
-            <Typography component='h2'>{headerText ?? 'Swap Transaction Settings'}</Typography>
+            <Typography component='h2'>{headerText ?? 'Exchange Transaction Settings'}</Typography>
             <Button className={classes.selectTokenClose} onClick={handleClose} />
           </Grid>
           <Typography className={classes.label}>Slippage tolerance</Typography>
@@ -182,7 +182,7 @@ const Slippage: React.FC<Props> = ({
           </Box>
           <Typography className={classes.info}>
             {infoText ??
-              'Slippage tolerance is a pricing difference between the price at the confirmation time and the actual price of the transaction users are willing to accept when swapping.'}
+              'Slippage tolerance is a pricing difference between the price at the confirmation time and the actual price of the transaction users are willing to accept when exchanging tokens.'}
           </Typography>
         </Grid>
       </Popover>

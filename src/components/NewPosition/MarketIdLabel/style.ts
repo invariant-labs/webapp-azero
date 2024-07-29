@@ -11,11 +11,13 @@ export const useLabelStyles = makeStyles()(() => {
       letterSpacing: '-0.03px',
       textAlign: 'right',
       color: `${colors.invariant.textGrey} !important`,
-      paddingRight: 7
+      paddingRight: 7,
+      display: 'flex',
+      alignItems: 'center',
+      gap: 4
     },
     clipboardIcon: {
-      width: 15,
-      height: 13,
+      width: 18,
       cursor: 'pointer'
     }
   }

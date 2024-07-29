@@ -10,6 +10,7 @@ export const useStyles = makeStyles()(() => ({
     alignItems: 'center',
     backgroundColor: 'transparent',
     paddingInline: 94,
+    maxWidth: '100%',
 
     [theme.breakpoints.down('lg')]: {
       paddingInline: 36
