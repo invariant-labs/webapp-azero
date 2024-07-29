@@ -12,7 +12,7 @@ const useStyles = makeStyles()((theme: Theme) => {
       textTransform: 'none',
       ...typography.body1,
       lineHeight: '22px',
-      height: 40,
+      height: 32,
       boxShadow: 'none',
       '&:hover': {
         background: colors.invariant.light

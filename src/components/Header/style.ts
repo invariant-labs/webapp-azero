@@ -88,7 +88,8 @@ const useStyles = makeStyles()((theme: Theme) => {
       alignItems: 'center',
       backgroundColor: colors.invariant.component,
       borderRadius: 14,
-      width: 'auto'
+      width: 'auto',
+      padding: 4
     },
     buttonsLgConnected: {
       [theme.breakpoints.up('lg')]: {
