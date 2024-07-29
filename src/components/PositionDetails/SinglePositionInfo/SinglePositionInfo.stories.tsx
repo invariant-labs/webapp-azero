@@ -42,7 +42,8 @@ export const Primary: Story = {
     },
     xToY: true,
     showFeesLoader: false,
-    isBalanceLoading: false
+    isBalanceLoading: false,
+    isActive: true
   },
   render: args => {
     return (

@@ -9,6 +9,7 @@ import {
   calcTicksAmountInRange,
   calculateConcentrationRange,
   findClosestIndexByValue,
+  formatNumber,
   nearestTickIndex,
   toMaxNumericPlaces
 } from '@utils/utils'
@@ -412,7 +413,14 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
     <Grid container className={classes.wrapper} direction='column'>
       <Grid className={classes.topInnerWrapper}>
         <Grid className={classes.headerContainer} container justifyContent='space-between'>
-          <Typography className={classes.header}>Price range</Typography>
+          <Grid>
+            <Typography className={classes.header}>Price range</Typography>
+            {poolKey !== '' && (
+              <Typography className={classes.currentPrice}>
+                {formatNumber(midPrice.x, false, 4)} {tokenBSymbol} per {tokenASymbol}
+              </Typography>
+            )}
+          </Grid>
           <Grid className={classes.activeLiquidityContainer} container direction='column'>
             <Tooltip
               title={
@@ -603,7 +611,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
             />
           </Grid>
         ) : (
-          <Grid container className={classes.buttons}>
+          <Grid container className={classes.buttons} justifyContent='center' alignItems='center'>
             <Button className={classes.button} onClick={resetPlot}>
               Reset range
             </Button>

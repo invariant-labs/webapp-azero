@@ -87,6 +87,12 @@ export const useStyles = makeStyles()((theme: Theme) => ({
       marginTop: 0
     }
   },
+  marketIdWithRefresher: {
+    [theme.breakpoints.down('sm')]: {
+      width: '100%',
+      justifyContent: 'space-between'
+    }
+  },
   rightHeaderWrapper: {
     marginBottom: 20
   }

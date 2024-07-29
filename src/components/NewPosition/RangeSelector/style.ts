@@ -66,10 +66,15 @@ const useStyles = makeStyles()(theme => {
       backgroundColor: colors.invariant.light,
       borderRadius: 11,
 
+      '&:hover': {
+        '@media (hover: none)': {
+          backgroundColor: colors.invariant.light
+        }
+      },
+
       [theme.breakpoints.down('md')]: {
         '&:first-of-type': {
-          marginRight: 0,
-          marginBottom: 8
+          marginRight: 0
         }
       }
     },
@@ -102,8 +107,9 @@ const useStyles = makeStyles()(theme => {
       zIndex: 99
     },
     buttons: {
-      marginTop: 38,
+      marginTop: 4,
       width: '100%',
+      height: 70,
       flexDirection: 'row',
       gap: 16,
       alignItems: 'center'
@@ -160,6 +166,7 @@ const useStyles = makeStyles()(theme => {
       marginBottom: 16
     },
     activeLiquidity: {
+      height: 24,
       color: colors.invariant.text,
       ...typography.caption2,
       display: 'flex',

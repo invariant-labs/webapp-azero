@@ -82,6 +82,8 @@ const PositionDetails: React.FC<IProps> = ({
   )
   const [refresherTime, setRefresherTime] = useState<number>(REFRESHER_INTERVAL)
 
+  const isActive = midPrice.x >= min && midPrice.x <= max
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (refresherTime > 0) {
@@ -105,8 +107,14 @@ const PositionDetails: React.FC<IProps> = ({
               <Typography className={classes.backText}>Back to Liquidity Positions List</Typography>
             </Grid>
           </Link>
-          <Hidden mdUp>
-            <Box mr={1}>
+          <Grid container width='auto' className={classes.marketIdWithRefresher}>
+            <Hidden mdUp>
+              <MarketIdLabel
+                marketId={poolAddress.toString()}
+                displayLength={9}
+                copyPoolAddressHandler={copyPoolAddressHandler}
+                style={{ paddingRight: 10 }}
+              />
               <Refresher
                 currentIndex={refresherTime}
                 maxIndex={REFRESHER_INTERVAL}
@@ -115,10 +123,9 @@ const PositionDetails: React.FC<IProps> = ({
                   setRefresherTime(REFRESHER_INTERVAL)
                 }}
               />
-            </Box>
-          </Hidden>
+            </Hidden>
+          </Grid>
         </Grid>
-
         <SinglePositionInfo
           fee={+printBigint(fee, PERCENTAGE_SCALE - 2n)}
           onClickClaimFee={onClickClaimFee}
@@ -132,6 +139,7 @@ const PositionDetails: React.FC<IProps> = ({
           showFeesLoader={showFeesLoader}
           userHasStakes={userHasStakes}
           isBalanceLoading={isBalanceLoading}
+          isActive={isActive}
         />
       </Grid>
 
@@ -177,13 +185,13 @@ const PositionDetails: React.FC<IProps> = ({
                   }}
                 />
               </Grid>
+              <MarketIdLabel
+                marketId={poolAddress.toString()}
+                displayLength={9}
+                copyPoolAddressHandler={copyPoolAddressHandler}
+                style={{ padding: '8px 8px  0 0px' }}
+              />
             </Hidden>
-            <MarketIdLabel
-              marketId={poolAddress.toString()}
-              displayLength={9}
-              copyPoolAddressHandler={copyPoolAddressHandler}
-              style={{ padding: '8px 8px  0 4px' }}
-            />
           </Grid>
           <SinglePositionPlot
             data={

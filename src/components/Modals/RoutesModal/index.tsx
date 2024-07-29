@@ -12,6 +12,7 @@ export interface IRoutesModal {
   current?: string
   onFaucet?: () => void
   onRPC?: () => void
+  onChainSelect?: () => void
 }
 export const RoutesModal: React.FC<IRoutesModal> = ({
   routes,
@@ -21,7 +22,8 @@ export const RoutesModal: React.FC<IRoutesModal> = ({
   onSelect,
   current,
   onFaucet,
-  onRPC
+  onRPC,
+  onChainSelect
 }) => {
   const { classes } = useStyles()
 
@@ -83,6 +85,11 @@ export const RoutesModal: React.FC<IRoutesModal> = ({
         {typeof onRPC !== 'undefined' ? (
           <Grid item className={classes.listItem} onClick={onRPC}>
             <Typography className={classes.name}>Set RPC</Typography>
+          </Grid>
+        ) : null}
+        {typeof onChainSelect !== 'undefined' ? (
+          <Grid item className={classes.listItem} onClick={onChainSelect}>
+            <Typography className={classes.name}>Change chain</Typography>
           </Grid>
         ) : null}
       </Grid>
