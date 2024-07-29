@@ -671,6 +671,7 @@ export const NewPosition: React.FC<INewPosition> = ({
           positionOpeningMethod={positionOpeningMethod}
           isBalanceLoading={isBalanceLoading}
           isGetLiquidityError={isGetLiquidityError}
+          ticksLoading={ticksLoading}
         />
         <Hidden mdUp>
           <Grid container justifyContent='end' mb={2}>
