@@ -6,6 +6,8 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   root: {
     width: 1122,
     display: 'flex',
+    maxWidth: '100%',
+
     [theme.breakpoints.down('lg')]: {
       width: '100%'
     },

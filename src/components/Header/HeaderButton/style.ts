@@ -5,17 +5,17 @@ import { makeStyles } from 'tss-react/mui'
 const useStyles = makeStyles()((theme: Theme) => {
   return {
     headerButton: {
-      background: colors.invariant.light,
+      background: 'transparent',
       color: colors.white.main,
       paddingInline: 12,
-      borderRadius: 10,
+      borderRadius: 14,
       textTransform: 'none',
       ...typography.body1,
       lineHeight: '22px',
-      height: 40,
-
+      height: 32,
+      boxShadow: 'none',
       '&:hover': {
-        background: colors.blue.deep
+        background: colors.invariant.light
       },
       '&:active': {
         '& #downIcon': {
@@ -33,7 +33,7 @@ const useStyles = makeStyles()((theme: Theme) => {
       background: colors.invariant.pinkLinearGradientOpacity,
       color: colors.invariant.newDark,
       paddingInline: 12,
-      borderRadius: 10,
+      borderRadius: 14,
       textTransform: 'none',
       ...typography.body1,
       height: 40,
@@ -53,7 +53,7 @@ const useStyles = makeStyles()((theme: Theme) => {
       background: colors.invariant.light,
       color: colors.white.main,
       paddingInline: 12,
-      borderRadius: 10,
+      borderRadius: 14,
       textTransform: 'none',
       ...typography.body1,
       height: 40,

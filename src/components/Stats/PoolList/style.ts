@@ -9,6 +9,7 @@ export const useStyles = makeStyles()(() => ({
     backgroundColor: `${colors.invariant.component} !important`
   },
   pagination: {
-    padding: '20px 0 10px 0'
+    padding: '20px 0 10px 0',
+    maxWidth: '100%'
   }
 }))
