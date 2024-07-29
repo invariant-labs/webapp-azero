@@ -1,7 +1,6 @@
 import React from 'react'
-import { theme } from '@static/theme'
 import { useSingleTabStyles, useTabsStyles } from './style'
-import { Tab, Tabs, useMediaQuery } from '@mui/material'
+import { Tab, Tabs } from '@mui/material'
 
 export interface IProps {
   onSwitch: (isConcentrated: boolean) => void
@@ -18,8 +17,6 @@ export const ConcentrationTypeSwitch: React.FC<IProps> = ({
   disabled = false,
   currentValue
 }) => {
-  const isXs = useMediaQuery(theme.breakpoints.down('sm'))
-
   const { classes: tabsClasses } = useTabsStyles({ value: currentValue })
   const { classes: singleTabClasses } = useSingleTabStyles()
 
@@ -38,7 +35,7 @@ export const ConcentrationTypeSwitch: React.FC<IProps> = ({
       classes={tabsClasses}>
       <Tab
         disableRipple
-        label={isXs ? 'Conc.' : 'Concentr.'}
+        label='Concentration'
         classes={singleTabClasses}
         style={{ cursor: !disabled ? 'pointer' : 'default' }}
       />

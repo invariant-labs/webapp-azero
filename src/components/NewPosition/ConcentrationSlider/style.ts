@@ -26,7 +26,7 @@ export const useSliderStyles = makeStyles<{ valuesLength: number; disabledRange:
       width: '100%',
       paddingBlock: 13,
       [theme.breakpoints.down('sm')]: {
-        margin: '0 16px'
+        marginInline: '16px'
       }
     },
     thumb: {

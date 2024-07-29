@@ -511,36 +511,40 @@ export const NewPosition: React.FC<INewPosition> = ({
         <Grid container item alignItems='center' className={classes.options}>
           {poolKey !== '' ? (
             <MarketIdLabel
-              displayLength={9}
+              displayLength={4}
               marketId={poolKey}
               copyPoolAddressHandler={copyPoolAddressHandler}
             />
           ) : null}
-          <Hidden mdDown>
-            <ConcentrationTypeSwitch
-              onSwitch={val => {
-                if (val) {
-                  setPositionOpeningMethod('concentration')
-                  onPositionOpeningMethodChange('concentration')
-                } else {
-                  setPositionOpeningMethod('range')
-                  onPositionOpeningMethodChange('range')
-                }
-              }}
-              className={classes.switch}
-              currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
-            />
-          </Hidden>
-          {poolKey !== '' && (
-            <TooltipHover text='Settings'>
-              <Button
-                onClick={handleClickSettings}
-                className={classes.settingsIconBtn}
-                disableRipple>
-                <img src={settingIcon} className={classes.settingsIcon} alt='settings' />
-              </Button>
-            </TooltipHover>
-          )}
+          <Grid className={classes.optionsWrapper}>
+            <Hidden mdDown>
+              {poolKey !== '' && (
+                <ConcentrationTypeSwitch
+                  onSwitch={val => {
+                    if (val) {
+                      setPositionOpeningMethod('concentration')
+                      onPositionOpeningMethodChange('concentration')
+                    } else {
+                      setPositionOpeningMethod('range')
+                      onPositionOpeningMethodChange('range')
+                    }
+                  }}
+                  className={classes.switch}
+                  currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
+                />
+              )}
+            </Hidden>
+            {poolKey !== '' && (
+              <TooltipHover text='Settings'>
+                <Button
+                  onClick={handleClickSettings}
+                  className={classes.settingsIconBtn}
+                  disableRipple>
+                  <img src={settingIcon} className={classes.settingsIcon} alt='settings' />
+                </Button>
+              </TooltipHover>
+            )}
+          </Grid>
         </Grid>
       </Grid>
 
@@ -684,19 +688,21 @@ export const NewPosition: React.FC<INewPosition> = ({
         />
         <Hidden mdUp>
           <Grid container justifyContent='end' mb={2}>
-            <ConcentrationTypeSwitch
-              onSwitch={val => {
-                if (val) {
-                  setPositionOpeningMethod('concentration')
-                  onPositionOpeningMethodChange('concentration')
-                } else {
-                  setPositionOpeningMethod('range')
-                  onPositionOpeningMethodChange('range')
-                }
-              }}
-              className={classes.switch}
-              currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
-            />
+            {poolKey !== '' && (
+              <ConcentrationTypeSwitch
+                onSwitch={val => {
+                  if (val) {
+                    setPositionOpeningMethod('concentration')
+                    onPositionOpeningMethodChange('concentration')
+                  } else {
+                    setPositionOpeningMethod('range')
+                    onPositionOpeningMethodChange('range')
+                  }
+                }}
+                className={classes.switch}
+                currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
+              />
+            )}
           </Grid>
         </Hidden>
         {isCurrentPoolExisting ||

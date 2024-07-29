@@ -25,11 +25,20 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     width: 22,
     marginRight: 8,
     marginLeft: 8,
+    height: 22,
+    borderRadius: '100%',
+    padding: 4,
 
     [theme.breakpoints.down('sm')]: {
       width: 15,
       marginRight: 2,
       marginLeft: 2
+    },
+    '&:hover': {
+      cursor: 'pointer',
+      background: 'rgba(255, 255, 255, 0.15)',
+
+      filter: 'brightness(1.2)'
     }
   },
   text: {
@@ -325,6 +334,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     padding: '0 10px 0 20px',
     width: 15,
     height: 15
+  },
+  active: {
+    color: colors.invariant.green,
+    outline: `1px solid ${colors.invariant.green}`
   }
 }))
 
