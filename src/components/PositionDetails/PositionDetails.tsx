@@ -4,7 +4,7 @@ import SinglePositionPlot from '@components/PositionDetails/SinglePositionPlot/S
 import { TickPlotPositionData } from '@components/PriceRangePlot/PriceRangePlot'
 import Refresher from '@components/Refresher/Refresher'
 import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
-import { Box, Button, Grid, Typography } from '@mui/material'
+import { Box, Button, Grid, Hidden, Typography } from '@mui/material'
 import backIcon from '@static/svg/back-arrow.svg'
 import { REFRESHER_INTERVAL } from '@store/consts/static'
 import { addressToTicker, initialXtoY, parseFeeToPathFee, printBigint } from '@utils/utils'
@@ -82,6 +82,8 @@ const PositionDetails: React.FC<IProps> = ({
   )
   const [refresherTime, setRefresherTime] = useState<number>(REFRESHER_INTERVAL)
 
+  const isActive = midPrice.x >= min && midPrice.x <= max
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (refresherTime > 0) {
@@ -105,14 +107,24 @@ const PositionDetails: React.FC<IProps> = ({
               <Typography className={classes.backText}>Back to Liquidity Positions List</Typography>
             </Grid>
           </Link>
-          <Refresher
-            currentIndex={refresherTime}
-            maxIndex={REFRESHER_INTERVAL}
-            onClick={() => {
-              onRefresh()
-              setRefresherTime(REFRESHER_INTERVAL)
-            }}
-          />
+          <Grid container width='auto' className={classes.marketIdWithRefresher}>
+            <Hidden mdUp>
+              <MarketIdLabel
+                marketId={poolAddress.toString()}
+                displayLength={9}
+                copyPoolAddressHandler={copyPoolAddressHandler}
+                style={{ paddingRight: 10 }}
+              />
+            </Hidden>
+            <Refresher
+              currentIndex={refresherTime}
+              maxIndex={REFRESHER_INTERVAL}
+              onClick={() => {
+                onRefresh()
+                setRefresherTime(REFRESHER_INTERVAL)
+              }}
+            />
+          </Grid>
         </Grid>
 
         <SinglePositionInfo
@@ -128,6 +140,7 @@ const PositionDetails: React.FC<IProps> = ({
           showFeesLoader={showFeesLoader}
           userHasStakes={userHasStakes}
           isBalanceLoading={isBalanceLoading}
+          isActive={isActive}
         />
       </Grid>
 
@@ -160,12 +173,14 @@ const PositionDetails: React.FC<IProps> = ({
               <span className={classes.buttonText}>+ Add Liquidity</span>
             </Button>
           </Box>
-          <MarketIdLabel
-            marketId={poolAddress.toString()}
-            displayLength={9}
-            copyPoolAddressHandler={copyPoolAddressHandler}
-            style={{ paddingBottom: 20, paddingRight: 10 }}
-          />
+          <Hidden mdDown>
+            <MarketIdLabel
+              marketId={poolAddress.toString()}
+              displayLength={9}
+              copyPoolAddressHandler={copyPoolAddressHandler}
+              style={{ paddingBottom: 20, paddingRight: 10 }}
+            />
+          </Hidden>
         </Grid>
 
         <Grid className={classes.positionPlotWrapper}>
