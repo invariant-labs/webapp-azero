@@ -169,6 +169,8 @@ export const DepositAmountInput: React.FC<IProps> = ({
                 </Typography>
               ) : (
                 <Tooltip
+                  enterTouchDelay={0}
+                  leaveTouchDelay={Number.MAX_SAFE_INTEGER}
                   title='Cannot fetch price of token'
                   placement='bottom'
                   classes={{
