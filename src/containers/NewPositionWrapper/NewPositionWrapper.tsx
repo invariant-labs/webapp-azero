@@ -69,7 +69,16 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const shouldNotUpdatePriceRange = useSelector(shouldNotUpdateRange)
 
   const { success, inProgress } = useSelector(initPosition)
-  const { data: ticksData, loading: ticksLoading, hasError: hasTicksError } = useSelector(plotTicks)
+
+  const [onlyUserPositions, setOnlyUserPositions] = useState(false)
+  const {
+    allData,
+    userData,
+    loading: ticksLoading,
+    hasError: hasTicksError
+  } = useSelector(plotTicks)
+  const ticksData = onlyUserPositions ? userData : allData
+
   const isFetchingNewPool = useSelector(isLoadingLatestPoolsForTransaction)
   const currentNetwork = useSelector(networkType)
 
@@ -704,6 +713,8 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       shouldNotUpdatePriceRange={shouldNotUpdatePriceRange}
       unblockUpdatePriceRange={unblockUpdatePriceRange}
       isGetLiquidityError={isGetLiquidityError}
+      onlyUserPositions={onlyUserPositions}
+      setOnlyUserPositions={setOnlyUserPositions}
     />
   )
 }

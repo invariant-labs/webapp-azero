@@ -3,6 +3,7 @@ import { fn } from '@storybook/test'
 import Header from './Header'
 import { MemoryRouter } from 'react-router-dom'
 import { Network } from '@invariant-labs/a0-sdk'
+import { Chain } from '@store/consts/types'
 
 const meta = {
   title: 'Layout/Header',
@@ -33,6 +34,11 @@ export const Primary: Story = {
     walletConnected: true,
     onFaucet: fn(),
     onCopyAddress: fn(),
-    onChangeWallet: fn()
+    onChangeWallet: fn(),
+    activeChain: {
+      name: Chain.AlephZero,
+      address: 'https://azero.invariant.app/swap'
+    },
+    onChainSelect: fn()
   }
 }

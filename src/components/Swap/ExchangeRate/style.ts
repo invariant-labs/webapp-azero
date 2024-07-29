@@ -1,4 +1,4 @@
-import { colors, typography } from '@static/theme'
+import { colors, theme, typography } from '@static/theme'
 import { makeStyles } from 'tss-react/mui'
 
 export const useStyles = makeStyles()(() => ({
@@ -33,8 +33,9 @@ export const useStyles = makeStyles()(() => ({
     '&:hover': {
       borderColor: colors.invariant.lightHover
     },
-    '@media (max-width: 400px)': {
-      width: '100%'
+    [theme.breakpoints.down('sm')]: {
+      width: '100%',
+      flex: 1
     }
   }
 }))

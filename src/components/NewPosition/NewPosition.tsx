@@ -104,6 +104,8 @@ export interface INewPosition {
   shouldNotUpdatePriceRange: boolean
   unblockUpdatePriceRange: () => void
   isGetLiquidityError: boolean
+  onlyUserPositions: boolean
+  setOnlyUserPositions: (val: boolean) => void
 }
 
 export const NewPosition: React.FC<INewPosition> = ({
@@ -153,7 +155,9 @@ export const NewPosition: React.FC<INewPosition> = ({
   isBalanceLoading,
   shouldNotUpdatePriceRange,
   unblockUpdatePriceRange,
-  isGetLiquidityError
+  isGetLiquidityError,
+  onlyUserPositions,
+  setOnlyUserPositions
 }) => {
   const { classes } = useStyles()
   const navigate = useNavigate()
@@ -732,6 +736,8 @@ export const NewPosition: React.FC<INewPosition> = ({
             setShouldReversePlot={setShouldReversePlot}
             shouldNotUpdatePriceRange={shouldNotUpdatePriceRange}
             unblockUpdatePriceRange={unblockUpdatePriceRange}
+            onlyUserPositions={onlyUserPositions}
+            setOnlyUserPositions={setOnlyUserPositions}
           />
         ) : (
           <PoolInit
