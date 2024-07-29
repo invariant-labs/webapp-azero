@@ -64,12 +64,6 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     '&:hover': {
       backgroundColor: colors.invariant.green,
       boxShadow: `0 0 10px ${colors.invariant.green}`
-    },
-
-    [theme.breakpoints.down('md')]: {
-      minWidth: 40,
-      width: 40,
-      height: 40
     }
   },
   buttonIcon: {

@@ -72,7 +72,7 @@ const PoolListItem: React.FC<IProps> = ({
   }
 
   const handleOpenSwap = () => {
-    navigate(`/swap/${symbolFrom}/${symbolTo}`)
+    navigate(`/exchange/${symbolFrom}/${symbolTo}`)
   }
   return (
     <Grid maxWidth='100%'>
@@ -140,7 +140,7 @@ const PoolListItem: React.FC<IProps> = ({
           <Typography>{`$${formatNumbers()(TVL.toString())}${showPrefix(TVL)}`}</Typography>
           <Box className={classes.action}>
             <button className={classes.actionButton} onClick={handleOpenSwap}>
-              <img width={32} height={32} src={icons.horizontalSwapIcon} alt={'Swap'} />
+              <img width={32} height={32} src={icons.horizontalSwapIcon} alt={'Exchange'} />
             </button>
             <button className={classes.actionButton} onClick={handleOpenPosition}>
               <img width={32} height={32} src={icons.plusIcon} alt={'Open'} />
