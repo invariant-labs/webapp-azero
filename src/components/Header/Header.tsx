@@ -147,37 +147,43 @@ export const Header: React.FC<IHeader> = ({
         </Grid>
 
         <Grid container item className={classes.buttons} wrap='nowrap'>
-          {typeOfNetwork === Network.Testnet ? (
+          <Grid container className={classes.leftButtons}>
+            {typeOfNetwork === Network.Testnet ? (
+              <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                <Button
+                  className={buttonStyles.classes.headerButton}
+                  variant='contained'
+                  sx={{ '& .MuiButton-label': buttonStyles.classes.label }}
+                  onClick={onFaucet}>
+                  Faucet
+                </Button>
+              </Box>
+            ) : null}
+            {typeOfNetwork === Network.Testnet ? (
+              <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                <SelectRPCButton rpc={rpc} networks={testnetRPCs} onSelect={onNetworkSelect} />
+              </Box>
+            ) : null}
             <Box sx={{ display: { xs: 'none', md: 'block' } }}>
-              <Button
-                className={buttonStyles.classes.headerButton}
-                variant='contained'
-                sx={{ '& .MuiButton-label': buttonStyles.classes.label }}
-                onClick={onFaucet}>
-                Faucet
-              </Button>
+              <SelectChainButton
+                activeChain={activeChain}
+                chains={CHAINS}
+                onSelect={onChainSelect}
+              />
             </Box>
-          ) : null}
-          {typeOfNetwork === Network.Testnet ? (
-            <Box sx={{ display: { xs: 'none', md: 'block' } }}>
-              <SelectRPCButton rpc={rpc} networks={testnetRPCs} onSelect={onNetworkSelect} />
-            </Box>
-          ) : null}
-          <Box sx={{ display: { xs: 'none', md: 'block' } }}>
-            <SelectChainButton activeChain={activeChain} chains={CHAINS} onSelect={onChainSelect} />
-          </Box>
-          <SelectNetworkButton
-            name={typeOfNetwork}
-            networks={[
-              {
-                networkType: Network.Testnet,
-                rpc: defaultTestnetRPC,
-                rpcName:
-                  testnetRPCs.find(data => data.rpc === defaultTestnetRPC)?.rpcName ?? 'Custom'
-              }
-            ]}
-            onSelect={onNetworkSelect}
-          />
+            <SelectNetworkButton
+              name={typeOfNetwork}
+              networks={[
+                {
+                  networkType: Network.Testnet,
+                  rpc: defaultTestnetRPC,
+                  rpcName:
+                    testnetRPCs.find(data => data.rpc === defaultTestnetRPC)?.rpcName ?? 'Custom'
+                }
+              ]}
+              onSelect={onNetworkSelect}
+            />
+          </Grid>
           <ChangeWalletButton
             name={
               walletConnected

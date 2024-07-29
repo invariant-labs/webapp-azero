@@ -5,7 +5,7 @@ import { makeStyles } from 'tss-react/mui'
 const useStyles = makeStyles()((theme: Theme) => {
   return {
     headerButton: {
-      background: colors.invariant.light,
+      background: 'transparent',
       color: colors.white.main,
       paddingInline: 12,
       borderRadius: 10,
@@ -13,9 +13,10 @@ const useStyles = makeStyles()((theme: Theme) => {
       ...typography.body1,
       lineHeight: '22px',
       height: 40,
-
+      boxShadow: 'none',
       '&:hover': {
-        background: colors.blue.deep
+        background: 'none',
+        boxShadow: 'none'
       },
       '&:active': {
         '& #downIcon': {

@@ -58,9 +58,12 @@ const useStyles = makeStyles()((theme: Theme) => {
       }
     },
     buttons: {
+      display: 'flex',
       width: 'auto',
       justifyContent: 'flex-end',
-      gap: 12,
+      gap: 8,
+      flexWrap: 'nowrap',
+      alignItems: 'center',
 
       [theme.breakpoints.up('lg')]: {
         minWidth: 350
@@ -77,11 +80,15 @@ const useStyles = makeStyles()((theme: Theme) => {
 
       [theme.breakpoints.down('sm')]: {
         gap: 4
-      },
-
-      [theme.breakpoints.up(1600)]: {
-        width: 600
       }
+    },
+    leftButtons: {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      border: `1px solid ${colors.invariant.light}`,
+      borderRadius: 14,
+      width: 'auto'
     },
     buttonsLgConnected: {
       [theme.breakpoints.up('lg')]: {
