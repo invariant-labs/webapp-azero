@@ -166,14 +166,8 @@ const PositionDetails: React.FC<IProps> = ({
                 <span className={classes.buttonText}>+ Add Liquidity</span>
               </Button>
             </Box>
-            <MarketIdLabel
-              marketId={poolAddress.toString()}
-              displayLength={9}
-              copyPoolAddressHandler={copyPoolAddressHandler}
-              style={{ paddingBottom: 5, paddingRight: 10 }}
-            />
             <Hidden mdDown>
-              <Box ml={1} mr='auto'>
+              <Grid mr={2} ml='auto' display='flex' justifyContent='center'>
                 <Refresher
                   currentIndex={refresherTime}
                   maxIndex={REFRESHER_INTERVAL}
@@ -182,8 +176,14 @@ const PositionDetails: React.FC<IProps> = ({
                     setRefresherTime(REFRESHER_INTERVAL)
                   }}
                 />
-              </Box>
+              </Grid>
             </Hidden>
+            <MarketIdLabel
+              marketId={poolAddress.toString()}
+              displayLength={9}
+              copyPoolAddressHandler={copyPoolAddressHandler}
+              style={{ padding: '8px 8px  0 4px' }}
+            />
           </Grid>
           <SinglePositionPlot
             data={

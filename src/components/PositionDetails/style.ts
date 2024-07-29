@@ -58,7 +58,6 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     borderRadius: 14,
     height: 40,
     width: 130,
-    marginBottom: 16,
     paddingRight: 9,
     paddingLeft: 9,
     letterSpacing: -0.03,
@@ -89,6 +88,6 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     }
   },
   rightHeaderWrapper: {
-    marginBottom: 4
+    marginBottom: 20
   }
 }))

@@ -247,9 +247,6 @@ export const useStyles = makeStyles()((theme: Theme) => ({
       background: colors.invariant.greenLinearGradient,
       boxShadow: '0px 0px 16px rgba(46, 224, 154, 0.35)'
     },
-    [theme.breakpoints.down('lg')]: {
-      marginRight: 10
-    },
 
     [theme.breakpoints.down('sm')]: {
       width: '50%',
