@@ -88,9 +88,16 @@ const useStyles = makeStyles()(theme => {
       }
     },
     options: {
-      width: 'fit-content',
+      width: 'calc(50% - 12px)',
       marginBottom: 18,
-      height: 28
+      height: 28,
+      display: 'flex',
+      flexWrap: 'nowrap',
+      justifyContent: 'space-between',
+
+      [theme.breakpoints.down('md')]: {
+        width: '100%'
+      }
     },
     switch: {
       transition: 'opacity 500ms'
@@ -106,6 +113,10 @@ const useStyles = makeStyles()(theme => {
       [theme.breakpoints.down('md')]: {
         maxWidth: 'none'
       }
+    },
+    optionsWrapper: {
+      display: 'flex',
+      alignItems: 'center'
     }
   }
 })
