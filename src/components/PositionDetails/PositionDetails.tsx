@@ -102,7 +102,7 @@ const PositionDetails: React.FC<IProps> = ({
           <Link to='/liquidity' style={{ textDecoration: 'none' }}>
             <Grid className={classes.back} container item alignItems='center'>
               <img className={classes.backIcon} src={backIcon} alt='Back' />
-              <Typography className={classes.backText}>Liquidity Positions</Typography>
+              <Typography className={classes.backText}>Positions</Typography>
             </Grid>
           </Link>
           <Refresher
