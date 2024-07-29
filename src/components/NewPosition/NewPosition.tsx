@@ -478,10 +478,10 @@ export const NewPosition: React.FC<INewPosition> = ({
 
   return (
     <Grid container className={classes.wrapper} direction='column'>
-      <Link to='/pool' style={{ textDecoration: 'none', maxWidth: 'fit-content' }}>
+      <Link to='/liquidity' style={{ textDecoration: 'none', maxWidth: 'fit-content' }}>
         <Grid className={classes.back} container item alignItems='center'>
           <img className={classes.backIcon} src={backIcon} alt='back' />
-          <Typography className={classes.backText}>Back to Liquidity Positions List</Typography>
+          <Typography className={classes.backText}>Positions</Typography>
         </Grid>
       </Link>
 
@@ -491,7 +491,7 @@ export const NewPosition: React.FC<INewPosition> = ({
         alignItems='center'
         className={classes.headerContainer}>
         <Box className={classes.titleContainer}>
-          <Typography className={classes.title}>Add new liquidity position</Typography>
+          <Typography className={classes.title}>Add new position</Typography>
           {poolKey !== '' && tokenAIndex !== tokenBIndex && (
             <Refresher
               currentIndex={refresherTime}

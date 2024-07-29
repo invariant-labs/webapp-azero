@@ -177,7 +177,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
       return 'Add tokens to position'
     }
 
-    return 'Add Liquidity'
+    return 'Add Position'
   }, [
     tokenAIndex,
     tokenBIndex,
@@ -365,7 +365,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
             onAddLiquidity()
           }
         }}
-        disabled={getButtonMessage() !== 'Add Liquidity'}
+        disabled={getButtonMessage() !== 'Add Position'}
         content={getButtonMessage()}
         progress={progress}
       />
