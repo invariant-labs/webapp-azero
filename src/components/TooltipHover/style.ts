@@ -9,13 +9,11 @@ const useStyles = makeStyles()(() => {
       lineHeight: '24px',
       background: colors.black.full,
       borderRadius: 12,
-      height: 24,
-      width: 72,
-      padding: 0,
+      width: 80,
       textAlign: 'center',
       position: 'absolute',
       transform: 'translate(-50%, -50%)',
-      top: -16
+      top: -20
     }
   }
 })

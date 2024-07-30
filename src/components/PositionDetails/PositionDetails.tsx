@@ -178,16 +178,18 @@ const PositionDetails: React.FC<IProps> = ({
               </Button>
             </Box>
             <Hidden mdDown>
-              <Grid mr={2} ml='auto' display='flex' justifyContent='center'>
-                <Refresher
-                  currentIndex={refresherTime}
-                  maxIndex={REFRESHER_INTERVAL}
-                  onClick={() => {
-                    onRefresh()
-                    setRefresherTime(REFRESHER_INTERVAL)
-                  }}
-                />
-              </Grid>
+              <TooltipHover text='Refresh'>
+                <Grid mr={2} ml='auto' display='flex' justifyContent='center'>
+                  <Refresher
+                    currentIndex={refresherTime}
+                    maxIndex={REFRESHER_INTERVAL}
+                    onClick={() => {
+                      onRefresh()
+                      setRefresherTime(REFRESHER_INTERVAL)
+                    }}
+                  />
+                </Grid>
+              </TooltipHover>
               <MarketIdLabel
                 marketId={poolAddress.toString()}
                 displayLength={9}
