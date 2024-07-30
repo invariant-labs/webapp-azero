@@ -187,7 +187,8 @@ const useStyles = makeStyles()(theme => {
       textAlign: 'center',
       boxSizing: 'border-box',
       paddingTop: 3,
-      cursor: 'default'
+      cursor: 'default',
+      userSelect: 'none'
     },
     liquidityTooltip: {
       background: colors.invariant.component,

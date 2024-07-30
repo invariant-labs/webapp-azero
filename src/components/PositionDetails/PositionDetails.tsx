@@ -102,10 +102,10 @@ const PositionDetails: React.FC<IProps> = ({
     <Grid container className={classes.wrapperContainer} wrap='nowrap'>
       <Grid className={classes.positionDetails} container item direction='column'>
         <Grid className={classes.backContainer} container>
-          <Link to='/pool' style={{ textDecoration: 'none' }}>
+          <Link to='/liquidity' style={{ textDecoration: 'none' }}>
             <Grid className={classes.back} container item alignItems='center'>
               <img className={classes.backIcon} src={backIcon} alt='Back' />
-              <Typography className={classes.backText}>Back to Liquidity Positions List</Typography>
+              <Typography className={classes.backText}>Positions</Typography>
             </Grid>
           </Link>
           <Grid container width='auto' className={classes.marketIdWithRefresher}>
@@ -116,9 +116,7 @@ const PositionDetails: React.FC<IProps> = ({
                 copyPoolAddressHandler={copyPoolAddressHandler}
                 style={{ paddingRight: 10 }}
               />
-            </Hidden>
-            <TooltipHover text='Refresh'>
-              <Box>
+              <TooltipHover text='Refresh'>
                 <Refresher
                   currentIndex={refresherTime}
                   maxIndex={REFRESHER_INTERVAL}
@@ -127,11 +125,10 @@ const PositionDetails: React.FC<IProps> = ({
                     setRefresherTime(REFRESHER_INTERVAL)
                   }}
                 />
-              </Box>
-            </TooltipHover>
+              </TooltipHover>
+            </Hidden>
           </Grid>
         </Grid>
-
         <SinglePositionInfo
           fee={+printBigint(fee, PERCENTAGE_SCALE - 2n)}
           onClickClaimFee={onClickClaimFee}
@@ -156,39 +153,49 @@ const PositionDetails: React.FC<IProps> = ({
         alignItems='flex-end'
         className={classes.right}
         wrap='nowrap'>
-        <Grid
-          container
-          item
-          direction='row'
-          alignItems='flex-end'
-          style={{ paddingLeft: 20, flexDirection: 'row-reverse' }}
-          className={classes.right}
-          wrap='nowrap'>
-          <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-            <Button
-              className={classes.button}
-              variant='contained'
-              onClick={() => {
-                const parsedFee = parseFeeToPathFee(fee)
-                const address1 = addressToTicker(tokenXAddress.toString())
-                const address2 = addressToTicker(tokenYAddress.toString())
-
-                navigate(`/newPosition/${address1}/${address2}/${parsedFee}`)
-              }}>
-              <span className={classes.buttonText}>+ Add Liquidity</span>
-            </Button>
-          </Box>
-          <Hidden mdDown>
-            <MarketIdLabel
-              marketId={poolAddress.toString()}
-              displayLength={9}
-              copyPoolAddressHandler={copyPoolAddressHandler}
-              style={{ paddingBottom: 20, paddingRight: 10 }}
-            />
-          </Hidden>
-        </Grid>
-
         <Grid className={classes.positionPlotWrapper}>
+          <Grid
+            container
+            item
+            direction='row'
+            alignItems='center'
+            flexDirection='row-reverse'
+            className={classes.rightHeaderWrapper}
+            mt='22px'
+            wrap='nowrap'>
+            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+              <Button
+                className={classes.button}
+                variant='contained'
+                onClick={() => {
+                  const parsedFee = parseFeeToPathFee(fee)
+                  const address1 = addressToTicker(tokenXAddress.toString())
+                  const address2 = addressToTicker(tokenYAddress.toString())
+
+                  navigate(`/newPosition/${address1}/${address2}/${parsedFee}`)
+                }}>
+                <span className={classes.buttonText}>+ Add Position</span>
+              </Button>
+            </Box>
+            <Hidden mdDown>
+              <Grid mr={2} ml='auto' display='flex' justifyContent='center'>
+                <Refresher
+                  currentIndex={refresherTime}
+                  maxIndex={REFRESHER_INTERVAL}
+                  onClick={() => {
+                    onRefresh()
+                    setRefresherTime(REFRESHER_INTERVAL)
+                  }}
+                />
+              </Grid>
+              <MarketIdLabel
+                marketId={poolAddress.toString()}
+                displayLength={9}
+                copyPoolAddressHandler={copyPoolAddressHandler}
+                style={{ padding: '8px 8px  0 0px' }}
+              />
+            </Hidden>
+          </Grid>
           <SinglePositionPlot
             data={
               detailsData.length

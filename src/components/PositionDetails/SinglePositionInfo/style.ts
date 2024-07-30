@@ -69,6 +69,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
+    columnGap: 10,
     [theme.breakpoints.down('sm')]: {
       justifyContent: 'space-between',
       marginTop: 16
@@ -255,9 +256,6 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     '&:hover': {
       background: colors.invariant.greenLinearGradient,
       boxShadow: '0px 0px 16px rgba(46, 224, 154, 0.35)'
-    },
-    [theme.breakpoints.down('lg')]: {
-      marginRight: 10
     },
 
     [theme.breakpoints.down('sm')]: {

@@ -60,6 +60,7 @@ export interface IDepositSelector {
   positionOpeningMethod: PositionOpeningMethod
   isBalanceLoading: boolean
   isGetLiquidityError: boolean
+  ticksLoading: boolean
 }
 
 export const DepositSelector: React.FC<IDepositSelector> = ({
@@ -91,7 +92,8 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
   minimumSliderIndex,
   positionOpeningMethod,
   isBalanceLoading,
-  isGetLiquidityError
+  isGetLiquidityError,
+  ticksLoading
 }) => {
   const { classes } = useStyles()
 
@@ -178,7 +180,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
       return 'Add tokens to position'
     }
 
-    return 'Add Liquidity'
+    return 'Add Position'
   }, [
     tokenAIndex,
     tokenBIndex,
@@ -243,6 +245,10 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
               src={SwapList}
               alt='Arrow'
               onClick={() => {
+                if (ticksLoading) {
+                  return
+                }
+
                 if (!tokenBInputState.blocked) {
                   tokenAInputState.setValue(tokenBInputState.value)
                 } else {
@@ -368,7 +374,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
             onAddLiquidity()
           }
         }}
-        disabled={getButtonMessage() !== 'Add Liquidity'}
+        disabled={getButtonMessage() !== 'Add Position'}
         content={getButtonMessage()}
         progress={progress}
       />

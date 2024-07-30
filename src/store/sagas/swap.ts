@@ -65,7 +65,7 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
   try {
     yield put(
       snackbarsActions.add({
-        message: 'Swapping tokens...',
+        message: 'Exchanging tokens...',
         variant: 'pending',
         persist: true,
         key: loaderSwappingTokens
