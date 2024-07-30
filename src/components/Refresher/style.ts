@@ -4,7 +4,10 @@ export const useStyles = makeStyles()(() => ({
   ring: {
     cursor: 'pointer',
     '&:hover': {
-      filter: 'brightness(1.25)'
+      filter: 'brightness(1.25)',
+      '@media (hover: none)': {
+        filter: 'none'
+      }
     }
   },
   innerCircle: {

@@ -25,7 +25,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
 
       color: colors.invariant.light,
       '&:hover': {
-        color: colors.invariant.lightGrey
+        color: colors.invariant.lightGrey,
+        '@media (hover: none)': {
+          color: colors.invariant.light
+        }
       }
     },
 

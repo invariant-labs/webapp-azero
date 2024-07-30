@@ -63,7 +63,11 @@ export const useStyles = makeStyles()((theme: Theme) => ({
 
     '&:hover': {
       backgroundColor: colors.invariant.green,
-      boxShadow: `0 0 10px ${colors.invariant.green}`
+      boxShadow: `0 0 10px ${colors.invariant.green}`,
+      '@media (hover: none)': {
+        background: ' rgba(46, 224, 154, 0.8)',
+        boxShadow: 'none'
+      }
     }
   },
   buttonIcon: {

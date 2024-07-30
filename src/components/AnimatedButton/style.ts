@@ -54,7 +54,10 @@ const useStyles = makeStyles()(() => {
         '&:hover': {
           boxShadow: 'none',
           cursor: 'not-allowed',
-          filter: 'brightness(1.15)'
+          filter: 'brightness(1.15)',
+          '@media (hover: none)': {
+            filter: 'none'
+          }
         }
       }
     },
