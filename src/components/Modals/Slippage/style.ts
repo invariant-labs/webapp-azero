@@ -49,7 +49,7 @@ export const useStyles = makeStyles()(() => {
     },
     detailsInfoForm: {
       border: `1px solid ${colors.invariant.component}`,
-      color: colors.invariant.light,
+      color: colors.invariant.textGrey,
       borderRadius: 15,
       width: '100%',
       backgroundColor: colors.invariant.newDark,
@@ -117,6 +117,9 @@ export const useStyles = makeStyles()(() => {
     },
     inputAdornedEnd: {
       marginRight: 2
+    },
+    inputAdornedStart: {
+      color: colors.invariant.pink
     }
   }
 })
