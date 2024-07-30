@@ -118,7 +118,7 @@ const Slippage: React.FC<Props> = ({
         <Grid container className={classes.detailsWrapper}>
           <Grid container justifyContent='space-between' style={{ marginBottom: 6 }}>
             <Typography component='h2'>{headerText ?? 'Exchange Transaction Settings'}</Typography>
-            <Button className={classes.selectTokenClose} onClick={handleClose} />
+            <Button className={classes.selectTokenClose} onClick={handleClose} aria-label='Close' />
           </Grid>
           <Typography className={classes.label}>Slippage tolerance</Typography>
           <Grid container gap='9px'>
