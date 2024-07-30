@@ -345,6 +345,14 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     ...typography.caption4,
     fontSize: 13,
     color: colors.white.main
+  },
+  arrows: {
+    width: 32,
+    cursor: 'pointer',
+
+    '&:hover': {
+      filter: 'brightness(2)'
+    }
   }
 }))
 

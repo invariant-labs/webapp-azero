@@ -113,7 +113,7 @@ export const PositionItem: React.FC<IPositionItem> = ({
               src={xToY ? tokenXIcon : tokenYIcon}
               alt={xToY ? tokenXName : tokenYName}
             />
-            <TooltipHover text='Swap tokens'>
+            <TooltipHover text='Exchange tokens'>
               <img
                 className={classes.arrows}
                 src={SwapList}

@@ -239,7 +239,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
             />
           </Grid>
 
-          <TooltipHover text='Swap tokens'>
+          <TooltipHover text='Exchange tokens'>
             <img
               className={classes.arrows}
               src={SwapList}

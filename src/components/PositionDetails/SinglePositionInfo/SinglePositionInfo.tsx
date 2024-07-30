@@ -1,6 +1,6 @@
 import ClosePositionWarning from '@components/Modals/ClosePositionWarning/ClosePositionWarning'
 import { Button, Grid, Hidden, Tooltip, Typography } from '@mui/material'
-import icons from '@static/icons'
+import SwapList from '@static/svg/swap-list.svg'
 import { blurContent, unblurContent } from '@utils/uiUtils'
 import classNames from 'classnames'
 import React, { useState } from 'react'
@@ -74,13 +74,8 @@ const SinglePositionInfo: React.FC<IProp> = ({
             src={xToY ? tokenX.icon : tokenY.icon}
             alt={xToY ? tokenX.name : tokenY.name}
           />
-          <TooltipHover text='Swap tokens'>
-            <img
-              className={classes.arrowIcon}
-              src={icons.ArrowIcon}
-              alt={'Arrow'}
-              onClick={swapHandler}
-            />
+          <TooltipHover text='Exchange tokens'>
+            <img className={classes.arrows} src={SwapList} alt='Arrow' onClick={swapHandler} />
           </TooltipHover>
           <img
             className={classes.icon}
