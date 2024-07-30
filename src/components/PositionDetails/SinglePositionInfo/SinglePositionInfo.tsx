@@ -118,7 +118,6 @@ const SinglePositionInfo: React.FC<IProp> = ({
             Close position
           </Button>
           <Hidden smUp>
-            {' '}
             <Button
               className={classes.button}
               variant='contained'
