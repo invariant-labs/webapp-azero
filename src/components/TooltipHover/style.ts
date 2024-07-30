@@ -10,7 +10,7 @@ const useStyles = makeStyles()(() => {
       background: colors.black.full,
       borderRadius: 12,
       height: 24,
-      width: 59,
+      width: 72,
       padding: 0,
       textAlign: 'center',
       position: 'absolute',

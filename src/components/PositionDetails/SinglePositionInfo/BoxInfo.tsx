@@ -7,6 +7,7 @@ import loadingAnimation from '@static/gif/loading.gif'
 import { ILiquidityToken } from './consts'
 import useStyles from './style'
 import { FormatNumberThreshold, PrefixConfig } from '@store/consts/types'
+import { TooltipHover } from '@components/TooltipHover/TooltipHover'
 
 export interface BoxInfoToken extends Omit<ILiquidityToken, 'claimValue' | 'liqValue'> {
   value: number
@@ -133,7 +134,14 @@ export const BoxInfo: React.FC<{
         </Grid>
 
         {typeof swapHandler !== 'undefined' ? (
-          <img src={SwapPosition} className={classes.arrowsIcon} onClick={swapHandler} alt='Swap' />
+          <TooltipHover text='Swap tokens'>
+            <img
+              src={SwapPosition}
+              className={classes.arrowsIcon}
+              onClick={swapHandler}
+              alt='Swap'
+            />
+          </TooltipHover>
         ) : null}
 
         <Grid className={classes.tokenArea}>
