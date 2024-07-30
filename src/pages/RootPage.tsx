@@ -25,7 +25,7 @@ const RootPage: React.FC = React.memo(() => {
 
   useEffect(() => {
     if (location.pathname === '/') {
-      navigate('/swap')
+      navigate('/exchange')
     }
   }, [location.pathname, navigate])
 

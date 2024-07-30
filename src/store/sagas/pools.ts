@@ -46,7 +46,6 @@ export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) 
   )
   const knownTokenBalances = yield* call(getTokenBalances, [...knownTokens], psp22, walletAddress)
 
-  yield* put(walletActions.getBalances(Object.keys(unknownTokensData)))
   yield* put(actions.addTokens(unknownTokensData))
   yield* put(actions.updateTokenBalances(knownTokenBalances))
 

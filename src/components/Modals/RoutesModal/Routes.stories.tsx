@@ -26,8 +26,8 @@ export const Primary: Story = {
     handleClose: fn(),
     open: true,
     onSelect: fn(),
-    routes: ['swap', 'pool'],
-    current: 'swap',
+    routes: ['exchange', 'liquidity', 'statistics'],
+    current: 'exchange',
     onRPC: fn(),
     onFaucet: fn()
   }

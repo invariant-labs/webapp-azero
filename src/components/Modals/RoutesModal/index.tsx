@@ -28,8 +28,8 @@ export const RoutesModal: React.FC<IRoutesModal> = ({
   const { classes } = useStyles()
 
   const otherRoutesToHighlight: Record<string, RegExp[]> = {
-    pool: [/^newPosition\/*/, /^position\/*/],
-    swap: [/^swap\/*/]
+    liquidity: [/^newPosition\/*/, /^position\/*/],
+    exchange: [/^exchange\/*/]
   }
 
   return (

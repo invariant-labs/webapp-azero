@@ -423,6 +423,8 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
           </Grid>
           <Grid className={classes.activeLiquidityContainer} container direction='column'>
             <Tooltip
+              enterTouchDelay={0}
+              leaveTouchDelay={Number.MAX_SAFE_INTEGER}
               title={
                 <>
                   <Typography className={classes.liquidityTitle}>Active liquidity</Typography>
@@ -439,7 +441,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
                     <Typography className={classes.liquidityDesc}>
                       The active liquidity range is represented by white, dashed lines in the
                       liquidity chart. Active liquidity is determined by the maximum price range
-                      resulting from the statistical volume of swaps for the last 7 days.
+                      resulting from the statistical volume of exchanges for the last 7 days.
                     </Typography>
                     <img className={classes.liquidityImg} src={activeLiquidity} alt='Liquidity' />
                   </Grid>
