@@ -93,7 +93,7 @@ const useStyles = makeStyles()(() => {
       height: '100%',
       padding: 0,
       position: 'absolute',
-      animation: `${slideEndSuccess} 1.5s ease-out`
+      animation: `${slideEndSuccess} 0.5s ease-out`
     },
     backgroundApprovedWithFail: {
       top: 0,
@@ -102,7 +102,7 @@ const useStyles = makeStyles()(() => {
       height: '100%',
       padding: 0,
       position: 'absolute',
-      animation: `${slideEndFail} 1.5s ease-out`
+      animation: `${slideEndFail} 0.5s ease-out`
     },
     buttonContent: {
       position: 'relative',
