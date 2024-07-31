@@ -134,7 +134,7 @@ export const BoxInfo: React.FC<{
         </Grid>
 
         {typeof swapHandler !== 'undefined' ? (
-          <TooltipHover text='Exchange tokens'>
+          <TooltipHover text='Reverse tokens'>
             <img
               src={SwapPosition}
               className={classes.arrowsIcon}

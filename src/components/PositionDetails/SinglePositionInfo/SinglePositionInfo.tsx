@@ -74,7 +74,7 @@ const SinglePositionInfo: React.FC<IProp> = ({
             src={xToY ? tokenX.icon : tokenY.icon}
             alt={xToY ? tokenX.name : tokenY.name}
           />
-          <TooltipHover text='Exchange tokens'>
+          <TooltipHover text='Reverse tokens'>
             <img className={classes.arrows} src={SwapList} alt='Arrow' onClick={swapHandler} />
           </TooltipHover>
           <img

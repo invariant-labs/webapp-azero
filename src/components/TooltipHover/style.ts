@@ -13,7 +13,7 @@ const useStyles = makeStyles()(() => {
       textAlign: 'center',
       position: 'absolute',
       transform: 'translate(-50%, -50%)',
-      top: -20
+      top: -30
     }
   }
 })
