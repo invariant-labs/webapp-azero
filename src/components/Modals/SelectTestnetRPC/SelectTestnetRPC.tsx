@@ -1,7 +1,6 @@
 import { Network } from '@invariant-labs/a0-sdk'
 import DotIcon from '@mui/icons-material/FiberManualRecord'
 import { Button, Grid, Input, Popover, Typography } from '@mui/material'
-import icons from '@static/icons'
 import { ISelectNetwork } from '@store/consts/types'
 import classNames from 'classnames'
 import React, { useState } from 'react'
