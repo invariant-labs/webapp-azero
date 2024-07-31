@@ -50,7 +50,11 @@ export const useStyles = makeStyles()(() => ({
 
     '&:hover': {
       background: colors.invariant.pinkLinearGradient,
-      boxShadow: '0px 0px 16px rgba(239, 132, 245, 0.35)'
+      boxShadow: '0px 0px 16px rgba(239, 132, 245, 0.35)',
+      '@media (hover: none)': {
+        background: colors.invariant.pinkLinearGradientOpacity,
+        boxShadow: 'none'
+      }
     }
   }
 }))

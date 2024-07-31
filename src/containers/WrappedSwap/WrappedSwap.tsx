@@ -68,14 +68,13 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
 
       timeoutId1 = setTimeout(() => {
         setProgress(success ? 'success' : 'failed')
-      }, 1500)
+      }, 1000)
 
       timeoutId2 = setTimeout(() => {
         setProgress('none')
       }, 3000)
     }
 
-    // Cleanup function
     return () => {
       clearTimeout(timeoutId1)
       clearTimeout(timeoutId2)

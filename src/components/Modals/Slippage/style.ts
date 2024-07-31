@@ -49,7 +49,7 @@ export const useStyles = makeStyles()(() => {
     },
     detailsInfoForm: {
       border: `1px solid ${colors.invariant.component}`,
-      color: colors.invariant.light,
+      color: colors.invariant.textGrey,
       borderRadius: 15,
       width: '100%',
       backgroundColor: colors.invariant.newDark,
@@ -82,7 +82,11 @@ export const useStyles = makeStyles()(() => {
         filter: 'brightness(1.15)',
         transition: ' .4s filter',
         boxShadow:
-          '0px 3px 1px -2px rgba(43, 193, 144, 0.2),0px 1px 2px 0px rgba(45, 168, 128, 0.14),0px 0px 5px 7px rgba(59, 183, 142, 0.12)'
+          '0px 3px 1px -2px rgba(43, 193, 144, 0.2),0px 1px 2px 0px rgba(45, 168, 128, 0.14),0px 0px 5px 7px rgba(59, 183, 142, 0.12)',
+        '@media (hover: none)': {
+          filter: 'none',
+          boxShadow: 'none'
+        }
       }
     },
     info: {
@@ -99,7 +103,11 @@ export const useStyles = makeStyles()(() => {
 
       '&:hover': {
         backgroundColor: colors.invariant.light,
-        color: colors.invariant.text
+        color: colors.invariant.text,
+        '@media (hover: none)': {
+          backgroundColor: colors.invariant.newDark,
+          color: colors.invariant.textGrey
+        }
       }
     },
     slippagePercentageButtonActive: {
@@ -109,6 +117,9 @@ export const useStyles = makeStyles()(() => {
     },
     inputAdornedEnd: {
       marginRight: 2
+    },
+    inputAdornedStart: {
+      color: colors.invariant.pink
     }
   }
 })

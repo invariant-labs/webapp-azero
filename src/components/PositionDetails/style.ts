@@ -37,7 +37,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     transition: 'filter 300ms',
 
     '&:hover': {
-      filter: 'brightness(2)'
+      filter: 'brightness(2)',
+      '@media (hover: none)': {
+        filter: 'none'
+      }
     }
   },
   backIcon: {
@@ -58,14 +61,17 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     borderRadius: 14,
     height: 40,
     width: 130,
-    marginBottom: 16,
     paddingRight: 9,
     paddingLeft: 9,
     letterSpacing: -0.03,
 
     '&:hover': {
       background: colors.invariant.pinkLinearGradient,
-      boxShadow: `0 0 16px ${colors.invariant.pink}`
+      boxShadow: `0 0 16px ${colors.invariant.pink}`,
+      '@media (hover: none)': {
+        background: colors.invariant.pinkLinearGradientOpacity,
+        boxShadow: 'none'
+      }
     }
   },
   buttonStartIcon: {
@@ -82,7 +88,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   },
   positionPlotWrapper: {
     width: '100%',
-    marginTop: 56,
+    marginTop: 30,
 
     [theme.breakpoints.down('md')]: {
       marginTop: 0
@@ -93,5 +99,8 @@ export const useStyles = makeStyles()((theme: Theme) => ({
       width: '100%',
       justifyContent: 'space-between'
     }
+  },
+  rightHeaderWrapper: {
+    marginBottom: 20
   }
 }))

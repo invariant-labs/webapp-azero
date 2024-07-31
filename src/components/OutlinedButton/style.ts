@@ -13,7 +13,10 @@ const useStyles = makeStyles()(() => ({
     marginTop: 1,
     textTransform: 'none',
     '&:hover': {
-      background: `${colors.invariant.green} !important`
+      background: `${colors.invariant.green} !important`,
+      '@media (hover: none)': {
+        background: 'rgba(46, 224, 154, 0.8)'
+      }
     },
 
     [theme.breakpoints.down('md')]: {
