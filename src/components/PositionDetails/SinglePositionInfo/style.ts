@@ -22,10 +22,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     }
   },
   arrowIcon: {
-    width: 22,
+    width: 32,
     marginRight: 8,
     marginLeft: 8,
-    height: 22,
+    height: 32,
     borderRadius: '100%',
     padding: 4,
 
