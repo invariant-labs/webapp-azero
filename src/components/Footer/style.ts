@@ -18,7 +18,11 @@ const useStyles = makeStyles()(() => {
       transition: '.2s all',
       '&:hover': {
         opacity: 1,
-        transform: 'scale(1.1) rotate(10deg)'
+        transform: 'scale(1.1) rotate(10deg)',
+        '@media (hover: none)': {
+          opacity: 0.5,
+          transform: 'none'
+        }
       }
     },
     footerLink: {

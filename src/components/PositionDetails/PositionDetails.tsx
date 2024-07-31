@@ -115,18 +115,17 @@ const PositionDetails: React.FC<IProps> = ({
                 copyPoolAddressHandler={copyPoolAddressHandler}
                 style={{ paddingRight: 10 }}
               />
+              <Refresher
+                currentIndex={refresherTime}
+                maxIndex={REFRESHER_INTERVAL}
+                onClick={() => {
+                  onRefresh()
+                  setRefresherTime(REFRESHER_INTERVAL)
+                }}
+              />
             </Hidden>
-            <Refresher
-              currentIndex={refresherTime}
-              maxIndex={REFRESHER_INTERVAL}
-              onClick={() => {
-                onRefresh()
-                setRefresherTime(REFRESHER_INTERVAL)
-              }}
-            />
           </Grid>
         </Grid>
-
         <SinglePositionInfo
           fee={+printBigint(fee, PERCENTAGE_SCALE - 2n)}
           onClickClaimFee={onClickClaimFee}
@@ -151,39 +150,49 @@ const PositionDetails: React.FC<IProps> = ({
         alignItems='flex-end'
         className={classes.right}
         wrap='nowrap'>
-        <Grid
-          container
-          item
-          direction='row'
-          alignItems='flex-end'
-          style={{ paddingLeft: 20, flexDirection: 'row-reverse' }}
-          className={classes.right}
-          wrap='nowrap'>
-          <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-            <Button
-              className={classes.button}
-              variant='contained'
-              onClick={() => {
-                const parsedFee = parseFeeToPathFee(fee)
-                const address1 = addressToTicker(tokenXAddress.toString())
-                const address2 = addressToTicker(tokenYAddress.toString())
-
-                navigate(`/newPosition/${address1}/${address2}/${parsedFee}`)
-              }}>
-              <span className={classes.buttonText}>+ Add Position</span>
-            </Button>
-          </Box>
-          <Hidden mdDown>
-            <MarketIdLabel
-              marketId={poolAddress.toString()}
-              displayLength={9}
-              copyPoolAddressHandler={copyPoolAddressHandler}
-              style={{ paddingBottom: 20, paddingRight: 10 }}
-            />
-          </Hidden>
-        </Grid>
-
         <Grid className={classes.positionPlotWrapper}>
+          <Grid
+            container
+            item
+            direction='row'
+            alignItems='center'
+            flexDirection='row-reverse'
+            className={classes.rightHeaderWrapper}
+            mt='22px'
+            wrap='nowrap'>
+            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+              <Button
+                className={classes.button}
+                variant='contained'
+                onClick={() => {
+                  const parsedFee = parseFeeToPathFee(fee)
+                  const address1 = addressToTicker(tokenXAddress.toString())
+                  const address2 = addressToTicker(tokenYAddress.toString())
+
+                  navigate(`/newPosition/${address1}/${address2}/${parsedFee}`)
+                }}>
+                <span className={classes.buttonText}>+ Add Position</span>
+              </Button>
+            </Box>
+            <Hidden mdDown>
+              <Grid mr={2} ml='auto' display='flex' justifyContent='center'>
+                <Refresher
+                  currentIndex={refresherTime}
+                  maxIndex={REFRESHER_INTERVAL}
+                  onClick={() => {
+                    onRefresh()
+                    setRefresherTime(REFRESHER_INTERVAL)
+                  }}
+                />
+              </Grid>
+              <MarketIdLabel
+                marketId={poolAddress.toString()}
+                displayLength={9}
+                copyPoolAddressHandler={copyPoolAddressHandler}
+                style={{ padding: '8px 8px  0 0px' }}
+              />
+            </Hidden>
+          </Grid>
           <SinglePositionPlot
             data={
               detailsData.length

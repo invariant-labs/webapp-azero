@@ -31,7 +31,11 @@ export const useStyles = makeStyles<{ walletDisconnected: boolean }>()(
       '&:hover': {
         background: 'none',
         backgroundColor: colors.invariant.green,
-        boxShadow: '0px 0px 20px -10px white'
+        boxShadow: '0px 0px 20px -10px white',
+        '@media (hover: none)': {
+          background: ' rgba(46, 224, 154, 0.8)',
+          boxShadow: 'none'
+        }
       },
       [theme.breakpoints.down('md')]: {
         width: 26,

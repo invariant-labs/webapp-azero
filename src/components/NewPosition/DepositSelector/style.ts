@@ -52,7 +52,10 @@ export const useStyles = makeStyles()(theme => {
       },
 
       '&:hover': {
-        backgroundColor: colors.invariant.light
+        backgroundColor: colors.invariant.light,
+        '@media (hover: none)': {
+          backgroundColor: colors.invariant.componentBcg
+        }
       }
     },
     addButton: {
@@ -73,7 +76,10 @@ export const useStyles = makeStyles()(theme => {
       cursor: 'pointer',
 
       '&:hover': {
-        filter: 'brightness(2)'
+        filter: 'brightness(2)',
+        '@media (hover: none)': {
+          filter: 'none'
+        }
       }
     }
   }

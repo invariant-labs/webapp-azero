@@ -57,7 +57,10 @@ export const useStyles = makeStyles<{ isToken: boolean }>()((_theme, { isToken }
     columnGap: 4,
     cursor: isToken ? 'pointer' : 'default',
     '&:hover': {
-      filter: isToken ? 'brightness(1.2)' : 'none'
+      filter: isToken ? 'brightness(1.2)' : 'none',
+      '@media (hover: none)': {
+        filter: 'none'
+      }
     },
 
     '& p': {
@@ -100,7 +103,10 @@ export const useStyles = makeStyles<{ isToken: boolean }>()((_theme, { isToken }
       transform: 'translateY(-12px)'
     },
     '&:hover': {
-      filter: 'brightness(1.2)'
+      filter: 'brightness(1.2)',
+      '@media (hover: none)': {
+        filter: 'none'
+      }
     }
   }
 }))

@@ -32,7 +32,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     cursor: 'pointer',
     transition: 'filter 100ms',
     '&:hover': {
-      filter: 'brightness(1.5)'
+      filter: 'brightness(1.5)',
+      '@media (hover: none)': {
+        filter: 'none'
+      }
     }
   },
   settingsIcon: {
@@ -41,7 +44,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     cursor: 'pointer',
     transition: 'filter 100ms',
     '&:hover': {
-      filter: 'brightness(1.5)'
+      filter: 'brightness(1.5)',
+      '@media (hover: none)': {
+        filter: 'none'
+      }
     }
   },
   HiddenTransactionButton: {
@@ -52,7 +58,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     padding: 0,
     '&:hover': {
       filter: 'brightness(1.15)',
-      cursor: 'pointer'
+      cursor: 'pointer',
+      '@media (hover: none)': {
+        filter: 'none'
+      }
     },
     '@media (max-width: 400px)': {
       width: '100%'
@@ -166,7 +175,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     justifyContent: 'center',
     borderRadius: 100,
     '&:hover': {
-      backgroundColor: colors.invariant.light
+      backgroundColor: colors.invariant.light,
+      '@media (hover: none)': {
+        backgroundColor: colors.invariant.newDark
+      }
     }
   },
 
@@ -307,7 +319,11 @@ export const useStyles = makeStyles()((theme: Theme) => ({
 
     '&:hover': {
       background: colors.invariant.light,
-      color: colors.invariant.text
+      color: colors.invariant.text,
+      '@media (hover: none)': {
+        backgroundColor: colors.invariant.component,
+        color: colors.invariant.textGrey
+      }
     }
   },
   slippageAmount: {

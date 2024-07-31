@@ -69,7 +69,10 @@ export const useSingleTabStyles = makeStyles()(() => {
         color: colors.invariant.lightHover,
         backgroundColor: colors.invariant.light,
         height: 36,
-        borderRadius: 10
+        borderRadius: 10,
+        '@media (hover: none)': {
+          color: colors.invariant.light
+        }
       },
 
       '&:last-of-type': {

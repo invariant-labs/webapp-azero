@@ -25,7 +25,11 @@ const useStyles = makeStyles()(() => {
       alignItems: 'center',
       '&:hover': {
         background: colors.invariant.light,
-        color: colors.white.main
+        color: colors.white.main,
+        '@media (hover: none)': {
+          background: colors.invariant.component,
+          color: colors.invariant.textGrey
+        }
       },
       '&:first-of-type': {
         marginBottom: '4px'

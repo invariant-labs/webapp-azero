@@ -120,7 +120,10 @@ const useStyles = makeStyles()((theme: Theme) => {
       },
 
       '&:hover': {
-        background: colors.invariant.light
+        background: colors.invariant.light,
+        '@media (hover: none)': {
+          background: colors.invariant.newDark
+        }
       }
     },
     commonTokenIcon: {
@@ -182,7 +185,10 @@ const useStyles = makeStyles()((theme: Theme) => {
         textDecoration: 'none',
 
         '&:hover': {
-          filter: 'brightness(1.2)'
+          filter: 'brightness(1.2)',
+          '@media (hover: none)': {
+            filter: 'none'
+          }
         },
         '& p': {
           color: colors.invariant.lightGrey,
@@ -294,7 +300,11 @@ const useStyles = makeStyles()((theme: Theme) => {
       '&:hover': {
         backgroundColor: colors.invariant.light,
         boxShadow: 'none',
-        color: colors.white.main
+        color: colors.white.main,
+        '@media (hover: none)': {
+          backgroundColor: colors.invariant.component,
+          color: colors.invariant.textGrey
+        }
       },
       '&:hover span': {
         color: colors.white.main
