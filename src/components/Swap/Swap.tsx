@@ -156,8 +156,6 @@ export const Swap: React.FC<ISwap> = ({
 
   const navigate = useNavigate()
 
-  console.log(inputRef, amountFrom, amountTo)
-
   useEffect(() => {
     const tokenFromAddress = addressToTicker(tokens[tokenFromIndex ?? -1]?.assetAddress)
     const tokenToAddress = addressToTicker(tokens[tokenToIndex ?? -1]?.assetAddress)
