@@ -156,6 +156,8 @@ export const Swap: React.FC<ISwap> = ({
 
   const navigate = useNavigate()
 
+  console.log(inputRef, amountFrom, amountTo)
+
   useEffect(() => {
     const tokenFromAddress = addressToTicker(tokens[tokenFromIndex ?? -1]?.assetAddress)
     const tokenToAddress = addressToTicker(tokens[tokenToIndex ?? -1]?.assetAddress)
@@ -246,10 +248,6 @@ export const Swap: React.FC<ISwap> = ({
   }, [refresherTime, tokenFromIndex, tokenToIndex])
 
   useEffect(() => {
-    updateEstimatedAmount()
-  }, [tokenToIndex, tokenFromIndex, pools.length])
-
-  useEffect(() => {
     if (inputRef !== inputTarget.DEFAULT) {
       const temp: string = amountFrom
       setAmountFrom(amountTo)
@@ -300,13 +298,6 @@ export const Swap: React.FC<ISwap> = ({
         (fromToken === pool.poolKey.tokenY && toToken === pool.poolKey.tokenX)
     )
     return !!swapPool
-  }
-
-  const updateEstimatedAmount = () => {
-    if (tokenFromIndex !== null && tokenToIndex !== null) {
-      const amount = getAmountOut(tokens[tokenToIndex])
-      setAmountTo(+amount === 0 ? '' : trimLeadingZeros(amount))
-    }
   }
 
   const isError = (error: SwapError): boolean => {
