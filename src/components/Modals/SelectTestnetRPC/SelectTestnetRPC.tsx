@@ -86,7 +86,7 @@ export const SelectTestnetRPC: React.FC<ISelectTestnetRPC> = ({
               setActiveCustom(true)
               setButtonApplied(false)
             }}>
-            <Typography className={classes.name}>Custom</Typography>
+            <Typography className={classes.name}>Custom RPC</Typography>
             <DotIcon className={classes.dotIcon} />
           </Grid>
         </Grid>
