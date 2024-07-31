@@ -31,7 +31,10 @@ export const useStyles = makeStyles()(() => ({
     justifyContent: 'center',
     display: 'flex',
     '&:hover': {
-      borderColor: colors.invariant.lightHover
+      borderColor: colors.invariant.lightHover,
+      '@media (hover: none)': {
+        borderColor: colors.invariant.light
+      }
     },
     [theme.breakpoints.down('sm')]: {
       width: '100%',

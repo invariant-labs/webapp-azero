@@ -78,7 +78,12 @@ export const useStyles = makeStyles()((theme: Theme) => ({
 
     '&:hover': {
       background: 'linear-gradient(180deg, #EF84F5 0%, #9C3EBD 100%)',
-      boxShadow: '0px 0px 16px rgba(239, 132, 245, 0.35)'
+      boxShadow: '0px 0px 16px rgba(239, 132, 245, 0.35)',
+      '@media (hover: none)': {
+        background:
+          'linear-gradient(180deg, rgba(239, 132, 245, 0.8) 0%, rgba(156, 62, 189, 0.8) 100%)',
+        boxShadow: 'none'
+      }
     }
   },
 
@@ -94,7 +99,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     background: `${colors.invariant.light} !important`,
 
     '&:hover': {
-      filter: 'brightness(1.15)'
+      filter: 'brightness(1.15)',
+      '@media (hover: none)': {
+        filter: 'none'
+      }
     }
   },
   buttonText: {

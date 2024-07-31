@@ -134,7 +134,10 @@ export const useStyles = makeStyles()(() => ({
 
     '&:hover': {
       filter: 'brightness(1.2)',
-      cursor: 'pointer'
+      cursor: 'pointer',
+      '@media (hover: none)': {
+        filter: 'none'
+      }
     }
   }
 }))

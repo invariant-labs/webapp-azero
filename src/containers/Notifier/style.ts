@@ -19,7 +19,10 @@ const useStyles = makeStyles()((theme: Theme) => {
       fontSmoothing: 'subpixel-antialiased',
       padding: '0 4px',
       '&:hover': {
-        transform: 'scale(1.15) translateY(0px)'
+        transform: 'scale(1.15) translateY(0px)',
+        '@media (hover: none)': {
+          transform: 'none'
+        }
       },
       [theme.breakpoints.down('sm')]: {
         width: 36,
@@ -44,7 +47,10 @@ const useStyles = makeStyles()((theme: Theme) => {
         transition: '.2s all ease-in',
         cursor: 'pointer',
         '&:hover': {
-          transform: 'scale(1.1)'
+          transform: 'scale(1.1)',
+          '@media (hover: none)': {
+            transform: 'none'
+          }
         }
       }
     },

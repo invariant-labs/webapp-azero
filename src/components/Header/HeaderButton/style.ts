@@ -15,7 +15,10 @@ const useStyles = makeStyles()((theme: Theme) => {
       height: 32,
       boxShadow: 'none',
       '&:hover': {
-        background: colors.invariant.light
+        background: colors.invariant.light,
+        '@media (hover: none)': {
+          background: 'transparent'
+        }
       },
       '&:active': {
         '& #downIcon': {
@@ -46,7 +49,11 @@ const useStyles = makeStyles()((theme: Theme) => {
 
       '&:hover': {
         boxShadow: `0 0 15px ${colors.invariant.light}`,
-        backgroundColor: colors.invariant.light
+        backgroundColor: colors.invariant.light,
+        '@media (hover: none)': {
+          background: colors.invariant.pinkLinearGradientOpacity,
+          boxShadow: 'none'
+        }
       }
     },
     headerButtonConnected: {
@@ -59,7 +66,10 @@ const useStyles = makeStyles()((theme: Theme) => {
       height: 40,
 
       '&:hover': {
-        background: colors.blue.deep
+        background: colors.blue.deep,
+        '@media (hover: none)': {
+          background: colors.invariant.light
+        }
       }
     },
     headerButtonTextEllipsis: {

@@ -16,7 +16,10 @@ const useStyles = makeStyles()(() => {
       '&:hover': {
         background: 'transparent',
         color: colors.invariant.lightGrey,
-        ...typography.body1
+        ...typography.body1,
+        '@media (hover: none)': {
+          color: colors.invariant.light
+        }
       }
     },
     active: {
