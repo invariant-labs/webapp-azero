@@ -74,7 +74,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     marginBottom: 10,
 
     '&:hover': {
-      background: colors.invariant.greenLinearGradient
+      background: colors.invariant.greenLinearGradient,
+      '@media (hover: none)': {
+        background: colors.invariant.greenLinearGradientOpacity
+      }
     }
   },
   claimButton: {
@@ -86,7 +89,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     borderRadius: 18,
 
     '&:hover': {
-      background: colors.invariant.pinkLinearGradient
+      background: colors.invariant.pinkLinearGradient,
+      '@media (hover: none)': {
+        background: colors.invariant.pinkLinearGradientOpacity
+      }
     }
   },
   cancelButton: {
@@ -99,7 +105,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     marginBottom: 10,
 
     '&:hover': {
-      background: colors.invariant.lightHover
+      background: colors.invariant.lightHover,
+      '@media (hover: none)': {
+        background: colors.invariant.light
+      }
     }
   }
 }))

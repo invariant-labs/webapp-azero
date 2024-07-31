@@ -37,8 +37,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     '&:hover': {
       cursor: 'pointer',
       background: 'rgba(255, 255, 255, 0.15)',
-
-      filter: 'brightness(1.2)'
+      filter: 'brightness(1.2)',
+      '@media (hover: none)': {
+        filter: 'none'
+      }
     }
   },
   text: {
@@ -155,7 +157,11 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     ...typography.body1,
     '&:hover': {
       background: colors.invariant.pinkLinearGradient,
-      boxShadow: '0px 0px 16px rgba(46, 224, 154, 0.35)'
+      boxShadow: '0px 0px 16px rgba(46, 224, 154, 0.35)',
+      '@media (hover: none)': {
+        background: colors.invariant.pinkLinearGradientOpacity,
+        boxShadow: 'none'
+      }
     },
     '&:disabled': {
       background: colors.invariant.light,
@@ -255,7 +261,11 @@ export const useStyles = makeStyles()((theme: Theme) => ({
 
     '&:hover': {
       background: colors.invariant.greenLinearGradient,
-      boxShadow: '0px 0px 16px rgba(46, 224, 154, 0.35)'
+      boxShadow: '0px 0px 16px rgba(46, 224, 154, 0.35)',
+      '@media (hover: none)': {
+        background: colors.invariant.greenLinearGradientOpacity,
+        boxShadow: 'none'
+      }
     },
 
     [theme.breakpoints.down('sm')]: {
@@ -278,7 +288,11 @@ export const useStyles = makeStyles()((theme: Theme) => ({
 
     '&:hover': {
       background: colors.invariant.pinkLinearGradient,
-      boxShadow: `0 0 16px ${colors.invariant.pink}`
+      boxShadow: `0 0 16px ${colors.invariant.pink}`,
+      '@media (hover: none)': {
+        background: colors.invariant.pinkLinearGradientOpacity,
+        boxShadow: 'none'
+      }
     },
     [theme.breakpoints.down('sm')]: {
       width: '50%',
@@ -312,7 +326,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     cursor: 'pointer',
 
     '&:hover': {
-      filter: 'brightness(2)'
+      filter: 'brightness(2)',
+      '@media (hover: none)': {
+        filter: 'none'
+      }
     }
   },
   cover: {

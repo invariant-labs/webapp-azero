@@ -21,7 +21,10 @@ export const useStyles = makeStyles()((theme: Theme) => {
 
       '&:hover': {
         filter: 'brightness(1)',
-        backgroundColor: colors.invariant.light
+        backgroundColor: colors.invariant.light,
+        '@media (hover: none)': {
+          filter: 'brightness(0.8)'
+        }
       },
 
       [theme.breakpoints.down('sm')]: {

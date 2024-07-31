@@ -37,7 +37,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     transition: 'filter 300ms',
 
     '&:hover': {
-      filter: 'brightness(2)'
+      filter: 'brightness(2)',
+      '@media (hover: none)': {
+        filter: 'none'
+      }
     }
   },
   backIcon: {
@@ -64,7 +67,11 @@ export const useStyles = makeStyles()((theme: Theme) => ({
 
     '&:hover': {
       background: colors.invariant.pinkLinearGradient,
-      boxShadow: `0 0 16px ${colors.invariant.pink}`
+      boxShadow: `0 0 16px ${colors.invariant.pink}`,
+      '@media (hover: none)': {
+        background: colors.invariant.pinkLinearGradientOpacity,
+        boxShadow: 'none'
+      }
     }
   },
   buttonStartIcon: {
