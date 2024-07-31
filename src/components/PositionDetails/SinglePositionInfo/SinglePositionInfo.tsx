@@ -10,7 +10,6 @@ import useStyles from './style'
 import { useNavigate } from 'react-router-dom'
 import { TokenPriceData } from '@store/consts/types'
 import { addressToTicker } from '@utils/utils'
-import SwapList from '@static/svg/swap-list.svg'
 
 interface IProp {
   fee: number
