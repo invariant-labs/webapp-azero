@@ -36,8 +36,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     },
     '&:hover': {
       cursor: 'pointer',
-      background: 'rgba(255, 255, 255, 0.15)',
-      filter: 'brightness(1.2)',
+      filter: 'brightness(2)',
       '@media (hover: none)': {
         filter: 'none'
       }
