@@ -453,23 +453,26 @@ export function* handleGetSinglePosition(action: PayloadAction<bigint>) {
   try {
     const walletAddress = yield* select(address)
     const invariant = yield* getInvariant()
-    const position = yield* call([invariant, invariant.getPosition], walletAddress, action.payload)
+    const [position, pool, lowerTick, upperTick] = yield* call(
+      [invariant, invariant.getPositionWithAssociates],
+      walletAddress,
+      action.payload
+    )
     yield* put(
       actions.setSinglePosition({
         index: action.payload,
         position
       })
     )
-    yield* put(
-      actions.getCurrentPositionTicks({
-        poolKey: position.poolKey,
-        lowerTickIndex: position.lowerTickIndex,
-        upperTickIndex: position.upperTickIndex
+    yield put(
+      actions.setCurrentPositionTicks({
+        lowerTick,
+        upperTick
       })
     )
     yield* put(
-      poolsActions.getPoolsDataForList({
-        poolKeys: [position.poolKey],
+      poolsActions.addPoolsForList({
+        data: [{ poolKey: position.poolKey, ...pool }],
         listType: ListType.POSITIONS
       })
     )
