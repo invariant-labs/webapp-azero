@@ -106,7 +106,9 @@ const useStyles = makeStyles()(theme => {
       }
     },
     switch: {
-      transition: 'opacity 500ms'
+      transition: 'opacity 500ms',
+      display: 'flex',
+      justifyContent: 'flex-end'
     },
     titleContainer: {
       maxWidth: 464,
@@ -122,7 +124,9 @@ const useStyles = makeStyles()(theme => {
     },
     optionsWrapper: {
       display: 'flex',
-      alignItems: 'center'
+      alignItems: 'center',
+      flex: 1,
+      justifyContent: 'flex-end'
     }
   }
 })

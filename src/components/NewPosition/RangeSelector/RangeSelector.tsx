@@ -377,7 +377,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
           ? cachedConcentrationArray.length - 1
           : concentrationIndex
       setConcentrationIndex(index)
-      console.log('test')
+
       const { leftRange, rightRange } = calculateConcentrationRange(
         tickSpacing,
         cachedConcentrationArray[index],
