@@ -75,8 +75,8 @@ const SinglePositionInfo: React.FC<IProp> = ({
           />
           <img
             className={classes.arrowIcon}
-            src={icons.ArrowIcon}
-            alt={'Arrow'}
+            src={icons.swapListIcon}
+            alt='Reverse tokens'
             onClick={swapHandler}
           />
           <img
