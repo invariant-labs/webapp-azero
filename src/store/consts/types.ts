@@ -75,5 +75,6 @@ export interface ISelectChain {
 
 export enum Chain {
   Solana = 'Solana',
-  AlephZero = 'Aleph Zero'
+  AlephZero = 'Aleph Zero',
+  Eclipse = 'Eclipse'
 }

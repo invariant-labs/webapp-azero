@@ -143,6 +143,7 @@ const useStyles = makeStyles()(() => {
     applied: {
       background: colors.invariant.light,
       color: colors.invariant.text,
+      padding: '6px 12px',
       '&:hover': {
         background: colors.invariant.light,
         color: colors.invariant.text,

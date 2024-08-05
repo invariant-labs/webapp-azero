@@ -42,7 +42,10 @@ export const SelectTestnetRPC: React.FC<ISelectTestnetRPC> = ({
       open={open}
       anchorEl={anchorEl}
       classes={{ paper: classes.paper }}
-      onClose={handleClose}
+      onClose={() => {
+        handleClose()
+        !buttonApplied && setActiveCustom(false)
+      }}
       anchorOrigin={{
         vertical: 'bottom',
         horizontal: 'center'
@@ -58,15 +61,16 @@ export const SelectTestnetRPC: React.FC<ISelectTestnetRPC> = ({
             <Grid
               className={classNames(
                 classes.listItem,
-                rpc === activeRPC && !customApplied ? classes.active : null
+                rpc === activeRPC && !customApplied ? classes.active : null,
+                !activeCustom && rpc === activeRPC ? classes.activeBackground : null
               )}
               item
               key={`networks-${networkType}-${rpc}`}
               onClick={() => {
-                console.log(rpc)
                 onSelect(networkType, rpc, rpcName)
                 setActiveCustom(false)
                 setCustomApplied(false)
+                setButtonApplied(false)
                 handleClose()
               }}>
               <Typography className={classes.name}>{rpcName}</Typography>
@@ -83,7 +87,6 @@ export const SelectTestnetRPC: React.FC<ISelectTestnetRPC> = ({
             key={`custom-rpc`}
             onClick={() => {
               setActiveCustom(true)
-              setButtonApplied(false)
             }}>
             <Typography className={classes.name}>Custom RPC</Typography>
             <DotIcon className={classes.dotIcon} />
