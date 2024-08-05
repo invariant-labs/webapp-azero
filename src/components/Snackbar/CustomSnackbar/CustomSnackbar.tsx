@@ -26,7 +26,7 @@ const variantColors: Record<string, string> = {
 }
 
 const CustomSnackbar = React.forwardRef<HTMLDivElement, CustomContentProps>(
-  ({ message, txid, variant = 'default', snackbarId, iconVariant }, ref) => {
+  ({ message, txid, variant = 'default', snackbarId, iconVariant, link }, ref) => {
     const { closeSnackbar } = useSnackbar()
     const dispatch = useDispatch()
 
@@ -44,12 +44,11 @@ const CustomSnackbar = React.forwardRef<HTMLDivElement, CustomContentProps>(
       return (
         <>
           <Grid
-            container
+            display='flex'
             alignItems='center'
             ml={2}
             flexDirection='row'
             wrap='nowrap'
-            flexGrow={1}
             style={{ width: 'fix-content' }}>
             <Grid ml={1}>
               {variant === 'pending' ? (
@@ -61,7 +60,7 @@ const CustomSnackbar = React.forwardRef<HTMLDivElement, CustomContentProps>(
             <StyledTitle>{message}</StyledTitle>
           </Grid>
           {txid && (
-            <Grid style={{ display: 'inline-flex' }}>
+            <Grid display='flex' mx={1}>
               <StyledDetails
                 onClick={() => {
                   window.open(`https://alephzero-testnet.subscan.io/extrinsic/${txid}`, '_blank')
@@ -69,7 +68,20 @@ const CustomSnackbar = React.forwardRef<HTMLDivElement, CustomContentProps>(
                 Details
               </StyledDetails>
               <StyledCloseButton onClick={handleDismiss}>
-                <img width={30} src={icons.closeIcon} alt='Close'></img>
+                <img width={16} src={icons.closeIcon} alt='Close'></img>
+              </StyledCloseButton>
+            </Grid>
+          )}
+          {link && (
+            <Grid display='flex' mx={1}>
+              <StyledDetails
+                onClick={() => {
+                  window.open(link.href, '_blank')
+                }}>
+                {link.label}
+              </StyledDetails>
+              <StyledCloseButton onClick={handleDismiss}>
+                <img width={16} src={icons.closeIcon} alt='Close'></img>
               </StyledCloseButton>
             </Grid>
           )}
