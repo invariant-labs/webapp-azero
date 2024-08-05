@@ -27,7 +27,7 @@ import {
   printBigint
 } from '@utils/utils'
 import { actions as poolsActions } from '@store/reducers/pools'
-import { InitMidPrice, actions as positionsActions } from '@store/reducers/positions'
+import { actions, InitMidPrice, actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Status, actions as walletActions } from '@store/reducers/wallet'
 import { networkType } from '@store/selectors/connection'
@@ -502,6 +502,13 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const unblockUpdatePriceRange = () => {
     dispatch(positionsActions.setShouldNotUpdateRange(false))
   }
+
+  useEffect(() => {
+    if (success) {
+      dispatch(actions.setInitPositionSuccess(false))
+    }
+  }, [success])
+
   const onRefresh = () => {
     if (!success) {
       dispatch(positionsActions.setShouldNotUpdateRange(true))
