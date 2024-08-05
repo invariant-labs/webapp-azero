@@ -46,8 +46,8 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     flexWrap: 'wrap',
     rowGap: '8px',
     [theme.breakpoints.down('sm')]: {
-      flexDirection: 'column-reverse',
-      alignItems: 'flex-end'
+      // flexDirection: 'column-reverse',
+      // alignItems: 'flex-end'
     }
   },
   searchBar: {
@@ -72,7 +72,6 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     height: 40,
     minWidth: 130,
     paddingInline: 0,
-    marginLeft: 16,
     background:
       'linear-gradient(180deg, rgba(239, 132, 245, 0.8) 0%, rgba(156, 62, 189, 0.8) 100%)',
 
@@ -84,9 +83,17 @@ export const useStyles = makeStyles()((theme: Theme) => ({
           'linear-gradient(180deg, rgba(239, 132, 245, 0.8) 0%, rgba(156, 62, 189, 0.8) 100%)',
         boxShadow: 'none'
       }
+    },
+    [theme.breakpoints.down('sm')]: {
+      width: '100%'
     }
   },
-
+  fullWidthWrapper: {
+    [theme.breakpoints.down('sm')]: {
+      width: '100%',
+      margin: '0 0 8px'
+    }
+  },
   buttonSelectDisabled: {
     ...typography.body1,
     textTransform: 'none',
@@ -95,7 +102,6 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     minWidth: 130,
     paddingInline: 0,
     cursor: 'auto',
-    marginLeft: 16,
     background: `${colors.invariant.light} !important`,
 
     '&:hover': {
@@ -103,6 +109,9 @@ export const useStyles = makeStyles()((theme: Theme) => ({
       '@media (hover: none)': {
         filter: 'none'
       }
+    },
+    [theme.breakpoints.down('sm')]: {
+      width: '100%'
     }
   },
   buttonText: {

@@ -1,7 +1,7 @@
 import { EmptyPlaceholder } from '@components/EmptyPlaceholder/EmptyPlaceholder'
 import { INoConnected, NoConnected } from '@components/NoConnected/NoConnected'
 import { PaginationList } from '@components/PaginationList/PaginationList'
-import { Button, Grid, InputAdornment, InputBase, Typography } from '@mui/material'
+import { Button, Grid, Hidden, InputAdornment, InputBase, Typography } from '@mui/material'
 import loader from '@static/gif/loader.gif'
 import SearchIcon from '@static/svg/lupaDark.svg'
 import refreshIcon from '@static/svg/refresh.svg'
@@ -109,27 +109,50 @@ export const PositionsList: React.FC<IProps> = ({
             <Typography className={classes.positionsNumber}>{String(length)}</Typography>
           </Grid>
           <Grid className={classes.searchWrapper}>
-            <InputBase
-              type={'text'}
-              className={classes.searchBar}
-              placeholder='Search position'
-              endAdornment={
-                <InputAdornment position='end'>
-                  <img src={SearchIcon} className={classes.searchIcon} alt='Search' />
-                </InputAdornment>
-              }
-              onChange={handleChangeInput}
-              value={searchValue}
-            />
-            <Grid rowGap={1} justifyContent='space-between'>
-              <TooltipHover text='Refresh'>
-                <Button
-                  disabled={showNoConnected}
-                  onClick={showNoConnected ? () => {} : handleRefresh}
-                  className={classes.refreshIconBtn}>
-                  <img src={refreshIcon} className={classes.refreshIcon} alt='Refresh' />
-                </Button>
-              </TooltipHover>
+            <Grid
+              display='flex'
+              columnGap={2}
+              justifyContent='space-between'
+              alignItems='center'
+              className={classes.fullWidthWrapper}>
+              <InputBase
+                type={'text'}
+                className={classes.searchBar}
+                placeholder='Search position'
+                endAdornment={
+                  <InputAdornment position='end'>
+                    <img src={SearchIcon} className={classes.searchIcon} alt='Search' />
+                  </InputAdornment>
+                }
+                onChange={handleChangeInput}
+                value={searchValue}
+              />
+              <Hidden smUp>
+                <TooltipHover text='Refresh'>
+                  <Button
+                    disabled={showNoConnected}
+                    onClick={showNoConnected ? () => {} : handleRefresh}
+                    className={classes.refreshIconBtn}>
+                    <img src={refreshIcon} className={classes.refreshIcon} alt='Refresh' />
+                  </Button>
+                </TooltipHover>
+              </Hidden>
+            </Grid>
+            <Grid
+              display='flex'
+              columnGap={2}
+              justifyContent='space-between'
+              className={classes.fullWidthWrapper}>
+              <Hidden smDown>
+                <TooltipHover text='Refresh'>
+                  <Button
+                    disabled={showNoConnected}
+                    onClick={showNoConnected ? () => {} : handleRefresh}
+                    className={classes.refreshIconBtn}>
+                    <img src={refreshIcon} className={classes.refreshIcon} alt='Refresh' />
+                  </Button>
+                </TooltipHover>
+              </Hidden>
               <Button
                 className={showNoConnected ? classes.buttonSelectDisabled : classes.button}
                 variant='contained'
