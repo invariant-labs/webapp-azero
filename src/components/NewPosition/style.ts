@@ -17,7 +17,10 @@ const useStyles = makeStyles()(theme => {
       transition: 'filter 300ms',
 
       '&:hover': {
-        filter: 'brightness(2)'
+        filter: 'brightness(2)',
+        '@media (hover: none)': {
+          filter: 'none'
+        }
       }
     },
     backIcon: {
@@ -84,7 +87,10 @@ const useStyles = makeStyles()(theme => {
       cursor: 'pointer',
       transition: 'filter 100ms',
       '&:hover': {
-        filter: 'brightness(1.5)'
+        filter: 'brightness(1.5)',
+        '@media (hover: none)': {
+          filter: 'none'
+        }
       }
     },
     options: {
@@ -100,7 +106,9 @@ const useStyles = makeStyles()(theme => {
       }
     },
     switch: {
-      transition: 'opacity 500ms'
+      transition: 'opacity 500ms',
+      display: 'flex',
+      justifyContent: 'flex-end'
     },
     titleContainer: {
       maxWidth: 464,
@@ -116,7 +124,9 @@ const useStyles = makeStyles()(theme => {
     },
     optionsWrapper: {
       display: 'flex',
-      alignItems: 'center'
+      alignItems: 'center',
+      flex: 1,
+      justifyContent: 'flex-end'
     }
   }
 })

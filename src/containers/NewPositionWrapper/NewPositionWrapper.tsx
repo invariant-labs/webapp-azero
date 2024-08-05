@@ -126,11 +126,11 @@ export const NewPositionWrapper: React.FC<IProps> = ({
 
       timeoutId1 = setTimeout(() => {
         setProgress(success ? 'success' : 'failed')
-      }, 1500)
+      }, 500)
 
       timeoutId2 = setTimeout(() => {
         setProgress('none')
-      }, 3000)
+      }, 1800)
     }
 
     return () => {

@@ -103,7 +103,10 @@ export const StyledCloseButton = styled('button')({
   '&:hover': {
     '& img': {
       transition: '.2s all ease-in',
-      transform: 'scale(1.2)'
+      transform: 'scale(1.2)',
+      '@media (hover: none)': {
+        transform: 'none'
+      }
     }
   }
 })
@@ -132,7 +135,10 @@ export const StyledDetails = styled('button')({
   fontSmoothing: 'subpixel-antialiased',
   padding: '0 4px',
   '&:hover': {
-    transform: 'scale(1.15) translateY(0px)'
+    transform: 'scale(1.15) translateY(0px)',
+    '@media (hover: none)': {
+      transform: 'none'
+    }
   },
   [theme.breakpoints.down('sm')]: {
     width: 36,

@@ -278,7 +278,8 @@ export const EMPTY_POSITION: Position = {
   feeGrowthInsideY: 0n,
   lastBlockNumber: 0n,
   tokensOwedX: 0n,
-  tokensOwedY: 0n
+  tokensOwedY: 0n,
+  createdAt: 0n
 }
 
 export const POSITIONS_PER_QUERY =

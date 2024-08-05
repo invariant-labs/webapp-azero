@@ -1,6 +1,5 @@
 import ClosePositionWarning from '@components/Modals/ClosePositionWarning/ClosePositionWarning'
 import { Button, Grid, Hidden, Tooltip, Typography } from '@mui/material'
-import SwapList from '@static/svg/swap-list.svg'
 import { blurContent, unblurContent } from '@utils/uiUtils'
 import classNames from 'classnames'
 import React, { useState } from 'react'
@@ -11,6 +10,7 @@ import { useNavigate } from 'react-router-dom'
 import { TokenPriceData } from '@store/consts/types'
 import { addressToTicker } from '@utils/utils'
 import { TooltipHover } from '@components/TooltipHover/TooltipHover'
+import icons from '@static/icons'
 
 interface IProp {
   fee: number
@@ -75,7 +75,12 @@ const SinglePositionInfo: React.FC<IProp> = ({
             alt={xToY ? tokenX.name : tokenY.name}
           />
           <TooltipHover text='Reverse tokens'>
-            <img className={classes.arrows} src={SwapList} alt='Arrow' onClick={swapHandler} />
+            <img
+              className={classes.arrowIcon}
+              src={icons.swapListIcon}
+              alt='Reverse tokens'
+              onClick={swapHandler}
+            />
           </TooltipHover>
           <img
             className={classes.icon}

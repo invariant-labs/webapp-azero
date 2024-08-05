@@ -39,7 +39,10 @@ export const useSingleTabStyles = makeStyles()(() => {
       transition: 'color 300ms',
 
       '&:hover': {
-        color: colors.invariant.lightHover
+        color: colors.invariant.lightHover,
+        '@media (hover: none)': {
+          color: colors.invariant.light
+        }
       }
     },
     selected: {
