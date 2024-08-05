@@ -109,50 +109,31 @@ export const PositionsList: React.FC<IProps> = ({
             <Typography className={classes.positionsNumber}>{String(length)}</Typography>
           </Grid>
           <Grid className={classes.searchWrapper}>
-            <Grid
-              display='flex'
-              columnGap={2}
-              justifyContent='space-between'
-              alignItems='center'
-              className={classes.fullWidthWrapper}>
-              <InputBase
-                type={'text'}
-                className={classes.searchBar}
-                placeholder='Search position'
-                endAdornment={
-                  <InputAdornment position='end'>
-                    <img src={SearchIcon} className={classes.searchIcon} alt='Search' />
-                  </InputAdornment>
-                }
-                onChange={handleChangeInput}
-                value={searchValue}
-              />
-              <Hidden smUp>
-                <TooltipHover text='Refresh'>
-                  <Button
-                    disabled={showNoConnected}
-                    onClick={showNoConnected ? () => {} : handleRefresh}
-                    className={classes.refreshIconBtn}>
-                    <img src={refreshIcon} className={classes.refreshIcon} alt='Refresh' />
-                  </Button>
-                </TooltipHover>
-              </Hidden>
-            </Grid>
+            <InputBase
+              type={'text'}
+              className={classes.searchBar}
+              placeholder='Search position'
+              endAdornment={
+                <InputAdornment position='end'>
+                  <img src={SearchIcon} className={classes.searchIcon} alt='Search' />
+                </InputAdornment>
+              }
+              onChange={handleChangeInput}
+              value={searchValue}
+            />
             <Grid
               display='flex'
               columnGap={2}
               justifyContent='space-between'
               className={classes.fullWidthWrapper}>
-              <Hidden smDown>
-                <TooltipHover text='Refresh'>
-                  <Button
-                    disabled={showNoConnected}
-                    onClick={showNoConnected ? () => {} : handleRefresh}
-                    className={classes.refreshIconBtn}>
-                    <img src={refreshIcon} className={classes.refreshIcon} alt='Refresh' />
-                  </Button>
-                </TooltipHover>
-              </Hidden>
+              <TooltipHover text='Refresh'>
+                <Button
+                  disabled={showNoConnected}
+                  onClick={showNoConnected ? () => {} : handleRefresh}
+                  className={classes.refreshIconBtn}>
+                  <img src={refreshIcon} className={classes.refreshIcon} alt='Refresh' />
+                </Button>
+              </TooltipHover>
               <Button
                 className={showNoConnected ? classes.buttonSelectDisabled : classes.button}
                 variant='contained'
