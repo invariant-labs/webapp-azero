@@ -22,10 +22,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     }
   },
   arrowIcon: {
-    width: 22,
+    width: 32,
     marginRight: 8,
     marginLeft: 8,
-    height: 22,
+    height: 32,
     borderRadius: '100%',
     padding: 4,
 
@@ -36,8 +36,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     },
     '&:hover': {
       cursor: 'pointer',
-      background: 'rgba(255, 255, 255, 0.15)',
-      filter: 'brightness(1.2)',
+      filter: 'brightness(2)',
       '@media (hover: none)': {
         filter: 'none'
       }

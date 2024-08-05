@@ -513,7 +513,7 @@ export const NewPosition: React.FC<INewPosition> = ({
           ) : null}
           <Grid className={classes.optionsWrapper}>
             <Hidden mdDown>
-              {poolKey !== '' && (
+              {tokenAIndex !== null && tokenBIndex !== null && (
                 <ConcentrationTypeSwitch
                   onSwitch={val => {
                     if (val) {
