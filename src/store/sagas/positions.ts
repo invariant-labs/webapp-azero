@@ -655,7 +655,6 @@ export function* handleGetPositionsListPage(
   }
 
   if (!length || refresh) {
-    console.log('call', index)
     const result = yield* call(
       [invariant, invariant.getPositions],
       walletAddress,
@@ -684,7 +683,6 @@ export function* handleGetPositionsListPage(
 
   if (!isPageLoaded || refresh) {
     if (length && !refresh) {
-      console.log('call', index)
       const result = yield* call(
         [invariant, invariant.getPositions],
         walletAddress,
