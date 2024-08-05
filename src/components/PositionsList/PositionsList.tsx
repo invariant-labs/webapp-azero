@@ -1,7 +1,7 @@
 import { EmptyPlaceholder } from '@components/EmptyPlaceholder/EmptyPlaceholder'
 import { INoConnected, NoConnected } from '@components/NoConnected/NoConnected'
 import { PaginationList } from '@components/PaginationList/PaginationList'
-import { Button, Grid, Hidden, InputAdornment, InputBase, Typography } from '@mui/material'
+import { Button, Grid, InputAdornment, InputBase, Typography } from '@mui/material'
 import loader from '@static/gif/loader.gif'
 import SearchIcon from '@static/svg/lupaDark.svg'
 import refreshIcon from '@static/svg/refresh.svg'
