@@ -99,7 +99,6 @@ export const StyledCloseButton = styled('button')({
 
   width: 'fit-content',
   cursor: 'pointer',
-  marginRight: 10,
   '&:hover': {
     '& img': {
       transition: '.2s all ease-in',
@@ -121,7 +120,6 @@ export const StyledIcon = styled('div')({
 })
 
 export const StyledDetails = styled('button')({
-  height: 30,
   backgroundColor: 'transparent',
   textTransform: 'uppercase',
   borderRadius: 6,
@@ -133,7 +131,8 @@ export const StyledDetails = styled('button')({
   transition: '0.2s all cubic-bezier(0.25, 0.46, 0.45, 0.94)',
   backfaceVisibility: 'hidden',
   fontSmoothing: 'subpixel-antialiased',
-  padding: '0 4px',
+  width: 'auto',
+  textWrap: 'nowrap',
   '&:hover': {
     transform: 'scale(1.15) translateY(0px)',
     '@media (hover: none)': {
@@ -149,9 +148,7 @@ export const StyledDetails = styled('button')({
     paddingBottom: 17,
     paddingRight: 36
   },
-  display: 'inline-block',
-  paddingRight: 40,
-  marginLeft: 10,
+
   '& *': {
     width: 'auto !important'
   }

@@ -352,6 +352,23 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   active: {
     color: colors.invariant.green,
     outline: `1px solid ${colors.invariant.green}`
+  },
+  tooltip: {
+    background: colors.invariant.componentBcg,
+    border: `1px solid ${colors.invariant.lightGrey}`,
+    borderRadius: 12,
+    padding: 10,
+    ...typography.caption4,
+    fontSize: 13,
+    color: colors.white.main
+  },
+  arrows: {
+    width: 32,
+    cursor: 'pointer',
+
+    '&:hover': {
+      filter: 'brightness(2)'
+    }
   }
 }))
 

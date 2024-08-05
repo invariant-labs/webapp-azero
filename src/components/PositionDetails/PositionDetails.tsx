@@ -15,6 +15,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { ILiquidityToken } from './SinglePositionInfo/consts'
 import { useStyles } from './style'
 import { TokenPriceData } from '@store/consts/types'
+import { TooltipHover } from '@components/TooltipHover/TooltipHover'
 
 interface IProps {
   tokenXAddress: string
@@ -115,14 +116,16 @@ const PositionDetails: React.FC<IProps> = ({
                 copyPoolAddressHandler={copyPoolAddressHandler}
                 style={{ paddingRight: 10 }}
               />
-              <Refresher
-                currentIndex={refresherTime}
-                maxIndex={REFRESHER_INTERVAL}
-                onClick={() => {
-                  onRefresh()
-                  setRefresherTime(REFRESHER_INTERVAL)
-                }}
-              />
+              <TooltipHover text='Refresh'>
+                <Refresher
+                  currentIndex={refresherTime}
+                  maxIndex={REFRESHER_INTERVAL}
+                  onClick={() => {
+                    onRefresh()
+                    setRefresherTime(REFRESHER_INTERVAL)
+                  }}
+                />
+              </TooltipHover>
             </Hidden>
           </Grid>
         </Grid>
@@ -175,16 +178,18 @@ const PositionDetails: React.FC<IProps> = ({
               </Button>
             </Box>
             <Hidden mdDown>
-              <Grid mr={2} ml='auto' display='flex' justifyContent='center'>
-                <Refresher
-                  currentIndex={refresherTime}
-                  maxIndex={REFRESHER_INTERVAL}
-                  onClick={() => {
-                    onRefresh()
-                    setRefresherTime(REFRESHER_INTERVAL)
-                  }}
-                />
-              </Grid>
+              <TooltipHover text='Refresh'>
+                <Grid mr={2} ml='auto' display='flex' justifyContent='center'>
+                  <Refresher
+                    currentIndex={refresherTime}
+                    maxIndex={REFRESHER_INTERVAL}
+                    onClick={() => {
+                      onRefresh()
+                      setRefresherTime(REFRESHER_INTERVAL)
+                    }}
+                  />
+                </Grid>
+              </TooltipHover>
               <MarketIdLabel
                 marketId={poolAddress.toString()}
                 displayLength={9}
