@@ -5,6 +5,7 @@ import { formatNumber, initialXtoY, tickerToAddress } from '@utils/utils'
 import classNames from 'classnames'
 import { useMemo, useState } from 'react'
 import { useStyles } from './style'
+import { TooltipHover } from '@components/TooltipHover/TooltipHover'
 
 export interface IPositionItem {
   tokenXName: string
@@ -112,15 +113,17 @@ export const PositionItem: React.FC<IPositionItem> = ({
               src={xToY ? tokenXIcon : tokenYIcon}
               alt={xToY ? tokenXName : tokenYName}
             />
-            <img
-              className={classes.arrows}
-              src={SwapList}
-              alt='Arrow'
-              onClick={e => {
-                e.stopPropagation()
-                setXToY(!xToY)
-              }}
-            />
+            <TooltipHover text='Reverse tokens'>
+              <img
+                className={classes.arrows}
+                src={SwapList}
+                alt='Arrow'
+                onClick={e => {
+                  e.stopPropagation()
+                  setXToY(!xToY)
+                }}
+              />
+            </TooltipHover>
             <img
               className={classes.tokenIcon}
               src={xToY ? tokenYIcon : tokenXIcon}

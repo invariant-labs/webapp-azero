@@ -1,6 +1,5 @@
 import ClosePositionWarning from '@components/Modals/ClosePositionWarning/ClosePositionWarning'
-import { Button, Grid, Hidden, Typography } from '@mui/material'
-import icons from '@static/icons'
+import { Button, Grid, Hidden, Tooltip, Typography } from '@mui/material'
 import { blurContent, unblurContent } from '@utils/uiUtils'
 import classNames from 'classnames'
 import React, { useState } from 'react'
@@ -10,6 +9,8 @@ import useStyles from './style'
 import { useNavigate } from 'react-router-dom'
 import { TokenPriceData } from '@store/consts/types'
 import { addressToTicker } from '@utils/utils'
+import { TooltipHover } from '@components/TooltipHover/TooltipHover'
+import icons from '@static/icons'
 
 interface IProp {
   fee: number
@@ -73,12 +74,14 @@ const SinglePositionInfo: React.FC<IProp> = ({
             src={xToY ? tokenX.icon : tokenY.icon}
             alt={xToY ? tokenX.name : tokenY.name}
           />
-          <img
-            className={classes.arrowIcon}
-            src={icons.swapListIcon}
-            alt='Reverse tokens'
-            onClick={swapHandler}
-          />
+          <TooltipHover text='Reverse tokens'>
+            <img
+              className={classes.arrowIcon}
+              src={icons.swapListIcon}
+              alt='Reverse tokens'
+              onClick={swapHandler}
+            />
+          </TooltipHover>
           <img
             className={classes.icon}
             src={xToY ? tokenY.icon : tokenX.icon}
@@ -92,14 +95,25 @@ const SinglePositionInfo: React.FC<IProp> = ({
             <Typography className={classes.name}>{xToY ? tokenY.name : tokenX.name}</Typography>
           </Grid>
           <Grid className={classes.rangeGrid}>
-            <Typography
-              className={classNames(
-                classes.text,
-                classes.feeText,
-                isActive ? classes.active : null
-              )}>
-              {fee.toString()}% fee
-            </Typography>
+            <Tooltip
+              title={
+                isActive
+                  ? 'Position active. Current price is inside range'
+                  : 'Position inactive. Current price is outside range'
+              }
+              placement='top'
+              classes={{
+                tooltip: classes.tooltip
+              }}>
+              <Typography
+                className={classNames(
+                  classes.text,
+                  classes.feeText,
+                  isActive ? classes.active : null
+                )}>
+                {fee.toString()}% fee
+              </Typography>
+            </Tooltip>
           </Grid>
         </Grid>
 

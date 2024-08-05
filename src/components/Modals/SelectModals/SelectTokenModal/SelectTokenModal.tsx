@@ -22,6 +22,7 @@ import { formatNumber, printBigint } from '@utils/utils'
 import { SwapToken } from '@store/selectors/wallet'
 import Scrollbars from 'rc-scrollbars'
 import icons from '@static/icons'
+import { TooltipHover } from '@components/TooltipHover/TooltipHover'
 
 export interface ISelectTokenModal {
   tokens: SwapToken[]
@@ -177,7 +178,12 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
               />
               <CardMedia image={searchIcon} className={classes.inputIcon} />
             </Grid>
-            <AddCircleOutlineIcon className={classes.addIcon} onClick={() => setIsAddOpen(true)} />
+            <TooltipHover text='Add token'>
+              <AddCircleOutlineIcon
+                className={classes.addIcon}
+                onClick={() => setIsAddOpen(true)}
+              />
+            </TooltipHover>
           </Grid>
           <Grid container>
             <Grid className={classes.commonTokensList}>
