@@ -3,7 +3,7 @@ import DotIcon from '@mui/icons-material/FiberManualRecord'
 import { Button, Grid, Input, Popover, Typography } from '@mui/material'
 import { ISelectNetwork } from '@store/consts/types'
 import classNames from 'classnames'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import useStyles from './styles'
 
 export interface ISelectTestnetRPC {
@@ -30,6 +30,7 @@ export const SelectTestnetRPC: React.FC<ISelectTestnetRPC> = ({
   const [address, setAddress] = useState(
     networks.some(net => net.rpc === activeRPC) ? '' : activeRPC
   )
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const isAddressValid = () => {
     const urlRegex = /^wss?:\/\/[^.]+\.[^.]+/
@@ -102,6 +103,7 @@ export const SelectTestnetRPC: React.FC<ISelectTestnetRPC> = ({
             key={`custom-rpc`}
             onClick={() => {
               setActiveCustom(true)
+              inputRef.current?.focus()
             }}>
             <Typography className={classes.name}>Custom RPC</Typography>
             <DotIcon className={classes.dotIcon} />
@@ -126,6 +128,7 @@ export const SelectTestnetRPC: React.FC<ISelectTestnetRPC> = ({
             onClick={() => setActiveCustom(true)}
             value={address}
             disableUnderline
+            inputRef={inputRef}
           />
           <Button
             className={classNames(classes.add, buttonApplied ? classes.applied : null)}
