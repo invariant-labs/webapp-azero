@@ -51,7 +51,11 @@ export const SelectChain: React.FC<ISelectChainModal> = ({
               onClick={() => {
                 onSelect(chain)
               }}>
-              <img className={classes.icon} src={icons.Mainnet} alt={`${chain} icon`} />
+              <img
+                className={classes.icon}
+                src={icons[chain.name.replace(/\s/g, '')]}
+                alt={`${chain.name} icon`}
+              />
               <Typography className={classes.name}>{chain.name}</Typography>
               <DotIcon className={classes.dotIcon} />
             </Grid>

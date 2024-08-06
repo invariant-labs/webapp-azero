@@ -1,13 +1,17 @@
 import { sendTx } from '@invariant-labs/a0-sdk'
 import { NightlyConnectAdapter } from '@nightlylabs/wallet-selector-polkadot'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { FaucetTokenList, TokenAirdropAmount } from '@store/consts/static'
+import {
+  FAUCET_SAFE_TRANSACTION_FEE,
+  FaucetTokenList,
+  TokenAirdropAmount
+} from '@store/consts/static'
 import { createLoaderKey, getTokenBalances } from '@utils/utils'
 import { actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Status, actions, actions as walletActions } from '@store/reducers/wallet'
 import { tokens } from '@store/selectors/pools'
-import { address, status } from '@store/selectors/wallet'
+import { address, status, balance } from '@store/selectors/wallet'
 import { disconnectWallet, getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
 import {
@@ -56,6 +60,7 @@ export function* getBalance(walletAddress: string): SagaGenerator<string> {
 
 export function* handleAirdrop(): Generator {
   const walletAddress = yield* select(address)
+  const walletBalance = yield* select(balance)
 
   if (!walletAddress) {
     return yield* put(
@@ -63,6 +68,20 @@ export function* handleAirdrop(): Generator {
         message: 'Connect wallet to claim the faucet.',
         variant: 'error',
         persist: false
+      })
+    )
+  }
+
+  if (FAUCET_SAFE_TRANSACTION_FEE > walletBalance) {
+    return yield* put(
+      snackbarsActions.add({
+        message: 'Insufficient TZERO balance.',
+        variant: 'error',
+        persist: false,
+        link: {
+          label: 'GET TZERO',
+          href: 'https://faucet.test.azero.dev/'
+        }
       })
     )
   }

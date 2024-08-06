@@ -12,6 +12,10 @@ export interface ISnackbar {
   persist?: boolean
   txid?: string
   isAccount?: boolean
+  link?: {
+    label: string
+    href: string
+  }
 }
 
 export interface ISnackbarStore {

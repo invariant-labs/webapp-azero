@@ -49,7 +49,7 @@ const useStyles = makeStyles()(() => {
       width: 12,
       marginLeft: 'auto',
       color: colors.invariant.green,
-      display: 'none'
+      visibility: 'hidden'
     },
     name: {
       textTransform: 'capitalize',
@@ -66,28 +66,38 @@ const useStyles = makeStyles()(() => {
       opacity: 1
     },
     active: {
-      background: colors.invariant.light,
-      color: colors.white.main,
-      '& $icon': {
-        opacity: 1
-      },
-
-      '& $dotIcon': {
-        display: 'block'
+      '& *': {
+        opacity: 1,
+        visibility: 'visible'
       }
     },
+    activeBackground: {
+      background: colors.invariant.light,
+      color: colors.white.main
+    },
     lowerRow: {
-      height: 30,
-      marginBlock: 10
+      marginTop: 8,
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      height: 40,
+      marginBottom: 10,
+      backgroundColor: colors.invariant.newDark,
+      borderRadius: 16
     },
     input: {
       backgroundColor: colors.invariant.newDark,
       width: '100%',
-      height: 30,
+      height: 40,
       color: colors.white.main,
-      borderRadius: 11,
+      padding: '8px 0',
+      borderRadius: 16,
       ...typography.body2,
       marginRight: 6,
+      '&::disabled': {
+        color: colors.invariant.light,
+        ...typography.body2
+      },
       '&::placeholder': {
         color: colors.invariant.light,
         ...typography.body2
@@ -96,21 +106,48 @@ const useStyles = makeStyles()(() => {
         outline: 'none'
       }
     },
+    activePlaceholder: {
+      '&:placeholder': {
+        color: colors.invariant.light
+      }
+    },
     innerInput: {
-      padding: '6px 10px'
+      padding: '8px 10px',
+      '&::disabled': {
+        color: colors.invariant.light,
+        ...typography.body2
+      },
+      '&::placeholder': {
+        color: colors.invariant.light,
+        ...typography.body2
+      },
+      '&:focus': {
+        outline: 'none'
+      }
     },
     add: {
       minWidth: 50,
       height: 30,
       background: colors.invariant.greenLinearGradient,
-      ...typography.body1,
+      ...typography.body2,
       color: colors.invariant.black,
       textTransform: 'none',
-      borderRadius: 11,
+      borderRadius: 9,
+      marginRight: 8,
 
       '&:disabled': {
         background: colors.invariant.light,
         color: colors.invariant.black
+      }
+    },
+    applied: {
+      background: colors.invariant.light,
+      color: colors.invariant.text,
+      padding: '6px 12px',
+      '&:hover': {
+        background: colors.invariant.light,
+        color: colors.invariant.text,
+        cursor: 'default'
       }
     }
   }

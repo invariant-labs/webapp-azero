@@ -11,6 +11,10 @@ export type SnackbarVariant = ExtraVariants
 interface CustomProps {
   txid?: string
   snackbarId: string
+  link?: {
+    label: string
+    href: string
+  }
 }
 
 export interface SnackbarSnackbarProps extends CustomContentProps, CustomProps {}

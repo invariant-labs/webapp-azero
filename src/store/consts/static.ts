@@ -187,6 +187,7 @@ export const U128MAX = 2n ** 128n - 1n
 
 export const SWAP_SAFE_TRANSACTION_FEE = BigInt(Math.ceil(0.05 * 10 ** 12))
 export const POOL_SAFE_TRANSACTION_FEE = BigInt(Math.ceil(0.05 * 10 ** 12))
+export const FAUCET_SAFE_TRANSACTION_FEE = BigInt(Math.ceil(0.001 * 10 ** 12))
 
 export enum ErrorMessage {
   TRANSACTION_SIGNING_ERROR = 'Error while signing transaction.'
@@ -292,5 +293,6 @@ export const DEFAULT_NEW_POSITION_SLIPPAGE = '0.50'
 
 export const CHAINS = [
   { name: Chain.Solana, address: 'https://invariant.app/swap' },
-  { name: Chain.AlephZero, address: 'https://azero.invariant.app/swap' }
+  { name: Chain.AlephZero, address: 'https://azero.invariant.app/swap' },
+  { name: Chain.Eclipse, address: 'https://eclipse.invariant.app/swap' }
 ]

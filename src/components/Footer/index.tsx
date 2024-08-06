@@ -1,124 +1,54 @@
-import React, { useEffect, useState } from 'react'
-
 import { social } from '@static/links'
 import icons from '@static/icons'
 import useStyles from './style'
-import { TransitionProps } from '@mui/material/transitions'
-import { Fade, Grid, Tooltip } from '@mui/material'
-
-export const FooterTransition: React.FC<
-  TransitionProps & {
-    children?: React.ReactNode
-  }
-> = ({ children, ...props }) => {
-  const [translate, setTranslate] = useState('translateY(50px)')
-
-  useEffect(() => {
-    setTranslate(props.in ? 'translateY(0)' : 'translateY(50px)')
-  }, [props.in])
-
-  return (
-    <Fade
-      {...props}
-      timeout={{
-        appear: 500,
-        enter: 500,
-        exit: 400
-      }}>
-      <div>
-        <div
-          style={{
-            transition: 'transform 400ms',
-            transform: translate
-          }}>
-          {children}
-        </div>
-      </div>
-    </Fade>
-  )
-}
+import { Grid } from '@mui/material'
+import { TooltipHover } from '@components/TooltipHover/TooltipHover'
 
 export const Footer = () => {
   const { classes } = useStyles()
   return (
     <Grid className={classes.footer}>
       <Grid className={classes.footerItem}>
-        <Tooltip
-          enterTouchDelay={0}
-          leaveTouchDelay={Number.MAX_SAFE_INTEGER}
-          classes={{ tooltip: classes.tooltip }}
-          title='Github'
-          placement='top'
-          TransitionComponent={FooterTransition}>
+        <TooltipHover text='Github'>
           <a href={social.github} className={classes.footerLink} target='_blank'>
             <img className={classes.icon} src={icons.GithubIcon} alt={'github icon'} />
           </a>
-        </Tooltip>
+        </TooltipHover>
       </Grid>
       <Grid className={classes.footerItem}>
-        <Tooltip
-          enterTouchDelay={0}
-          leaveTouchDelay={Number.MAX_SAFE_INTEGER}
-          classes={{ tooltip: classes.tooltip }}
-          title='Telegram'
-          placement='top'
-          TransitionComponent={FooterTransition}>
+        <TooltipHover text='Telegram'>
           <a href={social.telegram} className={classes.footerLink} target='_blank'>
             <img className={classes.icon} src={icons.TelegramIcon} alt={'telegram icon'} />
           </a>
-        </Tooltip>
+        </TooltipHover>
       </Grid>
       <Grid className={classes.footerItem}>
-        <Tooltip
-          enterTouchDelay={0}
-          leaveTouchDelay={Number.MAX_SAFE_INTEGER}
-          classes={{ tooltip: classes.tooltip }}
-          title='X'
-          placement='top'
-          TransitionComponent={FooterTransition}>
+        <TooltipHover text='X'>
           <a href={social.x} className={classes.footerLink} target='_blank'>
             <img className={classes.icon} src={icons.XIcon} alt={'x icon'} />
           </a>
-        </Tooltip>
+        </TooltipHover>
       </Grid>
       <Grid className={classes.footerItem}>
-        <Tooltip
-          enterTouchDelay={0}
-          leaveTouchDelay={Number.MAX_SAFE_INTEGER}
-          classes={{ tooltip: classes.tooltip }}
-          title='Discord'
-          placement='top'
-          TransitionComponent={FooterTransition}>
+        <TooltipHover text='Discord'>
           <a href={social.discord} className={classes.footerLink} target='_blank'>
             <img className={classes.icon} src={icons.DiscordIcon} alt={'discord icon'} />
           </a>
-        </Tooltip>
+        </TooltipHover>
       </Grid>
       <Grid className={classes.footerItem}>
-        <Tooltip
-          enterTouchDelay={0}
-          leaveTouchDelay={Number.MAX_SAFE_INTEGER}
-          classes={{ tooltip: classes.tooltip }}
-          title='Medium'
-          placement='top'
-          TransitionComponent={FooterTransition}>
+        <TooltipHover text='Medium'>
           <a href={social.medium} className={classes.footerLink} target='_blank'>
             <img className={classes.icon} src={icons.mediumIcon} alt={'medium icon'} />
           </a>
-        </Tooltip>
+        </TooltipHover>
       </Grid>
       <Grid className={classes.footerItem}>
-        <Tooltip
-          enterTouchDelay={0}
-          leaveTouchDelay={Number.MAX_SAFE_INTEGER}
-          classes={{ tooltip: classes.tooltip }}
-          title='Docs'
-          placement='top'
-          TransitionComponent={FooterTransition}>
+        <TooltipHover text='Docs'>
           <a href={social.docs} className={classes.footerLink} target='_blank'>
             <img className={classes.icon} src={icons.docsIcon} alt={'medium icon'} />
           </a>
-        </Tooltip>
+        </TooltipHover>
       </Grid>
     </Grid>
   )
