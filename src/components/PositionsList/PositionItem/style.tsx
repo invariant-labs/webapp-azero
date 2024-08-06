@@ -185,12 +185,10 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     marginRight: 2
   },
   tooltip: {
-    background: colors.invariant.componentBcg,
-    border: `1px solid ${colors.invariant.lightGrey}`,
-    borderRadius: 12,
-    padding: 10,
+    color: colors.invariant.textGrey,
     ...typography.caption4,
-    fontSize: 13,
-    color: colors.white.main
+    lineHeight: '24px',
+    background: colors.black.full,
+    borderRadius: 12
   }
 }))
