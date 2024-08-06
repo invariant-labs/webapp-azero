@@ -1,6 +1,6 @@
 import { CircularProgress, Typography } from '@mui/material'
 import { styled } from '@mui/system'
-import { colors, theme, typography } from '@static/theme'
+import { colors, typography } from '@static/theme'
 import { SnackbarContent } from 'notistack'
 
 export const StyledSnackbarContent = styled(SnackbarContent)(({ theme }) => ({
