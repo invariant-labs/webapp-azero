@@ -91,7 +91,8 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   fullWidthWrapper: {
     [theme.breakpoints.down('sm')]: {
       width: '100%',
-      margin: '0 0 8px'
+      marginBottom: 8,
+      flexDirection: 'row-reverse'
     }
   },
   buttonSelectDisabled: {
@@ -103,7 +104,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     paddingInline: 0,
     cursor: 'auto',
     background: `${colors.invariant.light} !important`,
-
+    display: 'flex',
     '&:hover': {
       filter: 'brightness(1.15)',
       '@media (hover: none)': {
@@ -111,7 +112,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
       }
     },
     [theme.breakpoints.down('sm')]: {
-      width: '100%'
+      flexGrow: 1
     }
   },
   buttonText: {
@@ -161,6 +162,9 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     },
     '&:disabled': {
       opacity: 0.5
+    },
+    [theme.breakpoints.down('sm')]: {
+      marginRight: 16
     }
   },
   refreshIcon: {
