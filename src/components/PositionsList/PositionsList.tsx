@@ -28,6 +28,7 @@ interface IProps {
   length: bigint
   loadedPages: Record<number, boolean>
   getRemainingPositions: () => void
+  noInitialPositions: boolean
 }
 
 export const PositionsList: React.FC<IProps> = ({
@@ -45,7 +46,8 @@ export const PositionsList: React.FC<IProps> = ({
   pageChanged,
   length,
   loadedPages,
-  getRemainingPositions
+  getRemainingPositions,
+  noInitialPositions
 }) => {
   const { classes } = useStyles()
   const navigate = useNavigate()
@@ -120,6 +122,7 @@ export const PositionsList: React.FC<IProps> = ({
               }
               onChange={handleChangeInput}
               value={searchValue}
+              disabled={noInitialPositions}
             />
             <Grid rowGap={1} justifyContent='space-between'>
               <TooltipHover text='Refresh'>
@@ -162,9 +165,14 @@ export const PositionsList: React.FC<IProps> = ({
           </Grid>
         ) : (
           <EmptyPlaceholder
-            desc='Add your first position by pressing the button and start earning!'
+            desc={
+              noInitialPositions
+                ? 'Add your first position by pressing the button and start earning!'
+                : 'Did not find any matching positions'
+            }
             className={classes.placeholder}
             onAction={onAddPositionClick}
+            withButton={noInitialPositions}
           />
         )}
       </Grid>

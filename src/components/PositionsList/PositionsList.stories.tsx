@@ -100,6 +100,7 @@ export const Primary: Story = {
     pageChanged: () => {},
     length: 0 as any,
     loadedPages: {},
-    getRemainingPositions: () => {}
+    getRemainingPositions: () => {},
+    noInitialPositions: false
   }
 }

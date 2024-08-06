@@ -172,20 +172,20 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
     }
 
     if (
-      !tokenAInputState.blocked &&
-      +tokenAInputState.value === 0 &&
-      !tokenBInputState.blocked &&
-      +tokenBInputState.value === 0
+      (!tokenAInputState.blocked && +tokenAInputState.value === 0) ||
+      (!tokenBInputState.blocked && +tokenBInputState.value === 0)
     ) {
-      return 'Enter token amounts'
+      return !tokenAInputState.blocked && !tokenBInputState.blocked
+        ? 'Enter token amounts'
+        : 'Enter token amount'
     }
 
     return 'Add Position'
   }, [
     tokenAIndex,
     tokenBIndex,
-    tokenAInputState.value,
-    tokenBInputState.value,
+    tokenAInputState,
+    tokenBInputState,
     tokens,
     positionOpeningMethod,
     concentrationIndex,
