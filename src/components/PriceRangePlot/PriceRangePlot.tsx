@@ -270,7 +270,7 @@ export const PriceRangePlot: React.FC<IPriceRangePlot> = ({
       <svg x={(midPrice.x - plotMin) * unitLen - 20} y={-20} width={40} height={innerHeight + 20}>
         <defs>
           <filter id='shadow-global-price' x='-10' y='-9' width='20' height={innerHeight}>
-            <feGaussianBlur path='' in='SourceGraphic' stdDeviation='8' />
+            <feGaussianBlur in='SourceGraphic' stdDeviation='8' />
           </filter>
         </defs>
         <rect
