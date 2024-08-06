@@ -60,7 +60,7 @@ const CustomSnackbar = React.forwardRef<HTMLDivElement, CustomContentProps>(
             <StyledTitle>{message}</StyledTitle>
           </Grid>
           {txid && (
-            <Grid display='flex' mx={1}>
+            <Grid display='flex' alignItems='center' mr={1}>
               <StyledDetails
                 onClick={() => {
                   window.open(`https://alephzero-testnet.subscan.io/extrinsic/${txid}`, '_blank')

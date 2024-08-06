@@ -139,16 +139,6 @@ export const StyledDetails = styled('button')({
       transform: 'none'
     }
   },
-  [theme.breakpoints.down('sm')]: {
-    width: 36,
-    height: 16,
-    lineHeight: '14px',
-    marginTop: 2,
-    marginRight: 8,
-    paddingBottom: 17,
-    paddingRight: 36
-  },
-
   '& *': {
     width: 'auto !important'
   }

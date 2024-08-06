@@ -163,7 +163,7 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
       snackbarsActions.add({
         message: 'Tokens exchanged.',
         variant: 'success',
-        persist: false,
+        persist: true,
         txid: txResult.hash
       })
     )
