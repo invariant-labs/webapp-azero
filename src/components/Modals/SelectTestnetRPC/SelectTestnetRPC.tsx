@@ -1,7 +1,6 @@
 import { Network } from '@invariant-labs/a0-sdk'
 import DotIcon from '@mui/icons-material/FiberManualRecord'
 import { Button, Grid, Input, Popover, Typography } from '@mui/material'
-import icons from '@static/icons'
 import { ISelectNetwork } from '@store/consts/types'
 import classNames from 'classnames'
 import React, { useState } from 'react'
@@ -25,6 +24,9 @@ export const SelectTestnetRPC: React.FC<ISelectTestnetRPC> = ({
 }) => {
   const { classes } = useStyles()
 
+  const [activeCustom, setActiveCustom] = useState(false)
+  const [customApplied, setCustomApplied] = useState(false)
+  const [buttonApplied, setButtonApplied] = useState(false)
   const [address, setAddress] = useState(
     networks.some(net => net.rpc === activeRPC) ? '' : activeRPC
   )
@@ -40,7 +42,10 @@ export const SelectTestnetRPC: React.FC<ISelectTestnetRPC> = ({
       open={open}
       anchorEl={anchorEl}
       classes={{ paper: classes.paper }}
-      onClose={handleClose}
+      onClose={() => {
+        handleClose()
+        !buttonApplied && setActiveCustom(false)
+      }}
       anchorOrigin={{
         vertical: 'bottom',
         horizontal: 'center'
@@ -54,23 +59,38 @@ export const SelectTestnetRPC: React.FC<ISelectTestnetRPC> = ({
         <Grid className={classes.list} container alignContent='space-around' direction='column'>
           {networks.map(({ networkType, rpc, rpcName }) => (
             <Grid
-              className={classNames(classes.listItem, rpc === activeRPC ? classes.active : null)}
+              className={classNames(
+                classes.listItem,
+                rpc === activeRPC && !customApplied ? classes.active : null,
+                !activeCustom && rpc === activeRPC ? classes.activeBackground : null
+              )}
               item
               key={`networks-${networkType}-${rpc}`}
               onClick={() => {
                 onSelect(networkType, rpc, rpcName)
+                setActiveCustom(false)
+                setCustomApplied(false)
+                setButtonApplied(false)
                 handleClose()
               }}>
-              <img
-                className={classes.icon}
-                src={icons[`${networkType}Icon`]}
-                alt={`${networkType} icon`}
-              />
-
               <Typography className={classes.name}>{rpcName}</Typography>
               <DotIcon className={classes.dotIcon} />
             </Grid>
           ))}
+          <Grid
+            className={classNames(
+              classes.listItem,
+              activeCustom && customApplied ? classes.active : null,
+              activeCustom ? classes.activeBackground : null
+            )}
+            item
+            key={`custom-rpc`}
+            onClick={() => {
+              setActiveCustom(true)
+            }}>
+            <Typography className={classes.name}>Custom RPC</Typography>
+            <DotIcon className={classes.dotIcon} />
+          </Grid>
         </Grid>
         <Grid
           className={classes.lowerRow}
@@ -79,24 +99,31 @@ export const SelectTestnetRPC: React.FC<ISelectTestnetRPC> = ({
           justifyContent='space-between'
           wrap='nowrap'>
           <Input
-            className={classes.input}
+            className={classNames(classes.input, activeCustom ? classes.activePlaceholder : null)}
             classes={{
               input: classes.innerInput
             }}
             placeholder='Custom RPC address'
-            onChange={e => setAddress(e.target.value)}
+            onChange={e => {
+              setButtonApplied(false)
+              setAddress(e.target.value)
+            }}
             value={address}
             disableUnderline
+            disabled={!activeCustom}
           />
           <Button
-            className={classes.add}
+            className={classNames(classes.add, buttonApplied ? classes.applied : null)}
             onClick={() => {
               onSelect(Network.Testnet, address, 'Custom')
+              setCustomApplied(true)
+              setButtonApplied(true)
               handleClose()
             }}
             disableRipple
-            disabled={!isAddressValid()}>
-            Set
+            disabled={!isAddressValid()}
+            style={{ opacity: !activeCustom ? '0.5' : '1' }}>
+            {buttonApplied ? 'Applied' : 'Apply'}
           </Button>
         </Grid>
       </Grid>

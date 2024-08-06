@@ -68,11 +68,8 @@ const useStyles = makeStyles()(() => {
     active: {
       background: colors.invariant.light,
       color: colors.white.main,
-      '& $icon': {
-        opacity: 1
-      },
-
-      '& $dotIcon': {
+      '& *': {
+        opacity: 1,
         display: 'block'
       }
     }

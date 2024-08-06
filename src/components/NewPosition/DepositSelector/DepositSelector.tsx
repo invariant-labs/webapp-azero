@@ -17,6 +17,7 @@ import FeeSwitch from '../FeeSwitch/FeeSwitch'
 import { useStyles } from './style'
 import { PositionOpeningMethod } from '@store/consts/types'
 import { SwapToken } from '@store/selectors/wallet'
+import { TooltipHover } from '@components/TooltipHover/TooltipHover'
 export interface InputState {
   value: string
   setValue: (value: string) => void
@@ -238,26 +239,28 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
             />
           </Grid>
 
-          <img
-            className={classes.arrows}
-            src={SwapList}
-            alt='Arrow'
-            onClick={() => {
-              if (ticksLoading) {
-                return
-              }
+          <TooltipHover text='Reverse tokens'>
+            <img
+              className={classes.arrows}
+              src={SwapList}
+              alt='Arrow'
+              onClick={() => {
+                if (ticksLoading) {
+                  return
+                }
 
-              if (!tokenBInputState.blocked) {
-                tokenAInputState.setValue(tokenBInputState.value)
-              } else {
-                tokenBInputState.setValue(tokenAInputState.value)
-              }
-              const pom = tokenAIndex
-              setTokenAIndex(tokenBIndex)
-              setTokenBIndex(pom)
-              onReverseTokens()
-            }}
-          />
+                if (!tokenBInputState.blocked) {
+                  tokenAInputState.setValue(tokenBInputState.value)
+                } else {
+                  tokenBInputState.setValue(tokenAInputState.value)
+                }
+                const pom = tokenAIndex
+                setTokenAIndex(tokenBIndex)
+                setTokenBIndex(pom)
+                onReverseTokens()
+              }}
+            />
+          </TooltipHover>
 
           <Grid className={classes.selectWrapper}>
             <Select
