@@ -3,7 +3,7 @@ import DotIcon from '@mui/icons-material/FiberManualRecord'
 import { Button, Grid, Input, Popover, Typography } from '@mui/material'
 import { ISelectNetwork } from '@store/consts/types'
 import classNames from 'classnames'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import useStyles from './styles'
 
 export interface ISelectTestnetRPC {
@@ -36,6 +36,21 @@ export const SelectTestnetRPC: React.FC<ISelectTestnetRPC> = ({
 
     return urlRegex.test(address)
   }
+
+  useEffect(() => {
+    if (!open && !customApplied) {
+      setAddress('')
+    }
+  }, [open])
+
+  useEffect(() => {
+    if (!networks.some(net => net.rpc === activeRPC)) {
+      setCustomApplied(true)
+      setButtonApplied(true)
+      setActiveCustom(true)
+      setAddress(activeRPC)
+    }
+  }, [])
 
   return (
     <Popover
@@ -108,9 +123,9 @@ export const SelectTestnetRPC: React.FC<ISelectTestnetRPC> = ({
               setButtonApplied(false)
               setAddress(e.target.value)
             }}
+            onClick={() => setActiveCustom(true)}
             value={address}
             disableUnderline
-            disabled={!activeCustom}
           />
           <Button
             className={classNames(classes.add, buttonApplied ? classes.applied : null)}

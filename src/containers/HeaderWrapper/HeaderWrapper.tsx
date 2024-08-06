@@ -1,6 +1,6 @@
 import Header from '@components/Header/Header'
 import { Network } from '@invariant-labs/a0-sdk'
-import { AlephZeroNetworks, CHAINS } from '@store/consts/static'
+import { RPC, CHAINS } from '@store/consts/static'
 import { actions } from '@store/reducers/connection'
 import { Status, actions as walletActions } from '@store/reducers/wallet'
 import { networkType, rpcAddress } from '@store/selectors/connection'
@@ -41,9 +41,13 @@ export const HeaderWrapper: React.FC = () => {
   }, [])
 
   const defaultTestnetRPC = useMemo(() => {
-    const lastRPC = localStorage.getItem('INVARIANT_TESTNET_RPC')
+    const lastRPC = localStorage.getItem(`INVARIANT_RPC_AlephZero_${currentNetwork}`)
 
-    return lastRPC === null ? AlephZeroNetworks.TEST : lastRPC
+    if (lastRPC === null) {
+      localStorage.setItem(`INVARIANT_RPC_AlephZero_${currentNetwork}`, RPC.TEST)
+    }
+
+    return lastRPC === null ? RPC.TEST : lastRPC
   }, [])
 
   const activeChain = CHAINS.find(chain => chain.name === Chain.AlephZero) ?? CHAINS[0]
@@ -54,7 +58,7 @@ export const HeaderWrapper: React.FC = () => {
       onNetworkSelect={(network, rpcAddress, rpcName) => {
         if (network !== currentNetwork || rpcAddress !== currentRpc) {
           if (network === Network.Testnet) {
-            localStorage.setItem('INVARIANT_TESTNET_RPC', rpcAddress)
+            localStorage.setItem(`INVARIANT_RPC_AlephZero_${network}`, rpcAddress)
           }
 
           dispatch(actions.setNetwork({ networkType: network, rpcAddress, rpcName }))
