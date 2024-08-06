@@ -222,6 +222,23 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
             />
           </Grid>
           <Box className={classes.tokenList}>
+            {!filteredTokens.length && (
+              <Grid className={classes.noTokenFoundContainer}>
+                <img className={classes.img} src={icons.empty} alt='Not connected' />
+                <Typography className={classes.noTokenFoundPlaceholder}>
+                  No token found...
+                </Typography>
+                <Typography className={classes.noTokenFoundPlaceholder}>
+                  Add your token by pressing the button!
+                </Typography>
+                <Button
+                  className={classes.addTokenButton}
+                  onClick={() => setIsAddOpen(true)}
+                  variant='contained'>
+                  Add a token
+                </Button>
+              </Grid>
+            )}
             <List
               height={400}
               width={360}
