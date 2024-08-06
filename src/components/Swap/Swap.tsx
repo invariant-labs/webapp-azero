@@ -448,20 +448,22 @@ export const Swap: React.FC<ISwap> = ({
             </p>
           </Button>
           <TooltipHover text='Refresh'>
-            <Button
-              onClick={handleRefresh}
-              className={classes.refreshIconBtn}
-              disabled={
-                priceFromLoading ||
-                priceToLoading ||
-                isBalanceLoading ||
-                getStateMessage() === 'Loading' ||
-                tokenFromIndex === null ||
-                tokenToIndex === null ||
-                tokenFromIndex === tokenToIndex
-              }>
-              <img src={refreshIcon} className={classes.refreshIcon} alt='Refresh' />
-            </Button>
+            <div>
+              <Button
+                onClick={handleRefresh}
+                className={classes.refreshIconBtn}
+                disabled={
+                  priceFromLoading ||
+                  priceToLoading ||
+                  isBalanceLoading ||
+                  getStateMessage() === 'Loading' ||
+                  tokenFromIndex === null ||
+                  tokenToIndex === null ||
+                  tokenFromIndex === tokenToIndex
+                }>
+                <img src={refreshIcon} className={classes.refreshIcon} alt='Refresh' />
+              </Button>
+            </div>
           </TooltipHover>
           <TooltipHover text='Settings'>
             <Button onClick={handleClickSettings} className={classes.settingsIconBtn}>

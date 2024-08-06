@@ -48,8 +48,7 @@ const CustomSnackbar = React.forwardRef<HTMLDivElement, CustomContentProps>(
             alignItems='center'
             ml={2}
             flexDirection='row'
-            wrap='nowrap'
-            style={{ width: 'fix-content' }}>
+            style={{ width: 'fix-content', flexWrap: 'nowrap' }}>
             <Grid ml={1}>
               {variant === 'pending' ? (
                 <StyledCircularProgress size={13} />
