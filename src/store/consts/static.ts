@@ -19,7 +19,7 @@ import {
 import { testnetBestTiersCreator } from '@utils/utils'
 import { POSITIONS_ENTRIES_LIMIT } from '@invariant-labs/a0-sdk/target/consts'
 
-export enum AlephZeroNetworks {
+export enum RPC {
   TEST = 'wss://ws.test.azero.dev',
   DEV = 'wss://ws.dev.azero.dev'
 }
