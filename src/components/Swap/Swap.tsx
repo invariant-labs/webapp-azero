@@ -387,7 +387,7 @@ export const Swap: React.FC<ISwap> = ({
     let timeoutId: NodeJS.Timeout
 
     if (lockAnimation) {
-      timeoutId = setTimeout(() => setLockAnimation(false), 500)
+      timeoutId = setTimeout(() => setLockAnimation(false), 300)
     }
 
     return () => {
@@ -528,8 +528,9 @@ export const Swap: React.FC<ISwap> = ({
             isBalanceLoading={isBalanceLoading}
             showMaxButton={true}
             showBlur={
-              getStateMessage() === 'Loading' &&
-              (inputRef === inputTarget.TO || inputRef === inputTarget.DEFAULT)
+              lockAnimation ||
+              (getStateMessage() === 'Loading' &&
+                (inputRef === inputTarget.TO || inputRef === inputTarget.DEFAULT))
             }
           />
         </Box>
@@ -612,8 +613,9 @@ export const Swap: React.FC<ISwap> = ({
             isBalanceLoading={isBalanceLoading}
             showMaxButton={false}
             showBlur={
-              getStateMessage() === 'Loading' &&
-              (inputRef === inputTarget.FROM || inputRef === inputTarget.DEFAULT)
+              lockAnimation ||
+              (getStateMessage() === 'Loading' &&
+                (inputRef === inputTarget.FROM || inputRef === inputTarget.DEFAULT))
             }
           />
         </Box>
@@ -669,7 +671,9 @@ export const Swap: React.FC<ISwap> = ({
           {canShowDetails ? (
             <Box className={classes.exchangeRateWrapper}>
               <ExchangeRate
-                onClick={() => setRateReversed(!rateReversed)}
+                onClick={() => {
+                  setRateReversed(!rateReversed)
+                }}
                 tokenFromSymbol={tokens[rateReversed ? tokenToIndex : tokenFromIndex].symbol}
                 tokenToSymbol={tokens[rateReversed ? tokenFromIndex : tokenToIndex].symbol}
                 amount={rateReversed ? 1 / swapRate : swapRate}
