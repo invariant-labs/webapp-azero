@@ -508,44 +508,46 @@ export const NewPosition: React.FC<INewPosition> = ({
             </TooltipHover>
           )}
         </Box>
-        <Grid container item alignItems='center' className={classes.options}>
-          {poolKey !== '' ? (
-            <MarketIdLabel
-              displayLength={4}
-              marketId={poolKey}
-              copyPoolAddressHandler={copyPoolAddressHandler}
-            />
-          ) : null}
-          <Grid className={classes.optionsWrapper}>
-            <Hidden mdDown>
-              {tokenAIndex !== null && tokenBIndex !== null && (
-                <ConcentrationTypeSwitch
-                  onSwitch={val => {
-                    if (val) {
-                      setPositionOpeningMethod('concentration')
-                      onPositionOpeningMethodChange('concentration')
-                    } else {
-                      setPositionOpeningMethod('range')
-                      onPositionOpeningMethodChange('range')
-                    }
-                  }}
-                  className={classes.switch}
-                  currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
-                />
+        {poolKey !== '' && (
+          <Grid container item alignItems='center' className={classes.options}>
+            {poolKey !== '' ? (
+              <MarketIdLabel
+                displayLength={4}
+                marketId={poolKey}
+                copyPoolAddressHandler={copyPoolAddressHandler}
+              />
+            ) : null}
+            <Grid className={classes.optionsWrapper}>
+              <Hidden mdDown>
+                {tokenAIndex !== null && tokenBIndex !== null && (
+                  <ConcentrationTypeSwitch
+                    onSwitch={val => {
+                      if (val) {
+                        setPositionOpeningMethod('concentration')
+                        onPositionOpeningMethodChange('concentration')
+                      } else {
+                        setPositionOpeningMethod('range')
+                        onPositionOpeningMethodChange('range')
+                      }
+                    }}
+                    className={classes.switch}
+                    currentValue={positionOpeningMethod === 'concentration' ? 0 : 1}
+                  />
+                )}
+              </Hidden>
+              {poolKey !== '' && (
+                <TooltipHover text='Settings'>
+                  <Button
+                    onClick={handleClickSettings}
+                    className={classes.settingsIconBtn}
+                    disableRipple>
+                    <img src={settingIcon} className={classes.settingsIcon} alt='settings' />
+                  </Button>
+                </TooltipHover>
               )}
-            </Hidden>
-            {poolKey !== '' && (
-              <TooltipHover text='Settings'>
-                <Button
-                  onClick={handleClickSettings}
-                  className={classes.settingsIconBtn}
-                  disableRipple>
-                  <img src={settingIcon} className={classes.settingsIcon} alt='settings' />
-                </Button>
-              </TooltipHover>
-            )}
+            </Grid>
           </Grid>
-        </Grid>
+        )}
       </Grid>
 
       <Slippage
