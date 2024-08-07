@@ -12,8 +12,6 @@ export interface IPositionItem {
   tokenYName: string
   tokenXIcon: string
   tokenYIcon: string
-  tokenXLiq: number
-  tokenYLiq: number
   fee: number
   min: number
   max: number
@@ -22,6 +20,9 @@ export interface IPositionItem {
   address: string
   id: number
   isActive?: boolean
+  minTick: bigint
+  maxTick: bigint
+  currentTick: bigint
 }
 
 export const PositionItem: React.FC<IPositionItem> = ({
@@ -29,14 +30,15 @@ export const PositionItem: React.FC<IPositionItem> = ({
   tokenYName,
   tokenXIcon,
   tokenYIcon,
-  tokenXLiq,
-  tokenYLiq,
   fee,
   min,
   max,
   valueX,
   valueY,
-  isActive = false
+  isActive = false,
+  minTick,
+  maxTick,
+  currentTick
 }) => {
   const { classes } = useStyles()
 
@@ -46,6 +48,33 @@ export const PositionItem: React.FC<IPositionItem> = ({
   const [xToY, setXToY] = useState<boolean>(
     initialXtoY(tickerToAddress(tokenXName), tickerToAddress(tokenYName))
   )
+
+  const getPercentageRatio = () => {
+    if (maxTick <= currentTick) {
+      return {
+        tokenXPercentage: xToY ? '0' : '100',
+        tokenYPercentage: xToY ? '100' : '0'
+      }
+    } else if (minTick >= currentTick) {
+      return {
+        tokenXPercentage: xToY ? '100' : '0',
+        tokenYPercentage: xToY ? '0' : '100'
+      }
+    } else {
+      const totalTicksRange = Math.abs(Number(maxTick - minTick))
+
+      const tokenXPercentage = xToY
+        ? (Math.abs(Number(maxTick - currentTick)) * 100) / totalTicksRange
+        : (Math.abs(Number(minTick - currentTick)) * 100) / totalTicksRange
+
+      const tokenYPercentage = 100 - tokenXPercentage
+      return {
+        tokenXPercentage: tokenXPercentage.toFixed(0),
+        tokenYPercentage: tokenYPercentage.toFixed(0)
+      }
+    }
+  }
+  const { tokenXPercentage, tokenYPercentage } = getPercentageRatio()
 
   const feeFragment = useMemo(
     () => (
@@ -141,7 +170,6 @@ export const PositionItem: React.FC<IPositionItem> = ({
 
       <Grid container item className={classes.mdInfo} direction='row'>
         <Hidden mdDown>{feeFragment}</Hidden>
-
         <Grid
           container
           item
@@ -149,11 +177,28 @@ export const PositionItem: React.FC<IPositionItem> = ({
           justifyContent='center'
           alignItems='center'>
           <Typography className={classes.infoText}>
-            {formatNumber(xToY ? tokenXLiq : tokenYLiq)} {xToY ? tokenXName : tokenYName} {' - '}
-            {formatNumber(xToY ? tokenYLiq : tokenXLiq)} {xToY ? tokenYName : tokenXName}
+            {tokenXPercentage === '100' && (
+              <span>
+                {tokenXPercentage}
+                {'%'} {xToY ? tokenXName : tokenYName}
+              </span>
+            )}
+            {tokenYPercentage === '100' && (
+              <span>
+                {tokenYPercentage}
+                {'%'} {xToY ? tokenYName : tokenXName}
+              </span>
+            )}
+
+            {tokenYPercentage !== '100' && tokenXPercentage !== '100' && (
+              <span>
+                {tokenXPercentage}
+                {'%'} {xToY ? tokenXName : tokenYName} {' - '} {tokenYPercentage}
+                {'%'} {xToY ? tokenYName : tokenXName}
+              </span>
+            )}
           </Typography>
         </Grid>
-
         <Hidden mdUp>{valueFragment}</Hidden>
 
         <Grid
