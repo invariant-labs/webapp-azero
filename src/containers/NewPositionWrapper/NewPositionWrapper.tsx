@@ -130,6 +130,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
 
       timeoutId2 = setTimeout(() => {
         setProgress('none')
+        dispatch(actions.setInitPositionSuccess(false))
       }, 1800)
     }
 
@@ -502,12 +503,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const unblockUpdatePriceRange = () => {
     dispatch(positionsActions.setShouldNotUpdateRange(false))
   }
-
-  useEffect(() => {
-    if (success) {
-      dispatch(actions.setInitPositionSuccess(false))
-    }
-  }, [success])
 
   const onRefresh = () => {
     if (!success) {

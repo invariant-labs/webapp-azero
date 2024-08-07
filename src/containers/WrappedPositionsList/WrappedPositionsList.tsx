@@ -130,7 +130,7 @@ export const WrappedPositionsList: React.FC = () => {
         isActive: currentPrice >= min && currentPrice <= max,
         minTick: position.lowerTickIndex,
         maxTick: position.upperTickIndex,
-        currentTick: position.poolData.currentTickIndex
+        currentTick: position.poolData?.currentTickIndex
       }
     })
     .filter(item => {

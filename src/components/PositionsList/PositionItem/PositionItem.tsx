@@ -64,8 +64,8 @@ export const PositionItem: React.FC<IPositionItem> = ({
       const totalTicksRange = Math.abs(Number(maxTick - minTick))
 
       const tokenXPercentage = xToY
-        ? (Math.abs(Number(maxTick - currentTick)) * 100) / totalTicksRange
-        : (Math.abs(Number(minTick - currentTick)) * 100) / totalTicksRange
+        ? (Math.abs(Number(maxTick) - Number(currentTick)) * 100) / totalTicksRange
+        : (Math.abs(Number(minTick) - Number(currentTick)) * 100) / totalTicksRange
 
       const tokenYPercentage = 100 - tokenXPercentage
       return {
