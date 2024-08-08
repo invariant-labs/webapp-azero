@@ -124,7 +124,11 @@ export const PositionsList: React.FC<IProps> = ({
               value={searchValue}
               disabled={noInitialPositions}
             />
-            <Grid rowGap={1} justifyContent='space-between'>
+            <Grid
+              display='flex'
+              columnGap={2}
+              justifyContent='space-between'
+              className={classes.fullWidthWrapper}>
               <TooltipHover text='Refresh'>
                 <span>
                   <Button

@@ -56,7 +56,7 @@ export const Primary: Story = {
     setMidPrice: fn(),
     ticksLoading: false,
     tickSpacing: 1 as any,
-    tokens: [],
+    tokens: {},
     xDecimal: 9 as any,
     yDecimal: 12 as any,
     hasTicksError: false,
@@ -98,7 +98,7 @@ export const Primary: Story = {
         isCurrentPoolExisting={true}
         isWaitingForNewPool={false}
         poolIndex={0}
-        tokens={[]}
+        tokens={{}}
         bestTiers={[]}
         currentPairReversed={false}
         isXtoY={true}

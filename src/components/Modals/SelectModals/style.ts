@@ -374,6 +374,40 @@ const useStyles = makeStyles()((theme: Theme) => {
       marginLeft: 10,
       cursor: 'pointer',
       fontSize: 28
+    },
+    noTokenFoundPlaceholder: {
+      ...typography.body2,
+      fontWeight: 500,
+      lineHeight: '20px',
+      color: colors.invariant.lightHover
+    },
+    addTokenButton: {
+      height: 40,
+      width: 200,
+      marginTop: 20,
+      color: colors.invariant.componentBcg,
+      ...typography.body1,
+      textTransform: 'none',
+      borderRadius: 14,
+      background: colors.invariant.pinkLinearGradientOpacity,
+
+      '&:hover': {
+        background: colors.invariant.pinkLinearGradient,
+        boxShadow: '0px 0px 16px rgba(239, 132, 245, 0.35)',
+        '@media (hover: none)': {
+          background: colors.invariant.pinkLinearGradientOpacity,
+          boxShadow: 'none'
+        }
+      }
+    },
+    noTokenFoundContainer: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      marginTop: 32
+    },
+    img: {
+      paddingBottom: 25
     }
   }
 })
