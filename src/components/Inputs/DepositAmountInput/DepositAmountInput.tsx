@@ -172,7 +172,7 @@ export const DepositAmountInput: React.FC<IProps> = ({
                   classes={{
                     tooltip: classes.tooltip
                   }}>
-                  <Typography className={classes.caption2}>
+                  <Typography className={classes.estimatedBalance}>
                     ~${formatNumber(usdBalance.toFixed(2))}
                   </Typography>
                 </Tooltip>
