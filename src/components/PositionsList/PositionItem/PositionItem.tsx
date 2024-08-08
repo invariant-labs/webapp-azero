@@ -52,28 +52,30 @@ export const PositionItem: React.FC<IPositionItem> = ({
   const getPercentageRatio = () => {
     if (maxTick <= currentTick) {
       return {
-        tokenXPercentage: xToY ? '0' : '100',
-        tokenYPercentage: xToY ? '100' : '0'
+        tokenXPercentage: xToY ? 0 : 100,
+        tokenYPercentage: xToY ? 100 : 0
       }
     } else if (minTick >= currentTick) {
       return {
-        tokenXPercentage: xToY ? '100' : '0',
-        tokenYPercentage: xToY ? '0' : '100'
+        tokenXPercentage: xToY ? 100 : 0,
+        tokenYPercentage: xToY ? 0 : 100
       }
     } else {
       const totalTicksRange = Math.abs(Number(maxTick - minTick))
 
-      const tokenXPercentage = xToY
-        ? (Math.abs(Number(maxTick) - Number(currentTick)) * 100) / totalTicksRange
-        : (Math.abs(Number(minTick) - Number(currentTick)) * 100) / totalTicksRange
+      const upperPercentage =
+        (Math.abs(Number(maxTick) - Number(currentTick)) * 100) / totalTicksRange
+      const validatedUpperPercentage = Math.max(Math.min(upperPercentage, 99), 1)
 
+      const tokenXPercentage = xToY ? validatedUpperPercentage : 100 - validatedUpperPercentage
       const tokenYPercentage = 100 - tokenXPercentage
       return {
-        tokenXPercentage: tokenXPercentage.toFixed(0),
-        tokenYPercentage: tokenYPercentage.toFixed(0)
+        tokenXPercentage: +tokenXPercentage.toFixed(0),
+        tokenYPercentage: +tokenYPercentage.toFixed(0)
       }
     }
   }
+
   const { tokenXPercentage, tokenYPercentage } = getPercentageRatio()
 
   const feeFragment = useMemo(
@@ -177,20 +179,20 @@ export const PositionItem: React.FC<IPositionItem> = ({
           justifyContent='center'
           alignItems='center'>
           <Typography className={classes.infoText}>
-            {tokenXPercentage === '100' && (
+            {tokenXPercentage === 100 && (
               <span>
                 {tokenXPercentage}
                 {'%'} {xToY ? tokenXName : tokenYName}
               </span>
             )}
-            {tokenYPercentage === '100' && (
+            {tokenYPercentage === 100 && (
               <span>
                 {tokenYPercentage}
                 {'%'} {xToY ? tokenYName : tokenXName}
               </span>
             )}
 
-            {tokenYPercentage !== '100' && tokenXPercentage !== '100' && (
+            {tokenYPercentage !== 100 && tokenXPercentage !== 100 && (
               <span>
                 {tokenXPercentage}
                 {'%'} {xToY ? tokenXName : tokenYName} {' - '} {tokenYPercentage}

@@ -1,5 +1,5 @@
 import { PositionsList } from '@components/PositionsList/PositionsList'
-import { calculateTokenAmounts } from '@invariant-labs/a0-sdk'
+import { calculateTick, calculateTokenAmounts } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { POSITIONS_PER_PAGE } from '@store/consts/static'
 import {
@@ -116,6 +116,18 @@ export const WrappedPositionsList: React.FC = () => {
       const valueX = tokenXLiq + tokenYLiq / currentPrice
       const valueY = tokenYLiq + tokenXLiq * currentPrice
 
+      const currentTick = position.poolData?.sqrtPrice
+        ? BigInt(calculateTick(position.poolData?.sqrtPrice, position.poolKey.feeTier.tickSpacing))
+        : BigInt(
+            calculateTickFromBalance(
+              currentPrice,
+              position.poolKey.feeTier.tickSpacing,
+              true,
+              position.tokenX.decimals,
+              position.tokenY.decimals
+            )
+          )
+
       return {
         tokenXName: position.tokenX.symbol,
         tokenYName: position.tokenY.symbol,
@@ -128,20 +140,10 @@ export const WrappedPositionsList: React.FC = () => {
         valueY,
         address: walletAddress,
         id: index,
-        isActive: currentPrice >= min && currentPrice <= max,
+        isActive: currentTick > position.lowerTickIndex && currentTick < position.upperTickIndex,
         minTick: position.lowerTickIndex,
         maxTick: position.upperTickIndex,
-        currentTick: position.poolData?.currentTickIndex
-          ? position.poolData.currentTickIndex
-          : BigInt(
-              calculateTickFromBalance(
-                currentPrice,
-                position.poolKey.feeTier.tickSpacing,
-                true,
-                position.tokenX.decimals,
-                position.tokenY.decimals
-              )
-            )
+        currentTick
       }
     })
     .filter(item => {
