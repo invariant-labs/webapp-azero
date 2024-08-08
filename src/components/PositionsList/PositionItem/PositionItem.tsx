@@ -54,9 +54,17 @@ export const PositionItem: React.FC<IPositionItem> = ({
         leaveTouchDelay={Number.MAX_SAFE_INTEGER}
         onClick={e => e.stopPropagation()}
         title={
-          isActive
-            ? 'Position active. Current price is inside range'
-            : 'Position inactive. Current price is outside range'
+          isActive ? (
+            <>
+              The position is <b>active</b> and currently <b>earning a fee</b> as long as the
+              current price is <b>within</b> the position's price range.
+            </>
+          ) : (
+            <>
+              The position is <b>inactive</b> and <b>not earning a fee</b> as long as the current
+              price is <b>outside</b> the position's price range.
+            </>
+          )
         }
         placement='top'
         classes={{

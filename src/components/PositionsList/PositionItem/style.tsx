@@ -189,6 +189,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     ...typography.caption4,
     lineHeight: '24px',
     background: colors.black.full,
-    borderRadius: 12
+    borderRadius: 12,
+    fontSize: 14
   }
 }))
