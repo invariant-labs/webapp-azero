@@ -18,8 +18,8 @@ interface IProps {
   style?: CSSProperties
   onMaxClick: () => void
   current: SwapToken | null
-  tokens: SwapToken[]
-  onSelect: (index: number) => void
+  tokens: Record<string, SwapToken>
+  onSelect: (address: string) => void
   disabled: boolean
   balance?: string
   hideBalances?: boolean
