@@ -1,13 +1,13 @@
 import { PositionsList } from '@components/PositionsList/PositionsList'
-import { calculateTick, calculateTokenAmounts } from '@invariant-labs/a0-sdk'
+import { calculateTokenAmounts } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { POSITIONS_PER_PAGE } from '@store/consts/static'
 import {
   calcYPerXPriceByTickIndex,
   positionListPageToQueryPage,
-  printBigint,
   calcPriceBySqrtPrice,
-  calculateTickFromBalance
+  printBigint,
+  calculateTickFromSqrtPrice
 } from '@utils/utils'
 import { actions } from '@store/reducers/positions'
 import { actions as walletActions } from '@store/reducers/wallet'
@@ -116,17 +116,13 @@ export const WrappedPositionsList: React.FC = () => {
       const valueX = tokenXLiq + tokenYLiq / currentPrice
       const valueY = tokenYLiq + tokenXLiq * currentPrice
 
-      const currentTick = position.poolData?.sqrtPrice
-        ? BigInt(calculateTick(position.poolData?.sqrtPrice, position.poolKey.feeTier.tickSpacing))
-        : BigInt(
-            calculateTickFromBalance(
-              currentPrice,
-              position.poolKey.feeTier.tickSpacing,
-              true,
-              position.tokenX.decimals,
-              position.tokenY.decimals
-            )
-          )
+      const currentTick = calculateTickFromSqrtPrice(
+        position.poolData?.sqrtPrice ?? 0n,
+        position.poolKey.feeTier.tickSpacing,
+        true,
+        position.tokenX.decimals,
+        position.tokenY.decimals
+      )
 
       return {
         tokenXName: position.tokenX.symbol,
