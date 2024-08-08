@@ -20,13 +20,7 @@ import {
   tickMaps
 } from '@store/selectors/pools'
 import { simulateResult, swap as swapPool } from '@store/selectors/swap'
-import {
-  address,
-  balanceLoading,
-  status,
-  swapTokens,
-  swapTokensDict
-} from '@store/selectors/wallet'
+import { address, balanceLoading, status, swapTokensDict } from '@store/selectors/wallet'
 import apiSingleton from '@store/services/apiSingleton'
 import SingletonPSP22 from '@store/services/psp22Singleton'
 import { openWalletSelectorModal } from '@utils/web3/selector'
@@ -47,7 +41,6 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
   const swap = useSelector(swapPool)
   const tickmap = useSelector(tickMaps)
   const allPools = useSelector(poolsArraySortedByFees)
-  const tokensList = useSelector(swapTokens)
   const tokensDict = useSelector(swapTokensDict)
   const isBalanceLoading = useSelector(balanceLoading)
   const { success, inProgress } = useSelector(swapPool)
@@ -98,21 +91,10 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
   const lastTokenTo =
     tickerToAddress(initialTokenTo) || localStorage.getItem(`INVARIANT_LAST_TOKEN_TO_${network}`)
 
-  const initialTokenFromIndex =
-    lastTokenFrom === null
-      ? null
-      : tokensList.findIndex(token => token.assetAddress === lastTokenFrom)
-  const initialTokenToIndex =
-    lastTokenTo === null ? null : tokensList.findIndex(token => token.assetAddress === lastTokenTo)
-
   const addTokenHandler = async (address: string) => {
     const psp22 = SingletonPSP22.getInstance()
 
-    if (
-      psp22 &&
-      api !== null &&
-      tokensList.findIndex(token => token.address.toString() === address) === -1
-    ) {
+    if (psp22 && api !== null && !tokensDict[address]) {
       getNewTokenOrThrow(address, psp22, walletAddress)
         .then(data => {
           dispatch(poolsActions.addTokens(data))
@@ -207,22 +189,17 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
     localStorage.setItem('INVARIANT_SWAP_SLIPPAGE', slippage)
   }
 
-  const onRefresh = (tokenFromIndex: number | null, tokenToIndex: number | null) => {
-    if (tokenFromIndex === null || tokenToIndex == null) {
+  const onRefresh = (tokenFromAddress: string | null, tokenToAddress: string | null) => {
+    if (tokenFromAddress === null || tokenToAddress == null) {
       return
     }
 
-    dispatch(
-      walletActions.getBalances([
-        tokensList[tokenFromIndex].address.toString(),
-        tokensList[tokenToIndex].address.toString()
-      ])
-    )
+    dispatch(walletActions.getBalances([tokenFromAddress, tokenToAddress]))
 
     dispatch(
       poolsActions.getAllPoolsForPairData({
-        first: tokensList[tokenFromIndex].address,
-        second: tokensList[tokenToIndex].address
+        first: tokenFromAddress,
+        second: tokenToAddress
       })
     )
 
@@ -230,7 +207,7 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
       return
     }
 
-    const idTo = tokensDict[tokenTo.toString()].coingeckoId ?? ''
+    const idTo = tokensDict[tokenTo].coingeckoId ?? ''
 
     if (idTo.length) {
       setPriceToLoading(true)
@@ -244,7 +221,7 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
       setTokenToPriceData(undefined)
     }
 
-    const idFrom = tokensDict[tokenFrom.toString()].coingeckoId ?? ''
+    const idFrom = tokensDict[tokenFrom].coingeckoId ?? ''
 
     if (idFrom.length) {
       setPriceFromLoading(true)
@@ -331,14 +308,14 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
         dispatch(walletActions.disconnect())
       }}
       walletStatus={walletStatus}
-      tokens={tokensList}
+      tokens={tokensDict}
       pools={allPools}
       swapData={swap}
       progress={progress}
       isWaitingForNewPool={isFetchingNewPool}
       tickmap={tickmap}
-      initialTokenFromIndex={initialTokenFromIndex === -1 ? null : initialTokenFromIndex}
-      initialTokenToIndex={initialTokenToIndex === -1 ? null : initialTokenToIndex}
+      initialTokenFrom={lastTokenFrom}
+      initialTokenTo={lastTokenTo}
       handleAddToken={addTokenHandler}
       commonTokens={commonTokensForNetworks[network]}
       initialHideUnknownTokensValue={initialHideUnknownTokensValue}

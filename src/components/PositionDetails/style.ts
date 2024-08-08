@@ -21,8 +21,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     },
 
     [theme.breakpoints.down('md')]: {
-      marginRight: 0,
-      marginBottom: 32
+      marginRight: 0
     }
   },
   right: {
@@ -101,6 +100,9 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     }
   },
   rightHeaderWrapper: {
-    marginBottom: 20
+    marginBottom: 20,
+    [theme.breakpoints.down('sm')]: {
+      marginBottom: 0
+    }
   }
 }))

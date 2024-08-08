@@ -109,6 +109,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     width: 170,
     marginRight: 8,
     lineHeight: 20,
+    paddingInline: 10,
     [theme.breakpoints.down('lg')]: {
       flex: '1 1 0%'
     }

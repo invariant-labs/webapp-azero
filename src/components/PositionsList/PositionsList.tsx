@@ -28,6 +28,7 @@ interface IProps {
   length: bigint
   loadedPages: Record<number, boolean>
   getRemainingPositions: () => void
+  noInitialPositions: boolean
 }
 
 export const PositionsList: React.FC<IProps> = ({
@@ -45,7 +46,8 @@ export const PositionsList: React.FC<IProps> = ({
   pageChanged,
   length,
   loadedPages,
-  getRemainingPositions
+  getRemainingPositions,
+  noInitialPositions
 }) => {
   const { classes } = useStyles()
   const navigate = useNavigate()
@@ -120,15 +122,22 @@ export const PositionsList: React.FC<IProps> = ({
               }
               onChange={handleChangeInput}
               value={searchValue}
+              disabled={noInitialPositions}
             />
-            <Grid rowGap={1} justifyContent='space-between'>
+            <Grid
+              display='flex'
+              columnGap={2}
+              justifyContent='space-between'
+              className={classes.fullWidthWrapper}>
               <TooltipHover text='Refresh'>
-                <Button
-                  disabled={showNoConnected}
-                  onClick={showNoConnected ? () => {} : handleRefresh}
-                  className={classes.refreshIconBtn}>
-                  <img src={refreshIcon} className={classes.refreshIcon} alt='Refresh' />
-                </Button>
+                <span>
+                  <Button
+                    disabled={showNoConnected}
+                    onClick={showNoConnected ? () => {} : handleRefresh}
+                    className={classes.refreshIconBtn}>
+                    <img src={refreshIcon} className={classes.refreshIcon} alt='Refresh' />
+                  </Button>
+                </span>
               </TooltipHover>
               <Button
                 className={showNoConnected ? classes.buttonSelectDisabled : classes.button}
@@ -160,9 +169,14 @@ export const PositionsList: React.FC<IProps> = ({
           </Grid>
         ) : (
           <EmptyPlaceholder
-            desc='Add your first position by pressing the button and start earning!'
+            desc={
+              noInitialPositions
+                ? 'Add your first position by pressing the button and start earning!'
+                : 'Did not find any matching positions'
+            }
             className={classes.placeholder}
             onAction={onAddPositionClick}
+            withButton={noInitialPositions}
           />
         )}
       </Grid>
