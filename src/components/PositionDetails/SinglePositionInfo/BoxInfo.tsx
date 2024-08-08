@@ -1,4 +1,4 @@
-import { Button, Grid, Typography } from '@mui/material'
+import { Button, Grid, Tooltip, Typography } from '@mui/material'
 import loader from '@static/gif/loading2.gif'
 import SwapPosition from '@static/svg/swap-position.svg'
 import { formatNumber, formatNumbers, showPrefix } from '@utils/utils'
@@ -124,10 +124,19 @@ export const BoxInfo: React.FC<{
                 {tokenA.name}
               </Typography>
               {typeof tokenA.usdValue !== 'undefined' && tokenA.price ? (
-                <Typography className={classes.tokenUSDValue}>
-                  ~${formatNumber((tokenA.value * tokenA.price).toFixed(2))}
-                  {showPrefix(tokenA.value * tokenA.price)}
-                </Typography>
+                <Tooltip
+                  enterTouchDelay={0}
+                  leaveTouchDelay={Number.MAX_SAFE_INTEGER}
+                  title='Estimated liquidity in USD'
+                  placement='bottom'
+                  classes={{
+                    tooltip: classes.tooltip
+                  }}>
+                  <Typography className={classes.tokenUSDValue}>
+                    ~${formatNumber((tokenA.value * tokenA.price).toFixed(2))}
+                    {showPrefix(tokenA.value * tokenA.price)}
+                  </Typography>
+                </Tooltip>
               ) : null}
             </Grid>
           ) : null}
@@ -169,10 +178,19 @@ export const BoxInfo: React.FC<{
                 {tokenB.name}
               </Typography>
               {typeof tokenB.usdValue !== 'undefined' && tokenB.price ? (
-                <Typography className={classes.tokenUSDValue}>
-                  ~${formatNumber((tokenB.value * tokenB.price).toFixed(2))}
-                  {showPrefix(tokenB.value * tokenB.price)}
-                </Typography>
+                <Tooltip
+                  enterTouchDelay={0}
+                  leaveTouchDelay={Number.MAX_SAFE_INTEGER}
+                  title='Estimated liquidity in USD'
+                  placement='bottom'
+                  classes={{
+                    tooltip: classes.tooltip
+                  }}>
+                  <Typography className={classes.tokenUSDValue}>
+                    ~${formatNumber((tokenB.value * tokenB.price).toFixed(2))}
+                    {showPrefix(tokenB.value * tokenB.price)}
+                  </Typography>
+                </Tooltip>
               ) : null}
             </Grid>
           ) : null}

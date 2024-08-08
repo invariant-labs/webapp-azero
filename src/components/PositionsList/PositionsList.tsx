@@ -130,14 +130,14 @@ export const PositionsList: React.FC<IProps> = ({
               justifyContent='space-between'
               className={classes.fullWidthWrapper}>
               <TooltipHover text='Refresh'>
-                <span>
+                <Grid display='flex' alignItems='center'>
                   <Button
                     disabled={showNoConnected}
                     onClick={showNoConnected ? () => {} : handleRefresh}
                     className={classes.refreshIconBtn}>
                     <img src={refreshIcon} className={classes.refreshIcon} alt='Refresh' />
                   </Button>
-                </span>
+                </Grid>
               </TooltipHover>
               <Button
                 className={showNoConnected ? classes.buttonSelectDisabled : classes.button}

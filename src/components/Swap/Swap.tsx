@@ -430,7 +430,7 @@ export const Swap: React.FC<ISwap> = ({
             </p>
           </Button>
           <TooltipHover text='Refresh'>
-            <div>
+            <Grid display='flex' alignItems='center'>
               <Button
                 onClick={handleRefresh}
                 className={classes.refreshIconBtn}
@@ -445,7 +445,7 @@ export const Swap: React.FC<ISwap> = ({
                 }>
                 <img src={refreshIcon} className={classes.refreshIcon} alt='Refresh' />
               </Button>
-            </div>
+            </Grid>
           </TooltipHover>
           <TooltipHover text='Settings'>
             <Button onClick={handleClickSettings} className={classes.settingsIconBtn}>
