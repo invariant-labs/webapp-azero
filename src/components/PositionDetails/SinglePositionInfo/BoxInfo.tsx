@@ -127,7 +127,7 @@ export const BoxInfo: React.FC<{
                 <Tooltip
                   enterTouchDelay={0}
                   leaveTouchDelay={Number.MAX_SAFE_INTEGER}
-                  title='Estimated liquidity in USD'
+                  title="Estimated USD Value of the Position's Tokens"
                   placement='bottom'
                   classes={{
                     tooltip: classes.tooltip
@@ -181,7 +181,7 @@ export const BoxInfo: React.FC<{
                 <Tooltip
                   enterTouchDelay={0}
                   leaveTouchDelay={Number.MAX_SAFE_INTEGER}
-                  title='Estimated liquidity in USD'
+                  title="Estimated USD Value of the Position's Tokens"
                   placement='bottom'
                   classes={{
                     tooltip: classes.tooltip
