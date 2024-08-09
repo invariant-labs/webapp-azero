@@ -127,7 +127,7 @@ export const WrappedPositionsList: React.FC = () => {
         valueY,
         address: walletAddress,
         id: index,
-        isActive: currentPrice > min && currentPrice < max,
+        isActive: currentPrice >= min && currentPrice <= max,
         currentPrice,
         tokenXLiq,
         tokenYLiq
