@@ -1,6 +1,6 @@
 import { Network, TESTNET_INVARIANT_ADDRESS, TESTNET_WAZERO_ADDRESS } from '@invariant-labs/a0-sdk'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
-import { AlephZeroNetworks } from '@store/consts/static'
+import { RPC } from '@store/consts/static'
 import { PayloadType } from '@store/consts/types'
 
 export enum Status {
@@ -24,7 +24,7 @@ export const defaultState: IAlephZeroConnectionStore = {
   message: '',
   networkType: Network.Testnet,
   blockNumber: 0,
-  rpcAddress: AlephZeroNetworks.TEST,
+  rpcAddress: localStorage.getItem(`INVARIANT_RPC_AlephZero_${Network.Testnet}`) || RPC.TEST,
   invariantAddress: TESTNET_INVARIANT_ADDRESS,
   wrappedAZEROAddress: TESTNET_WAZERO_ADDRESS
 }

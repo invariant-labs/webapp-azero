@@ -12,8 +12,6 @@ export interface IPositionItem {
   tokenYName: string
   tokenXIcon: string
   tokenYIcon: string
-  tokenXLiq: number
-  tokenYLiq: number
   fee: number
   min: number
   max: number
@@ -22,6 +20,9 @@ export interface IPositionItem {
   address: string
   id: number
   isActive?: boolean
+  currentPrice: number
+  tokenXLiq: number
+  tokenYLiq: number
 }
 
 export const PositionItem: React.FC<IPositionItem> = ({
@@ -29,14 +30,15 @@ export const PositionItem: React.FC<IPositionItem> = ({
   tokenYName,
   tokenXIcon,
   tokenYIcon,
-  tokenXLiq,
-  tokenYLiq,
   fee,
   min,
   max,
   valueX,
   valueY,
-  isActive = false
+  isActive = false,
+  currentPrice,
+  tokenXLiq,
+  tokenYLiq
 }) => {
   const { classes } = useStyles()
 
@@ -47,6 +49,23 @@ export const PositionItem: React.FC<IPositionItem> = ({
     initialXtoY(tickerToAddress(tokenXName), tickerToAddress(tokenYName))
   )
 
+  const getPercentageRatio = () => {
+    const firstTokenPercentage =
+      ((tokenXLiq * currentPrice) / (tokenYLiq + tokenXLiq * currentPrice)) * 100
+
+    const tokenXPercentageFloat = xToY ? firstTokenPercentage : 100 - firstTokenPercentage
+    const tokenXPercentage =
+      tokenXPercentageFloat > 50
+        ? Math.floor(tokenXPercentageFloat)
+        : Math.ceil(tokenXPercentageFloat)
+
+    const tokenYPercentage = 100 - tokenXPercentage
+
+    return { tokenXPercentage, tokenYPercentage }
+  }
+
+  const { tokenXPercentage, tokenYPercentage } = getPercentageRatio()
+
   const feeFragment = useMemo(
     () => (
       <Tooltip
@@ -54,9 +73,17 @@ export const PositionItem: React.FC<IPositionItem> = ({
         leaveTouchDelay={Number.MAX_SAFE_INTEGER}
         onClick={e => e.stopPropagation()}
         title={
-          isActive
-            ? 'Position active. Current price is inside range'
-            : 'Position inactive. Current price is outside range'
+          isActive ? (
+            <>
+              The position is <b>active</b> and currently <b>earning a fee</b> as long as the
+              current price is <b>within</b> the position's price range.
+            </>
+          ) : (
+            <>
+              The position is <b>inactive</b> and <b>not earning a fee</b> as long as the current
+              price is <b>outside</b> the position's price range.
+            </>
+          )
         }
         placement='top'
         classes={{
@@ -141,7 +168,6 @@ export const PositionItem: React.FC<IPositionItem> = ({
 
       <Grid container item className={classes.mdInfo} direction='row'>
         <Hidden mdDown>{feeFragment}</Hidden>
-
         <Grid
           container
           item
@@ -149,11 +175,28 @@ export const PositionItem: React.FC<IPositionItem> = ({
           justifyContent='center'
           alignItems='center'>
           <Typography className={classes.infoText}>
-            {formatNumber(xToY ? tokenXLiq : tokenYLiq)} {xToY ? tokenXName : tokenYName} {' - '}
-            {formatNumber(xToY ? tokenYLiq : tokenXLiq)} {xToY ? tokenYName : tokenXName}
+            {tokenXPercentage === 100 && (
+              <span>
+                {tokenXPercentage}
+                {'%'} {xToY ? tokenXName : tokenYName}
+              </span>
+            )}
+            {tokenYPercentage === 100 && (
+              <span>
+                {tokenYPercentage}
+                {'%'} {xToY ? tokenYName : tokenXName}
+              </span>
+            )}
+
+            {tokenYPercentage !== 100 && tokenXPercentage !== 100 && (
+              <span>
+                {tokenXPercentage}
+                {'%'} {xToY ? tokenXName : tokenYName} {' - '} {tokenYPercentage}
+                {'%'} {xToY ? tokenYName : tokenXName}
+              </span>
+            )}
           </Typography>
         </Grid>
-
         <Hidden mdUp>{valueFragment}</Hidden>
 
         <Grid

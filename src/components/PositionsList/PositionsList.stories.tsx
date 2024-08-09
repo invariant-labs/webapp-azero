@@ -23,60 +23,64 @@ const data = [
     tokenYName: 'AZERO',
     tokenXIcon: '',
     tokenYIcon: '',
-    tokenXLiq: 5000,
-    tokenYLiq: 300.2,
     min: 2149.6,
     max: 149.6,
     fee: 0.05,
     valueX: 10000.45,
     valueY: 2137.4,
     id: 1,
-    address: '0x123132423423'
+    address: '0x123132423423',
+    tokenXLiq: 5000,
+    tokenYLiq: 300.2,
+    currentPrice: 1000
   },
   {
     tokenXName: 'BTC',
     tokenYName: 'AZERO',
     tokenXIcon: '',
     tokenYIcon: '',
-    tokenXLiq: 5000,
-    tokenYLiq: 300.2,
     min: 2149.6,
     max: 149.6,
     fee: 0.05,
     valueX: 10000.45,
     valueY: 2137.4,
     id: 2,
-    address: '0x123132423423'
+    address: '0x123132423423',
+    tokenXLiq: 5000,
+    tokenYLiq: 300.2,
+    currentPrice: 1000
   },
   {
     tokenXName: 'BTC',
     tokenYName: 'AZERO',
     tokenXIcon: '',
     tokenYIcon: '',
-    tokenXLiq: 5000,
-    tokenYLiq: 300.2,
     min: 2149.6,
     max: 149.6,
     fee: 0.05,
     valueX: 10000.45,
     valueY: 2137.4,
     id: 3,
-    address: '0x123132423423'
+    address: '0x123132423423',
+    tokenXLiq: 5000,
+    tokenYLiq: 300.2,
+    currentPrice: 1000
   },
   {
     tokenXName: 'BTC',
     tokenYName: 'AZERO',
     tokenXIcon: '',
     tokenYIcon: '',
-    tokenXLiq: 5000,
-    tokenYLiq: 300.2,
     min: 2149.6,
     max: 149.6,
     fee: 0.05,
     valueX: 10000.45,
     valueY: 2137.4,
     id: 4,
-    address: '0x123132423423'
+    address: '0x123132423423',
+    tokenXLiq: 5000,
+    tokenYLiq: 300.2,
+    currentPrice: 1000
   }
 ]
 
@@ -100,6 +104,7 @@ export const Primary: Story = {
     pageChanged: () => {},
     length: 0 as any,
     loadedPages: {},
-    getRemainingPositions: () => {}
+    getRemainingPositions: () => {},
+    noInitialPositions: false
   }
 }

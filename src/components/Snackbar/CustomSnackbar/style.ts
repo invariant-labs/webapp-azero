@@ -1,6 +1,6 @@
 import { CircularProgress, Typography } from '@mui/material'
 import { styled } from '@mui/system'
-import { colors, theme, typography } from '@static/theme'
+import { colors, typography } from '@static/theme'
 import { SnackbarContent } from 'notistack'
 
 export const StyledSnackbarContent = styled(SnackbarContent)(({ theme }) => ({
@@ -96,7 +96,6 @@ export const StyledCloseButton = styled('button')({
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-
   width: 'fit-content',
   cursor: 'pointer',
   '&:hover': {
@@ -138,15 +137,6 @@ export const StyledDetails = styled('button')({
     '@media (hover: none)': {
       transform: 'none'
     }
-  },
-  [theme.breakpoints.down('sm')]: {
-    width: 36,
-    height: 16,
-    lineHeight: '14px',
-    marginTop: 2,
-    marginRight: 8,
-    paddingBottom: 17,
-    paddingRight: 36
   },
 
   '& *': {

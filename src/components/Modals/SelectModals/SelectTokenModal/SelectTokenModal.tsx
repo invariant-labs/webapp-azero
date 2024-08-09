@@ -25,13 +25,13 @@ import icons from '@static/icons'
 import { TooltipHover } from '@components/TooltipHover/TooltipHover'
 
 export interface ISelectTokenModal {
-  tokens: SwapToken[]
+  tokens: Record<string, SwapToken>
   commonTokens: string[]
   open: boolean
   handleClose: () => void
   anchorEl: HTMLButtonElement | null
   centered?: boolean
-  onSelect: (index: number) => void
+  onSelect: (address: string) => void
   hideBalances?: boolean
   handleAddToken: (address: string) => void
   initialHideUnknownTokensValue: boolean
@@ -78,47 +78,70 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
   const outerRef = useRef<HTMLElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const tokensWithIndexes = useMemo(
-    () =>
-      tokens.map((token, index) => ({
-        ...token,
-        index,
-        strAddress: token.assetAddress.toString()
-      })),
-    [tokens]
-  )
+  const commonTokensList = useMemo(() => {
+    const commonTokensList: SwapToken[] = []
 
-  const commonTokensList = useMemo(
-    () =>
-      tokensWithIndexes.filter(
-        ({ assetAddress }) => commonTokens.findIndex(key => key === assetAddress) !== -1
-      ),
-    [tokensWithIndexes, commonTokens]
-  )
+    commonTokens.forEach(assetAddress => {
+      const token = tokens[assetAddress.toString()]
 
-  const filteredTokens = useMemo(() => {
-    const list = tokensWithIndexes.filter(token => {
-      return (
-        token.symbol.toLowerCase().includes(value.toLowerCase()) ||
-        token.name.toLowerCase().includes(value.toLowerCase()) ||
-        token.strAddress.includes(value)
-      )
-    })
-    const sorted = list.sort((a, b) => {
-      const aBalance = +printBigint(a.balance, a.decimals)
-      const bBalance = +printBigint(b.balance, b.decimals)
-
-      if (aBalance > bBalance) {
-        return -1
-      } else if (aBalance < bBalance) {
-        return 1
-      } else {
-        return 0
+      if (token) {
+        commonTokensList.push({ ...token, assetAddress })
       }
     })
 
-    return hideUnknown ? sorted.filter(token => !token.isUnknown) : sorted
-  }, [value, tokensWithIndexes, hideUnknown])
+    return commonTokensList
+  }, [tokens, commonTokens])
+
+  const filteredTokens = useMemo(() => {
+    if (!open) {
+      return []
+    }
+
+    const filteredTokens: SwapToken[] = []
+    for (const [assetAddress, token] of Object.entries(tokens)) {
+      if (
+        token.symbol.toLowerCase().includes(value.toLowerCase()) ||
+        token.name.toLowerCase().includes(value.toLowerCase()) ||
+        assetAddress.includes(value)
+      ) {
+        if (hideUnknown && token.isUnknown) {
+          continue
+        }
+
+        filteredTokens.push({ ...token, assetAddress })
+      }
+    }
+
+    const sortedTokens = value
+      ? filteredTokens.sort((a, b) => {
+          const aBalance = +printBigint(a.balance, a.decimals)
+          const bBalance = +printBigint(b.balance, b.decimals)
+          if ((aBalance === 0 && bBalance === 0) || (aBalance > 0 && bBalance > 0)) {
+            if (value.length) {
+              if (
+                a.symbol.toLowerCase().startsWith(value.toLowerCase()) &&
+                !b.symbol.toLowerCase().startsWith(value.toLowerCase())
+              ) {
+                return -1
+              }
+
+              if (
+                b.symbol.toLowerCase().startsWith(value.toLowerCase()) &&
+                !a.symbol.toLowerCase().startsWith(value.toLowerCase())
+              ) {
+                return 1
+              }
+            }
+
+            return a.symbol.toLowerCase().localeCompare(b.symbol.toLowerCase())
+          }
+
+          return aBalance === 0 ? 1 : -1
+        })
+      : filteredTokens
+
+    return sortedTokens
+  }, [value, tokens, hideUnknown, open])
 
   const searchToken = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value)
@@ -192,7 +215,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
                   className={classes.commonTokenItem}
                   key={token.symbol}
                   onClick={() => {
-                    onSelect(token.index)
+                    onSelect(token.assetAddress)
                     setValue('')
                     handleClose()
                   }}>
@@ -222,6 +245,23 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
             />
           </Grid>
           <Box className={classes.tokenList}>
+            {!filteredTokens.length && (
+              <Grid className={classes.noTokenFoundContainer}>
+                <img className={classes.img} src={icons.empty} alt='Not connected' />
+                <Typography className={classes.noTokenFoundPlaceholder}>
+                  No token found...
+                </Typography>
+                <Typography className={classes.noTokenFoundPlaceholder}>
+                  Add your token by pressing the button!
+                </Typography>
+                <Button
+                  className={classes.addTokenButton}
+                  onClick={() => setIsAddOpen(true)}
+                  variant='contained'>
+                  Add a token
+                </Button>
+              </Grid>
+            )}
             <List
               height={400}
               width={360}
@@ -244,7 +284,7 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
                     alignItems='center'
                     wrap='nowrap'
                     onClick={() => {
-                      onSelect(token.index)
+                      onSelect(token.assetAddress)
                       setValue('')
                       handleClose()
                     }}>

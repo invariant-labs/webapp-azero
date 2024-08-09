@@ -5,8 +5,8 @@ import { POSITIONS_PER_PAGE } from '@store/consts/static'
 import {
   calcYPerXPriceByTickIndex,
   positionListPageToQueryPage,
-  printBigint,
-  calcPriceBySqrtPrice
+  calcPriceBySqrtPrice,
+  printBigint
 } from '@utils/utils'
 import { actions } from '@store/reducers/positions'
 import { actions as walletActions } from '@store/reducers/wallet'
@@ -22,6 +22,7 @@ import { openWalletSelectorModal } from '@utils/web3/selector'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { IPositionItem } from '@components/PositionsList/PositionItem/PositionItem'
 
 export const WrappedPositionsList: React.FC = () => {
   const walletAddress = useSelector(address)
@@ -62,7 +63,7 @@ export const WrappedPositionsList: React.FC = () => {
     )
   }
 
-  const data = list
+  const data: IPositionItem[] = list
     .map((position, index) => {
       const lowerPrice = Number(
         calcYPerXPriceByTickIndex(
@@ -122,13 +123,14 @@ export const WrappedPositionsList: React.FC = () => {
         fee: +printBigint(position.poolKey.feeTier.fee, PERCENTAGE_SCALE - 2n),
         min,
         max,
-        tokenXLiq,
-        tokenYLiq,
         valueX,
         valueY,
         address: walletAddress,
         id: index,
-        isActive: currentPrice >= min && currentPrice <= max
+        isActive: currentPrice >= min && currentPrice <= max,
+        currentPrice,
+        tokenXLiq,
+        tokenYLiq
       }
     })
     .filter(item => {
@@ -182,6 +184,7 @@ export const WrappedPositionsList: React.FC = () => {
       getRemainingPositions={() => {
         dispatch(actions.getRemainingPositions())
       }}
+      noInitialPositions={list.length === 0}
     />
   )
 }
