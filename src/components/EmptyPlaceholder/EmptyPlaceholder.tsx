@@ -9,9 +9,14 @@ export interface IEmptyPlaceholder {
   onAction?: () => void
   className?: string
   style?: React.CSSProperties
+  withButton?: boolean
 }
 
-export const EmptyPlaceholder: React.FC<IEmptyPlaceholder> = ({ desc, onAction }) => {
+export const EmptyPlaceholder: React.FC<IEmptyPlaceholder> = ({
+  desc,
+  onAction,
+  withButton = true
+}) => {
   const { classes } = useStyles()
 
   return (
@@ -22,9 +27,11 @@ export const EmptyPlaceholder: React.FC<IEmptyPlaceholder> = ({ desc, onAction }
           <img className={classes.img} src={icons.empty} alt='Not connected' />
           <Typography className={classes.desc}>It's empty here...</Typography>
           {desc?.length && <Typography className={classes.desc}>{desc}</Typography>}
-          <Button className={classes.button} onClick={onAction} variant='contained'>
-            Add a position
-          </Button>
+          {withButton && (
+            <Button className={classes.button} onClick={onAction} variant='contained'>
+              Add a position
+            </Button>
+          )}
         </Grid>
       </Grid>
     </>

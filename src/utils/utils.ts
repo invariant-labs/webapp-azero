@@ -882,7 +882,7 @@ export const formatNumber = (
           FormatConfig.DecimalsAfterDot
         )
     formattedNumber =
-      beforeDot.slice(0, -FormatConfig.BDecimals) + !noDecimals ? formattedDecimals : '' + 'B'
+      beforeDot.slice(0, -FormatConfig.BDecimals) + (noDecimals ? '' : formattedDecimals) + 'B'
   } else if (Math.abs(numberAsNumber) > FormatConfig.M) {
     const formattedDecimals = noDecimals
       ? ''
@@ -891,8 +891,8 @@ export const formatNumber = (
           0,
           FormatConfig.DecimalsAfterDot
         )
-
-    formattedNumber = beforeDot.slice(0, -FormatConfig.MDecimals) + formattedDecimals + 'M'
+    formattedNumber =
+      beforeDot.slice(0, -FormatConfig.MDecimals) + (noDecimals ? '' : formattedDecimals) + 'M'
   } else if (Math.abs(numberAsNumber) > FormatConfig.K) {
     const formattedDecimals = noDecimals
       ? ''
@@ -901,7 +901,8 @@ export const formatNumber = (
           0,
           FormatConfig.DecimalsAfterDot
         )
-    formattedNumber = beforeDot.slice(0, -FormatConfig.KDecimals) + formattedDecimals + 'K'
+    formattedNumber =
+      beforeDot.slice(0, -FormatConfig.KDecimals) + (noDecimals ? '' : formattedDecimals) + 'K'
   } else if (afterDot && countLeadingZeros(afterDot) <= decimalsAfterDot) {
     const roundedNumber = numberAsNumber
       .toFixed(countLeadingZeros(afterDot) + decimalsAfterDot + 1)

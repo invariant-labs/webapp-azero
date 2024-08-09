@@ -48,8 +48,7 @@ const CustomSnackbar = React.forwardRef<HTMLDivElement, CustomContentProps>(
             alignItems='center'
             ml={2}
             flexDirection='row'
-            wrap='nowrap'
-            style={{ width: 'fix-content' }}>
+            style={{ width: 'fix-content', flexWrap: 'nowrap' }}>
             <Grid ml={1}>
               {variant === 'pending' ? (
                 <StyledCircularProgress size={13} />
@@ -60,7 +59,7 @@ const CustomSnackbar = React.forwardRef<HTMLDivElement, CustomContentProps>(
             <StyledTitle>{message}</StyledTitle>
           </Grid>
           {txid && (
-            <Grid display='flex' mx={1}>
+            <Grid display='flex' mx={1} minWidth='fit-content'>
               <StyledDetails
                 onClick={() => {
                   window.open(`https://alephzero-testnet.subscan.io/extrinsic/${txid}`, '_blank')
@@ -73,7 +72,7 @@ const CustomSnackbar = React.forwardRef<HTMLDivElement, CustomContentProps>(
             </Grid>
           )}
           {link && (
-            <Grid display='flex' mx={1}>
+            <Grid display='flex' mx={1} minWidth='fit-content'>
               <StyledDetails
                 onClick={() => {
                   window.open(link.href, '_blank')

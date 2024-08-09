@@ -18,7 +18,13 @@ export const useLabelStyles = makeStyles()(() => {
     },
     clipboardIcon: {
       width: 18,
-      cursor: 'pointer'
+      cursor: 'pointer',
+      '&:hover': {
+        filter: 'brightness(1.4)',
+        '@media (hover: none)': {
+          filter: 'brightness(1)'
+        }
+      }
     }
   }
 })

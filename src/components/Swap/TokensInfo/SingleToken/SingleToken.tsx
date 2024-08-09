@@ -48,16 +48,18 @@ const SingleToken: React.FC<IProps> = ({ token, tokenPrice, copyTokenAddressHand
             </Typography>
 
             {token && (
-              <a
-                href={`https://ascan.alephzero.org/testnet/account/${token.assetAddress}`}
-                target='_blank'
-                rel='noopener noreferrer'
-                onClick={event => {
-                  event.stopPropagation()
-                }}
-                className={classes.link}>
-                <img width={8} height={8} src={icons.newTab} alt={'Token address'} />
-              </a>
+              <TooltipHover text='Token details'>
+                <a
+                  href={`https://ascan.alephzero.org/testnet/account/${token.assetAddress}`}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  onClick={event => {
+                    event.stopPropagation()
+                  }}
+                  className={classes.link}>
+                  <img width={8} height={8} src={icons.newTab} alt={'Token address'} />
+                </a>
+              </TooltipHover>
             )}
           </Grid>
           <Typography className={classes.tokenDescription}>

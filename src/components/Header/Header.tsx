@@ -6,7 +6,7 @@ import { Box, Button, CardMedia, Grid, IconButton, useMediaQuery } from '@mui/ma
 import icons from '@static/icons'
 import Hamburger from '@static/svg/Hamburger.svg'
 import { theme } from '@static/theme'
-import { AlephZeroNetworks, CHAINS } from '@store/consts/static'
+import { RPC, CHAINS } from '@store/consts/static'
 import { blurContent, unblurContent } from '@utils/uiUtils'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -80,8 +80,8 @@ export const Header: React.FC<IHeader> = ({
   const testnetRPCs = [
     {
       networkType: Network.Testnet,
-      rpc: AlephZeroNetworks.TEST,
-      rpcName: 'Aleph zero'
+      rpc: RPC.TEST,
+      rpcName: 'Aleph Zero'
     }
   ]
 

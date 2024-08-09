@@ -145,13 +145,6 @@ const useStyles = makeStyles()(theme => {
       height: 14,
       marginLeft: 5
     },
-    tooltip: {
-      background: colors.invariant.componentBcg,
-      borderRadius: 12,
-      width: 300,
-      textAlign: 'justify',
-      padding: 10
-    },
     tooltipText: {
       ...typography.caption4,
       fontSize: 13,

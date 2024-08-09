@@ -12,8 +12,8 @@ export interface ISelectModal {
   name?: string
   current: SwapToken | null
   centered?: boolean
-  tokens: SwapToken[]
-  onSelect: (index: number) => void
+  tokens: Record<string, SwapToken>
+  onSelect: (address: string) => void
   className?: string
   hideBalancesInModal?: boolean
   handleAddToken: (address: string) => void

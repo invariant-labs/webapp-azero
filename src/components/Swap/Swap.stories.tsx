@@ -18,8 +18,8 @@ export const Primary: Story = {
     initialHideUnknownTokensValue: false,
     onSwap: fn(),
     initialSlippage: '0.5',
-    initialTokenFromIndex: 0,
-    initialTokenToIndex: 1,
+    initialTokenFrom: 'So11111111111111111111111111111111111111112',
+    initialTokenTo: '9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E',
     isBalanceLoading: false,
     isFetchingNewPool: false,
     isWaitingForNewPool: false,
@@ -42,7 +42,7 @@ export const Primary: Story = {
       poolKey: null
     },
     tickmap: {},
-    tokens: [],
+    tokens: {},
     walletStatus: Status.Initialized,
     simulateResult: {
       poolKey: null,
