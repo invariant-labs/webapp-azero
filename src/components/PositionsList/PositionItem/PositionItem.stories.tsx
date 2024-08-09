@@ -23,8 +23,8 @@ export const Primary: Story = {
     valueY: 2137.4,
     id: 0,
     address: '',
-    currentTick: 1234n,
-    minTick: 1000n,
-    maxTick: 2000n
+    tokenXLiq: 5000,
+    tokenYLiq: 300.2,
+    currentPrice: 10000
   }
 }

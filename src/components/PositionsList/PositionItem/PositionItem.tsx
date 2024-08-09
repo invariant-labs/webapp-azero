@@ -20,9 +20,9 @@ export interface IPositionItem {
   address: string
   id: number
   isActive?: boolean
-  minTick: bigint
-  maxTick: bigint
-  currentTick: bigint
+  currentPrice: number
+  tokenXLiq: number
+  tokenYLiq: number
 }
 
 export const PositionItem: React.FC<IPositionItem> = ({
@@ -36,9 +36,9 @@ export const PositionItem: React.FC<IPositionItem> = ({
   valueX,
   valueY,
   isActive = false,
-  minTick,
-  maxTick,
-  currentTick
+  currentPrice,
+  tokenXLiq,
+  tokenYLiq
 }) => {
   const { classes } = useStyles()
 
@@ -50,30 +50,18 @@ export const PositionItem: React.FC<IPositionItem> = ({
   )
 
   const getPercentageRatio = () => {
-    if (maxTick <= currentTick) {
-      return {
-        tokenXPercentage: xToY ? 0 : 100,
-        tokenYPercentage: xToY ? 100 : 0
-      }
-    } else if (minTick >= currentTick) {
-      return {
-        tokenXPercentage: xToY ? 100 : 0,
-        tokenYPercentage: xToY ? 0 : 100
-      }
-    } else {
-      const totalTicksRange = Math.abs(Number(maxTick - minTick))
+    const firstTokenPercentage =
+      ((tokenXLiq * currentPrice) / (tokenYLiq + tokenXLiq * currentPrice)) * 100
 
-      const upperPercentage =
-        (Math.abs(Number(maxTick) - Number(currentTick)) * 100) / totalTicksRange
-      const validatedUpperPercentage = Math.max(Math.min(upperPercentage, 99), 1)
+    const tokenXPercentageFloat = xToY ? firstTokenPercentage : 100 - firstTokenPercentage
+    const tokenXPercentage =
+      tokenXPercentageFloat > 50
+        ? Math.floor(tokenXPercentageFloat)
+        : Math.ceil(tokenXPercentageFloat)
 
-      const tokenXPercentage = xToY ? validatedUpperPercentage : 100 - validatedUpperPercentage
-      const tokenYPercentage = 100 - tokenXPercentage
-      return {
-        tokenXPercentage: +tokenXPercentage.toFixed(0),
-        tokenYPercentage: +tokenYPercentage.toFixed(0)
-      }
-    }
+    const tokenYPercentage = 100 - tokenXPercentage
+
+    return { tokenXPercentage, tokenYPercentage }
   }
 
   const { tokenXPercentage, tokenYPercentage } = getPercentageRatio()

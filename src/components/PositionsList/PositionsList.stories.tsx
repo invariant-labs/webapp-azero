@@ -30,9 +30,9 @@ const data = [
     valueY: 2137.4,
     id: 1,
     address: '0x123132423423',
-    currentTick: 1434n,
-    minTick: 1000n,
-    maxTick: 2000n
+    tokenXLiq: 5000,
+    tokenYLiq: 300.2,
+    currentPrice: 1000
   },
   {
     tokenXName: 'BTC',
@@ -46,9 +46,9 @@ const data = [
     valueY: 2137.4,
     id: 2,
     address: '0x123132423423',
-    currentTick: 1234n,
-    minTick: 200n,
-    maxTick: 2000n
+    tokenXLiq: 5000,
+    tokenYLiq: 300.2,
+    currentPrice: 1000
   },
   {
     tokenXName: 'BTC',
@@ -62,9 +62,9 @@ const data = [
     valueY: 2137.4,
     id: 3,
     address: '0x123132423423',
-    currentTick: 1234n,
-    minTick: 1000n,
-    maxTick: 2150n
+    tokenXLiq: 5000,
+    tokenYLiq: 300.2,
+    currentPrice: 1000
   },
   {
     tokenXName: 'BTC',
@@ -78,9 +78,9 @@ const data = [
     valueY: 2137.4,
     id: 4,
     address: '0x123132423423',
-    currentTick: 1234n,
-    minTick: 1000n,
-    maxTick: 12330n
+    tokenXLiq: 5000,
+    tokenYLiq: 300.2,
+    currentPrice: 1000
   }
 ]
 

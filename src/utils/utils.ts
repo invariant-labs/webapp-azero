@@ -1179,28 +1179,3 @@ export const findClosestIndexByValue = (arr: number[], value: number): number =>
   }
   return high
 }
-
-export const calculateTickFromSqrtPrice = (
-  sqrtPrice: bigint,
-  tickSpacing: bigint,
-  isXtoY: boolean,
-  xDecimal: bigint,
-  yDecimal: bigint
-): bigint => {
-  const minTick = getMinTick(tickSpacing)
-  const maxTick = getMaxTick(tickSpacing)
-
-  const sqrtString = printBigint(sqrtPrice, PRICE_SCALE)
-  const sqrt = parseFloat(sqrtString)
-
-  const proportion = sqrt * sqrt
-
-  const price = proportion / 10 ** Number(yDecimal - xDecimal)
-  const adjustedPrice = isXtoY ? price : 1 / price
-
-  const primaryUnitsPrice = adjustedPrice * 10 ** Number(yDecimal - xDecimal)
-
-  const tick = Math.round(logBase(primaryUnitsPrice, 1.0001))
-
-  return BigInt(Math.max(Math.min(tick, Number(maxTick)), Number(minTick)))
-}

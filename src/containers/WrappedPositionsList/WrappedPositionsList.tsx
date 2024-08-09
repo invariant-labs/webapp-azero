@@ -6,8 +6,7 @@ import {
   calcYPerXPriceByTickIndex,
   positionListPageToQueryPage,
   calcPriceBySqrtPrice,
-  printBigint,
-  calculateTickFromSqrtPrice
+  printBigint
 } from '@utils/utils'
 import { actions } from '@store/reducers/positions'
 import { actions as walletActions } from '@store/reducers/wallet'
@@ -116,14 +115,6 @@ export const WrappedPositionsList: React.FC = () => {
       const valueX = tokenXLiq + tokenYLiq / currentPrice
       const valueY = tokenYLiq + tokenXLiq * currentPrice
 
-      const currentTick = calculateTickFromSqrtPrice(
-        position.poolData?.sqrtPrice ?? 0n,
-        position.poolKey.feeTier.tickSpacing,
-        true,
-        position.tokenX.decimals,
-        position.tokenY.decimals
-      )
-
       return {
         tokenXName: position.tokenX.symbol,
         tokenYName: position.tokenY.symbol,
@@ -136,10 +127,10 @@ export const WrappedPositionsList: React.FC = () => {
         valueY,
         address: walletAddress,
         id: index,
-        isActive: currentTick > position.lowerTickIndex && currentTick < position.upperTickIndex,
-        minTick: position.lowerTickIndex,
-        maxTick: position.upperTickIndex,
-        currentTick
+        isActive: currentPrice > min && currentPrice < max,
+        currentPrice,
+        tokenXLiq,
+        tokenYLiq
       }
     })
     .filter(item => {
