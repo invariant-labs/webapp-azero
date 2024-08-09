@@ -16,14 +16,15 @@ export const Primary: Story = {
     tokenYName: 'AZERO',
     tokenXIcon: '',
     tokenYIcon: '',
-    tokenXLiq: 5000,
-    tokenYLiq: 300.2,
     min: 2149.6,
     max: 149.6,
     fee: 0.05,
     valueX: 10000.45,
     valueY: 2137.4,
     id: 0,
-    address: ''
+    address: '',
+    tokenXLiq: 5000,
+    tokenYLiq: 300.2,
+    currentPrice: 10000
   }
 }

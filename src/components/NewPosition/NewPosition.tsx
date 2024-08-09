@@ -498,7 +498,7 @@ export const NewPosition: React.FC<INewPosition> = ({
             </TooltipHover>
           )}
         </Box>
-        {poolKey !== '' && (
+        {tokenA !== null && tokenB !== null && (
           <Grid container item alignItems='center' className={classes.options}>
             {poolKey !== '' ? (
               <MarketIdLabel
