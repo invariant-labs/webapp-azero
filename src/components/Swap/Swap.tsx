@@ -369,7 +369,7 @@ export const Swap: React.FC<ISwap> = ({
     let timeoutId: NodeJS.Timeout
 
     if (lockAnimation) {
-      timeoutId = setTimeout(() => setLockAnimation(false), 500)
+      timeoutId = setTimeout(() => setLockAnimation(false), 300)
     }
 
     return () => {
@@ -430,7 +430,7 @@ export const Swap: React.FC<ISwap> = ({
             </p>
           </Button>
           <TooltipHover text='Refresh'>
-            <div>
+            <Grid display='flex' alignItems='center'>
               <Button
                 onClick={handleRefresh}
                 className={classes.refreshIconBtn}
@@ -445,7 +445,7 @@ export const Swap: React.FC<ISwap> = ({
                 }>
                 <img src={refreshIcon} className={classes.refreshIcon} alt='Refresh' />
               </Button>
-            </div>
+            </Grid>
           </TooltipHover>
           <TooltipHover text='Settings'>
             <Button onClick={handleClickSettings} className={classes.settingsIconBtn}>
@@ -508,8 +508,9 @@ export const Swap: React.FC<ISwap> = ({
             isBalanceLoading={isBalanceLoading}
             showMaxButton={true}
             showBlur={
-              getStateMessage() === 'Loading' &&
-              (inputRef === inputTarget.TO || inputRef === inputTarget.DEFAULT)
+              lockAnimation ||
+              (getStateMessage() === 'Loading' &&
+                (inputRef === inputTarget.TO || inputRef === inputTarget.DEFAULT))
             }
           />
         </Box>
@@ -590,8 +591,9 @@ export const Swap: React.FC<ISwap> = ({
             isBalanceLoading={isBalanceLoading}
             showMaxButton={false}
             showBlur={
-              getStateMessage() === 'Loading' &&
-              (inputRef === inputTarget.FROM || inputRef === inputTarget.DEFAULT)
+              lockAnimation ||
+              (getStateMessage() === 'Loading' &&
+                (inputRef === inputTarget.FROM || inputRef === inputTarget.DEFAULT))
             }
           />
         </Box>

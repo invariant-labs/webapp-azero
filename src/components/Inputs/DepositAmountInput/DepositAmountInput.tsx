@@ -164,9 +164,18 @@ export const DepositAmountInput: React.FC<IProps> = ({
               priceLoading ? (
                 <img src={loadingAnimation} className={classes.loading} alt='loading' />
               ) : tokenPrice ? (
-                <Typography className={classes.caption2}>
-                  ~${formatNumber(usdBalance.toFixed(2))}
-                </Typography>
+                <Tooltip
+                  enterTouchDelay={0}
+                  leaveTouchDelay={Number.MAX_SAFE_INTEGER}
+                  title='Estimated USD Value of the Selected Tokens in Your Wallet'
+                  placement='bottom'
+                  classes={{
+                    tooltip: classes.tooltip
+                  }}>
+                  <Typography className={classes.estimatedBalance}>
+                    ~${formatNumber(usdBalance.toFixed(2))}
+                  </Typography>
+                </Tooltip>
               ) : (
                 <Tooltip
                   enterTouchDelay={0}

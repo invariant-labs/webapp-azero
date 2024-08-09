@@ -2,6 +2,19 @@ import { Theme } from '@mui/material'
 import { colors, typography } from '@static/theme'
 import { makeStyles } from 'tss-react/mui'
 
+const caption2styles = {
+  ...typography.caption2,
+  color: colors.invariant.lightHover,
+  overflow: 'hidden',
+  whiteSpace: 'nowrap',
+  textOverflow: 'ellipsis',
+  display: 'flex',
+  alignItems: 'center',
+
+  paddingBlock: 6,
+  flexShrink: 1,
+  marginRight: 6
+}
 export const useStyles = makeStyles<{ isSelected: boolean }>()((theme: Theme, { isSelected }) => ({
   wrapper: {
     position: 'relative',
@@ -105,17 +118,7 @@ export const useStyles = makeStyles<{ isSelected: boolean }>()((theme: Theme, { 
     marginRight: 10
   },
   caption2: {
-    ...typography.caption2,
-    color: colors.invariant.lightHover,
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis',
-    display: 'flex',
-    alignItems: 'center',
-
-    paddingBlock: 6,
-    flexShrink: 1,
-    marginRight: 6,
+    ...caption2styles,
 
     '&:hover': {
       color: isSelected ? colors.white.main : '',
@@ -123,6 +126,9 @@ export const useStyles = makeStyles<{ isSelected: boolean }>()((theme: Theme, { 
         color: colors.invariant.lightHover
       }
     }
+  },
+  estimatedBalance: {
+    ...caption2styles
   },
   maxButton: {
     color: colors.invariant.componentBcg,
