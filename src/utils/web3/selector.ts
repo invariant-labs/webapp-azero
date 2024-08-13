@@ -14,7 +14,7 @@ export const nightlyConnectAdapter = async (
   }
 ) => {
   if (_adapter) return _adapter
-  _adapter = await NightlyConnectAdapter.buildLazy(
+  _adapter = await NightlyConnectAdapter.build(
     {
       appMetadata: {
         name: 'Invariant',
