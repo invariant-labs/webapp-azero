@@ -28,6 +28,7 @@ export const HeaderWrapper: React.FC = () => {
       await wallet.canEagerConnect().then(
         async canEagerConnect => {
           if (canEagerConnect) {
+            await openWalletSelectorModal()
             dispatch(walletActions.connect(true))
           }
         },

@@ -474,11 +474,11 @@ export const Swap: React.FC<ISwap> = ({
           <ExchangeAmountInput
             value={amountFrom}
             balance={
-              tokenFrom !== null
+              tokenFrom !== null && tokens[tokenFrom]
                 ? printBigint(tokens[tokenFrom].balance || 0n, tokens[tokenFrom].decimals)
                 : '- -'
             }
-            decimal={tokenFrom !== null ? tokens[tokenFrom].decimals : DEFAULT_TOKEN_DECIMAL}
+            decimal={tokenFrom !== null && tokens[tokenFrom] ? tokens[tokenFrom].decimals : DEFAULT_TOKEN_DECIMAL}
             className={classes.amountInput}
             setValue={value => {
               if (value.match(/^\d*\.?\d*$/)) {
@@ -557,12 +557,12 @@ export const Swap: React.FC<ISwap> = ({
           <ExchangeAmountInput
             value={amountTo}
             balance={
-              tokenTo !== null
-                ? printBigint(tokens[tokenTo].balance || 0n, tokens[tokenTo].decimals)
+              tokenTo !== null &&  tokens[tokenTo]
+                ? printBigint(tokens[tokenTo]?.balance || 0n, tokens[tokenTo]?.decimals)
                 : '- -'
             }
             className={classes.amountInput}
-            decimal={tokenTo !== null ? tokens[tokenTo].decimals : DEFAULT_TOKEN_DECIMAL}
+            decimal={tokenTo !== null &&  tokens[tokenTo] ? tokens[tokenTo].decimals : DEFAULT_TOKEN_DECIMAL}
             setValue={value => {
               if (value.match(/^\d*\.?\d*$/)) {
                 setAmountTo(value)

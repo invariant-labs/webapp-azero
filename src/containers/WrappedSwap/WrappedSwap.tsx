@@ -145,7 +145,7 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
       return
     }
 
-    const id = tokensDict[tokenFrom.toString()].coingeckoId ?? ''
+    const id = tokensDict[tokenFrom.toString()]?.coingeckoId || ''
 
     if (id.length) {
       setPriceFromLoading(true)
@@ -169,7 +169,7 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
       return
     }
 
-    const id = tokensDict[tokenTo.toString()].coingeckoId ?? ''
+    const id = tokensDict[tokenTo.toString()]?.coingeckoId || ''
     if (id.length) {
       setPriceToLoading(true)
       getCoinGeckoTokenPrice(id)
