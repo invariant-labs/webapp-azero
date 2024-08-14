@@ -86,10 +86,14 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
   }, [isFetchingNewPool])
 
   const lastTokenFrom =
-    tickerToAddress(initialTokenFrom) ||
-    localStorage.getItem(`INVARIANT_LAST_TOKEN_FROM_${network}`)
+    tickerToAddress(initialTokenFrom) && initialTokenFrom !== '-'
+      ? tickerToAddress(initialTokenFrom)
+      : localStorage.getItem(`INVARIANT_LAST_TOKEN_FROM_${network}`)
+
   const lastTokenTo =
-    tickerToAddress(initialTokenTo) || localStorage.getItem(`INVARIANT_LAST_TOKEN_TO_${network}`)
+    tickerToAddress(initialTokenTo) && initialTokenTo !== '-'
+      ? tickerToAddress(initialTokenTo)
+      : localStorage.getItem(`INVARIANT_LAST_TOKEN_TO_${network}`)
 
   const addTokenHandler = async (address: string) => {
     const psp22 = SingletonPSP22.getInstance()
@@ -291,7 +295,13 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
         if (tokenTo !== null) {
           localStorage.setItem(`INVARIANT_LAST_TOKEN_TO_${network}`, tokenTo.toString())
         }
-        if (tokenFrom !== null && tokenTo !== null && tokenFrom !== tokenTo) {
+        if (
+          tokenFrom !== null &&
+          tokenTo !== null &&
+          tokenFrom !== tokenTo &&
+          tokenFrom !== '-' &&
+          tokenTo !== '-'
+        ) {
           dispatch(
             poolsActions.getAllPoolsForPairData({
               first: tokenFrom,

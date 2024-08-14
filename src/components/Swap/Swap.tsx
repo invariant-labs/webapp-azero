@@ -211,12 +211,16 @@ export const Swap: React.FC<ISwap> = ({
 
   useEffect(() => {
     if (tokenFrom !== null && tokenTo !== null) {
-      if (inputRef === inputTarget.FROM) {
+      if (inputRef === inputTarget.FROM && tokens[tokenTo]) {
         const amount = getAmountOut(tokens[tokenTo])
         setAmountTo(+amount === 0 ? '' : trimLeadingZeros(amount))
-      } else {
+      } else if (tokens[tokenFrom]) {
         const amount = getAmountOut(tokens[tokenFrom])
         setAmountFrom(+amount === 0 ? '' : trimLeadingZeros(amount))
+      } else if (!tokens[tokenTo]) {
+        setAmountTo('')
+      } else if (!tokens[tokenFrom]) {
+        setAmountFrom('')
       }
     }
   }, [simulateResult])
@@ -478,7 +482,11 @@ export const Swap: React.FC<ISwap> = ({
                 ? printBigint(tokens[tokenFrom].balance || 0n, tokens[tokenFrom].decimals)
                 : '- -'
             }
-            decimal={tokenFrom !== null && tokens[tokenFrom] ? tokens[tokenFrom].decimals : DEFAULT_TOKEN_DECIMAL}
+            decimal={
+              tokenFrom !== null && tokens[tokenFrom]
+                ? tokens[tokenFrom].decimals
+                : DEFAULT_TOKEN_DECIMAL
+            }
             className={classes.amountInput}
             setValue={value => {
               if (value.match(/^\d*\.?\d*$/)) {
@@ -557,12 +565,14 @@ export const Swap: React.FC<ISwap> = ({
           <ExchangeAmountInput
             value={amountTo}
             balance={
-              tokenTo !== null &&  tokens[tokenTo]
+              tokenTo !== null && tokens[tokenTo]
                 ? printBigint(tokens[tokenTo]?.balance || 0n, tokens[tokenTo]?.decimals)
                 : '- -'
             }
             className={classes.amountInput}
-            decimal={tokenTo !== null &&  tokens[tokenTo] ? tokens[tokenTo].decimals : DEFAULT_TOKEN_DECIMAL}
+            decimal={
+              tokenTo !== null && tokens[tokenTo] ? tokens[tokenTo].decimals : DEFAULT_TOKEN_DECIMAL
+            }
             setValue={value => {
               if (value.match(/^\d*\.?\d*$/)) {
                 setAmountTo(value)
