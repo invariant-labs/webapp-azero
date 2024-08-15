@@ -9,7 +9,9 @@ export interface ConnectionOptions {
 let _adapter: NightlyConnectAdapter | undefined
 export const nightlyConnectAdapter = async (
   persisted = true,
-  connectionOptions: ConnectionOptions = {}
+  connectionOptions: ConnectionOptions = {
+    initOnConnect: true
+  }
 ) => {
   if (_adapter) return _adapter
   _adapter = await NightlyConnectAdapter.build(

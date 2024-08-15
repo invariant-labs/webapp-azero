@@ -103,16 +103,20 @@ export function* fetchAllPoolKeys(): Generator {
 }
 
 export function* fetchAllPoolsForPairData(action: PayloadAction<PairTokens>) {
-  const invariant = yield* getInvariant()
+  try {
+    const invariant = yield* getInvariant()
 
-  const token0 = action.payload.first.toString()
-  const token1 = action.payload.second.toString()
-  const poolPairs = yield* call([invariant, invariant.getAllPoolsForPair], token0, token1)
-  const poolsWithPoolKey: PoolWithPoolKey[] = poolPairs.map(([feeTier, pool]) => {
-    return { poolKey: newPoolKey(token0, token1, feeTier), ...pool }
-  })
+    const token0 = action.payload.first.toString()
+    const token1 = action.payload.second.toString()
+    const poolPairs = yield* call([invariant, invariant.getAllPoolsForPair], token0, token1)
+    const poolsWithPoolKey: PoolWithPoolKey[] = poolPairs.map(([feeTier, pool]) => {
+      return { poolKey: newPoolKey(token0, token1, feeTier), ...pool }
+    })
 
-  yield* put(actions.addPools(poolsWithPoolKey))
+    yield* put(actions.addPools(poolsWithPoolKey))
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMaps>) {
