@@ -221,7 +221,8 @@ export enum SwapError {
   AmountIsZero,
   NoRouteFound,
   MaxTicksCrossed,
-  StateOutdated
+  StateOutdated,
+  Unknown
 }
 
 export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
@@ -327,6 +328,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
         }
       } catch (e) {
         console.log(e)
+        errors.push(SwapError.Unknown)
       }
     }
 

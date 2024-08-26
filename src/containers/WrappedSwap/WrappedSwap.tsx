@@ -51,7 +51,7 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
   const [progress, setProgress] = useState<ProgressState>('none')
   const [tokenFrom, setTokenFrom] = useState<string | null>(null)
   const [tokenTo, setTokenTo] = useState<string | null>(null)
-
+  console.log(swapSimulateResult.errors)
   useEffect(() => {
     let timeoutId1: NodeJS.Timeout
     let timeoutId2: NodeJS.Timeout

@@ -337,6 +337,14 @@ export const Swap: React.FC<ISwap> = ({
       return 'Insufficient volume'
     }
 
+    if (
+      tokenFrom !== null &&
+      convertBalanceToBigint(amountFrom, Number(tokens[tokenFrom].decimals)) !== 0n &&
+      isError(SwapError.Unknown)
+    ) {
+      return 'Not enough liquidity'
+    }
+
     return 'Exchange'
   }
   const hasShowRateMessage = () => {
