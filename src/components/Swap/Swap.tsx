@@ -9,11 +9,7 @@ import { Box, Button, Grid, Typography } from '@mui/material'
 import refreshIcon from '@static/svg/refresh.svg'
 import settingIcon from '@static/svg/settings.svg'
 import SwapArrows from '@static/svg/swap-arrows.svg'
-import {
-  DEFAULT_SWAP_SLIPPAGE,
-  DEFAULT_TOKEN_DECIMAL,
-  REFRESHER_INTERVAL
-} from '@store/consts/static'
+import { DEFAULT_TOKEN_DECIMAL, REFRESHER_INTERVAL } from '@store/consts/static'
 import {
   addressToTicker,
   convertBalanceToBigint,
@@ -463,7 +459,6 @@ export const Swap: React.FC<ISwap> = ({
             setSlippage={setSlippage}
             handleClose={handleCloseSettings}
             anchorEl={anchorEl}
-            defaultSlippage={DEFAULT_SWAP_SLIPPAGE}
             initialSlippage={initialSlippage}
           />
         </Grid>
