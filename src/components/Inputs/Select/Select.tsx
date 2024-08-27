@@ -21,6 +21,7 @@ export interface ISelectModal {
   commonTokens: string[]
   initialHideUnknownTokensValue: boolean
   onHideUnknownTokensChange: (val: boolean) => void
+  hiddenUnknownTokens: boolean
 }
 
 export const Select: React.FC<ISelectModal> = ({
@@ -35,7 +36,8 @@ export const Select: React.FC<ISelectModal> = ({
   sliceName = false,
   commonTokens,
   initialHideUnknownTokensValue,
-  onHideUnknownTokensChange
+  onHideUnknownTokensChange,
+  hiddenUnknownTokens
 }) => {
   const { classes } = useStyles()
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
@@ -99,6 +101,7 @@ export const Select: React.FC<ISelectModal> = ({
         commonTokens={commonTokens}
         initialHideUnknownTokensValue={initialHideUnknownTokensValue}
         onHideUnknownTokensChange={onHideUnknownTokensChange}
+        hiddenUnknownTokens={hiddenUnknownTokens}
       />
     </>
   )

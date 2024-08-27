@@ -23,8 +23,8 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   },
   arrowIcon: {
     width: 32,
-    marginRight: 8,
-    marginLeft: 8,
+    marginRight: 4,
+    marginLeft: 4,
     height: 32,
     borderRadius: '100%',
     padding: 4,
@@ -56,7 +56,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   rangeGrid: {
     display: 'flex',
     flexDirection: 'row',
-    paddingRight: 10
+    paddingRight: 4
   },
   header: {
     display: 'flex',
@@ -77,10 +77,11 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     }
   },
   feeText: {
-    marginLeft: 12,
-    minWidth: 90,
+    marginLeft: 8,
+    paddingInline: 6,
+    minWidth: 66,
 
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       minWidth: 84
     }
   },
@@ -93,7 +94,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingLeft: 8,
+    paddingLeft: 4,
     '& #pause': {
       padding: ' 0px 3px'
     },
@@ -105,8 +106,8 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   name: {
     ...typography.heading3,
     color: colors.invariant.text,
-    lineHeight: '28px',
-
+    textWrap: 'nowrap',
+    fontSize: 22,
     [theme.breakpoints.down('sm')]: {
       ...typography.heading4
     }
@@ -251,11 +252,12 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     color: colors.invariant.dark,
     background: colors.invariant.greenLinearGradientOpacity,
     height: 36,
-    width: 116,
+    width: 110,
     textTransform: 'none',
     transition: '300ms',
     paddingInline: 0,
     borderRadius: 12,
+    textWrap: 'nowrap',
     ...typography.body1,
 
     '&:hover': {

@@ -100,6 +100,8 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
   const [tokenA, setTokenA] = useState<string | null>(null)
   const [tokenB, setTokenB] = useState<string | null>(null)
 
+  const [hideUnknownTokens, setHideUnknownTokens] = useState<boolean>(initialHideUnknownTokensValue)
+
   const [isLoaded, setIsLoaded] = useState<boolean>(false)
 
   useEffect(() => {
@@ -225,7 +227,11 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
               sliceName
               commonTokens={commonTokens}
               initialHideUnknownTokensValue={initialHideUnknownTokensValue}
-              onHideUnknownTokensChange={onHideUnknownTokensChange}
+              onHideUnknownTokensChange={e => {
+                onHideUnknownTokensChange(e)
+                setHideUnknownTokens(e)
+              }}
+              hiddenUnknownTokens={hideUnknownTokens}
             />
           </Grid>
 
@@ -266,7 +272,11 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
               sliceName
               commonTokens={commonTokens}
               initialHideUnknownTokensValue={initialHideUnknownTokensValue}
-              onHideUnknownTokensChange={onHideUnknownTokensChange}
+              onHideUnknownTokensChange={e => {
+                onHideUnknownTokensChange(e)
+                setHideUnknownTokens(e)
+              }}
+              hiddenUnknownTokens={hideUnknownTokens}
             />
           </Grid>
         </Grid>

@@ -50,6 +50,7 @@ export const Primary: Story = {
     handleAddToken: fn(),
     initialHideUnknownTokensValue: false,
     onHideUnknownTokensChange: fn(),
-    tokens: tokens
+    tokens: tokens,
+    hiddenUnknownTokens: false
   }
 }

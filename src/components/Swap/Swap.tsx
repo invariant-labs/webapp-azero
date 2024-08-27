@@ -9,11 +9,7 @@ import { Box, Button, Grid, Typography } from '@mui/material'
 import refreshIcon from '@static/svg/refresh.svg'
 import settingIcon from '@static/svg/settings.svg'
 import SwapArrows from '@static/svg/swap-arrows.svg'
-import {
-  DEFAULT_SWAP_SLIPPAGE,
-  DEFAULT_TOKEN_DECIMAL,
-  REFRESHER_INTERVAL
-} from '@store/consts/static'
+import { DEFAULT_TOKEN_DECIMAL, REFRESHER_INTERVAL } from '@store/consts/static'
 import {
   addressToTicker,
   convertBalanceToBigint,
@@ -152,6 +148,9 @@ export const Swap: React.FC<ISwap> = ({
   const [inputRef, setInputRef] = React.useState<string>(inputTarget.DEFAULT)
   const [rateReversed, setRateReversed] = React.useState<boolean>(false)
   const [refresherTime, setRefresherTime] = React.useState<number>(REFRESHER_INTERVAL)
+  const [hideUnknownTokens, setHideUnknownTokens] = React.useState<boolean>(
+    initialHideUnknownTokensValue
+  )
 
   const timeoutRef = useRef<number>(0)
 
@@ -338,6 +337,14 @@ export const Swap: React.FC<ISwap> = ({
       return 'Insufficient volume'
     }
 
+    if (
+      tokenFrom !== null &&
+      convertBalanceToBigint(amountFrom, Number(tokens[tokenFrom].decimals)) !== 0n &&
+      isError(SwapError.Unknown)
+    ) {
+      return 'Not enough liquidity'
+    }
+
     return 'Exchange'
   }
   const hasShowRateMessage = () => {
@@ -463,7 +470,6 @@ export const Swap: React.FC<ISwap> = ({
             setSlippage={setSlippage}
             handleClose={handleCloseSettings}
             anchorEl={anchorEl}
-            defaultSlippage={DEFAULT_SWAP_SLIPPAGE}
             initialSlippage={initialSlippage}
           />
         </Grid>
@@ -510,7 +516,10 @@ export const Swap: React.FC<ISwap> = ({
             commonTokens={commonTokens}
             limit={1e14}
             initialHideUnknownTokensValue={initialHideUnknownTokensValue}
-            onHideUnknownTokensChange={onHideUnknownTokensChange}
+            onHideUnknownTokensChange={e => {
+              onHideUnknownTokensChange(e)
+              setHideUnknownTokens(e)
+            }}
             tokenPrice={tokenFromPriceData?.price}
             priceLoading={priceFromLoading}
             isBalanceLoading={isBalanceLoading}
@@ -520,6 +529,7 @@ export const Swap: React.FC<ISwap> = ({
               (getStateMessage() === 'Loading' &&
                 (inputRef === inputTarget.TO || inputRef === inputTarget.DEFAULT))
             }
+            hiddenUnknownTokens={hideUnknownTokens}
           />
         </Box>
         <Box className={classes.tokenComponentTextContainer}>
@@ -595,7 +605,10 @@ export const Swap: React.FC<ISwap> = ({
             commonTokens={commonTokens}
             limit={1e14}
             initialHideUnknownTokensValue={initialHideUnknownTokensValue}
-            onHideUnknownTokensChange={onHideUnknownTokensChange}
+            onHideUnknownTokensChange={e => {
+              onHideUnknownTokensChange(e)
+              setHideUnknownTokens(e)
+            }}
             tokenPrice={tokenToPriceData?.price}
             priceLoading={priceToLoading}
             isBalanceLoading={isBalanceLoading}
@@ -605,6 +618,7 @@ export const Swap: React.FC<ISwap> = ({
               (getStateMessage() === 'Loading' &&
                 (inputRef === inputTarget.FROM || inputRef === inputTarget.DEFAULT))
             }
+            hiddenUnknownTokens={hideUnknownTokens}
           />
         </Box>
         <Box className={classes.transactionDetails}>
