@@ -8,7 +8,6 @@ interface Props {
   setSlippage: (slippage: string) => void
   handleClose: () => void
   anchorEl: HTMLButtonElement | null
-  defaultSlippage: string
   initialSlippage: string
   infoText?: string
   headerText?: string
@@ -19,7 +18,6 @@ const Slippage: React.FC<Props> = ({
   setSlippage,
   handleClose,
   anchorEl,
-  defaultSlippage,
   initialSlippage,
   infoText,
   headerText
@@ -128,7 +126,10 @@ const Slippage: React.FC<Props> = ({
                 className={classNames(classes.slippagePercentageButton, {
                   [classes.slippagePercentageButtonActive]: index === tierIndex
                 })}
-                onClick={() => setTieredSlippage(index)}>
+                onClick={() => {
+                  setTieredSlippage(index)
+                  handleClose()
+                }}>
                 {tier}%
               </Button>
             ))}
@@ -137,19 +138,17 @@ const Slippage: React.FC<Props> = ({
             <Input
               disableUnderline
               placeholder='0.00'
-              className={classes.detailsInfoForm}
+              className={classNames(
+                classes.detailsInfoForm,
+                tierIndex === -1 && classes.activeForm
+              )}
               type={'text'}
               value={slippTolerance}
               onChange={e => {
                 allowOnlyDigitsAndTrimUnnecessaryZeros(e)
                 checkSlippage(e)
-                setTierIndex(-1)
               }}
               ref={inputRef}
-              onBlur={() => {
-                setSlippTolerance(Number(slippTolerance).toFixed(2))
-                setSlippage(String(Number(slippTolerance).toFixed(2)))
-              }}
               startAdornment='Custom'
               endAdornment={
                 <>
@@ -157,20 +156,12 @@ const Slippage: React.FC<Props> = ({
                   <button
                     className={classes.detailsInfoBtn}
                     onClick={() => {
-                      const tierIndex = slippageTiers.findIndex(
-                        tier => String(Number(tier).toFixed(2)) === defaultSlippage
-                      )
-                      setTierIndex(tierIndex)
-
-                      if (tierIndex !== -1) {
-                        setSlippTolerance('')
-                      } else {
-                        setSlippTolerance(defaultSlippage)
-                      }
-
-                      setSlippage(defaultSlippage)
+                      setSlippTolerance(Number(slippTolerance).toFixed(2))
+                      setSlippage(String(Number(slippTolerance).toFixed(2)))
+                      setTierIndex(-1)
+                      handleClose()
                     }}>
-                    Auto
+                    Save
                   </button>
                 </>
               }

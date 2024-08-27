@@ -16,7 +16,6 @@ type Story = StoryObj<typeof meta>
 export const Primary: Story = {
   args: {
     anchorEl: null,
-    defaultSlippage: '0,5',
     handleClose: fn(),
     initialSlippage: '0,5',
     setSlippage: fn(),

@@ -6,6 +6,9 @@ import SnackbarProvider from '@components/Snackbar'
 import { theme } from '@static/theme'
 import { ThemeProvider } from '@mui/material/styles'
 import Notifier from '@containers/Notifier'
+import { filterConsoleMessages, messagesToHide } from './hideErrors'
+
+filterConsoleMessages(messagesToHide)
 
 function App() {
   return (

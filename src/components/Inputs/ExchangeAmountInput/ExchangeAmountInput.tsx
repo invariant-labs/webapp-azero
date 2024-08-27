@@ -34,6 +34,7 @@ interface IProps {
   isBalanceLoading: boolean
   showMaxButton: boolean
   showBlur: boolean
+  hiddenUnknownTokens: boolean
 }
 
 export const AmountInput: React.FC<IProps> = ({
@@ -60,7 +61,8 @@ export const AmountInput: React.FC<IProps> = ({
   priceLoading = false,
   isBalanceLoading,
   showMaxButton = true,
-  showBlur
+  showBlur,
+  hiddenUnknownTokens
 }) => {
   const hideBalance = balance === '- -' || !balance || hideBalances
   const { classes } = useStyles({ walletDisconnected: hideBalance })
@@ -121,6 +123,7 @@ export const AmountInput: React.FC<IProps> = ({
           commonTokens={commonTokens}
           initialHideUnknownTokensValue={initialHideUnknownTokensValue}
           onHideUnknownTokensChange={onHideUnknownTokensChange}
+          hiddenUnknownTokens={hiddenUnknownTokens}
         />
         {showBlur ? (
           <div className={classes.blur}></div>

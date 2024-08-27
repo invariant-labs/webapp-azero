@@ -63,6 +63,9 @@ export const useStyles = makeStyles()(() => {
         outline: 'none'
       }
     },
+    activeForm: {
+      outline: `1px solid ${colors.invariant.light}`
+    },
     innerInput: {
       paddingBlock: 0,
       textAlign: 'right'
