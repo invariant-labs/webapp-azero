@@ -88,11 +88,9 @@ const SinglePositionInfo: React.FC<IProp> = ({
             alt={xToY ? tokenY.name : tokenX.name}
           />
           <Grid className={classes.namesGrid}>
-            <Typography className={classes.name}>{xToY ? tokenX.name : tokenY.name}</Typography>
-            <Typography id='pause' className={classes.name}>
-              -
+            <Typography className={classes.name}>
+              {xToY ? tokenX.name : tokenY.name} - {xToY ? tokenY.name : tokenX.name}
             </Typography>
-            <Typography className={classes.name}>{xToY ? tokenY.name : tokenX.name}</Typography>
           </Grid>
           <Grid className={classes.rangeGrid}>
             <Tooltip

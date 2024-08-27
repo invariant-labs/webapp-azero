@@ -36,6 +36,7 @@ export interface ISelectTokenModal {
   handleAddToken: (address: string) => void
   initialHideUnknownTokensValue: boolean
   onHideUnknownTokensChange: (val: boolean) => void
+  hiddenUnknownTokens: boolean
 }
 
 interface IScroll {
@@ -66,7 +67,8 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
   hideBalances = false,
   handleAddToken,
   initialHideUnknownTokensValue,
-  onHideUnknownTokensChange
+  onHideUnknownTokensChange,
+  hiddenUnknownTokens
 }) => {
   const { classes } = useStyles()
   const isXs = useMediaQuery(theme.breakpoints.down('sm'))
@@ -77,6 +79,10 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
 
   const outerRef = useRef<HTMLElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    setHideUnknown(hiddenUnknownTokens)
+  }, [hiddenUnknownTokens])
 
   const commonTokensList = useMemo(() => {
     const commonTokensList: SwapToken[] = []
