@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import useStyles from './style'
 import { Grid, Popover, Typography } from '@mui/material'
+import classNames from 'classnames'
 
 export interface IRoutesModal {
   routes: string[]
@@ -47,30 +48,34 @@ export const RoutesModal: React.FC<IRoutesModal> = ({
         horizontal: 'center'
       }}>
       <Grid className={classes.root} container alignContent='space-around' direction='column'>
+        <Typography className={classes.subtitle}>Navigation</Typography>
         {routes.map(route => (
           <Grid
             item
             key={`routes-${route}`}
-            className={classes.listItem}
+            className={classNames(
+              classes.listItem,
+              current === route ||
+                (typeof current !== 'undefined' &&
+                  !!otherRoutesToHighlight[route] &&
+                  otherRoutesToHighlight[route].some(pathRegex => pathRegex.test(current)))
+                ? classes.current
+                : null
+            )}
             onClick={() => {
               onSelect(route)
               handleClose()
             }}>
             <Link to={`/${route}`} className={classes.link}>
-              <Typography
-                className={
-                  current === route ||
-                  (typeof current !== 'undefined' &&
-                    !!otherRoutesToHighlight[route] &&
-                    otherRoutesToHighlight[route].some(pathRegex => pathRegex.test(current)))
-                    ? classes.current
-                    : classes.name
-                }>
-                {route}
-              </Typography>
+              <Typography className={classes.name}>{route}</Typography>
             </Link>
           </Grid>
         ))}
+        {(typeof onFaucet !== 'undefined' ||
+          typeof onRPC !== 'undefined' ||
+          typeof onChainSelect !== 'undefined') && (
+          <Typography className={classes.subtitle}>Wallet</Typography>
+        )}
         {typeof onFaucet !== 'undefined' ? (
           <Grid
             item

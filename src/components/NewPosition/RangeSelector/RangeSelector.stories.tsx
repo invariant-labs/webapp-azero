@@ -2,14 +2,43 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { fn } from '@storybook/test'
 import { useState } from 'react'
 import RangeSelector from './RangeSelector'
+import { Provider } from 'react-redux'
+import { store } from '@store/index'
+import { MemoryRouter } from 'react-router-dom'
 
 const meta = {
   title: 'Components/RangeSelector',
-  component: RangeSelector
+  component: RangeSelector,
+  decorators: [
+    Story => (
+      <Provider store={store}>
+        <MemoryRouter>
+          <Story />
+        </MemoryRouter>
+      </Provider>
+    )
+  ]
 } satisfies Meta<typeof RangeSelector>
 
 export default meta
 type Story = StoryObj<typeof meta>
+
+const PrimaryComponent: React.FC<typeof Primary.args> = args => {
+  const [concentrationIndex, setConcentrationIndex] = useState<number>(2)
+
+  return (
+    <RangeSelector
+      {...args}
+      concentrationIndex={concentrationIndex}
+      setConcentrationIndex={setConcentrationIndex}
+      tickSpacing={1 as any}
+      xDecimal={9 as any}
+      yDecimal={12 as any}
+      midPrice={{ x: 1, index: 1 as any }}
+      data={[{ x: 0, y: 0, index: 0 as any }]}
+    />
+  )
+}
 
 export const Primary: Story = {
   args: {
@@ -19,7 +48,7 @@ export const Primary: Story = {
     concentrationArray: [0.1, 0.2, 0.3, 0.4, 0.5],
     concentrationIndex: 2,
     data: [{ x: 0, y: 0, index: 0 as any }],
-    getTicksInsideRange: fn(),
+    getTicksInsideRange: () => ({ leftInRange: 0n as any, rightInRange: 100n as any }),
     minimumSliderIndex: 0,
     onChangeRange: fn(),
     poolIndex: 0,
@@ -27,7 +56,7 @@ export const Primary: Story = {
     setConcentrationIndex: fn(),
     ticksLoading: false,
     tickSpacing: 1 as any,
-    tokenASymbol: 'BTC',
+    tokenASymbol: 'SOL',
     tokenBSymbol: 'ETH',
     xDecimal: 9 as any,
     yDecimal: 12 as any,
@@ -39,19 +68,5 @@ export const Primary: Story = {
     onlyUserPositions: false,
     setOnlyUserPositions: fn()
   },
-  render: args => {
-    const [concentrationIndex, setConcentrationIndex] = useState(2)
-    return (
-      <RangeSelector
-        {...args}
-        concentrationIndex={concentrationIndex}
-        setConcentrationIndex={setConcentrationIndex}
-        tickSpacing={1n}
-        xDecimal={9n}
-        yDecimal={12n}
-        midPrice={{ x: 1, index: 1n }}
-        data={[{ x: 0, y: 0, index: 0n }]}
-      />
-    )
-  }
+  render: args => <PrimaryComponent {...args} />
 }

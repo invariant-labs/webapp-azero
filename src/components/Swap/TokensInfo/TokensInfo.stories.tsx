@@ -2,10 +2,22 @@ import type { Meta, StoryObj } from '@storybook/react'
 import TokensInfo from './TokensInfo'
 import { fn } from '@storybook/test'
 import { BTC, ETH } from '@store/consts/static'
+import { Provider } from 'react-redux'
+import { store } from '@store/index'
+import { MemoryRouter } from 'react-router-dom'
 
 const meta = {
   title: 'Components/TokensInfo',
-  component: TokensInfo
+  component: TokensInfo,
+  decorators: [
+    Story => (
+      <Provider store={store}>
+        <MemoryRouter>
+          <Story />
+        </MemoryRouter>
+      </Provider>
+    )
+  ]
 } satisfies Meta<typeof TokensInfo>
 
 export default meta
