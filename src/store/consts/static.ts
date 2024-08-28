@@ -296,3 +296,29 @@ export const CHAINS = [
   { name: Chain.AlephZero, address: 'https://azero.invariant.app/swap' },
   { name: Chain.Eclipse, address: 'https://eclipse.invariant.app/swap' }
 ]
+
+export const enum SortTypePoolList {
+  NAME_ASC,
+  NAME_DESC,
+  FEE_ASC,
+  FEE_DESC,
+  VOLUME_ASC,
+  VOLUME_DESC,
+  TVL_ASC,
+  TVL_DESC
+  // APY_ASC,
+  // APY_DESC
+}
+
+export const enum SortTypeTokenList {
+  NAME_ASC,
+  NAME_DESC,
+  PRICE_ASC,
+  PRICE_DESC,
+  CHANGE_ASC,
+  CHANGE_DESC,
+  VOLUME_ASC,
+  VOLUME_DESC,
+  TVL_ASC,
+  TVL_DESC
+}

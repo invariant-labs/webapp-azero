@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { fn } from '@storybook/test'
-import RangeInput from './RangeInput'
+import RangeInput, { IRangeInput } from './RangeInput' // Assuming RangeInputProps is exported
 import { useState } from 'react'
 
 const meta = {
@@ -11,6 +11,37 @@ const meta = {
 
 export default meta
 type Story = StoryObj<typeof meta>
+
+const RangeInputWrapper: React.FC<IRangeInput> = args => {
+  const [val, setVal] = useState('100')
+
+  return (
+    <div
+      style={{
+        backgroundColor: '#202946',
+        width: 400,
+        paddingBlock: 20
+      }}>
+      <RangeInput
+        {...args}
+        currentValue={val}
+        decreaseValue={() => {
+          setVal((+val - 0.01).toFixed(2).toString())
+        }}
+        increaseValue={() => {
+          setVal((+val + 0.01).toFixed(2).toString())
+        }}
+        setValue={value => {
+          setVal(value)
+        }}
+        onBlur={() => {
+          setVal((+val).toFixed(2).toString())
+        }}
+        style={{ width: 200, maxHeight: 300, margin: 'auto' }}
+      />
+    </div>
+  )
+}
 
 export const Primary: Story = {
   args: {
@@ -25,33 +56,5 @@ export const Primary: Story = {
     tokenFromSymbol: 'USDC',
     tokenToSymbol: 'USDT'
   },
-  render: args => {
-    const [val, setVal] = useState('100')
-    return (
-      <div
-        style={{
-          backgroundColor: '#202946',
-          width: 400,
-          paddingBlock: 20
-        }}>
-        <RangeInput
-          {...args}
-          currentValue={val}
-          decreaseValue={() => {
-            setVal((+val - 0.01).toFixed(2).toString())
-          }}
-          increaseValue={() => {
-            setVal((+val + 0.01).toFixed(2).toString())
-          }}
-          setValue={value => {
-            setVal(value)
-          }}
-          onBlur={() => {
-            setVal((+val).toFixed(2).toString())
-          }}
-          style={{ width: 200, maxHeight: 300, margin: 'auto' }}
-        />
-      </div>
-    )
-  }
+  render: args => <RangeInputWrapper {...args} />
 }

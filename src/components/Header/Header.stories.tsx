@@ -4,6 +4,8 @@ import Header from './Header'
 import { MemoryRouter } from 'react-router-dom'
 import { Network } from '@invariant-labs/a0-sdk'
 import { Chain } from '@store/consts/types'
+import { Provider } from 'react-redux'
+import { store } from '@store/index'
 
 const meta = {
   title: 'Layout/Header',
@@ -11,9 +13,11 @@ const meta = {
   args: {},
   decorators: [
     Story => (
-      <MemoryRouter>
-        <Story />
-      </MemoryRouter>
+      <Provider store={store}>
+        <MemoryRouter>
+          <Story />
+        </MemoryRouter>
+      </Provider>
     )
   ]
 } satisfies Meta<typeof Header>
