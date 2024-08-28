@@ -5,19 +5,7 @@ import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
 import { useStyles } from './style'
 import { Grid, Typography, useMediaQuery } from '@mui/material'
 import { formatNumbers, showPrefix } from '@utils/utils'
-
-enum SortType {
-  NAME_ASC,
-  NAME_DESC,
-  PRICE_ASC,
-  PRICE_DESC,
-  CHANGE_ASC,
-  CHANGE_DESC,
-  VOLUME_ASC,
-  VOLUME_DESC,
-  TVL_ASC,
-  TVL_DESC
-}
+import { SortTypeTokenList } from '@store/consts/static'
 
 interface IProps {
   displayType: string
@@ -29,8 +17,8 @@ interface IProps {
   priceChange?: number
   volume?: number
   TVL?: number
-  sortType?: SortType
-  onSort?: (type: SortType) => void
+  sortType?: SortTypeTokenList
+  onSort?: (type: SortTypeTokenList) => void
   hideBottomLine?: boolean
 }
 
@@ -91,32 +79,32 @@ const TokenListItem: React.FC<IProps> = ({
           <Typography
             style={{ cursor: 'pointer' }}
             onClick={() => {
-              if (sortType === SortType.NAME_ASC) {
-                onSort?.(SortType.NAME_DESC)
+              if (sortType === SortTypeTokenList.NAME_ASC) {
+                onSort?.(SortTypeTokenList.NAME_DESC)
               } else {
-                onSort?.(SortType.NAME_ASC)
+                onSort?.(SortTypeTokenList.NAME_ASC)
               }
             }}>
             Name
-            {sortType === SortType.NAME_ASC ? (
+            {sortType === SortTypeTokenList.NAME_ASC ? (
               <ArrowDropUpIcon className={classes.icon} />
-            ) : sortType === SortType.NAME_DESC ? (
+            ) : sortType === SortTypeTokenList.NAME_DESC ? (
               <ArrowDropDownIcon className={classes.icon} />
             ) : null}
           </Typography>
           <Typography
             style={{ cursor: 'pointer' }}
             onClick={() => {
-              if (sortType === SortType.PRICE_ASC) {
-                onSort?.(SortType.PRICE_DESC)
+              if (sortType === SortTypeTokenList.PRICE_ASC) {
+                onSort?.(SortTypeTokenList.PRICE_DESC)
               } else {
-                onSort?.(SortType.PRICE_ASC)
+                onSort?.(SortTypeTokenList.PRICE_ASC)
               }
             }}>
             Price
-            {sortType === SortType.PRICE_ASC ? (
+            {sortType === SortTypeTokenList.PRICE_ASC ? (
               <ArrowDropUpIcon className={classes.icon} />
-            ) : sortType === SortType.PRICE_DESC ? (
+            ) : sortType === SortTypeTokenList.PRICE_DESC ? (
               <ArrowDropDownIcon className={classes.icon} />
             ) : null}
           </Typography>
@@ -124,16 +112,16 @@ const TokenListItem: React.FC<IProps> = ({
             <Typography
               style={{ cursor: 'pointer' }}
               onClick={() => {
-                if (sortType === SortType.CHANGE_ASC) {
-                  onSort?.(SortType.CHANGE_DESC)
+                if (sortType === SortTypeTokenList.CHANGE_ASC) {
+                  onSort?.(SortTypeTokenList.CHANGE_DESC)
                 } else {
-                  onSort?.(SortType.CHANGE_ASC)
+                  onSort?.(SortTypeTokenList.CHANGE_ASC)
                 }
               }}>
               Price change
-              {sortType === SortType.CHANGE_ASC ? (
+              {sortType === SortTypeTokenList.CHANGE_ASC ? (
                 <ArrowDropUpIcon className={classes.icon} />
-              ) : sortType === SortType.CHANGE_DESC ? (
+              ) : sortType === SortTypeTokenList.CHANGE_DESC ? (
                 <ArrowDropDownIcon className={classes.icon} />
               ) : null}
             </Typography>
@@ -141,32 +129,32 @@ const TokenListItem: React.FC<IProps> = ({
           <Typography
             style={{ cursor: 'pointer' }}
             onClick={() => {
-              if (sortType === SortType.VOLUME_DESC) {
-                onSort?.(SortType.VOLUME_ASC)
+              if (sortType === SortTypeTokenList.VOLUME_DESC) {
+                onSort?.(SortTypeTokenList.VOLUME_ASC)
               } else {
-                onSort?.(SortType.VOLUME_DESC)
+                onSort?.(SortTypeTokenList.VOLUME_DESC)
               }
             }}>
             Volume 24H
-            {sortType === SortType.VOLUME_ASC ? (
+            {sortType === SortTypeTokenList.VOLUME_ASC ? (
               <ArrowDropUpIcon className={classes.icon} />
-            ) : sortType === SortType.VOLUME_DESC ? (
+            ) : sortType === SortTypeTokenList.VOLUME_DESC ? (
               <ArrowDropDownIcon className={classes.icon} />
             ) : null}
           </Typography>
           <Typography
             style={{ cursor: 'pointer' }}
             onClick={() => {
-              if (sortType === SortType.TVL_DESC) {
-                onSort?.(SortType.TVL_ASC)
+              if (sortType === SortTypeTokenList.TVL_DESC) {
+                onSort?.(SortTypeTokenList.TVL_ASC)
               } else {
-                onSort?.(SortType.TVL_DESC)
+                onSort?.(SortTypeTokenList.TVL_DESC)
               }
             }}>
             TVL
-            {sortType === SortType.TVL_ASC ? (
+            {sortType === SortTypeTokenList.TVL_ASC ? (
               <ArrowDropUpIcon className={classes.icon} />
-            ) : sortType === SortType.TVL_DESC ? (
+            ) : sortType === SortTypeTokenList.TVL_DESC ? (
               <ArrowDropDownIcon className={classes.icon} />
             ) : null}
           </Typography>

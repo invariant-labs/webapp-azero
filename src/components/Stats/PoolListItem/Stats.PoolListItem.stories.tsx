@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { MemoryRouter } from 'react-router-dom'
-import PoolListItem, { SortType } from './PoolListItem'
+import PoolListItem from './PoolListItem'
 import { store } from '@store/index'
 import { Provider } from 'react-redux'
 import { fn } from '@storybook/test'
+import { SortTypePoolList } from '@store/consts/static'
 
 const meta = {
   title: 'Stats/PoolListItem',
@@ -28,7 +29,7 @@ export const Header: Story = {
   args: {
     displayType: 'header',
     onSort: fn(),
-    sortType: SortType.TVL_DESC
+    sortType: SortTypePoolList.TVL_DESC
   }
 }
 
