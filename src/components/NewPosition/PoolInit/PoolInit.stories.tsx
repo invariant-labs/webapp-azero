@@ -2,14 +2,41 @@ import type { Meta, StoryObj } from '@storybook/react'
 import PoolInit from './PoolInit'
 import { fn } from '@storybook/test'
 import { useState } from 'react'
+import { Provider } from 'react-redux'
+import { MemoryRouter } from 'react-router-dom'
+import { store } from '@store/index'
 
 const meta = {
   title: 'Components/PoolInit',
-  component: PoolInit
+  component: PoolInit,
+  decorators: [
+    Story => (
+      <Provider store={store}>
+        <MemoryRouter>
+          <Story />
+        </MemoryRouter>
+      </Provider>
+    )
+  ]
 } satisfies Meta<typeof PoolInit>
 
 export default meta
 type Story = StoryObj<typeof meta>
+
+const PrimaryComponent: React.FC<typeof Primary.args> = args => {
+  const [midPrice, setMidPrice] = useState<bigint>(0n)
+
+  return (
+    <PoolInit
+      {...args}
+      midPriceIndex={midPrice}
+      onChangeMidPrice={setMidPrice}
+      tickSpacing={1n}
+      xDecimal={9n}
+      yDecimal={12n}
+    />
+  )
+}
 
 export const Primary: Story = {
   args: {
@@ -29,17 +56,5 @@ export const Primary: Story = {
     setConcentrationIndex: fn(),
     positionOpeningMethod: 'range'
   },
-  render: args => {
-    const [midPrice, setMidPrice] = useState(0n)
-    return (
-      <PoolInit
-        {...args}
-        midPriceIndex={midPrice}
-        onChangeMidPrice={setMidPrice}
-        tickSpacing={1n}
-        xDecimal={9n}
-        yDecimal={12n}
-      />
-    )
-  }
+  render: args => <PrimaryComponent {...args} />
 }

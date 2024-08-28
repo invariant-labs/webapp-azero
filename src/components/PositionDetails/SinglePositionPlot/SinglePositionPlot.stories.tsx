@@ -2,15 +2,19 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { fn } from '@storybook/test'
 import { MemoryRouter } from 'react-router-dom'
 import SinglePositionPlot from './SinglePositionPlot'
+import { Provider } from 'react-redux'
+import { store } from '@store/index'
 
 const meta = {
   title: 'Components/SinglePositionPlot',
   component: SinglePositionPlot,
   decorators: [
     Story => (
-      <MemoryRouter>
-        <Story />
-      </MemoryRouter>
+      <Provider store={store}>
+        <MemoryRouter>
+          <Story />
+        </MemoryRouter>
+      </Provider>
     )
   ]
 } satisfies Meta<typeof SinglePositionPlot>

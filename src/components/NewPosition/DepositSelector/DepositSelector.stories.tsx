@@ -1,12 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { fn } from '@storybook/test'
 import { useState } from 'react'
-import DepositSelector from './DepositSelector'
+import DepositSelector, { IDepositSelector } from './DepositSelector'
+import { SwapToken } from '@store/selectors/wallet'
+import { Provider } from 'react-redux'
+import { store } from '@store/index'
+import { MemoryRouter } from 'react-router-dom'
 
-const tokens: any = {
+const tokens: Record<string, SwapToken> = {
   So11111111111111111111111111111111111111112: {
-    balance: 111,
-    decimals: 6,
+    balance: 111 as any,
+    decimals: 6 as any,
     symbol: 'SOL',
     assetAddress: 'So11111111111111111111111111111111111111112',
     name: 'Wrapped Solana',
@@ -14,8 +18,8 @@ const tokens: any = {
       'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png'
   },
   '9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E': {
-    balance: 1000,
-    decimals: 6,
+    balance: 1000 as any,
+    decimals: 6 as any,
     symbol: 'BTC',
     assetAddress: '9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E',
     name: 'BTC',
@@ -23,8 +27,8 @@ const tokens: any = {
       'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E/logo.png'
   },
   EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: {
-    balance: 222,
-    decimals: 6,
+    balance: 222 as any,
+    decimals: 6 as any,
     symbol: 'USDC',
     assetAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
     name: 'USD coin',
@@ -35,11 +39,35 @@ const tokens: any = {
 
 const meta = {
   title: 'Components/DepositSelector',
-  component: DepositSelector
+  component: DepositSelector,
+  decorators: [
+    Story => (
+      <Provider store={store}>
+        <MemoryRouter>
+          <Story />
+        </MemoryRouter>
+      </Provider>
+    )
+  ]
 } satisfies Meta<typeof DepositSelector>
 
 export default meta
 type Story = StoryObj<typeof meta>
+
+const PrimaryComponent: React.FC<IDepositSelector> = args => {
+  const [feeTierIndex, setFeeTierIndex] = useState<number>(0)
+
+  return (
+    <DepositSelector
+      {...args}
+      setPositionTokens={(_a, _b, fee) => {
+        setFeeTierIndex(fee)
+      }}
+      feeTierIndex={feeTierIndex}
+      poolIndex={0}
+    />
+  )
+}
 
 export const Primary: Story = {
   args: {
@@ -48,15 +76,7 @@ export const Primary: Story = {
       '9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E',
       'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
     ],
-    concentrationArray: [
-      2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
-      27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
-      50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72,
-      73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95,
-      96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114,
-      115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133,
-      134, 135, 136, 137, 138, 139, 140, 141
-    ],
+    concentrationArray: Array.from({ length: 141 }, (_, i) => i + 2),
     concentrationIndex: 0,
     feeTiers: [0.02, 0.04, 0.1, 0.3, 1, 2, 5],
     handleAddToken: fn(),
@@ -68,7 +88,7 @@ export const Primary: Story = {
     onAddLiquidity: fn(),
     onHideUnknownTokensChange: fn(),
     onReverseTokens: fn(),
-    poolIndex: 0 as any,
+    poolIndex: 0,
     positionOpeningMethod: 'range',
     progress: 'success',
     setPositionTokens: fn(),
@@ -95,17 +115,5 @@ export const Primary: Story = {
     isGetLiquidityError: false,
     ticksLoading: false
   },
-  render: args => {
-    const [feeTierIndex, setFeeTierIndex] = useState<number>(0)
-    return (
-      <DepositSelector
-        {...args}
-        setPositionTokens={(_a, _b, fee) => {
-          setFeeTierIndex(fee)
-        }}
-        feeTierIndex={feeTierIndex}
-        poolIndex={0}
-      />
-    )
-  }
+  render: args => <PrimaryComponent {...args} />
 }

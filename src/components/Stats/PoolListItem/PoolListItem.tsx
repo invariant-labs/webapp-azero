@@ -7,19 +7,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
 import { useNavigate } from 'react-router-dom'
 import icons from '@static/icons'
-
-export enum SortType {
-  NAME_ASC,
-  NAME_DESC,
-  FEE_ASC,
-  FEE_DESC,
-  VOLUME_ASC,
-  VOLUME_DESC,
-  TVL_ASC,
-  TVL_DESC
-  // APY_ASC,
-  // APY_DESC
-}
+import { SortTypePoolList } from '@store/consts/static'
 
 interface IProps {
   TVL?: number
@@ -31,8 +19,8 @@ interface IProps {
   iconFrom?: string
   iconTo?: string
   tokenIndex?: number
-  sortType?: SortType
-  onSort?: (type: SortType) => void
+  sortType?: SortTypePoolList
+  onSort?: (type: SortTypePoolList) => void
   hideBottomLine?: boolean
   // apy?: number
   // apyData?: {
@@ -157,16 +145,16 @@ const PoolListItem: React.FC<IProps> = ({
           <Typography
             style={{ cursor: 'pointer' }}
             onClick={() => {
-              if (sortType === SortType.NAME_ASC) {
-                onSort?.(SortType.NAME_DESC)
+              if (sortType === SortTypePoolList.NAME_ASC) {
+                onSort?.(SortTypePoolList.NAME_DESC)
               } else {
-                onSort?.(SortType.NAME_ASC)
+                onSort?.(SortTypePoolList.NAME_ASC)
               }
             }}>
             Name
-            {sortType === SortType.NAME_ASC ? (
+            {sortType === SortTypePoolList.NAME_ASC ? (
               <ArrowDropUpIcon className={classes.icon} />
-            ) : sortType === SortType.NAME_DESC ? (
+            ) : sortType === SortTypePoolList.NAME_DESC ? (
               <ArrowDropDownIcon className={classes.icon} />
             ) : null}
           </Typography>
@@ -191,48 +179,48 @@ const PoolListItem: React.FC<IProps> = ({
           <Typography
             style={{ cursor: 'pointer' }}
             onClick={() => {
-              if (sortType === SortType.FEE_ASC) {
-                onSort?.(SortType.FEE_DESC)
+              if (sortType === SortTypePoolList.FEE_ASC) {
+                onSort?.(SortTypePoolList.FEE_DESC)
               } else {
-                onSort?.(SortType.FEE_ASC)
+                onSort?.(SortTypePoolList.FEE_ASC)
               }
             }}>
             Fee
-            {sortType === SortType.FEE_ASC ? (
+            {sortType === SortTypePoolList.FEE_ASC ? (
               <ArrowDropUpIcon className={classes.icon} />
-            ) : sortType === SortType.FEE_DESC ? (
+            ) : sortType === SortTypePoolList.FEE_DESC ? (
               <ArrowDropDownIcon className={classes.icon} />
             ) : null}
           </Typography>
           <Typography
             style={{ cursor: 'pointer' }}
             onClick={() => {
-              if (sortType === SortType.VOLUME_DESC) {
-                onSort?.(SortType.VOLUME_ASC)
+              if (sortType === SortTypePoolList.VOLUME_DESC) {
+                onSort?.(SortTypePoolList.VOLUME_ASC)
               } else {
-                onSort?.(SortType.VOLUME_DESC)
+                onSort?.(SortTypePoolList.VOLUME_DESC)
               }
             }}>
             Volume 24H
-            {sortType === SortType.VOLUME_ASC ? (
+            {sortType === SortTypePoolList.VOLUME_ASC ? (
               <ArrowDropUpIcon className={classes.icon} />
-            ) : sortType === SortType.VOLUME_DESC ? (
+            ) : sortType === SortTypePoolList.VOLUME_DESC ? (
               <ArrowDropDownIcon className={classes.icon} />
             ) : null}
           </Typography>
           <Typography
             style={{ cursor: 'pointer' }}
             onClick={() => {
-              if (sortType === SortType.TVL_DESC) {
-                onSort?.(SortType.TVL_ASC)
+              if (sortType === SortTypePoolList.TVL_DESC) {
+                onSort?.(SortTypePoolList.TVL_ASC)
               } else {
-                onSort?.(SortType.TVL_DESC)
+                onSort?.(SortTypePoolList.TVL_DESC)
               }
             }}>
             TVL
-            {sortType === SortType.TVL_ASC ? (
+            {sortType === SortTypePoolList.TVL_ASC ? (
               <ArrowDropUpIcon className={classes.icon} />
-            ) : sortType === SortType.TVL_DESC ? (
+            ) : sortType === SortTypePoolList.TVL_DESC ? (
               <ArrowDropDownIcon className={classes.icon} />
             ) : null}
           </Typography>
