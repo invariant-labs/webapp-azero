@@ -6,7 +6,7 @@ import { useStyles } from './style'
 import { Grid, Typography, useMediaQuery } from '@mui/material'
 import { formatNumbers, showPrefix } from '@utils/utils'
 
-export enum SortType {
+enum SortType {
   NAME_ASC,
   NAME_DESC,
   PRICE_ASC,

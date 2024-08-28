@@ -8,7 +8,7 @@ import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
 import { useNavigate } from 'react-router-dom'
 import icons from '@static/icons'
 
-export enum SortType {
+enum SortType {
   NAME_ASC,
   NAME_DESC,
   FEE_ASC,

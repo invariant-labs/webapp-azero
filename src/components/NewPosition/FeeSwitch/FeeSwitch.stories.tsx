@@ -11,6 +11,21 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+const PrimaryComponent: React.FC<typeof Primary.args> = args => {
+  const [currentTier, setCurrentTier] = useState<number>(0)
+
+  return (
+    <FeeSwitch
+      {...args}
+      currentValue={currentTier}
+      onSelect={a => {
+        setCurrentTier(a)
+      }}
+      showOnlyPercents
+    />
+  )
+}
+
 export const Primary: Story = {
   args: {
     currentValue: 0,
@@ -18,17 +33,5 @@ export const Primary: Story = {
     onSelect: fn(),
     bestTierIndex: 2
   },
-  render: args => {
-    const [currentTier, setCurrentTier] = useState(0)
-    return (
-      <FeeSwitch
-        {...args}
-        currentValue={currentTier}
-        onSelect={a => {
-          setCurrentTier(a)
-        }}
-        showOnlyPercents
-      />
-    )
-  }
+  render: args => <PrimaryComponent {...args} />
 }

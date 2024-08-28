@@ -2,10 +2,22 @@ import { Status } from '@store/reducers/wallet'
 import type { Meta, StoryObj } from '@storybook/react'
 import { fn } from '@storybook/test'
 import Swap from './Swap'
+import { Provider } from 'react-redux'
+import { store } from '@store/index'
+import { MemoryRouter } from 'react-router-dom'
 
 const meta = {
   title: 'Components/Swap',
-  component: Swap
+  component: Swap,
+  decorators: [
+    Story => (
+      <Provider store={store}>
+        <MemoryRouter>
+          <Story />
+        </MemoryRouter>
+      </Provider>
+    )
+  ]
 } satisfies Meta<typeof Swap>
 
 export default meta
@@ -49,7 +61,7 @@ export const Primary: Story = {
       amountOut: 1000000000000 as any,
       priceImpact: 1.23,
       targetSqrtPrice: 1000000000000000000000000 as any,
-      fee: 200000000n,
+      fee: 200000000 as any,
       errors: []
     },
     simulateSwap: fn(),
@@ -60,21 +72,21 @@ export const Primary: Story = {
       <Swap
         {...args}
         swapData={{
-          slippage: 1n,
-          estimatedPriceAfterSwap: 123n,
+          slippage: 1 as any,
+          estimatedPriceAfterSwap: 123 as any,
           tokenFrom: '0x123132423423',
           tokenTo: '0x123132423423',
-          amountIn: 123n,
+          amountIn: 123 as any,
           byAmountIn: false,
-          amountOut: 1114n,
+          amountOut: 1114 as any,
           poolKey: null
         }}
         simulateResult={{
           poolKey: null,
-          amountOut: 1000000000000n,
+          amountOut: 1000000000000 as any,
           priceImpact: 1.23,
-          targetSqrtPrice: 1000000000000000000000000n,
-          fee: 200000000n,
+          targetSqrtPrice: 100000000000000 as any,
+          fee: 200000000 as any,
           errors: []
         }}
       />

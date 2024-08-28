@@ -19,6 +19,6 @@ export const Primary: Story = {
     isLoadingRate: false
   },
   render: args => {
-    return <TransactionDetailsBox {...args} priceImpact={1} fee={2n} />
+    return <TransactionDetailsBox {...args} priceImpact={1} fee={2 as any} />
   }
 }
