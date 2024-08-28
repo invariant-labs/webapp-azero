@@ -1,4 +1,4 @@
-import { Network, TESTNET_INVARIANT_ADDRESS, TESTNET_WAZERO_ADDRESS } from '@invariant-labs/a0-sdk'
+import { Network, INVARIANT_ADDRESS, WAZERO_ADDRESS } from '@invariant-labs/a0-sdk'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { RPC } from '@store/consts/static'
 import { PayloadType } from '@store/consts/types'
@@ -25,8 +25,8 @@ export const defaultState: IAlephZeroConnectionStore = {
   networkType: Network.Testnet,
   blockNumber: 0,
   rpcAddress: localStorage.getItem(`INVARIANT_RPC_AlephZero_${Network.Testnet}`) || RPC.TEST,
-  invariantAddress: TESTNET_INVARIANT_ADDRESS,
-  wrappedAZEROAddress: TESTNET_WAZERO_ADDRESS
+  invariantAddress: INVARIANT_ADDRESS[Network.Testnet],
+  wrappedAZEROAddress: INVARIANT_ADDRESS[Network.Testnet]
 }
 export const connectionSliceName = 'connection'
 const connectionSlice = createSlice({
@@ -55,6 +55,8 @@ const connectionSlice = createSlice({
     ) {
       state.networkType = action.payload.networkType
       state.rpcAddress = action.payload.rpcAddress
+      state.invariantAddress = INVARIANT_ADDRESS[action.payload.networkType]
+      state.wrappedAZEROAddress = WAZERO_ADDRESS[action.payload.networkType]
       return state
     },
     updateSlot(state) {

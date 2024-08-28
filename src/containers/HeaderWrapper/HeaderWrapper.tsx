@@ -41,13 +41,23 @@ export const HeaderWrapper: React.FC = () => {
   }, [])
 
   const defaultTestnetRPC = useMemo(() => {
-    const lastRPC = localStorage.getItem(`INVARIANT_RPC_AlephZero_${currentNetwork}`)
+    const lastRPC = localStorage.getItem(`INVARIANT_RPC_AlephZero_${Network.Testnet}`)
 
     if (lastRPC === null) {
-      localStorage.setItem(`INVARIANT_RPC_AlephZero_${currentNetwork}`, RPC.TEST)
+      localStorage.setItem(`INVARIANT_RPC_AlephZero_${Network.Testnet}`, RPC.TEST)
     }
 
     return lastRPC === null ? RPC.TEST : lastRPC
+  }, [])
+
+  const defaultMainnetRPC = useMemo(() => {
+    const lastRPC = localStorage.getItem(`INVARIANT_RPC_AlephZero_${Network.Mainnet}`)
+
+    if (lastRPC === null) {
+      localStorage.setItem(`INVARIANT_RPC_AlephZero_${Network.Mainnet}`, RPC.MAIN)
+    }
+
+    return lastRPC === null ? RPC.MAIN : lastRPC
   }, [])
 
   const activeChain = CHAINS.find(chain => chain.name === Chain.AlephZero) ?? CHAINS[0]
@@ -57,9 +67,7 @@ export const HeaderWrapper: React.FC = () => {
       address={walletAddress}
       onNetworkSelect={(network, rpcAddress, rpcName) => {
         if (network !== currentNetwork || rpcAddress !== currentRpc) {
-          if (network === Network.Testnet) {
-            localStorage.setItem(`INVARIANT_RPC_AlephZero_${network}`, rpcAddress)
-          }
+          localStorage.setItem(`INVARIANT_RPC_AlephZero_${network}`, rpcAddress)
 
           dispatch(actions.setNetwork({ networkType: network, rpcAddress, rpcName }))
         }
@@ -97,6 +105,8 @@ export const HeaderWrapper: React.FC = () => {
           window.location.replace(chain.address)
         }
       }}
+      network={currentNetwork}
+      defaultMainnetRPC={defaultMainnetRPC}
     />
   )
 }

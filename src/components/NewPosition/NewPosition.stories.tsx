@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { fn } from '@storybook/test'
 import { MemoryRouter } from 'react-router-dom'
 import NewPosition from './NewPosition'
+import { Network } from '@invariant-labs/a0-sdk'
 
 const meta = {
   title: 'PageComponent/NewPosition',
@@ -73,7 +74,8 @@ export const Primary: Story = {
     unblockUpdatePriceRange: fn(),
     isGetLiquidityError: false,
     onlyUserPositions: false,
-    setOnlyUserPositions: fn()
+    setOnlyUserPositions: fn(),
+    network: Network.Testnet
   },
   render: () => {
     return (
@@ -132,6 +134,7 @@ export const Primary: Story = {
         isGetLiquidityError={false}
         onlyUserPositions={false}
         setOnlyUserPositions={fn()}
+        network={Network.Testnet}
       />
     )
   }

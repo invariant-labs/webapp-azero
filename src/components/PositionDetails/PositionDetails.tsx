@@ -16,6 +16,7 @@ import { ILiquidityToken } from './SinglePositionInfo/consts'
 import { useStyles } from './style'
 import { TokenPriceData } from '@store/consts/types'
 import { TooltipHover } from '@components/TooltipHover/TooltipHover'
+import { Network } from '@invariant-labs/a0-sdk'
 
 interface IProps {
   tokenXAddress: string
@@ -44,6 +45,7 @@ interface IProps {
   userHasStakes?: boolean
   onRefresh: () => void
   isBalanceLoading: boolean
+  network: Network
 }
 
 const PositionDetails: React.FC<IProps> = ({
@@ -72,7 +74,8 @@ const PositionDetails: React.FC<IProps> = ({
   reloadHandler,
   userHasStakes = false,
   onRefresh,
-  isBalanceLoading
+  isBalanceLoading,
+  network
 }) => {
   const { classes } = useStyles()
 
@@ -143,6 +146,7 @@ const PositionDetails: React.FC<IProps> = ({
           userHasStakes={userHasStakes}
           isBalanceLoading={isBalanceLoading}
           isActive={isActive}
+          network={network}
         />
       </Grid>
 
@@ -169,8 +173,8 @@ const PositionDetails: React.FC<IProps> = ({
                 variant='contained'
                 onClick={() => {
                   const parsedFee = parseFeeToPathFee(fee)
-                  const address1 = addressToTicker(tokenXAddress.toString())
-                  const address2 = addressToTicker(tokenYAddress.toString())
+                  const address1 = addressToTicker(network, tokenXAddress.toString())
+                  const address2 = addressToTicker(network, tokenYAddress.toString())
 
                   navigate(`/newPosition/${address1}/${address2}/${parsedFee}`)
                 }}>

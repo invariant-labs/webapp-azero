@@ -19,6 +19,7 @@ import { Network } from '@invariant-labs/a0-sdk'
 import SelectChainButton from './HeaderButton/SelectChainButton'
 import { ISelectChain } from '@store/consts/types'
 import SelectChain from '@components/Modals/SelectChain/SelectChain'
+import SelectMainnetRPC from '@components/Modals/SelectMainnetRPC/SelectMainnetRPC'
 
 export interface IHeader {
   address: string
@@ -35,6 +36,8 @@ export interface IHeader {
   onChangeWallet: () => void
   activeChain: ISelectChain
   onChainSelect: (chain: ISelectChain) => void
+  network: Network
+  defaultMainnetRPC: string
 }
 
 export const Header: React.FC<IHeader> = ({
@@ -51,7 +54,9 @@ export const Header: React.FC<IHeader> = ({
   onCopyAddress,
   onChangeWallet,
   activeChain,
-  onChainSelect
+  onChainSelect,
+  network,
+  defaultMainnetRPC
 }) => {
   const { classes } = useStyles()
   const buttonStyles = useButtonStyles()
@@ -81,6 +86,14 @@ export const Header: React.FC<IHeader> = ({
     {
       networkType: Network.Testnet,
       rpc: RPC.TEST,
+      rpcName: 'Aleph Zero'
+    }
+  ]
+
+  const mainnetRPCs = [
+    {
+      networkType: Network.Mainnet,
+      rpc: RPC.MAIN,
       rpcName: 'Aleph Zero'
     }
   ]
@@ -159,11 +172,14 @@ export const Header: React.FC<IHeader> = ({
                 </Button>
               </Box>
             ) : null}
-            {typeOfNetwork === Network.Testnet ? (
-              <Box sx={{ display: { xs: 'none', md: 'block' } }}>
-                <SelectRPCButton rpc={rpc} networks={testnetRPCs} onSelect={onNetworkSelect} />
-              </Box>
-            ) : null}
+            <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+              <SelectRPCButton
+                rpc={rpc}
+                networks={network === Network.Testnet ? testnetRPCs : mainnetRPCs}
+                onSelect={onNetworkSelect}
+                network={network}
+              />
+            </Box>
             <Box sx={{ display: { xs: 'none', md: 'block' } }}>
               <SelectChainButton
                 activeChain={activeChain}
@@ -179,6 +195,12 @@ export const Header: React.FC<IHeader> = ({
                   rpc: defaultTestnetRPC,
                   rpcName:
                     testnetRPCs.find(data => data.rpc === defaultTestnetRPC)?.rpcName ?? 'Custom'
+                },
+                {
+                  networkType: Network.Mainnet,
+                  rpc: defaultMainnetRPC,
+                  rpcName:
+                    mainnetRPCs.find(data => data.rpc === defaultMainnetRPC)?.rpcName ?? 'Custom'
                 }
               ]}
               onSelect={onNetworkSelect}
@@ -261,7 +283,19 @@ export const Header: React.FC<IHeader> = ({
               }}
               activeRPC={rpc}
             />
-          ) : null}
+          ) : (
+            <SelectMainnetRPC
+              networks={mainnetRPCs}
+              open={testnetRpcsOpen}
+              anchorEl={routesModalAnchor}
+              onSelect={onNetworkSelect}
+              handleClose={() => {
+                setTestnetRpcsOpen(false)
+                unblurContent()
+              }}
+              activeRPC={rpc}
+            />
+          )}
           <SelectChain
             chains={CHAINS}
             open={chainSelectOpen}

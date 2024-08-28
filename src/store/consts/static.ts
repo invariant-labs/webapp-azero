@@ -2,10 +2,10 @@ import {
   FEE_TIERS,
   Network,
   Position,
-  TESTNET_BTC_ADDRESS,
-  TESTNET_ETH_ADDRESS,
-  TESTNET_USDC_ADDRESS,
-  TESTNET_WAZERO_ADDRESS
+  BTC_ADDRESS,
+  ETH_ADDRESS,
+  USDC_ADDRESS,
+  WAZERO_ADDRESS
 } from '@invariant-labs/a0-sdk'
 import { Keyring } from '@polkadot/api'
 import {
@@ -16,12 +16,12 @@ import {
   Token,
   TokenPriceData
 } from './types'
-import { testnetBestTiersCreator } from '@utils/utils'
+import { bestTiersCreator } from '@utils/utils'
 import { POSITIONS_ENTRIES_LIMIT } from '@invariant-labs/a0-sdk/target/consts'
 
 export enum RPC {
   TEST = 'wss://ws.test.azero.dev',
-  DEV = 'wss://ws.dev.azero.dev'
+  MAIN = 'wss://ws.azero.dev'
 }
 
 export const POSITIONS_PER_PAGE = 5
@@ -47,15 +47,17 @@ export const TokenAirdropAmount = {
   USDC: 50000000n
 }
 
-export const FaucetTokenList = {
-  BTC: TESTNET_BTC_ADDRESS,
-  ETH: TESTNET_ETH_ADDRESS,
-  USDC: TESTNET_USDC_ADDRESS
+export const getFaucetTokenList = (network: Network) => {
+  return {
+    BTC: BTC_ADDRESS[network],
+    ETH: ETH_ADDRESS[network],
+    USDC: USDC_ADDRESS[network]
+  }
 }
 
-export const BTC: Token = {
+export const TESTNET_BTC: Token = {
   symbol: 'BTC',
-  address: TESTNET_BTC_ADDRESS,
+  address: BTC_ADDRESS[Network.Testnet],
   decimals: 8n,
   name: 'Bitcoin',
   logoURI:
@@ -63,9 +65,9 @@ export const BTC: Token = {
   coingeckoId: 'bitcoin'
 }
 
-export const ETH: Token = {
+export const TESTNET_ETH: Token = {
   symbol: 'ETH',
-  address: TESTNET_ETH_ADDRESS,
+  address: ETH_ADDRESS[Network.Testnet],
   decimals: 12n,
   name: 'Ether',
   logoURI:
@@ -73,9 +75,9 @@ export const ETH: Token = {
   coingeckoId: 'ethereum'
 }
 
-export const USDC: Token = {
+export const TESTNET_USDC: Token = {
   symbol: 'USDC',
-  address: TESTNET_USDC_ADDRESS,
+  address: USDC_ADDRESS[Network.Testnet],
   decimals: 6n,
   name: 'USDC',
   logoURI:
@@ -83,26 +85,75 @@ export const USDC: Token = {
   coingeckoId: 'usd-coin'
 }
 
-export const AZERO: Token = {
+export const TESTNET_AZERO: Token = {
   symbol: 'AZERO',
-  address: TESTNET_WAZERO_ADDRESS,
+  address: WAZERO_ADDRESS[Network.Testnet],
   decimals: 12n,
   name: 'Aleph Zero',
   logoURI: 'https://assets.coingecko.com/coins/images/17212/standard/azero-logo_coingecko.png',
   coingeckoId: 'aleph-zero'
 }
 
-export const DEFAULT_TOKENS = [BTC, ETH, USDC, AZERO]
+export const MAINNET_BTC: Token = {
+  symbol: 'BTC',
+  address: BTC_ADDRESS[Network.Testnet],
+  decimals: 8n,
+  name: 'Bitcoin',
+  logoURI:
+    'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E/logo.png',
+  coingeckoId: 'bitcoin'
+}
+
+export const MAINNET_ETH: Token = {
+  symbol: 'ETH',
+  address: ETH_ADDRESS[Network.Testnet],
+  decimals: 12n,
+  name: 'Ether',
+  logoURI:
+    'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk/logo.png',
+  coingeckoId: 'ethereum'
+}
+
+export const MAINNET_USDC: Token = {
+  symbol: 'USDC',
+  address: USDC_ADDRESS[Network.Testnet],
+  decimals: 6n,
+  name: 'USDC',
+  logoURI:
+    'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
+  coingeckoId: 'usd-coin'
+}
+
+export const MAINNET_AZERO: Token = {
+  symbol: 'AZERO',
+  address: WAZERO_ADDRESS[Network.Testnet],
+  decimals: 12n,
+  name: 'Aleph Zero',
+  logoURI: 'https://assets.coingecko.com/coins/images/17212/standard/azero-logo_coingecko.png',
+  coingeckoId: 'aleph-zero'
+}
+
+export const DEFAULT_TOKENS = ['bitcoin', 'ethereum', 'usd-coin', 'aleph-zero']
 
 export const bestTiers: Record<Network, BestTier[]> = {
-  [Network.Testnet]: testnetBestTiersCreator(),
+  [Network.Testnet]: bestTiersCreator(Network.Testnet),
   [Network.Mainnet]: [],
-  [Network.Local]: []
+  [Network.Local]: bestTiersCreator(Network.Local)
 }
 
 export const commonTokensForNetworks: Record<Network, string[]> = {
-  [Network.Testnet]: [BTC.address, ETH.address, USDC.address, AZERO.address],
-  [Network.Mainnet]: [],
+  [Network.Testnet]: [
+    TESTNET_BTC.address,
+    TESTNET_ETH.address,
+    TESTNET_USDC.address,
+    TESTNET_AZERO.address
+  ],
+  [Network.Mainnet]: [
+    MAINNET_BTC.address,
+    MAINNET_ETH.address,
+    MAINNET_USDC.address,
+    MAINNET_AZERO.address
+  ],
   [Network.Local]: []
 }
 
@@ -251,16 +302,20 @@ export const defaultPrefixConfig: PrefixConfig = {
   K: 10000
 }
 
-export const addressTickerMap: { [key: string]: string } = {
-  BTC: TESTNET_BTC_ADDRESS,
-  ETH: TESTNET_ETH_ADDRESS,
-  USDC: TESTNET_USDC_ADDRESS,
-  AZERO: TESTNET_WAZERO_ADDRESS
+export const getAddressTickerMap = (network: Network): { [k: string]: string } => {
+  return {
+    BTC: BTC_ADDRESS[network],
+    ETH: ETH_ADDRESS[network],
+    USDC: USDC_ADDRESS[network],
+    AZERO: WAZERO_ADDRESS[network]
+  }
 }
 
-export const reversedAddressTickerMap = Object.fromEntries(
-  Object.entries(addressTickerMap).map(([key, value]) => [value, key])
-)
+export const getReversedAddressTickerMap = (network: Network) => {
+  return Object.fromEntries(
+    Object.entries(getAddressTickerMap(network)).map(([key, value]) => [value, key])
+  )
+}
 
 export const LIQUIDITY_PLOT_DECIMAL = 12n
 
@@ -268,8 +323,8 @@ export const DEFAULT_TOKEN_DECIMAL = 12n
 
 export const EMPTY_POSITION: Position = {
   poolKey: {
-    tokenX: TESTNET_BTC_ADDRESS,
-    tokenY: TESTNET_ETH_ADDRESS,
+    tokenX: TESTNET_BTC.address,
+    tokenY: TESTNET_ETH.address,
     feeTier: { fee: 0n, tickSpacing: 1n }
   },
   liquidity: 0n,

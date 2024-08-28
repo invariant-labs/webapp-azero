@@ -20,10 +20,10 @@ import {
   PERCENTAGE_SCALE,
   PRICE_SCALE,
   SQRT_PRICE_SCALE,
-  TESTNET_BTC_ADDRESS,
-  TESTNET_ETH_ADDRESS,
-  TESTNET_USDC_ADDRESS,
-  TESTNET_WAZERO_ADDRESS
+  BTC_ADDRESS,
+  ETH_ADDRESS,
+  USDC_ADDRESS,
+  WAZERO_ADDRESS
 } from '@invariant-labs/a0-sdk/target/consts'
 import {
   calculateLiquidityBreakpoints,
@@ -34,10 +34,8 @@ import { PoolWithPoolKey } from '@store/reducers/pools'
 import { PlotTickData } from '@store/reducers/positions'
 import axios from 'axios'
 import {
-  BTC,
   COINGECKO_QUERY_COOLDOWN,
   DEFAULT_TOKENS,
-  ETH,
   ErrorMessage,
   FAUCET_DEPLOYER_MNEMONIC,
   FormatConfig,
@@ -46,13 +44,18 @@ import {
   POSITIONS_PER_QUERY,
   PositionTokenBlock,
   STABLECOIN_ADDRESSES,
-  USDC,
-  addressTickerMap,
+  getAddressTickerMap,
   defaultPrefixConfig,
   defaultThresholds,
-  reversedAddressTickerMap,
+  getReversedAddressTickerMap,
   subNumbers,
-  tokensPrices
+  tokensPrices,
+  TESTNET_USDC,
+  TESTNET_BTC,
+  TESTNET_ETH,
+  MAINNET_USDC,
+  MAINNET_BTC,
+  MAINNET_ETH
 } from '@store/consts/static'
 import { sleep } from '@store/sagas/wallet'
 import {
@@ -263,7 +266,7 @@ export const getCoinGeckoTokenPrice = async (id: string): Promise<number | undef
   } else {
     try {
       const { data } = await axios.get<CoinGeckoAPIData>(
-        `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${DEFAULT_TOKENS.map(token => token.coingeckoId)}`
+        `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${DEFAULT_TOKENS}`
       )
       priceData = data
       localStorage.setItem('COINGECKO_PRICE_DATA', JSON.stringify(priceData))
@@ -436,13 +439,17 @@ export const poolKeyToString = (poolKey: PoolKey): string => {
 export const getNetworkTokensList = (networkType: Network): Record<string, Token> => {
   switch (networkType) {
     case Network.Mainnet: {
-      return {}
+      return {
+        [MAINNET_USDC.address.toString()]: MAINNET_USDC,
+        [MAINNET_BTC.address.toString()]: MAINNET_BTC,
+        [MAINNET_ETH.address.toString()]: MAINNET_ETH
+      }
     }
     case Network.Testnet:
       return {
-        [USDC.address.toString()]: USDC,
-        [BTC.address.toString()]: BTC,
-        [ETH.address.toString()]: ETH
+        [TESTNET_USDC.address.toString()]: TESTNET_USDC,
+        [TESTNET_BTC.address.toString()]: TESTNET_BTC,
+        [TESTNET_ETH.address.toString()]: TESTNET_ETH
       }
     default:
       return {}
@@ -988,12 +995,12 @@ export const stringToFixed = (string: string, numbersAfterDot: number): string =
   return string.includes('.') ? string.slice(0, string.indexOf('.') + 1 + numbersAfterDot) : string
 }
 
-export const tickerToAddress = (ticker: string): string => {
-  return addressTickerMap[ticker] || ticker
+export const tickerToAddress = (network: Network, ticker: string): string => {
+  return getAddressTickerMap(network)[ticker] || ticker
 }
 
-export const addressToTicker = (address: string): string => {
-  return reversedAddressTickerMap[address] || address
+export const addressToTicker = (network: Network, address: string): string => {
+  return getReversedAddressTickerMap(network)[address] || address
 }
 
 export const initialXtoY = (tokenXAddress?: string, tokenYAddress?: string) => {
@@ -1027,15 +1034,15 @@ export const getFaucetDeployer = () => {
   return keyring.addFromUri(FAUCET_DEPLOYER_MNEMONIC)
 }
 
-export function testnetBestTiersCreator() {
+export function bestTiersCreator(network: Network) {
   const stableTokens = {
-    USDC: TESTNET_USDC_ADDRESS
+    USDC: USDC_ADDRESS[network]
   }
 
   const unstableTokens = {
-    BTC: TESTNET_BTC_ADDRESS,
-    ETH: TESTNET_ETH_ADDRESS,
-    AZERO: TESTNET_WAZERO_ADDRESS
+    BTC: BTC_ADDRESS[network],
+    ETH: ETH_ADDRESS[network],
+    AZERO: WAZERO_ADDRESS[network]
   }
 
   const bestTiers: BestTier[] = []

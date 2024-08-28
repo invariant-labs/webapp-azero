@@ -73,6 +73,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const loadingTicksAndTickMaps = useSelector(isLoadingTicksAndTickMaps)
   const isBalanceLoading = useSelector(balanceLoading)
   const shouldNotUpdatePriceRange = useSelector(shouldNotUpdateRange)
+  const network = useSelector(networkType)
 
   const { success, inProgress } = useSelector(initPosition)
 
@@ -661,6 +662,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       isGetLiquidityError={isGetLiquidityError}
       onlyUserPositions={onlyUserPositions}
       setOnlyUserPositions={setOnlyUserPositions}
+      network={network}
     />
   )
 }

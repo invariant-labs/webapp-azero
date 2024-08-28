@@ -50,7 +50,11 @@ export const SelectNetworkButton: React.FC<IProps> = ({
         open={openNetworks}
         anchorEl={anchorEl}
         onSelect={(networkType, rpcAddress, rpcName) => {
-          onSelect(networkType, rpcAddress, rpcName)
+          onSelect(
+            networkType,
+            localStorage.getItem(`INVARIANT_RPC_AlephZero_${networkType}`) ?? rpcAddress,
+            rpcName
+          )
           handleClose()
         }}
         handleClose={handleClose}

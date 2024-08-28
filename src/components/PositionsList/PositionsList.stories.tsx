@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { BrowserRouter } from 'react-router-dom'
 import { PositionsList } from './PositionsList'
+import { Network } from '@invariant-labs/a0-sdk'
 
 const meta = {
   title: 'PositionsList',
@@ -32,7 +33,8 @@ const data = [
     address: '0x123132423423',
     tokenXLiq: 5000,
     tokenYLiq: 300.2,
-    currentPrice: 1000
+    currentPrice: 1000,
+    network: Network.Testnet
   },
   {
     tokenXName: 'BTC',
@@ -48,7 +50,8 @@ const data = [
     address: '0x123132423423',
     tokenXLiq: 5000,
     tokenYLiq: 300.2,
-    currentPrice: 1000
+    currentPrice: 1000,
+    network: Network.Testnet
   },
   {
     tokenXName: 'BTC',
@@ -64,7 +67,8 @@ const data = [
     address: '0x123132423423',
     tokenXLiq: 5000,
     tokenYLiq: 300.2,
-    currentPrice: 1000
+    currentPrice: 1000,
+    network: Network.Testnet
   },
   {
     tokenXName: 'BTC',
@@ -80,7 +84,8 @@ const data = [
     address: '0x123132423423',
     tokenXLiq: 5000,
     tokenYLiq: 300.2,
-    currentPrice: 1000
+    currentPrice: 1000,
+    network: Network.Testnet
   }
 ]
 

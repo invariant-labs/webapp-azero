@@ -6,6 +6,7 @@ import { SwapToken } from '@store/selectors/wallet'
 import { Provider } from 'react-redux'
 import { store } from '@store/index'
 import { MemoryRouter } from 'react-router-dom'
+import { Network } from '@invariant-labs/a0-sdk'
 
 const tokens: Record<string, SwapToken> = {
   So11111111111111111111111111111111111111112: {
@@ -113,7 +114,8 @@ export const Primary: Story = {
     priceB: 2222,
     isBalanceLoading: false,
     isGetLiquidityError: false,
-    ticksLoading: false
+    ticksLoading: false,
+    network: Network.Testnet
   },
   render: args => <PrimaryComponent {...args} />
 }

@@ -2,7 +2,7 @@ import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import Slippage from '@components/Modals/Slippage/Slippage'
 import { INoConnected, NoConnected } from '@components/NoConnected/NoConnected'
 import Refresher from '@components/Refresher/Refresher'
-import { getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
+import { getMaxTick, getMinTick, Network } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
 import { Box, Button, Grid, Hidden, Typography } from '@mui/material'
 import backIcon from '@static/svg/back-arrow.svg'
@@ -102,6 +102,7 @@ export interface INewPosition {
   isGetLiquidityError: boolean
   onlyUserPositions: boolean
   setOnlyUserPositions: (val: boolean) => void
+  network: Network
 }
 
 export const NewPosition: React.FC<INewPosition> = ({
@@ -153,7 +154,8 @@ export const NewPosition: React.FC<INewPosition> = ({
   unblockUpdatePriceRange,
   isGetLiquidityError,
   onlyUserPositions,
-  setOnlyUserPositions
+  setOnlyUserPositions,
+  network
 }) => {
   const { classes } = useStyles()
   const navigate = useNavigate()
@@ -672,6 +674,7 @@ export const NewPosition: React.FC<INewPosition> = ({
           isBalanceLoading={isBalanceLoading}
           isGetLiquidityError={isGetLiquidityError}
           ticksLoading={ticksLoading}
+          network={network}
         />
         <Hidden mdUp>
           <Grid container justifyContent='end' mb={2}>
