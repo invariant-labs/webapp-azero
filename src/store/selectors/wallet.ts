@@ -1,11 +1,10 @@
-import { WAZERO_ADDRESS } from '@invariant-labs/a0-sdk'
+import { Network, WAZERO_ADDRESS } from '@invariant-labs/a0-sdk'
 import { BN } from '@polkadot/util'
 import { createSelector } from '@reduxjs/toolkit'
 import { POOL_SAFE_TRANSACTION_FEE, SWAP_SAFE_TRANSACTION_FEE } from '@store/consts/static'
 import { IAlephZeroWallet, ITokenBalance, walletSliceName } from '@store/reducers/wallet'
 import { AnyProps, keySelectors } from './helpers'
 import { tokens } from './pools'
-import { networkType } from './connection'
 
 const store = (s: AnyProps) => s[walletSliceName] as IAlephZeroWallet
 
@@ -42,17 +41,18 @@ export interface SwapToken {
   coingeckoId?: string
 }
 
+const network = Network[localStorage.getItem('INVARIANT_NETWORK_AlephZero') as keyof typeof Network]
+
 export const swapTokens = createSelector(
   tokensBalances,
   tokens,
   balance,
-  networkType,
-  (allAccounts, tokens, a0Balance, network) => {
+  (allAccounts, tokens, a0Balance) => {
     return Object.values(tokens).map(token => ({
       ...token,
       assetAddress: token.address,
       balance:
-        token.address.toString() === WAZERO_ADDRESS[network]
+        token.address.toString() === WAZERO_ADDRESS[network ?? Network.Testnet]
           ? BigInt(Math.max(Number(a0Balance - SWAP_SAFE_TRANSACTION_FEE), 0))
           : allAccounts[token.address.toString()]?.balance ?? 0n
     }))
@@ -63,13 +63,12 @@ export const poolTokens = createSelector(
   tokensBalances,
   tokens,
   balance,
-  networkType,
-  (allAccounts, tokens, a0Balance, network) => {
+  (allAccounts, tokens, a0Balance) => {
     return Object.values(tokens).map(token => ({
       ...token,
       assetAddress: token.address,
       balance:
-        token.address.toString() === WAZERO_ADDRESS[network]
+        token.address.toString() === WAZERO_ADDRESS[network ?? Network.Testnet]
           ? BigInt(Math.max(Number(a0Balance - POOL_SAFE_TRANSACTION_FEE), 0))
           : allAccounts[token.address.toString()]?.balance ?? 0n
     }))
@@ -80,15 +79,14 @@ export const swapTokensDict = createSelector(
   tokensBalances,
   tokens,
   balance,
-  networkType,
-  (allAccounts, tokens, a0Balance, network) => {
+  (allAccounts, tokens, a0Balance) => {
     const swapTokens: Record<string, SwapToken> = {}
     Object.entries(tokens).forEach(([key, val]) => {
       swapTokens[key] = {
         ...val,
         assetAddress: val.address,
         balance:
-          val.address.toString() === WAZERO_ADDRESS[network]
+          val.address.toString() === WAZERO_ADDRESS[network ?? Network.Testnet]
             ? BigInt(a0Balance)
             : allAccounts[val.address.toString()]?.balance ?? BigInt(0)
       }
