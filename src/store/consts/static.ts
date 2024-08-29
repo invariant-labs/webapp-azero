@@ -96,7 +96,7 @@ export const TESTNET_AZERO: Token = {
 
 export const MAINNET_BTC: Token = {
   symbol: 'BTC',
-  address: BTC_ADDRESS[Network.Testnet],
+  address: BTC_ADDRESS[Network.Mainnet],
   decimals: 8n,
   name: 'Bitcoin',
   logoURI:
@@ -106,7 +106,7 @@ export const MAINNET_BTC: Token = {
 
 export const MAINNET_ETH: Token = {
   symbol: 'ETH',
-  address: ETH_ADDRESS[Network.Testnet],
+  address: ETH_ADDRESS[Network.Mainnet],
   decimals: 12n,
   name: 'Ether',
   logoURI:
@@ -116,7 +116,7 @@ export const MAINNET_ETH: Token = {
 
 export const MAINNET_USDC: Token = {
   symbol: 'USDC',
-  address: USDC_ADDRESS[Network.Testnet],
+  address: USDC_ADDRESS[Network.Mainnet],
   decimals: 6n,
   name: 'USDC',
   logoURI:
@@ -126,7 +126,7 @@ export const MAINNET_USDC: Token = {
 
 export const MAINNET_AZERO: Token = {
   symbol: 'AZERO',
-  address: WAZERO_ADDRESS[Network.Testnet],
+  address: WAZERO_ADDRESS[Network.Mainnet],
   decimals: 12n,
   name: 'Aleph Zero',
   logoURI: 'https://assets.coingecko.com/coins/images/17212/standard/azero-logo_coingecko.png',

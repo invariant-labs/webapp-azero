@@ -12,7 +12,16 @@ import {
   WAZERO_ADDRESS
 } from '@invariant-labs/a0-sdk'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
-import { TESTNET_AZERO, TESTNET_BTC, TESTNET_ETH, TESTNET_USDC } from '@store/consts/static'
+import {
+  MAINNET_AZERO,
+  MAINNET_BTC,
+  MAINNET_ETH,
+  MAINNET_USDC,
+  TESTNET_AZERO,
+  TESTNET_BTC,
+  TESTNET_ETH,
+  TESTNET_USDC
+} from '@store/consts/static'
 import { PayloadType, Token } from '@store/consts/types'
 import { poolKeyToString } from '@utils/utils'
 
@@ -72,13 +81,23 @@ export interface FetchTicksAndTickMaps {
   allPools: PoolWithPoolKey[]
 }
 
+const network = Network[localStorage.getItem('INVARIANT_NETWORK_AlephZero') as keyof typeof Network]
+
 export const defaultState: IPoolsStore = {
-  tokens: {
-    [BTC_ADDRESS[Network.Testnet]]: TESTNET_BTC,
-    [ETH_ADDRESS[Network.Testnet]]: TESTNET_ETH,
-    [USDC_ADDRESS[Network.Testnet]]: TESTNET_USDC,
-    [WAZERO_ADDRESS[Network.Testnet]]: TESTNET_AZERO
-  },
+  tokens:
+    network === Network.Mainnet
+      ? {
+          [BTC_ADDRESS[Network.Mainnet]]: MAINNET_BTC,
+          [ETH_ADDRESS[Network.Mainnet]]: MAINNET_ETH,
+          [USDC_ADDRESS[Network.Mainnet]]: MAINNET_USDC,
+          [WAZERO_ADDRESS[Network.Mainnet]]: MAINNET_AZERO
+        }
+      : {
+          [BTC_ADDRESS[Network.Testnet]]: TESTNET_BTC,
+          [ETH_ADDRESS[Network.Testnet]]: TESTNET_ETH,
+          [USDC_ADDRESS[Network.Testnet]]: TESTNET_USDC,
+          [WAZERO_ADDRESS[Network.Testnet]]: TESTNET_AZERO
+        },
   pools: {},
   poolKeys: {},
   poolTicks: {},
@@ -204,9 +223,6 @@ const poolsSlice = createSlice({
     getTicksAndTickMaps(state, _action: PayloadAction<FetchTicksAndTickMaps>) {
       state.isLoadingTicksAndTickMaps = true
       return state
-    },
-    resetState() {
-      return defaultState
     }
   }
 })

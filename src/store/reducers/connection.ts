@@ -19,14 +19,19 @@ export interface IAlephZeroConnectionStore {
   wrappedAZEROAddress: string
 }
 
+const network = Network[localStorage.getItem('INVARIANT_NETWORK_AlephZero') as keyof typeof Network]
+
 export const defaultState: IAlephZeroConnectionStore = {
   status: Status.Uninitialized,
   message: '',
-  networkType: Network.Testnet,
+  networkType: network ?? Network.Testnet,
   blockNumber: 0,
-  rpcAddress: localStorage.getItem(`INVARIANT_RPC_AlephZero_${Network.Testnet}`) || RPC.TEST,
-  invariantAddress: INVARIANT_ADDRESS[Network.Testnet],
-  wrappedAZEROAddress: INVARIANT_ADDRESS[Network.Testnet]
+  rpcAddress:
+    localStorage.getItem(`INVARIANT_RPC_AlephZero_${network}`) ?? network === Network.Testnet
+      ? RPC.TEST
+      : RPC.MAIN,
+  invariantAddress: INVARIANT_ADDRESS[network] ?? INVARIANT_ADDRESS[Network.Testnet],
+  wrappedAZEROAddress: WAZERO_ADDRESS[network] ?? WAZERO_ADDRESS[Network.Testnet]
 }
 export const connectionSliceName = 'connection'
 const connectionSlice = createSlice({

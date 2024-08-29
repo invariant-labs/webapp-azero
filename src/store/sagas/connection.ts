@@ -1,4 +1,4 @@
-import { all, call, put, SagaGenerator, select, takeLeading, spawn, delay } from 'typed-redux-saga'
+import { all, call, put, SagaGenerator, select, takeLeading, spawn } from 'typed-redux-saga'
 import { actions, Status, PayloadTypes } from '@store/reducers/connection'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import {
@@ -103,10 +103,6 @@ export function* initConnection(): Generator {
 }
 
 export function* handleNetworkChange(action: PayloadAction<PayloadTypes['setNetwork']>): Generator {
-  yield* delay(1000)
-
-  yield* getApi()
-
   yield* put(
     snackbarsActions.add({
       message: `You are on network ${action.payload.networkType}${
@@ -116,6 +112,9 @@ export function* handleNetworkChange(action: PayloadAction<PayloadTypes['setNetw
       persist: false
     })
   )
+
+  localStorage.setItem('INVARIANT_NETWORK_AlephZero', action.payload.networkType)
+  window.location.reload()
 }
 
 export function* networkChangeSaga(): Generator {
