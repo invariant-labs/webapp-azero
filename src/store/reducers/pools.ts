@@ -203,6 +203,9 @@ const poolsSlice = createSlice({
     getTicksAndTickMaps(state, _action: PayloadAction<FetchTicksAndTickMaps>) {
       state.isLoadingTicksAndTickMaps = true
       return state
+    },
+    getTokens(state, _action: PayloadAction<string[]>) {
+      return state
     }
   }
 })
