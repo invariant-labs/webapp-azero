@@ -24,7 +24,8 @@ import {
   getMockedTokenPrice,
   getNewTokenOrThrow,
   poolKeyToString,
-  printBigint
+  printBigint,
+  tickerToAddress
 } from '@utils/utils'
 import { actions as poolsActions } from '@store/reducers/pools'
 import { actions, InitMidPrice, actions as positionsActions } from '@store/reducers/positions'
@@ -34,6 +35,8 @@ import { networkType } from '@store/selectors/connection'
 import {
   isLoadingLatestPoolsForTransaction,
   isLoadingTicksAndTickMaps,
+  isLoadingTokens,
+  isLoadingTokensError,
   poolKeys,
   pools,
   poolsArraySortedByFees
@@ -51,6 +54,7 @@ import { openWalletSelectorModal } from '@utils/web3/selector'
 import { VariantType } from 'notistack'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 export interface IProps {
   initialTokenFrom: string
@@ -105,6 +109,37 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const [isGetLiquidityError, setIsGetLiquidityError] = useState(false)
 
   const isMountedRef = useRef(false)
+  const navigate = useNavigate()
+  const isCurrentlyLoadingTokens = useSelector(isLoadingTokens)
+  const isCurrentlyLoadingTokensError = useSelector(isLoadingTokensError)
+
+  useEffect(() => {
+    const tokensToFetch = []
+
+    if (initialTokenFrom && !tokens[tickerToAddress(initialTokenFrom)]) {
+      tokensToFetch.push(tickerToAddress(initialTokenFrom))
+    }
+
+    if (initialTokenTo && !tokens[tickerToAddress(initialTokenTo)]) {
+      tokensToFetch.push(tickerToAddress(initialTokenTo))
+    }
+
+    if (tokensToFetch.length) {
+      dispatch(poolsActions.getTokens(tokensToFetch))
+    } else {
+      dispatch(poolsActions.addTokens({}))
+    }
+  }, [])
+
+  useEffect(() => {
+    if (isCurrentlyLoadingTokensError) {
+      if (tokens[tickerToAddress(initialTokenFrom)]) {
+        navigate(`/newPosition/${initialTokenFrom}/${initialFee}`)
+      } else if (tokens[tickerToAddress(initialTokenTo)]) {
+        navigate(`/newPosition/${initialTokenTo}/${initialTokenTo}/${initialFee}`)
+      }
+    }
+  }, [isCurrentlyLoadingTokensError])
 
   useEffect(() => {
     dispatch(poolsActions.getPoolKeys())
@@ -661,6 +696,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       isGetLiquidityError={isGetLiquidityError}
       onlyUserPositions={onlyUserPositions}
       setOnlyUserPositions={setOnlyUserPositions}
+      isLoadingTokens={isCurrentlyLoadingTokens}
     />
   )
 }

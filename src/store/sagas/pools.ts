@@ -190,9 +190,13 @@ export function* handleGetTokens(action: PayloadAction<string[]>) {
   const walletAddress = yield* select(address)
   const psp22 = yield* getPSP22()
 
-  const tokensData = yield* call(getTokenDataByAddresses, tokens, psp22, walletAddress)
+  try {
+    const tokensData = yield* call(getTokenDataByAddresses, tokens, psp22, walletAddress)
 
-  yield* put(actions.addTokens(tokensData))
+    yield* put(actions.addTokens(tokensData))
+  } catch (e) {
+    yield* put(actions.setTokensError(true))
+  }
 }
 
 export function* getPoolsDataForListHandler(): Generator {
