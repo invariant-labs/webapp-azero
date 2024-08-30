@@ -161,17 +161,15 @@ export const Header: React.FC<IHeader> = ({
 
         <Grid container item className={classes.buttons} wrap='nowrap'>
           <Grid container className={classes.leftButtons}>
-            {typeOfNetwork === Network.Testnet ? (
-              <Box sx={{ display: { xs: 'none', md: 'block' } }}>
-                <Button
-                  className={buttonStyles.classes.headerButton}
-                  variant='contained'
-                  sx={{ '& .MuiButton-label': buttonStyles.classes.label }}
-                  onClick={onFaucet}>
-                  Faucet
-                </Button>
-              </Box>
-            ) : null}
+            <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+              <Button
+                className={buttonStyles.classes.headerButton}
+                variant='contained'
+                sx={{ '& .MuiButton-label': buttonStyles.classes.label }}
+                onClick={onFaucet}>
+                Faucet
+              </Button>
+            </Box>
             <Box sx={{ display: { xs: 'none', md: 'block' } }}>
               <SelectRPCButton
                 rpc={rpc}
