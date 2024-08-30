@@ -81,7 +81,9 @@ export interface FetchTicksAndTickMaps {
   allPools: PoolWithPoolKey[]
 }
 
-const network = Network[localStorage.getItem('INVARIANT_NETWORK_AlephZero') as keyof typeof Network]
+const network =
+  Network[localStorage.getItem('INVARIANT_NETWORK_AlephZero') as keyof typeof Network] ??
+  Network.Testnet
 
 export const defaultState: IPoolsStore = {
   tokens:
