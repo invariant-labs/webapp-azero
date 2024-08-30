@@ -88,12 +88,12 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
   const lastTokenFrom =
     tickerToAddress(network, initialTokenFrom) && initialTokenFrom !== '-'
       ? tickerToAddress(network, initialTokenFrom)
-      : localStorage.getItem(`INVARIANT_LAST_TOKEN_FROM`)
+      : localStorage.getItem(`INVARIANT_LAST_TOKEN_FROM_${network}`)
 
   const lastTokenTo =
     tickerToAddress(network, initialTokenTo) && initialTokenTo !== '-'
       ? tickerToAddress(network, initialTokenTo)
-      : localStorage.getItem(`INVARIANT_LAST_TOKEN_TO`)
+      : localStorage.getItem(`INVARIANT_LAST_TOKEN_TO_${network}`)
 
   const addTokenHandler = async (address: string) => {
     const psp22 = SingletonPSP22.getInstance()
@@ -289,11 +289,11 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
         setTokenTo(tokenTo)
 
         if (tokenFrom !== null) {
-          localStorage.setItem(`INVARIANT_LAST_TOKEN_FROM`, tokenFrom.toString())
+          localStorage.setItem(`INVARIANT_LAST_TOKEN_FROM_${network}`, tokenFrom.toString())
         }
 
         if (tokenTo !== null) {
-          localStorage.setItem(`INVARIANT_LAST_TOKEN_TO`, tokenTo.toString())
+          localStorage.setItem(`INVARIANT_LAST_TOKEN_TO_${network}`, tokenTo.toString())
         }
         if (
           tokenFrom !== null &&

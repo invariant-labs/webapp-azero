@@ -9,7 +9,7 @@ import { openWalletSelectorModal } from '@utils/web3/selector'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import React, { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Chain } from '@store/consts/types'
 
@@ -20,6 +20,7 @@ export const HeaderWrapper: React.FC = () => {
   const currentRpc = useSelector(rpcAddress)
   const location = useLocation()
   const walletAddress = useSelector(address)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchWallet = async () => {
@@ -72,6 +73,14 @@ export const HeaderWrapper: React.FC = () => {
         }
 
         if (network !== currentNetwork) {
+          if (location.pathname.startsWith('/exchange')) {
+            navigate('/exchange')
+          }
+
+          if (location.pathname.startsWith('/newPosition')) {
+            navigate('/newPosition')
+          }
+
           dispatch(actions.setNetwork(network))
         }
       }}

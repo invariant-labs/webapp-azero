@@ -251,9 +251,9 @@ export const Header: React.FC<IHeader> = ({
               setRoutesModalOpen(false)
               unblurContent()
             }}
-            onFaucet={typeOfNetwork === Network.Testnet && isMdDown ? onFaucet : undefined}
+            onFaucet={isMdDown ? onFaucet : undefined}
             onRPC={
-              typeOfNetwork === Network.Testnet && isMdDown
+              isMdDown
                 ? () => {
                     setRoutesModalOpen(false)
                     setTestnetRpcsOpen(true)
