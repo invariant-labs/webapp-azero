@@ -71,18 +71,6 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   const poolKey = position?.poolKey ? poolKeyToString(position?.poolKey) : ''
 
   useEffect(() => {
-    if (position?.tokenX && position?.tokenY) {
-      dispatch(
-        poolsActions.getTicksAndTickMaps({
-          tokenFrom: position.tokenX.address,
-          tokenTo: position.tokenY.address,
-          allPools
-        })
-      )
-    }
-  }, [waitingForTicksData, position?.tokenX, position?.tokenY])
-
-  useEffect(() => {
     if (position?.poolKey && waitingForTicksData === null && allTickMaps[poolKey] !== undefined) {
       setWaitingForTicksData(true)
 
