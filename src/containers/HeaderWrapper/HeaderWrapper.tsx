@@ -65,11 +65,14 @@ export const HeaderWrapper: React.FC = () => {
   return (
     <Header
       address={walletAddress}
-      onNetworkSelect={(network, rpcAddress, rpcName) => {
-        if (network !== currentNetwork || rpcAddress !== currentRpc) {
+      onNetworkSelect={(network, rpcAddress) => {
+        if (rpcAddress !== currentRpc) {
           localStorage.setItem(`INVARIANT_RPC_AlephZero_${network}`, rpcAddress)
+          dispatch(actions.setRPCAddress(rpcAddress))
+        }
 
-          dispatch(actions.setNetwork({ networkType: network, rpcAddress, rpcName }))
+        if (network !== currentNetwork) {
+          dispatch(actions.setNetwork(network))
         }
       }}
       onConnectWallet={async () => {

@@ -49,18 +49,10 @@ const connectionSlice = createSlice({
       state.message = action.payload
       return state
     },
-    setNetwork(
-      state,
-      action: PayloadAction<{
-        networkType: Network
-        rpcAddress: string
-        rpcName?: string
-      }>
-    ) {
-      state.networkType = action.payload.networkType
-      state.rpcAddress = action.payload.rpcAddress
-      state.invariantAddress = INVARIANT_ADDRESS[action.payload.networkType]
-      state.wrappedAZEROAddress = WAZERO_ADDRESS[action.payload.networkType]
+    setNetwork(state, action: PayloadAction<Network>) {
+      state.networkType = action.payload
+      state.invariantAddress = INVARIANT_ADDRESS[action.payload]
+      state.wrappedAZEROAddress = WAZERO_ADDRESS[action.payload]
       return state
     },
     updateSlot(state) {
@@ -68,6 +60,10 @@ const connectionSlice = createSlice({
     },
     setSlot(state, action: PayloadAction<number>) {
       state.blockNumber = action.payload
+      return state
+    },
+    setRPCAddress(state, action: PayloadAction<string>) {
+      state.rpcAddress = action.payload
       return state
     }
   }
