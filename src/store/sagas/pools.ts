@@ -184,6 +184,21 @@ export function* fetchTokens(poolsWithPoolKeys: PoolWithPoolKey[]) {
   yield* put(actions.updateTokenBalances(knownTokenBalances))
 }
 
+export function* handleGetTokens(action: PayloadAction<string[]>) {
+  const tokens = action.payload
+
+  const walletAddress = yield* select(address)
+  const psp22 = yield* getPSP22()
+
+  try {
+    const tokensData = yield* call(getTokenDataByAddresses, tokens, psp22, walletAddress)
+
+    yield* put(actions.addTokens(tokensData))
+  } catch (e) {
+    yield* put(actions.setTokensError(true))
+  }
+}
+
 export function* getPoolsDataForListHandler(): Generator {
   yield* takeEvery(actions.getPoolsDataForList, fetchPoolsDataForList)
 }
@@ -204,6 +219,10 @@ export function* getTicksAndTickMapsHandler(): Generator {
   yield* takeEvery(actions.getTicksAndTickMaps, fetchTicksAndTickMaps)
 }
 
+export function* getTokensHandler(): Generator {
+  yield* takeLatest(actions.getTokens, handleGetTokens)
+}
+
 export function* poolsSaga(): Generator {
   yield all(
     [
@@ -211,7 +230,8 @@ export function* poolsSaga(): Generator {
       getPoolKeysHandler,
       getPoolsDataForListHandler,
       getAllPoolsForPairDataHandler,
-      getTicksAndTickMapsHandler
+      getTicksAndTickMapsHandler,
+      getTokensHandler
     ].map(spawn)
   )
 }
