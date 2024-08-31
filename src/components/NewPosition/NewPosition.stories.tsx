@@ -73,7 +73,8 @@ export const Primary: Story = {
     unblockUpdatePriceRange: fn(),
     isGetLiquidityError: false,
     onlyUserPositions: false,
-    setOnlyUserPositions: fn()
+    setOnlyUserPositions: fn(),
+    isLoadingTokens: false
   },
   render: () => {
     return (
@@ -132,6 +133,7 @@ export const Primary: Story = {
         isGetLiquidityError={false}
         onlyUserPositions={false}
         setOnlyUserPositions={fn()}
+        isLoadingTokens={false}
       />
     )
   }
