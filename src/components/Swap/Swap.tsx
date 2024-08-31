@@ -324,14 +324,15 @@ export const Swap: React.FC<ISwap> = ({
     }
 
     if (
-      convertBalanceToBigint(amountFrom, Number(tokens[tokenFrom].decimals)) >
-      tokens[tokenFrom].balance
+      convertBalanceToBigint(amountFrom, Number(tokens[tokenFrom]?.decimals) ?? 0n) >
+        tokens[tokenFrom]?.balance ??
+      0n
     ) {
       return 'Insufficient balance'
     }
 
     if (
-      convertBalanceToBigint(amountFrom, Number(tokens[tokenFrom].decimals)) === 0n ||
+      convertBalanceToBigint(amountFrom, Number(tokens[tokenFrom]?.decimals ?? 0n)) === 0n ||
       (simulateResult.poolKey === null && isError(SwapError.AmountIsZero))
     ) {
       return 'Insufficient volume'
@@ -339,7 +340,7 @@ export const Swap: React.FC<ISwap> = ({
 
     if (
       tokenFrom !== null &&
-      convertBalanceToBigint(amountFrom, Number(tokens[tokenFrom].decimals)) !== 0n &&
+      convertBalanceToBigint(amountFrom, Number(tokens[tokenFrom]?.decimals ?? 0n)) !== 0n &&
       isError(SwapError.Unknown)
     ) {
       return 'Not enough liquidity'
