@@ -192,13 +192,13 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
   const [wasRunTokenB, setWasRunTokenB] = useState(false)
 
   useEffect(() => {
-    if (!wasRunTokenA && tokens[tickerToAddress(initialTokenFrom)]) {
-      setTokenA(tickerToAddress(initialTokenFrom))
+    if (!wasRunTokenA && tokens[tickerToAddress(network, initialTokenFrom)]) {
+      setTokenA(tickerToAddress(network, initialTokenFrom))
       setWasRunTokenA(true)
     }
 
-    if (!wasRunTokenB && tokens[tickerToAddress(initialTokenTo)]) {
-      setTokenB(tickerToAddress(initialTokenTo))
+    if (!wasRunTokenB && tokens[tickerToAddress(network, initialTokenTo)]) {
+      setTokenB(tickerToAddress(network, initialTokenTo))
       setWasRunTokenB(true)
     }
   }, [wasRunTokenA, wasRunTokenB, tokens])
