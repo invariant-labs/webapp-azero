@@ -86,7 +86,7 @@ export const Header: React.FC<IHeader> = ({
     {
       networkType: Network.Testnet,
       rpc: RPC.TEST,
-      rpcName: 'Aleph Zero'
+      rpcName: 'Aleph Zero Testnet'
     }
   ]
 
@@ -94,7 +94,7 @@ export const Header: React.FC<IHeader> = ({
     {
       networkType: Network.Mainnet,
       rpc: RPC.MAIN,
-      rpcName: 'Aleph Zero'
+      rpcName: 'Aleph Zero Mainnet'
     }
   ]
 
