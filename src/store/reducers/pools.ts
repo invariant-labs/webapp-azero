@@ -45,6 +45,8 @@ export interface IPoolsStore {
   isLoadingLatestPoolsForTransaction: boolean
   isLoadingTicksAndTickMaps: boolean
   isLoadingPoolKeys: boolean
+  isLoadingTokens: boolean
+  isLoadingTokensError: boolean
   tickMaps: { [key in string]: string }
 }
 
@@ -107,6 +109,8 @@ export const defaultState: IPoolsStore = {
   isLoadingLatestPoolsForTransaction: false,
   isLoadingTicksAndTickMaps: false,
   isLoadingPoolKeys: true,
+  isLoadingTokens: true,
+  isLoadingTokensError: false,
   tickMaps: {}
 }
 
@@ -140,6 +144,7 @@ const poolsSlice = createSlice({
         ...state.tokens,
         ...action.payload
       }
+      state.isLoadingTokens = false
       return state
     },
     updateTokenBalances(state, action: PayloadAction<[string, bigint][]>) {
@@ -224,6 +229,14 @@ const poolsSlice = createSlice({
     getPoolsDataForList(_state, _action: PayloadAction<ListPoolsRequest>) {},
     getTicksAndTickMaps(state, _action: PayloadAction<FetchTicksAndTickMaps>) {
       state.isLoadingTicksAndTickMaps = true
+      return state
+    },
+    getTokens(state, _action: PayloadAction<string[]>) {
+      state.isLoadingTokens = true
+      return state
+    },
+    setTokensError(state, action: PayloadAction<boolean>) {
+      state.isLoadingTokensError = action.payload
       return state
     }
   }

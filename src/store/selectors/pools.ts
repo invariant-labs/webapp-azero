@@ -13,6 +13,8 @@ export const {
   tickMaps,
   nearestPoolTicksForPair,
   isLoadingTicksAndTickMaps,
+  isLoadingTokens,
+  isLoadingTokensError,
   isLoadingPoolKeys
 } = keySelectors(store, [
   'pools',
@@ -23,6 +25,8 @@ export const {
   'tickMaps',
   'nearestPoolTicksForPair',
   'isLoadingTicksAndTickMaps',
+  'isLoadingTokens',
+  'isLoadingTokensError',
   'isLoadingPoolKeys'
 ])
 

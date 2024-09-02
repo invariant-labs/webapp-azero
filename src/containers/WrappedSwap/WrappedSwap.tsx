@@ -95,6 +95,22 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
       ? tickerToAddress(network, initialTokenTo)
       : localStorage.getItem(`INVARIANT_LAST_TOKEN_TO_${network}`)
 
+  useEffect(() => {
+    const tokens = []
+
+    if (lastTokenFrom && !tokensDict[lastTokenFrom]) {
+      tokens.push(lastTokenFrom)
+    }
+
+    if (lastTokenTo && !tokensDict[lastTokenTo]) {
+      tokens.push(lastTokenTo)
+    }
+
+    if (tokens.length) {
+      dispatch(poolsActions.getTokens(tokens))
+    }
+  }, [])
+
   const addTokenHandler = async (address: string) => {
     const psp22 = SingletonPSP22.getInstance()
 

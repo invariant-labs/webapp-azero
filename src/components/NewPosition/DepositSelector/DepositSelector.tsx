@@ -188,6 +188,21 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
     minimumSliderIndex
   ])
 
+  const [wasRunTokenA, setWasRunTokenA] = useState(false)
+  const [wasRunTokenB, setWasRunTokenB] = useState(false)
+
+  useEffect(() => {
+    if (!wasRunTokenA && tokens[tickerToAddress(initialTokenFrom)]) {
+      setTokenA(tickerToAddress(initialTokenFrom))
+      setWasRunTokenA(true)
+    }
+
+    if (!wasRunTokenB && tokens[tickerToAddress(initialTokenTo)]) {
+      setTokenB(tickerToAddress(initialTokenTo))
+      setWasRunTokenB(true)
+    }
+  }, [wasRunTokenA, wasRunTokenB, tokens])
+
   useEffect(() => {
     if (tokenA !== null) {
       if (getScaleFromString(tokenAInputState.value) > Number(tokens[tokenA].decimals)) {

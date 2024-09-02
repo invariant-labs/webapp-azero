@@ -75,7 +75,8 @@ export const Primary: Story = {
     isGetLiquidityError: false,
     onlyUserPositions: false,
     setOnlyUserPositions: fn(),
-    network: Network.Testnet
+    network: Network.Testnet,
+    isLoadingTokens: false
   },
   render: () => {
     return (
@@ -135,6 +136,7 @@ export const Primary: Story = {
         onlyUserPositions={false}
         setOnlyUserPositions={fn()}
         network={Network.Testnet}
+        isLoadingTokens={false}
       />
     )
   }
