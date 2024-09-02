@@ -750,8 +750,8 @@ export const calculateAmountInWithSlippage = (
 ): bigint => {
   const price = +printBigint(sqrtPriceToPrice(sqrtPriceLimit), PRICE_SCALE)
   const amountIn = xToY
-    ? Math.ceil(Number(amountOut) / price)
-    : Math.ceil(Number(amountOut) * price)
+    ? Math.ceil(Number(amountOut + 1n) / price)
+    : Math.ceil(Number(amountOut + 1n) * price)
 
   const amountInWithFee = BigInt(
     Math.ceil(
