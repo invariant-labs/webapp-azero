@@ -13,12 +13,12 @@ import {
   poolKeyToString,
   printBigint
 } from '@utils/utils'
-import { actions as poolsActions } from '@store/reducers/pools'
+
 import { actions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Status, actions as walletActions } from '@store/reducers/wallet'
 import { networkType } from '@store/selectors/connection'
-import { poolsArraySortedByFees, tickMaps } from '@store/selectors/pools'
+import { tickMaps } from '@store/selectors/pools'
 import {
   currentPositionTicks,
   isLoadingPositionsList,
@@ -44,7 +44,6 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const allPools = useSelector(poolsArraySortedByFees)
   const currentNetwork = useSelector(networkType)
   const position = useSelector(singlePositionData(id))
   const isLoadingList = useSelector(isLoadingPositionsList)
