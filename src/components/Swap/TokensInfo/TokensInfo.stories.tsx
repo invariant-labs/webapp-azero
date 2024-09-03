@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import TokensInfo from './TokensInfo'
 import { fn } from '@storybook/test'
-import { BTC, ETH } from '@store/consts/static'
+import { TESTNET_BTC, TESTNET_ETH } from '@store/consts/static'
 import { Provider } from 'react-redux'
 import { store } from '@store/index'
 import { MemoryRouter } from 'react-router-dom'
@@ -28,22 +28,22 @@ export const Primary: Story = {
     copyTokenAddressHandler: fn(),
     tokenFrom: {
       balance: 234234000343400000n as any,
-      symbol: BTC.symbol,
-      assetAddress: BTC.address,
-      name: BTC.name,
-      logoURI: BTC.logoURI,
-      coingeckoId: BTC.coingeckoId,
-      decimals: BTC.decimals,
+      symbol: TESTNET_BTC.symbol,
+      assetAddress: TESTNET_BTC.address,
+      name: TESTNET_BTC.name,
+      logoURI: TESTNET_BTC.logoURI,
+      coingeckoId: TESTNET_BTC.coingeckoId,
+      decimals: TESTNET_BTC.decimals,
       isUnknown: false
     },
     tokenTo: {
       balance: 23435345450000400n as any,
-      symbol: ETH.symbol,
-      assetAddress: ETH.address,
-      name: ETH.name,
-      logoURI: ETH.logoURI,
-      coingeckoId: ETH.coingeckoId,
-      decimals: ETH.decimals,
+      symbol: TESTNET_ETH.symbol,
+      assetAddress: TESTNET_ETH.address,
+      name: TESTNET_ETH.name,
+      logoURI: TESTNET_ETH.logoURI,
+      coingeckoId: TESTNET_ETH.coingeckoId,
+      decimals: TESTNET_ETH.decimals,
       isUnknown: false
     },
     tokenFromPrice: 53433 as any,

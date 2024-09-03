@@ -44,6 +44,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
+  const network = useSelector(networkType)
   const allPools = useSelector(poolsArraySortedByFees)
   const currentNetwork = useSelector(networkType)
   const position = useSelector(singlePositionData(id))
@@ -403,6 +404,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
         }}
         onRefresh={onRefresh}
         isBalanceLoading={isBalanceLoading}
+        network={network}
       />
     )
   }

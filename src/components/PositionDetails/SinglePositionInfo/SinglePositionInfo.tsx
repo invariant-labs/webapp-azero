@@ -11,6 +11,7 @@ import { TokenPriceData } from '@store/consts/types'
 import { addressToTicker } from '@utils/utils'
 import { TooltipHover } from '@components/TooltipHover/TooltipHover'
 import icons from '@static/icons'
+import { Network } from '@invariant-labs/a0-sdk'
 
 interface IProp {
   fee: number
@@ -26,6 +27,7 @@ interface IProp {
   userHasStakes?: boolean
   isBalanceLoading: boolean
   isActive: boolean
+  network: Network
 }
 
 const SinglePositionInfo: React.FC<IProp> = ({
@@ -41,7 +43,8 @@ const SinglePositionInfo: React.FC<IProp> = ({
   showFeesLoader = false,
   userHasStakes = false,
   isBalanceLoading,
-  isActive
+  isActive,
+  network
 }) => {
   const navigate = useNavigate()
 
@@ -142,8 +145,8 @@ const SinglePositionInfo: React.FC<IProp> = ({
               className={classes.button}
               variant='contained'
               onClick={() => {
-                const address1 = addressToTicker(tokenX.name)
-                const address2 = addressToTicker(tokenY.name)
+                const address1 = addressToTicker(network, tokenX.name)
+                const address2 = addressToTicker(network, tokenY.name)
 
                 navigate(`/newPosition/${address1}/${address2}/${fee}`)
               }}>

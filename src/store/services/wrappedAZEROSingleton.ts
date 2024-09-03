@@ -1,4 +1,4 @@
-import { Network, TESTNET_WAZERO_ADDRESS, WrappedAZERO } from '@invariant-labs/a0-sdk'
+import { Network, WAZERO_ADDRESS, WrappedAZERO } from '@invariant-labs/a0-sdk'
 import { ApiPromise } from '@polkadot/api'
 import { DEFAULT_WAZERO_OPTIONS } from '@store/consts/static'
 
@@ -25,7 +25,7 @@ class SingletonWrappedAZERO {
       this.wrappedAZERO = await WrappedAZERO.load(
         api,
         network,
-        TESTNET_WAZERO_ADDRESS,
+        WAZERO_ADDRESS[network],
         DEFAULT_WAZERO_OPTIONS
       )
       this.api = api

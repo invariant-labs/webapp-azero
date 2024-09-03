@@ -77,6 +77,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const loadingTicksAndTickMaps = useSelector(isLoadingTicksAndTickMaps)
   const isBalanceLoading = useSelector(balanceLoading)
   const shouldNotUpdatePriceRange = useSelector(shouldNotUpdateRange)
+  const network = useSelector(networkType)
 
   const { success, inProgress } = useSelector(initPosition)
 
@@ -116,12 +117,12 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   useEffect(() => {
     const tokensToFetch = []
 
-    if (initialTokenFrom && !tokens[tickerToAddress(initialTokenFrom)]) {
-      tokensToFetch.push(tickerToAddress(initialTokenFrom))
+    if (initialTokenFrom && !tokens[tickerToAddress(network, initialTokenFrom)]) {
+      tokensToFetch.push(tickerToAddress(network, initialTokenFrom))
     }
 
-    if (initialTokenTo && !tokens[tickerToAddress(initialTokenTo)]) {
-      tokensToFetch.push(tickerToAddress(initialTokenTo))
+    if (initialTokenTo && !tokens[tickerToAddress(network, initialTokenTo)]) {
+      tokensToFetch.push(tickerToAddress(network, initialTokenTo))
     }
 
     if (tokensToFetch.length) {
@@ -133,9 +134,9 @@ export const NewPositionWrapper: React.FC<IProps> = ({
 
   useEffect(() => {
     if (isCurrentlyLoadingTokensError) {
-      if (tokens[tickerToAddress(initialTokenFrom)]) {
+      if (tokens[tickerToAddress(network, initialTokenFrom)]) {
         navigate(`/newPosition/${initialTokenFrom}/${initialFee}`)
-      } else if (tokens[tickerToAddress(initialTokenTo)]) {
+      } else if (tokens[tickerToAddress(network, initialTokenTo)]) {
         navigate(`/newPosition/${initialTokenTo}/${initialTokenTo}/${initialFee}`)
       }
     }
@@ -696,6 +697,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       isGetLiquidityError={isGetLiquidityError}
       onlyUserPositions={onlyUserPositions}
       setOnlyUserPositions={setOnlyUserPositions}
+      network={network}
       isLoadingTokens={isCurrentlyLoadingTokens}
     />
   )

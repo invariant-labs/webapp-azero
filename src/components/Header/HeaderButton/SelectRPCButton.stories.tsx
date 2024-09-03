@@ -22,6 +22,7 @@ export const Primary: Story = {
         rpcName: 'Testnet'
       }
     ],
-    onSelect: (networkType, rpc) => action('chosen: ' + networkType + ' ' + rpc)()
+    onSelect: (networkType, rpc) => action('chosen: ' + networkType + ' ' + rpc)(),
+    network: Network.Testnet
   }
 }
