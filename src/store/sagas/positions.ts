@@ -208,8 +208,6 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     const position = yield* call([invariant, invariant.getPosition], walletAddress, length)
     yield* put(actions.addPosition(position))
 
-    yield* call(fetchBalances, [tokenX === wazeroAddress ? tokenY : tokenX])
-
     yield* put(poolsActions.getPoolKeys())
   } catch (e: unknown) {
     const error = ensureError(e)
