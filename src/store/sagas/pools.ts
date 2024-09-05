@@ -131,16 +131,20 @@ export function* fetchTokens(poolsWithPoolKeys: PoolWithPoolKey[]) {
     )
   )
 
-  const unknownTokensData = yield* call(
-    getTokenDataByAddresses,
-    [...unknownTokens],
-    psp22,
-    walletAddress
-  )
-  const knownTokenBalances = yield* call(getTokenBalances, [...knownTokens], psp22, walletAddress)
+  const { unknownTokensData, knownTokenBalances } = yield* all({
+    unknownTokensData: call(getTokenDataByAddresses, [...unknownTokens], psp22, walletAddress),
+    knownTokenBalances: call(getTokenBalances, [...knownTokens], psp22, walletAddress)
+  })
 
-  yield* put(walletActions.getBalances(Object.keys(unknownTokensData)))
   yield* put(actions.addTokens(unknownTokensData))
+  yield* put(
+    walletActions.addTokenBalances(
+      Object.entries(unknownTokensData).map(([address, token]) => ({
+        address,
+        balance: token.balance ?? 0n
+      }))
+    )
+  )
   yield* put(actions.updateTokenBalances(knownTokenBalances))
 }
 
