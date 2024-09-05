@@ -665,6 +665,8 @@ export function* handleGetPositionsListPage(
     )
   }
 
+  const poolsWithTokensToFetch = []
+
   if (!length || refresh) {
     const result = yield* call(
       [invariant, invariant.getPositions],
@@ -683,7 +685,7 @@ export function* handleGetPositionsListPage(
     yield* put(
       poolsActions.addPoolsForList({ data: poolsWithPoolKeys, listType: ListType.POSITIONS })
     )
-    yield* call(fetchTokens, poolsWithPoolKeys)
+    poolsWithTokensToFetch.push(...poolsWithPoolKeys)
 
     yield* put(actions.setPositionsListLength(positionsLength))
   }
@@ -711,8 +713,11 @@ export function* handleGetPositionsListPage(
       yield* put(
         poolsActions.addPoolsForList({ data: poolsWithPoolKeys, listType: ListType.POSITIONS })
       )
-      yield* call(fetchTokens, poolsWithPoolKeys)
+
+      poolsWithTokensToFetch.push(...poolsWithPoolKeys)
     }
+
+    yield* call(fetchTokens, poolsWithTokensToFetch)
 
     for (let i = 0; i < entries.length; i++) {
       allList[i + index * POSITIONS_PER_QUERY] = entries[i][0]
