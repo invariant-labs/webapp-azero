@@ -34,6 +34,7 @@ export function* fetchPoolData(action: PayloadAction<PoolKey>): Generator {
 }
 
 export function* fetchAllPoolKeys(): Generator {
+  console.log('fetchAllPoolKeys')
   try {
     const invariant = yield* getInvariant()
 
@@ -60,6 +61,7 @@ export function* fetchAllPoolKeys(): Generator {
 }
 
 export function* fetchAllPoolsForPairData(action: PayloadAction<PairTokens>) {
+  console.log('fetchAllPoolsForPairData', action.payload)
   try {
     const invariant = yield* getInvariant()
 
@@ -77,6 +79,7 @@ export function* fetchAllPoolsForPairData(action: PayloadAction<PairTokens>) {
 }
 
 export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMaps>) {
+  console.log('fetchTicksAndTickMaps', action.payload)
   const { tokenFrom, tokenTo, allPools } = action.payload
 
   try {

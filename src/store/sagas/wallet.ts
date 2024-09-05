@@ -251,6 +251,7 @@ export function* handleDisconnect(): Generator {
 }
 
 export function* fetchBalances(tokens: string[]): Generator {
+  console.log('fetchBalances', tokens)
   const walletAddress = yield* select(address)
   const psp22 = yield* getPSP22()
 

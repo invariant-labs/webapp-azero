@@ -1,6 +1,5 @@
 import { getNetworkTokensList, getTokenDataByAddresses } from '@utils/utils'
 import { actions } from '@store/reducers/pools'
-import { actions as walletActions } from '@store/reducers/wallet'
 import {
   invariantAddress,
   networkType,
@@ -53,8 +52,6 @@ const MarketEvents = () => {
         .finally(() => {
           dispatch(actions.addTokens(tokens))
         })
-
-      dispatch(walletActions.getBalances(currentList))
     }
 
     connectEvents()

@@ -176,7 +176,7 @@ export const Swap: React.FC<ISwap> = ({
 
   useEffect(() => {
     onSetPair(tokenFrom, tokenTo)
-  }, [tokenFrom, tokenTo, pools.length])
+  }, [tokenFrom, tokenTo])
 
   useEffect(() => {
     if (inputRef === inputTarget.FROM && !(amountFrom === '' && amountTo === '')) {

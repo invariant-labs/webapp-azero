@@ -261,6 +261,7 @@ export function* handleGetCurrentPositionTicks(action: PayloadAction<GetPosition
 }
 
 export function* handleGetCurrentPlotTicks(action: PayloadAction<GetCurrentTicksData>): Generator {
+  console.log('handleGetCurrentPlotTicks', action.payload)
   const { poolKey, isXtoY, fetchTicksAndTickmap } = action.payload
   let allTickmaps = yield* select(tickMaps)
   let allTicks = yield* select(poolTicks)
@@ -610,6 +611,7 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
 }
 
 export function* handleGetRemainingPositions(): Generator {
+  console.log('handleGetRemainingPositions')
   const walletAddress = yield* select(address)
   const { length, list, loadedPages } = yield* select(positionsList)
 
