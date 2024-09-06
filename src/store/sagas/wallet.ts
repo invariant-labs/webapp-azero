@@ -289,11 +289,11 @@ export function* handleGetBalances(action: PayloadAction<string[]>): Generator {
 }
 
 export function* connectHandler(): Generator {
-  yield takeLeading(actions.connect, handleConnect)
+  yield takeLatest(actions.connect, handleConnect)
 }
 
 export function* disconnectHandler(): Generator {
-  yield takeLeading(actions.disconnect, handleDisconnect)
+  yield takeLatest(actions.disconnect, handleDisconnect)
 }
 
 export function* airdropSaga(): Generator {
