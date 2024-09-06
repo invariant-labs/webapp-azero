@@ -80,14 +80,8 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
           upperTickIndex: position.upperTickIndex
         })
       )
-      dispatch(
-        actions.getCurrentPlotTicks({
-          poolKey: position.poolKey,
-          isXtoY: true
-        })
-      )
     }
-  }, [position, position?.poolKey, allTickMaps, waitingForTicksData])
+  }, [position, allTickMaps])
 
   useEffect(() => {
     if (waitingForTicksData === true && !currentPositionTicksLoading) {
@@ -290,7 +284,15 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   }, [walletStatus])
 
   useEffect(() => {
-    onRefresh()
+    if (position) {
+      dispatch(
+        actions.getCurrentPlotTicks({
+          poolKey: position.poolKey,
+          isXtoY: true,
+          fetchTicksAndTickmap: true
+        })
+      )
+    }
   }, [])
 
   const onRefresh = () => {
