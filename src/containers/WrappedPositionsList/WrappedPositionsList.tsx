@@ -135,8 +135,8 @@ export const WrappedPositionsList: React.FC = () => {
     })
     .filter(item => {
       return (
-        item.tokenXName.toLowerCase().includes(value) ||
-        item.tokenYName.toLowerCase().includes(value)
+        item.tokenXName.toLowerCase().includes(value.toLowerCase()) ||
+        item.tokenYName.toLowerCase().includes(value.toLowerCase())
       )
     })
 
