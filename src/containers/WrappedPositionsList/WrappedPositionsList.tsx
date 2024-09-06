@@ -1,5 +1,5 @@
 import { PositionsList } from '@components/PositionsList/PositionsList'
-import { calculateTokenAmounts } from '@invariant-labs/a0-sdk'
+import { calculateTokenAmounts, Network } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 import { POSITIONS_PER_PAGE } from '@store/consts/static'
 import {
@@ -130,7 +130,8 @@ export const WrappedPositionsList: React.FC = () => {
         isActive: currentPrice >= min && currentPrice <= max,
         currentPrice,
         tokenXLiq,
-        tokenYLiq
+        tokenYLiq,
+        network: Network.Testnet
       }
     })
     .filter(item => {

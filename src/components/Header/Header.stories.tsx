@@ -43,6 +43,8 @@ export const Primary: Story = {
       name: Chain.AlephZero,
       address: 'https://azero.invariant.app/swap'
     },
-    onChainSelect: fn()
+    onChainSelect: fn(),
+    network: Network.Testnet,
+    defaultMainnetRPC: 'https://rpc.moonbeam.network'
   }
 }

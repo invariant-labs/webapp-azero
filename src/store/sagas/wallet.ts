@@ -3,7 +3,7 @@ import { NightlyConnectAdapter } from '@nightlylabs/wallet-selector-polkadot'
 import { PayloadAction } from '@reduxjs/toolkit'
 import {
   FAUCET_SAFE_TRANSACTION_FEE,
-  FaucetTokenList,
+  getFaucetTokenList,
   TokenAirdropAmount
 } from '@store/consts/static'
 import { createLoaderKey, getTokenBalances } from '@utils/utils'
@@ -28,6 +28,7 @@ import { Signer } from '@polkadot/api/types'
 import { positionsList } from '@store/selectors/positions'
 import { getApi, getPSP22 } from './connection'
 import { openWalletSelectorModal } from '@utils/web3/selector'
+import { networkType } from '@store/selectors/connection'
 
 export function* getWallet(): SagaGenerator<NightlyConnectAdapter> {
   const wallet = yield* call(getAlephZeroWallet)
@@ -100,15 +101,18 @@ export function* handleAirdrop(): Generator {
     )
 
     const connection = yield* getApi()
+    const network = yield* select(networkType)
     const adapter = yield* call(getAlephZeroWallet)
 
     const psp22 = yield* getPSP22()
 
     const txs = []
 
-    for (const ticker in FaucetTokenList) {
-      const address = FaucetTokenList[ticker as keyof typeof FaucetTokenList]
-      const airdropAmount = TokenAirdropAmount[ticker as keyof typeof FaucetTokenList]
+    const faucetTokenList = getFaucetTokenList(network)
+
+    for (const ticker in faucetTokenList) {
+      const address = faucetTokenList[ticker as keyof typeof faucetTokenList]
+      const airdropAmount = TokenAirdropAmount[ticker as keyof typeof faucetTokenList]
 
       const mintTx = psp22.mintTx(airdropAmount, address)
       txs.push(mintTx)
@@ -137,7 +141,7 @@ export function* handleAirdrop(): Generator {
     closeSnackbar(loaderAirdrop)
     yield put(snackbarsActions.remove(loaderAirdrop))
 
-    const tokenNames = Object.keys(FaucetTokenList).join(', ')
+    const tokenNames = Object.keys(faucetTokenList).join(', ')
 
     yield* put(
       snackbarsActions.add({
@@ -148,7 +152,7 @@ export function* handleAirdrop(): Generator {
       })
     )
 
-    yield* call(fetchBalances, [...Object.values(FaucetTokenList)])
+    yield* call(fetchBalances, [...Object.values(faucetTokenList)])
   } catch (error) {
     console.log(error)
 

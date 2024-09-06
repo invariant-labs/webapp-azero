@@ -5,6 +5,7 @@ import Swap from './Swap'
 import { Provider } from 'react-redux'
 import { store } from '@store/index'
 import { MemoryRouter } from 'react-router-dom'
+import { Network } from '@invariant-labs/a0-sdk'
 
 const meta = {
   title: 'Components/Swap',
@@ -65,7 +66,8 @@ export const Primary: Story = {
       errors: []
     },
     simulateSwap: fn(),
-    copyTokenAddressHandler: fn()
+    copyTokenAddressHandler: fn(),
+    network: Network.Testnet
   },
   render: args => {
     return (

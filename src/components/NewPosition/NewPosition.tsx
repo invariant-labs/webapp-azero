@@ -2,13 +2,14 @@ import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import Slippage from '@components/Modals/Slippage/Slippage'
 import { INoConnected, NoConnected } from '@components/NoConnected/NoConnected'
 import Refresher from '@components/Refresher/Refresher'
-import { getMaxTick, getMinTick } from '@invariant-labs/a0-sdk'
+import { getMaxTick, getMinTick, Network } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
 import { Box, Button, Grid, Hidden, Typography } from '@mui/material'
 import backIcon from '@static/svg/back-arrow.svg'
 import settingIcon from '@static/svg/settings.svg'
 import { ALL_FEE_TIERS_DATA, PositionTokenBlock, REFRESHER_INTERVAL } from '@store/consts/static'
 import {
+  addressToTicker,
   calcPriceBySqrtPrice,
   calculateConcentrationRange,
   convertBalanceToBigint,
@@ -102,6 +103,8 @@ export interface INewPosition {
   isGetLiquidityError: boolean
   onlyUserPositions: boolean
   setOnlyUserPositions: (val: boolean) => void
+  network: Network
+  isLoadingTokens: boolean
 }
 
 export const NewPosition: React.FC<INewPosition> = ({
@@ -153,7 +156,9 @@ export const NewPosition: React.FC<INewPosition> = ({
   unblockUpdatePriceRange,
   isGetLiquidityError,
   onlyUserPositions,
-  setOnlyUserPositions
+  setOnlyUserPositions,
+  network,
+  isLoadingTokens
 }) => {
   const { classes } = useStyles()
   const navigate = useNavigate()
@@ -413,14 +418,14 @@ export const NewPosition: React.FC<INewPosition> = ({
     const parsedFee = parseFeeToPathFee(ALL_FEE_TIERS_DATA[fee].tier.fee)
 
     if (address1 != null && address2 != null) {
-      const token1Symbol = tokens[address1].symbol
-      const token2Symbol = tokens[address2].symbol
+      const token1Symbol = addressToTicker(network, address1)
+      const token2Symbol = addressToTicker(network, address2)
       navigate(`/newPosition/${token1Symbol}/${token2Symbol}/${parsedFee}`, { replace: true })
     } else if (address1 != null) {
-      const tokenSymbol = tokens[address1].symbol
+      const tokenSymbol = addressToTicker(network, address1)
       navigate(`/newPosition/${tokenSymbol}/${parsedFee}`, { replace: true })
     } else if (address2 != null) {
-      const tokenSymbol = tokens[address2].symbol
+      const tokenSymbol = addressToTicker(network, address2)
       navigate(`/newPosition/${tokenSymbol}/${parsedFee}`, { replace: true })
     } else if (fee != null) {
       navigate(`/newPosition/${parsedFee}`, { replace: true })
@@ -558,7 +563,9 @@ export const NewPosition: React.FC<INewPosition> = ({
             setTokenB(address2)
             onChangePositionTokens(address1, address2, fee)
 
-            updatePath(address1, address2, fee)
+            if (!isLoadingTokens) {
+              updatePath(address1, address2, fee)
+            }
           }}
           onAddLiquidity={() => {
             if (tokenA !== null && tokenB !== null) {
@@ -652,7 +659,9 @@ export const NewPosition: React.FC<INewPosition> = ({
             setTokenB(pom)
             onChangePositionTokens(tokenB, tokenA, currentFeeIndex)
 
-            updatePath(tokenB, tokenA, currentFeeIndex)
+            if (!isLoadingTokens) {
+              updatePath(tokenB, tokenA, currentFeeIndex)
+            }
           }}
           poolIndex={poolIndex}
           bestTierIndex={bestTierIndex}
@@ -672,6 +681,7 @@ export const NewPosition: React.FC<INewPosition> = ({
           isBalanceLoading={isBalanceLoading}
           isGetLiquidityError={isGetLiquidityError}
           ticksLoading={ticksLoading}
+          network={network}
         />
         <Hidden mdUp>
           <Grid container justifyContent='end' mb={2}>

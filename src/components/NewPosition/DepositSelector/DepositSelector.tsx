@@ -18,7 +18,7 @@ import { useStyles } from './style'
 import { PositionOpeningMethod } from '@store/consts/types'
 import { SwapToken } from '@store/selectors/wallet'
 import { TooltipHover } from '@components/TooltipHover/TooltipHover'
-import { set } from 'remeda'
+import { Network } from '@invariant-labs/a0-sdk'
 export interface InputState {
   value: string
   setValue: (value: string) => void
@@ -62,6 +62,7 @@ export interface IDepositSelector {
   isBalanceLoading: boolean
   isGetLiquidityError: boolean
   ticksLoading: boolean
+  network: Network
 }
 
 export const DepositSelector: React.FC<IDepositSelector> = ({
@@ -94,7 +95,8 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
   positionOpeningMethod,
   isBalanceLoading,
   isGetLiquidityError,
-  ticksLoading
+  ticksLoading,
+  network
 }) => {
   const { classes } = useStyles()
 
@@ -122,8 +124,8 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
       return
     }
 
-    const tokenAFromPath = tokens[tickerToAddress(initialTokenFrom)]?.assetAddress || null
-    const tokenBFromPath = tokens[tickerToAddress(initialTokenTo)]?.assetAddress || null
+    const tokenAFromPath = tokens[tickerToAddress(network, initialTokenFrom)]?.assetAddress || null
+    const tokenBFromPath = tokens[tickerToAddress(network, initialTokenTo)]?.assetAddress || null
     let feeTierIndexFromPath = 0
 
     const parsedFee = parsePathFeeToFeeString(initialFee)
@@ -197,6 +199,21 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
     feeTierIndex,
     minimumSliderIndex
   ])
+
+  const [wasRunTokenA, setWasRunTokenA] = useState(false)
+  const [wasRunTokenB, setWasRunTokenB] = useState(false)
+
+  useEffect(() => {
+    if (!wasRunTokenA && tokens[tickerToAddress(network, initialTokenFrom)]) {
+      setTokenA(tickerToAddress(network, initialTokenFrom))
+      setWasRunTokenA(true)
+    }
+
+    if (!wasRunTokenB && tokens[tickerToAddress(network, initialTokenTo)]) {
+      setTokenB(tickerToAddress(network, initialTokenTo))
+      setWasRunTokenB(true)
+    }
+  }, [wasRunTokenA, wasRunTokenB, tokens])
 
   useEffect(() => {
     if (tokenA !== null) {
