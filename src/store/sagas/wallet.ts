@@ -21,7 +21,7 @@ import {
   put,
   select,
   spawn,
-  takeEvery,
+  takeLatest,
   takeLeading
 } from 'typed-redux-saga'
 import { Signer } from '@polkadot/api/types'
@@ -293,11 +293,11 @@ export function* handleGetBalances(action: PayloadAction<string[]>): Generator {
 }
 
 export function* connectHandler(): Generator {
-  yield takeEvery(actions.connect, handleConnect)
+  yield takeLatest(actions.connect, handleConnect)
 }
 
 export function* disconnectHandler(): Generator {
-  yield takeEvery(actions.disconnect, handleDisconnect)
+  yield takeLatest(actions.disconnect, handleDisconnect)
 }
 
 export function* airdropSaga(): Generator {
@@ -309,7 +309,7 @@ export function* getBalancesHandler(): Generator {
 }
 
 export function* reconnecthandler(): Generator {
-  yield takeEvery(actions.reconnect, handleReconnect)
+  yield takeLatest(actions.reconnect, handleReconnect)
 }
 
 export function* walletSaga(): Generator {
