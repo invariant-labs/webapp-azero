@@ -722,6 +722,11 @@ export function* handleGetPositionsListPage(
     for (let i = 0; i < entries.length; i++) {
       allList[i + index * POSITIONS_PER_QUERY] = entries[i][0]
     }
+
+    allList.splice(
+      entries.length + index * POSITIONS_PER_QUERY,
+      POSITIONS_PER_QUERY - entries.length
+    )
   }
 
   yield* put(actions.setPositionsList(allList))
