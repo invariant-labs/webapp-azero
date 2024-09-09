@@ -31,6 +31,7 @@ import {
 } from '@utils/utils'
 import { actions as poolActions } from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
+import { actions as positionsActions } from '@store/reducers/positions'
 import { Simulate, Swap, actions } from '@store/reducers/swap'
 import { invariantAddress, wrappedAZEROAddress } from '@store/selectors/connection'
 import { poolTicks, pools, tickMaps, tokens } from '@store/selectors/pools'
@@ -176,6 +177,13 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
       poolActions.getAllPoolsForPairData({
         first: tokenFrom,
         second: tokenTo
+      })
+    )
+
+    yield put(
+      positionsActions.getCurrentPlotTicks({
+        poolKey,
+        isXtoY: xToY
       })
     )
   } catch (e: unknown) {
