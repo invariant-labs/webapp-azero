@@ -21,6 +21,7 @@ import {
   put,
   select,
   spawn,
+  takeEvery,
   takeLatest,
   takeLeading
 } from 'typed-redux-saga'
@@ -293,11 +294,11 @@ export function* handleGetBalances(action: PayloadAction<string[]>): Generator {
 }
 
 export function* connectHandler(): Generator {
-  yield takeLatest(actions.connect, handleConnect)
+  yield takeEvery(actions.connect, handleConnect)
 }
 
 export function* disconnectHandler(): Generator {
-  yield takeLatest(actions.disconnect, handleDisconnect)
+  yield takeEvery(actions.disconnect, handleDisconnect)
 }
 
 export function* airdropSaga(): Generator {
@@ -309,7 +310,7 @@ export function* getBalancesHandler(): Generator {
 }
 
 export function* reconnecthandler(): Generator {
-  yield takeLatest(actions.reconnect, handleReconnect)
+  yield takeEvery(actions.reconnect, handleReconnect)
 }
 
 export function* walletSaga(): Generator {
