@@ -22,7 +22,6 @@ import {
   select,
   spawn,
   takeEvery,
-  takeLatest,
   takeLeading
 } from 'typed-redux-saga'
 import { Signer } from '@polkadot/api/types'
