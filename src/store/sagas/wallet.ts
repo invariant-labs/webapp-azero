@@ -22,7 +22,6 @@ import {
   put,
   select,
   spawn,
-  takeEvery,
   takeLatest,
   takeLeading
 } from 'typed-redux-saga'
