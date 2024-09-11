@@ -18,6 +18,7 @@ import {
   SagaGenerator,
   all,
   call,
+  delay,
   put,
   select,
   spawn,
@@ -167,6 +168,10 @@ export function* init(isEagerConnect: boolean): Generator {
   try {
     yield* put(actions.setStatus(Status.Init))
 
+    if (isEagerConnect) {
+      yield* delay(500)
+    }
+
     const walletAdapter = yield* call(getWallet)
     yield* call([walletAdapter, walletAdapter.connect])
     const accounts = yield* call([walletAdapter.accounts, walletAdapter.accounts.get])
@@ -289,11 +294,11 @@ export function* handleGetBalances(action: PayloadAction<string[]>): Generator {
 }
 
 export function* connectHandler(): Generator {
-  yield takeLeading(actions.connect, handleConnect)
+  yield takeLatest(actions.connect, handleConnect)
 }
 
 export function* disconnectHandler(): Generator {
-  yield takeLeading(actions.disconnect, handleDisconnect)
+  yield takeLatest(actions.disconnect, handleDisconnect)
 }
 
 export function* airdropSaga(): Generator {
