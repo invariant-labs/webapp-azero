@@ -1195,3 +1195,11 @@ export const getNetworkStats = async (name: string): Promise<Record<string, Pool
 
   return data
 }
+
+export const getCoingeckoPricesData = async (): Promise<CoinGeckoAPIData> => {
+  const { data } = await axios.get<CoinGeckoAPIData>(
+    `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${DEFAULT_TOKENS}`
+  )
+
+  return data
+}

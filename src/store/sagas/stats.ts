@@ -4,7 +4,13 @@ import { actions as poolsActions } from '@store/reducers/pools'
 import { networkType } from '@store/selectors/connection'
 import { tokens } from '@store/selectors/pools'
 import { address } from '@store/selectors/wallet'
-import { getNetworkStats, getTokenDataByAddresses, printBigint } from '@utils/utils'
+import {
+  getCoingeckoPricesData,
+  getNetworkStats,
+  getTokenDataByAddresses,
+  printBigint,
+  tickerToAddress
+} from '@utils/utils'
 import { call, put, select, takeEvery } from 'typed-redux-saga'
 import { getPSP22 } from './connection'
 
@@ -124,6 +130,17 @@ export function* getStats(): Generator {
       })
     })
 
+    const tokensPricesData = yield* call(getCoingeckoPricesData)
+    const allTokens = yield* select(tokens)
+
+    tokensPricesData.forEach(token => {
+      Object.entries(allTokens).forEach(([address, tokenData]) => {
+        if (tokenData.coingeckoId === token.id) {
+          tokensDataObject[address].price = token.current_price
+        }
+      })
+    })
+
     const volumePlot: TimeData[] = Object.entries(volumeForTimestamps)
       .map(([timestamp, value]) => ({
         timestamp: +timestamp,
@@ -170,8 +187,6 @@ export function* getStats(): Generator {
         liquidityPlot
       })
     )
-
-    const allTokens = yield* select(tokens)
 
     const unknownTokens = new Set<string>()
 
