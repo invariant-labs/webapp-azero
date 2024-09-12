@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import loader from '@static/gif/loader.gif'
 import useStyles from './styles'
 import { Grid, Typography } from '@mui/material'
-import { Network } from '@invariant-labs/a0-sdk'
 import { EmptyPlaceholder } from '@components/EmptyPlaceholder/EmptyPlaceholder'
 import {
   fees24,
@@ -44,11 +43,7 @@ export const WrappedStats: React.FC = () => {
 
   return (
     <Grid container className={classes.wrapper} direction='column'>
-      {currentNetwork !== Network.Testnet ? (
-        <Grid container direction='column' alignItems='center'>
-          <EmptyPlaceholder desc={'We have not started collecting statistics yet'} />
-        </Grid>
-      ) : isLoadingStats ? (
+      {isLoadingStats ? (
         <img src={loader} className={classes.loading} alt='Loading' />
       ) : liquidityPlotData.length === 0 ? (
         <Grid container direction='column' alignItems='center'>
