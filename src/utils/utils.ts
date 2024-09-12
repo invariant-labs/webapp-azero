@@ -62,6 +62,7 @@ import {
   BestTier,
   CoinGeckoAPIData,
   FormatNumberThreshold,
+  PoolSnapshot,
   PrefixConfig,
   Token,
   TokenPriceData
@@ -1185,4 +1186,12 @@ export const findClosestIndexByValue = (arr: number[], value: number): number =>
     }
   }
   return high
+}
+
+export const getNetworkStats = async (name: string): Promise<Record<string, PoolSnapshot[]>> => {
+  const { data } = await axios.get<Record<string, PoolSnapshot[]>>(
+    `https://stats.invariant.app/a0/full/${name}`
+  )
+
+  return data
 }

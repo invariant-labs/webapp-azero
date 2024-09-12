@@ -78,3 +78,18 @@ export enum Chain {
   AlephZero = 'Aleph Zero',
   Eclipse = 'Eclipse'
 }
+
+export interface SnapshotValueData {
+  tokenBNFromBeginning: string
+  usdValue24: number
+}
+
+export interface PoolSnapshot {
+  timestamp: number
+  volumeX: SnapshotValueData
+  volumeY: SnapshotValueData
+  liquidityX: SnapshotValueData
+  liquidityY: SnapshotValueData
+  feeX: SnapshotValueData
+  feeY: SnapshotValueData
+}

@@ -5,6 +5,7 @@ import { useStyles } from './style'
 import { Grid } from '@mui/material'
 import { PaginationList } from '@components/PaginationList/PaginationList'
 import { SortTypePoolList } from '@store/consts/static'
+import { Network } from '@invariant-labs/a0-sdk'
 
 interface PoolListInterface {
   data: Array<{
@@ -15,6 +16,8 @@ interface PoolListInterface {
     volume: number
     TVL: number
     fee: number
+    addressFrom: string
+    addressTo: string
     // apy: number
     // apyData: {
     //   fees: number
@@ -22,9 +25,10 @@ interface PoolListInterface {
     //   accumulatedFarmsSingleTick: number
     // }
   }>
+  network: Network
 }
 
-const PoolList: React.FC<PoolListInterface> = ({ data }) => {
+const PoolList: React.FC<PoolListInterface> = ({ data, network }) => {
   const { classes } = useStyles()
   const [page, setPage] = React.useState(1)
   const [sortType, setSortType] = React.useState(SortTypePoolList.VOLUME_DESC)
@@ -92,6 +96,9 @@ const PoolList: React.FC<PoolListInterface> = ({ data }) => {
           // apy={element.apy}
           // apyData={element.apyData}
           key={index}
+          addressFrom={element.addressFrom}
+          addressTo={element.addressTo}
+          network={network}
         />
       ))}
       {pages > 1 ? (

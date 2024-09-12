@@ -2,12 +2,14 @@ import React from 'react'
 import { theme } from '@static/theme'
 import { useStyles } from './style'
 import { Box, Grid, Typography, useMediaQuery } from '@mui/material'
-import { formatNumbers, showPrefix } from '@utils/utils'
+import { addressToTicker, formatNumbers, parseFeeToPathFee, showPrefix } from '@utils/utils'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
 import { useNavigate } from 'react-router-dom'
 import icons from '@static/icons'
 import { SortTypePoolList } from '@store/consts/static'
+import { Network } from '@invariant-labs/a0-sdk'
+import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
 
 interface IProps {
   TVL?: number
@@ -22,6 +24,9 @@ interface IProps {
   sortType?: SortTypePoolList
   onSort?: (type: SortTypePoolList) => void
   hideBottomLine?: boolean
+  addressFrom?: string
+  addressTo?: string
+  network?: Network
   // apy?: number
   // apyData?: {
   //   fees: number
@@ -42,7 +47,10 @@ const PoolListItem: React.FC<IProps> = ({
   tokenIndex,
   sortType,
   onSort,
-  hideBottomLine = false
+  hideBottomLine = false,
+  addressFrom,
+  addressTo,
+  network
   // apy = 0,
   // apyData = {
   //   fees: 0,
@@ -56,11 +64,15 @@ const PoolListItem: React.FC<IProps> = ({
   const isXs = useMediaQuery(theme.breakpoints.down('xs'))
 
   const handleOpenPosition = () => {
-    navigate(`/newPosition/${symbolFrom}/${symbolTo}/0_01`)
+    navigate(
+      `/newPosition/${addressToTicker(network ?? Network.Testnet, addressFrom ?? '')}/${addressToTicker(network ?? Network.Testnet, addressTo ?? '')}/${parseFeeToPathFee(BigInt(Math.round(fee * 10 ** Number(PERCENTAGE_SCALE - 2n))))}`
+    )
   }
 
   const handleOpenSwap = () => {
-    navigate(`/exchange/${symbolFrom}/${symbolTo}`)
+    navigate(
+      `/exchange/${addressToTicker(network ?? Network.Testnet, addressFrom ?? '')}/${addressToTicker(network ?? Network.Testnet, addressTo ?? '')}`
+    )
   }
   return (
     <Grid maxWidth='100%'>
