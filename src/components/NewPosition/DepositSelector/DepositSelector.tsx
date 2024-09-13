@@ -102,6 +102,18 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
 
   const [tokenA, setTokenA] = useState<string | null>(null)
   const [tokenB, setTokenB] = useState<string | null>(null)
+  const [tokenAPrice, setTokenAPrice] = useState<number | undefined>(undefined)
+  const [tokenBPrice, setTokenBPrice] = useState<number | undefined>(undefined)
+
+  useEffect(() => {
+    if (!tokenAPrice) {
+      setTokenAPrice(priceA)
+    }
+
+    if (!tokenBPrice) {
+      setTokenBPrice(priceB)
+    }
+  }, [priceALoading, priceBLoading, priceA, priceB])
 
   const [hideUnknownTokens, setHideUnknownTokens] = useState<boolean>(initialHideUnknownTokensValue)
 
@@ -271,6 +283,9 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
                 const pom = tokenA
                 setTokenA(tokenB)
                 setTokenB(pom)
+                const pricePom = tokenAPrice
+                setTokenAPrice(tokenBPrice)
+                setTokenBPrice(pricePom)
                 onReverseTokens()
               }}
             />
@@ -313,7 +328,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
       <Typography className={classes.sectionTitle}>Deposit Amount</Typography>
       <Grid container className={classes.sectionWrapper}>
         <DepositAmountInput
-          tokenPrice={priceA}
+          tokenPrice={tokenAPrice}
           currency={tokenA !== null ? tokens[tokenA].symbol : null}
           currencyIconSrc={tokenA !== null ? tokens[tokenA].logoURI : undefined}
           placeholder='0.0'
@@ -341,7 +356,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
         />
 
         <DepositAmountInput
-          tokenPrice={priceB}
+          tokenPrice={tokenBPrice}
           currency={tokenB !== null ? tokens[tokenB].symbol : null}
           currencyIconSrc={tokenB !== null ? tokens[tokenB].logoURI : undefined}
           placeholder='0.0'

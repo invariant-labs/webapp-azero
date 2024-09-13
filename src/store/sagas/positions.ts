@@ -18,7 +18,6 @@ import {
   createLiquidityPlot,
   createLoaderKey,
   createPlaceholderLiquidityPlot,
-  deserializeTickmap,
   ensureError,
   getLiquidityTicksByPositionsList,
   isErrorMessage,
@@ -36,7 +35,7 @@ import {
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { actions as walletActions } from '@store/reducers/wallet'
 import { invariantAddress, wrappedAZEROAddress } from '@store/selectors/connection'
-import { poolsArraySortedByFees, tickMaps, tokens } from '@store/selectors/pools'
+import { poolsArraySortedByFees, poolTicks, tickMaps, tokens } from '@store/selectors/pools'
 import { address, balance } from '@store/selectors/wallet'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import { closeSnackbar } from 'notistack'
@@ -209,8 +208,6 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
     const position = yield* call([invariant, invariant.getPosition], walletAddress, length)
     yield* put(actions.addPosition(position))
 
-    yield* call(fetchBalances, [tokenX === wazeroAddress ? tokenY : tokenX])
-
     yield* put(poolsActions.getPoolKeys())
   } catch (e: unknown) {
     const error = ensureError(e)
@@ -262,8 +259,10 @@ export function* handleGetCurrentPositionTicks(action: PayloadAction<GetPosition
 }
 
 export function* handleGetCurrentPlotTicks(action: PayloadAction<GetCurrentTicksData>): Generator {
+  console.log('handleGetCurrentPlotTicks', action.payload)
   const { poolKey, isXtoY, fetchTicksAndTickmap } = action.payload
   let allTickmaps = yield* select(tickMaps)
+  let allTicks = yield* select(poolTicks)
   const allTokens = yield* select(tokens)
   const allPools = yield* select(poolsArraySortedByFees)
 
@@ -271,8 +270,6 @@ export function* handleGetCurrentPlotTicks(action: PayloadAction<GetCurrentTicks
   const yDecimal = allTokens[poolKey.tokenY].decimals
 
   try {
-    const invariant = yield* getInvariant()
-
     if (!allTickmaps[poolKeyToString(poolKey)] || fetchTicksAndTickmap) {
       const fetchTicksAndTickMapsAction: PayloadAction<FetchTicksAndTickMaps> = {
         type: poolsActions.getTicksAndTickMaps.type,
@@ -287,6 +284,7 @@ export function* handleGetCurrentPlotTicks(action: PayloadAction<GetCurrentTicks
 
       yield* join(fetchTask)
       allTickmaps = yield* select(tickMaps)
+      allTicks = yield* select(poolTicks)
     }
 
     if (!allTickmaps[poolKeyToString(poolKey)]) {
@@ -301,14 +299,20 @@ export function* handleGetCurrentPlotTicks(action: PayloadAction<GetCurrentTicks
       return
     }
 
-    const allRawTicks = yield* call(
-      [invariant, invariant.getAllLiquidityTicks],
-      poolKey,
-      deserializeTickmap(allTickmaps[poolKeyToString(poolKey)])
-    )
+    if (!allTicks[poolKeyToString(poolKey)]) {
+      const data = createPlaceholderLiquidityPlot(
+        action.payload.isXtoY,
+        0,
+        poolKey.feeTier.tickSpacing,
+        xDecimal,
+        yDecimal
+      )
+      yield* put(actions.setPlotTicks({ allPlotTicks: data, userPlotTicks: data }))
+      return
+    }
 
     const allPlotTicks =
-      allRawTicks.length === 0
+      allTicks[poolKeyToString(poolKey)].length === 0
         ? createPlaceholderLiquidityPlot(
             action.payload.isXtoY,
             0,
@@ -316,7 +320,13 @@ export function* handleGetCurrentPlotTicks(action: PayloadAction<GetCurrentTicks
             xDecimal,
             yDecimal
           )
-        : createLiquidityPlot(allRawTicks, poolKey.feeTier.tickSpacing, isXtoY, xDecimal, yDecimal)
+        : createLiquidityPlot(
+            [...allTicks[poolKeyToString(poolKey)]],
+            poolKey.feeTier.tickSpacing,
+            isXtoY,
+            xDecimal,
+            yDecimal
+          )
 
     yield* call(handleGetRemainingPositions)
     const { list } = yield* select(positionsList)
@@ -599,6 +609,7 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
 }
 
 export function* handleGetRemainingPositions(): Generator {
+  console.log('handleGetRemainingPositions')
   const walletAddress = yield* select(address)
   const { length, list, loadedPages } = yield* select(positionsList)
 
@@ -654,6 +665,8 @@ export function* handleGetPositionsListPage(
     )
   }
 
+  const poolsWithTokensToFetch = []
+
   if (!length || refresh) {
     const result = yield* call(
       [invariant, invariant.getPositions],
@@ -672,7 +685,7 @@ export function* handleGetPositionsListPage(
     yield* put(
       poolsActions.addPoolsForList({ data: poolsWithPoolKeys, listType: ListType.POSITIONS })
     )
-    yield* call(fetchTokens, poolsWithPoolKeys)
+    poolsWithTokensToFetch.push(...poolsWithPoolKeys)
 
     yield* put(actions.setPositionsListLength(positionsLength))
   }
@@ -700,12 +713,20 @@ export function* handleGetPositionsListPage(
       yield* put(
         poolsActions.addPoolsForList({ data: poolsWithPoolKeys, listType: ListType.POSITIONS })
       )
-      yield* call(fetchTokens, poolsWithPoolKeys)
+
+      poolsWithTokensToFetch.push(...poolsWithPoolKeys)
     }
+
+    yield* call(fetchTokens, poolsWithTokensToFetch)
 
     for (let i = 0; i < entries.length; i++) {
       allList[i + index * POSITIONS_PER_QUERY] = entries[i][0]
     }
+
+    allList.splice(
+      entries.length + index * POSITIONS_PER_QUERY,
+      POSITIONS_PER_QUERY - entries.length
+    )
   }
 
   yield* put(actions.setPositionsList(allList))

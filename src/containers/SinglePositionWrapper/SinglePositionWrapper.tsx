@@ -13,12 +13,12 @@ import {
   poolKeyToString,
   printBigint
 } from '@utils/utils'
-import { actions as poolsActions } from '@store/reducers/pools'
+
 import { actions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Status, actions as walletActions } from '@store/reducers/wallet'
 import { networkType } from '@store/selectors/connection'
-import { poolsArraySortedByFees, tickMaps } from '@store/selectors/pools'
+import { tickMaps } from '@store/selectors/pools'
 import {
   currentPositionTicks,
   isLoadingPositionsList,
@@ -45,7 +45,6 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   const navigate = useNavigate()
 
   const network = useSelector(networkType)
-  const allPools = useSelector(poolsArraySortedByFees)
   const currentNetwork = useSelector(networkType)
   const position = useSelector(singlePositionData(id))
   const isLoadingList = useSelector(isLoadingPositionsList)
@@ -72,18 +71,6 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   const poolKey = position?.poolKey ? poolKeyToString(position?.poolKey) : ''
 
   useEffect(() => {
-    if (position?.tokenX && position?.tokenY) {
-      dispatch(
-        poolsActions.getTicksAndTickMaps({
-          tokenFrom: position.tokenX.address,
-          tokenTo: position.tokenY.address,
-          allPools
-        })
-      )
-    }
-  }, [waitingForTicksData, position?.tokenX, position?.tokenY])
-
-  useEffect(() => {
     if (position?.poolKey && waitingForTicksData === null && allTickMaps[poolKey] !== undefined) {
       setWaitingForTicksData(true)
 
@@ -94,14 +81,8 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
           upperTickIndex: position.upperTickIndex
         })
       )
-      dispatch(
-        actions.getCurrentPlotTicks({
-          poolKey: position.poolKey,
-          isXtoY: true
-        })
-      )
     }
-  }, [position, position?.poolKey, allTickMaps, waitingForTicksData])
+  }, [position, allTickMaps])
 
   useEffect(() => {
     if (waitingForTicksData === true && !currentPositionTicksLoading) {
@@ -304,7 +285,15 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   }, [walletStatus])
 
   useEffect(() => {
-    onRefresh()
+    if (position) {
+      dispatch(
+        actions.getCurrentPlotTicks({
+          poolKey: position.poolKey,
+          isXtoY: true,
+          fetchTicksAndTickmap: true
+        })
+      )
+    }
   }, [])
 
   const onRefresh = () => {

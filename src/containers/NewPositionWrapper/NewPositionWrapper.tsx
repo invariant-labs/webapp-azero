@@ -182,26 +182,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
     }
   }, [success, inProgress])
 
-  useEffect(() => {
-    if (
-      success &&
-      poolKey !== '' &&
-      tokenA !== null &&
-      tokenB !== null &&
-      poolIndex !== null &&
-      !loadingTicksAndTickMaps
-    ) {
-      dispatch(
-        positionsActions.getCurrentPlotTicks({
-          poolKey: allPoolKeys[poolKey],
-          isXtoY:
-            allPools[poolIndex].poolKey.tokenX === (currentPairReversed === true ? tokenB : tokenA),
-          disableLoading: true
-        })
-      )
-    }
-  }, [success, poolKey, tokenA, tokenB, poolIndex, loadingTicksAndTickMaps])
-
   const isXtoY = useMemo(() => {
     if (tokenA !== null && tokenB !== null) {
       return tokenA < tokenB
@@ -278,18 +258,20 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       })
 
       setPoolIndex(index !== -1 ? index : null)
-
-      if (poolKey !== '') {
-        dispatch(
-          positionsActions.getCurrentPlotTicks({
-            poolKey: allPoolKeys[poolKey],
-            isXtoY,
-            fetchTicksAndTickmap: true
-          })
-        )
-      }
     }
-  }, [isWaitingForNewPool, tokenA, tokenB, feeIndex, poolKey, walletStatus, allPoolKeys, allPools])
+  }, [isWaitingForNewPool, tokenA, tokenB, feeIndex, poolKey, allPoolKeys, allPools.length])
+
+  useEffect(() => {
+    if (poolKey !== '') {
+      dispatch(
+        positionsActions.getCurrentPlotTicks({
+          poolKey: allPoolKeys[poolKey],
+          isXtoY,
+          fetchTicksAndTickmap: true
+        })
+      )
+    }
+  }, [isWaitingForNewPool, tokenA, tokenB, poolKey, allPoolKeys])
 
   useEffect(() => {
     if (poolsData[poolKey]) {

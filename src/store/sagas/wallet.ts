@@ -260,15 +260,19 @@ export function* handleDisconnect(): Generator {
 }
 
 export function* fetchBalances(tokens: string[]): Generator {
+  console.log('fetchBalances', tokens)
   const walletAddress = yield* select(address)
   const psp22 = yield* getPSP22()
 
   yield* put(walletActions.setIsBalanceLoading(true))
 
-  const balance = yield* call(getBalance, walletAddress)
+  const { balance, tokenBalances } = yield* all({
+    balance: call(getBalance, walletAddress),
+    tokenBalances: call(getTokenBalances, tokens, psp22, walletAddress)
+  })
+
   yield* put(walletActions.setBalance(BigInt(balance)))
 
-  const tokenBalances = yield* call(getTokenBalances, tokens, psp22, walletAddress)
   yield* put(
     walletActions.addTokenBalances(
       tokenBalances.map(([address, balance]) => {

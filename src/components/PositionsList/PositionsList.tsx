@@ -59,7 +59,7 @@ export const PositionsList: React.FC<IProps> = ({
       getRemainingPositions()
     }
 
-    searchSetValue(e.target.value.toLowerCase())
+    searchSetValue(e.target.value)
   }
 
   const handleChangePagination = (page: number): void => {
