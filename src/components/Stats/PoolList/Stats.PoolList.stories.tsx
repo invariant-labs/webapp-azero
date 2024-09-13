@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router-dom'
 import PoolList from './PoolList'
 import { store } from '@store/index'
 import { Provider } from 'react-redux'
+import { Network } from '@invariant-labs/a0-sdk'
 
 const meta = {
   title: 'Stats/PoolList',
@@ -75,12 +76,15 @@ const poolsList = Array(40)
         coingeckoId: 'usd-coin'
       },
       volume24: randomVolume24,
-      tvl: randomTvl24
+      tvl: randomTvl24,
+      addressFrom: '5Dvb5E8zKU4E9c7YxfNL5VC8YQj4VAFUTCGYY9ayFLnnY3UA',
+      addressTo: '5Dvb5E8zKU4E9c7YxfNL5VC8YQj4VAFUTCGYY9ayFLnnY3UA'
     }
   })
 
 export const Primary: Story = {
   args: {
-    data: poolsList
+    data: poolsList,
+    network: Network.Local
   }
 }
