@@ -62,6 +62,7 @@ import {
   BestTier,
   CoinGeckoAPIData,
   FormatNumberThreshold,
+  FullSnap,
   PoolSnapshot,
   PrefixConfig,
   Token,
@@ -1200,6 +1201,12 @@ export const getCoingeckoPricesData = async (): Promise<CoinGeckoAPIData> => {
   const { data } = await axios.get<CoinGeckoAPIData>(
     `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${DEFAULT_TOKENS}`
   )
+
+  return data
+}
+
+export const getFullSnap = async (name: string): Promise<FullSnap> => {
+  const { data } = await axios.get<FullSnap>(`https://stats.invariant.app/a0/full_snap/${name}`)
 
   return data
 }
