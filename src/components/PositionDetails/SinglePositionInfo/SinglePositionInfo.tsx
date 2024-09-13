@@ -124,19 +124,26 @@ const SinglePositionInfo: React.FC<IProp> = ({
         </Grid>
 
         <Grid className={classes.headerButtons}>
-          <Button
-            className={classes.closeButton}
-            variant='contained'
-            onClick={() => {
-              if (!userHasStakes) {
-                closePosition()
-              } else {
-                setIsModalOpen(true)
-                blurContent()
-              }
-            }}>
-            Close position
-          </Button>
+          <TooltipHover
+            text={
+              tokenX.claimValue > 0 || tokenY.claimValue > 0
+                ? 'Unclaimed fees will be returned after closing position'
+                : ''
+            }>
+            <Button
+              className={classes.closeButton}
+              variant='contained'
+              onClick={() => {
+                if (!userHasStakes) {
+                  closePosition()
+                } else {
+                  setIsModalOpen(true)
+                  blurContent()
+                }
+              }}>
+              Close position
+            </Button>
+          </TooltipHover>
           <Hidden smUp>
             <Button
               className={classes.button}
