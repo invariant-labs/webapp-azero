@@ -127,7 +127,7 @@ const SinglePositionInfo: React.FC<IProp> = ({
           <TooltipHover
             text={
               tokenX.claimValue > 0 || tokenY.claimValue > 0
-                ? 'Unclaimed fees will be returned after closing position'
+                ? 'Unclaimed fees will be returned when closing the position'
                 : ''
             }>
             <Button
