@@ -1,56 +1,13 @@
 import { PoolKey, newPoolKey } from '@invariant-labs/a0-sdk'
 import { PayloadAction } from '@reduxjs/toolkit'
-import {
-  findPairs,
-  getPoolsByPoolKeys,
-  getTokenBalances,
-  getTokenDataByAddresses
-} from '@utils/utils'
-import {
-  FetchTicksAndTickMaps,
-  ListPoolsRequest,
-  PairTokens,
-  PoolWithPoolKey,
-  actions
-} from '@store/reducers/pools'
+import { findPairs, getTokenBalances, getTokenDataByAddresses } from '@utils/utils'
+import { FetchTicksAndTickMaps, PairTokens, PoolWithPoolKey, actions } from '@store/reducers/pools'
 import { actions as walletActions } from '@store/reducers/wallet'
 import { tokens } from '@store/selectors/pools'
 import { address } from '@store/selectors/wallet'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
 import { MAX_POOL_KEYS_RETURNED } from '@invariant-labs/a0-sdk/target/consts'
 import { getInvariant, getPSP22 } from './connection'
-
-export function* fetchPoolsDataForList(action: PayloadAction<ListPoolsRequest>) {
-  const walletAddress = yield* select(address)
-  const invariant = yield* getInvariant()
-  const pools = yield* call(getPoolsByPoolKeys, invariant, action.payload.poolKeys)
-  const psp22 = yield* getPSP22()
-
-  const allTokens = yield* select(tokens)
-  const unknownTokens = new Set(
-    action.payload.poolKeys.flatMap(({ tokenX, tokenY }) =>
-      [tokenX, tokenY].filter(token => !allTokens[token])
-    )
-  )
-  const knownTokens = new Set(
-    action.payload.poolKeys.flatMap(({ tokenX, tokenY }) =>
-      [tokenX, tokenY].filter(token => allTokens[token])
-    )
-  )
-
-  const unknownTokensData = yield* call(
-    getTokenDataByAddresses,
-    [...unknownTokens],
-    psp22,
-    walletAddress
-  )
-  const knownTokenBalances = yield* call(getTokenBalances, [...knownTokens], psp22, walletAddress)
-
-  yield* put(actions.addTokens(unknownTokensData))
-  yield* put(actions.updateTokenBalances(knownTokenBalances))
-
-  yield* put(actions.addPoolsForList({ data: pools, listType: action.payload.listType }))
-}
 
 export function* fetchPoolData(action: PayloadAction<PoolKey>): Generator {
   const { feeTier, tokenX, tokenY } = action.payload
@@ -77,6 +34,7 @@ export function* fetchPoolData(action: PayloadAction<PoolKey>): Generator {
 }
 
 export function* fetchAllPoolKeys(): Generator {
+  console.log('fetchAllPoolKeys')
   try {
     const invariant = yield* getInvariant()
 
@@ -103,6 +61,7 @@ export function* fetchAllPoolKeys(): Generator {
 }
 
 export function* fetchAllPoolsForPairData(action: PayloadAction<PairTokens>) {
+  console.log('fetchAllPoolsForPairData', action.payload)
   try {
     const invariant = yield* getInvariant()
 
@@ -120,6 +79,7 @@ export function* fetchAllPoolsForPairData(action: PayloadAction<PairTokens>) {
 }
 
 export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMaps>) {
+  console.log('fetchTicksAndTickMaps', action.payload)
   const { tokenFrom, tokenTo, allPools } = action.payload
 
   try {
@@ -171,16 +131,20 @@ export function* fetchTokens(poolsWithPoolKeys: PoolWithPoolKey[]) {
     )
   )
 
-  const unknownTokensData = yield* call(
-    getTokenDataByAddresses,
-    [...unknownTokens],
-    psp22,
-    walletAddress
-  )
-  const knownTokenBalances = yield* call(getTokenBalances, [...knownTokens], psp22, walletAddress)
+  const { unknownTokensData, knownTokenBalances } = yield* all({
+    unknownTokensData: call(getTokenDataByAddresses, [...unknownTokens], psp22, walletAddress),
+    knownTokenBalances: call(getTokenBalances, [...knownTokens], psp22, walletAddress)
+  })
 
-  yield* put(walletActions.getBalances(Object.keys(unknownTokensData)))
   yield* put(actions.addTokens(unknownTokensData))
+  yield* put(
+    walletActions.addTokenBalances(
+      Object.entries(unknownTokensData).map(([address, token]) => ({
+        address,
+        balance: token.balance ?? 0n
+      }))
+    )
+  )
   yield* put(actions.updateTokenBalances(knownTokenBalances))
 }
 
@@ -197,10 +161,6 @@ export function* handleGetTokens(action: PayloadAction<string[]>) {
   } catch (e) {
     yield* put(actions.setTokensError(true))
   }
-}
-
-export function* getPoolsDataForListHandler(): Generator {
-  yield* takeEvery(actions.getPoolsDataForList, fetchPoolsDataForList)
 }
 
 export function* getPoolDataHandler(): Generator {
@@ -228,7 +188,6 @@ export function* poolsSaga(): Generator {
     [
       getPoolDataHandler,
       getPoolKeysHandler,
-      getPoolsDataForListHandler,
       getAllPoolsForPairDataHandler,
       getTicksAndTickMapsHandler,
       getTokensHandler

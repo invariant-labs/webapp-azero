@@ -1,3 +1,4 @@
+import { Network } from '@invariant-labs/a0-sdk'
 import { PositionItem } from './PositionItem'
 
 import type { Meta, StoryObj } from '@storybook/react'
@@ -25,6 +26,7 @@ export const Primary: Story = {
     address: '',
     tokenXLiq: 5000,
     tokenYLiq: 300.2,
-    currentPrice: 10000
+    currentPrice: 10000,
+    network: Network.Testnet
   }
 }

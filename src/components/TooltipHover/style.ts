@@ -9,7 +9,7 @@ const useStyles = makeStyles()(() => {
       lineHeight: '24px',
       background: colors.black.full,
       borderRadius: 12,
-      width: 80,
+      width: 'max-content',
       textAlign: 'center',
       position: 'absolute',
       transform: 'translate(-50%, -50%)',

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { fn } from '@storybook/test'
 import { MemoryRouter } from 'react-router-dom'
 import SinglePositionInfo from './SinglePositionInfo'
+import { Network } from '@invariant-labs/a0-sdk'
 
 const meta = {
   title: 'Components/SinglePositionInfo',
@@ -43,7 +44,8 @@ export const Primary: Story = {
     xToY: true,
     showFeesLoader: false,
     isBalanceLoading: false,
-    isActive: true
+    isActive: true,
+    network: Network.Testnet
   },
   render: args => {
     return (

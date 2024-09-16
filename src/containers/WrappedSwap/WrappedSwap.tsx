@@ -86,13 +86,13 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
   }, [isFetchingNewPool])
 
   const lastTokenFrom =
-    tickerToAddress(initialTokenFrom) && initialTokenFrom !== '-'
-      ? tickerToAddress(initialTokenFrom)
+    tickerToAddress(network, initialTokenFrom) && initialTokenFrom !== '-'
+      ? tickerToAddress(network, initialTokenFrom)
       : localStorage.getItem(`INVARIANT_LAST_TOKEN_FROM_${network}`)
 
   const lastTokenTo =
-    tickerToAddress(initialTokenTo) && initialTokenTo !== '-'
-      ? tickerToAddress(initialTokenTo)
+    tickerToAddress(network, initialTokenTo) && initialTokenTo !== '-'
+      ? tickerToAddress(network, initialTokenTo)
       : localStorage.getItem(`INVARIANT_LAST_TOKEN_TO_${network}`)
 
   useEffect(() => {
@@ -356,6 +356,7 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
       simulateResult={swapSimulateResult}
       simulateSwap={simulateSwap}
       copyTokenAddressHandler={copyTokenAddressHandler}
+      network={network}
     />
   )
 }

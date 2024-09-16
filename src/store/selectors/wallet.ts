@@ -1,4 +1,4 @@
-import { TESTNET_WAZERO_ADDRESS } from '@invariant-labs/a0-sdk'
+import { Network, WAZERO_ADDRESS } from '@invariant-labs/a0-sdk'
 import { BN } from '@polkadot/util'
 import { createSelector } from '@reduxjs/toolkit'
 import { POOL_SAFE_TRANSACTION_FEE, SWAP_SAFE_TRANSACTION_FEE } from '@store/consts/static'
@@ -41,6 +41,8 @@ export interface SwapToken {
   coingeckoId?: string
 }
 
+const network = Network[localStorage.getItem('INVARIANT_NETWORK_AlephZero') as keyof typeof Network]
+
 export const swapTokens = createSelector(
   tokensBalances,
   tokens,
@@ -50,7 +52,7 @@ export const swapTokens = createSelector(
       ...token,
       assetAddress: token.address,
       balance:
-        token.address.toString() === TESTNET_WAZERO_ADDRESS
+        token.address.toString() === WAZERO_ADDRESS[network ?? Network.Testnet]
           ? BigInt(Math.max(Number(a0Balance - SWAP_SAFE_TRANSACTION_FEE), 0))
           : allAccounts[token.address.toString()]?.balance ?? 0n
     }))
@@ -66,7 +68,7 @@ export const poolTokens = createSelector(
       ...token,
       assetAddress: token.address,
       balance:
-        token.address.toString() === TESTNET_WAZERO_ADDRESS
+        token.address.toString() === WAZERO_ADDRESS[network ?? Network.Testnet]
           ? BigInt(Math.max(Number(a0Balance - POOL_SAFE_TRANSACTION_FEE), 0))
           : allAccounts[token.address.toString()]?.balance ?? 0n
     }))
@@ -84,7 +86,7 @@ export const swapTokensDict = createSelector(
         ...val,
         assetAddress: val.address,
         balance:
-          val.address.toString() === TESTNET_WAZERO_ADDRESS
+          val.address.toString() === WAZERO_ADDRESS[network ?? Network.Testnet]
             ? BigInt(a0Balance)
             : allAccounts[val.address.toString()]?.balance ?? BigInt(0)
       }
