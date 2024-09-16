@@ -9,7 +9,11 @@ import { Box, Button, Grid, Typography } from '@mui/material'
 import refreshIcon from '@static/svg/refresh.svg'
 import settingIcon from '@static/svg/settings.svg'
 import SwapArrows from '@static/svg/swap-arrows.svg'
-import { DEFAULT_TOKEN_DECIMAL, REFRESHER_INTERVAL } from '@store/consts/static'
+import {
+  DEFAULT_TOKEN_DECIMAL,
+  REFRESHER_INTERVAL,
+  SWAP_SAFE_TRANSACTION_FEE
+} from '@store/consts/static'
 import {
   addressToTicker,
   convertBalanceToBigint,
@@ -95,6 +99,7 @@ export interface ISwap {
   simulateSwap: (simulate: Simulate) => void
   copyTokenAddressHandler: (message: string, variant: VariantType) => void
   network: Network
+  azeroBalance: bigint
 }
 
 export const Swap: React.FC<ISwap> = ({
@@ -127,7 +132,8 @@ export const Swap: React.FC<ISwap> = ({
   simulateResult,
   simulateSwap,
   copyTokenAddressHandler,
-  network
+  network,
+  azeroBalance
 }) => {
   const { classes } = useStyles()
   enum inputTarget {
@@ -332,6 +338,10 @@ export const Swap: React.FC<ISwap> = ({
     ) {
       return 'Insufficient balance'
     }
+
+    // if (azeroBalance < SWAP_SAFE_TRANSACTION_FEE) {
+    //   return `Insufficient TZERO`
+    // }
 
     if (
       convertBalanceToBigint(amountFrom, Number(tokens[tokenFrom]?.decimals ?? 0n)) === 0n ||

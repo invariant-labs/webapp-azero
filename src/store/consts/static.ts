@@ -236,8 +236,8 @@ export const ALL_FEE_TIERS_DATA = FEE_TIERS.map((tier, index) => ({
 
 export const U128MAX = 2n ** 128n - 1n
 
-export const SWAP_SAFE_TRANSACTION_FEE = BigInt(Math.ceil(0.05 * 10 ** 12))
-export const POOL_SAFE_TRANSACTION_FEE = BigInt(Math.ceil(0.05 * 10 ** 12))
+export const SWAP_SAFE_TRANSACTION_FEE = BigInt(Math.ceil(0.1 * 10 ** 12))
+export const POOL_SAFE_TRANSACTION_FEE = BigInt(Math.ceil(0.2 * 10 ** 12))
 export const FAUCET_SAFE_TRANSACTION_FEE = BigInt(Math.ceil(0.001 * 10 ** 12))
 
 export enum ErrorMessage {

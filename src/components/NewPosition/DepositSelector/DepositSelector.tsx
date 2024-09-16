@@ -3,7 +3,7 @@ import DepositAmountInput from '@components/Inputs/DepositAmountInput/DepositAmo
 import Select from '@components/Inputs/Select/Select'
 import { Grid, Typography } from '@mui/material'
 import SwapList from '@static/svg/swap-list.svg'
-import { ALL_FEE_TIERS_DATA } from '@store/consts/static'
+import { ALL_FEE_TIERS_DATA, POOL_SAFE_TRANSACTION_FEE } from '@store/consts/static'
 import {
   convertBalanceToBigint,
   getScaleFromString,
@@ -63,6 +63,7 @@ export interface IDepositSelector {
   isGetLiquidityError: boolean
   ticksLoading: boolean
   network: Network
+  azeroBalance: bigint
 }
 
 export const DepositSelector: React.FC<IDepositSelector> = ({
@@ -96,7 +97,8 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
   isBalanceLoading,
   isGetLiquidityError,
   ticksLoading,
-  network
+  network,
+  azeroBalance
 }) => {
   const { classes } = useStyles()
 
@@ -176,6 +178,10 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
         tokens[tokenB].balance
     ) {
       return `Not enough ${tokens[tokenB].symbol}`
+    }
+
+    if (azeroBalance < POOL_SAFE_TRANSACTION_FEE) {
+      return `Insufficient TZERO`
     }
 
     if (

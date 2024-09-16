@@ -105,6 +105,7 @@ export interface INewPosition {
   setOnlyUserPositions: (val: boolean) => void
   network: Network
   isLoadingTokens: boolean
+  azeroBalance: bigint
 }
 
 export const NewPosition: React.FC<INewPosition> = ({
@@ -158,7 +159,8 @@ export const NewPosition: React.FC<INewPosition> = ({
   onlyUserPositions,
   setOnlyUserPositions,
   network,
-  isLoadingTokens
+  isLoadingTokens,
+  azeroBalance
 }) => {
   const { classes } = useStyles()
   const navigate = useNavigate()
@@ -682,6 +684,7 @@ export const NewPosition: React.FC<INewPosition> = ({
           isGetLiquidityError={isGetLiquidityError}
           ticksLoading={ticksLoading}
           network={network}
+          azeroBalance={azeroBalance}
         />
         <Hidden mdUp>
           <Grid container justifyContent='end' mb={2}>
