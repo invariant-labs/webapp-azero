@@ -76,7 +76,8 @@ export const Primary: Story = {
     onlyUserPositions: false,
     setOnlyUserPositions: fn(),
     network: Network.Testnet,
-    isLoadingTokens: false
+    isLoadingTokens: false,
+    azeroBalance: 20000000000000 as any
   },
   render: () => {
     return (
@@ -137,6 +138,7 @@ export const Primary: Story = {
         setOnlyUserPositions={fn()}
         network={Network.Testnet}
         isLoadingTokens={false}
+        azeroBalance={20000000000000n}
       />
     )
   }

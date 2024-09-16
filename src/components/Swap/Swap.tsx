@@ -339,9 +339,9 @@ export const Swap: React.FC<ISwap> = ({
       return 'Insufficient balance'
     }
 
-    // if (azeroBalance < SWAP_SAFE_TRANSACTION_FEE) {
-    //   return `Insufficient TZERO`
-    // }
+    if (azeroBalance < SWAP_SAFE_TRANSACTION_FEE) {
+      return `Insufficient TZERO`
+    }
 
     if (
       convertBalanceToBigint(amountFrom, Number(tokens[tokenFrom]?.decimals ?? 0n)) === 0n ||

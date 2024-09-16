@@ -115,7 +115,8 @@ export const Primary: Story = {
     isBalanceLoading: false,
     isGetLiquidityError: false,
     ticksLoading: false,
-    network: Network.Testnet
+    network: Network.Testnet,
+    azeroBalance: 20000000000000 as any
   },
   render: args => <PrimaryComponent {...args} />
 }
