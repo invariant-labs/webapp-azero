@@ -9,7 +9,7 @@ import { openWalletSelectorModal } from '@utils/web3/selector'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
 import React, { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Chain } from '@store/consts/types'
 
@@ -20,6 +20,7 @@ export const HeaderWrapper: React.FC = () => {
   const currentRpc = useSelector(rpcAddress)
   const location = useLocation()
   const walletAddress = useSelector(address)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchWallet = async () => {
@@ -41,13 +42,23 @@ export const HeaderWrapper: React.FC = () => {
   }, [])
 
   const defaultTestnetRPC = useMemo(() => {
-    const lastRPC = localStorage.getItem(`INVARIANT_RPC_AlephZero_${currentNetwork}`)
+    const lastRPC = localStorage.getItem(`INVARIANT_RPC_AlephZero_${Network.Testnet}`)
 
     if (lastRPC === null) {
-      localStorage.setItem(`INVARIANT_RPC_AlephZero_${currentNetwork}`, RPC.TEST)
+      localStorage.setItem(`INVARIANT_RPC_AlephZero_${Network.Testnet}`, RPC.TEST)
     }
 
     return lastRPC === null ? RPC.TEST : lastRPC
+  }, [])
+
+  const defaultMainnetRPC = useMemo(() => {
+    const lastRPC = localStorage.getItem(`INVARIANT_RPC_AlephZero_${Network.Mainnet}`)
+
+    if (lastRPC === null) {
+      localStorage.setItem(`INVARIANT_RPC_AlephZero_${Network.Mainnet}`, RPC.MAIN)
+    }
+
+    return lastRPC === null ? RPC.MAIN : lastRPC
   }, [])
 
   const activeChain = CHAINS.find(chain => chain.name === Chain.AlephZero) ?? CHAINS[0]
@@ -55,13 +66,22 @@ export const HeaderWrapper: React.FC = () => {
   return (
     <Header
       address={walletAddress}
-      onNetworkSelect={(network, rpcAddress, rpcName) => {
-        if (network !== currentNetwork || rpcAddress !== currentRpc) {
-          if (network === Network.Testnet) {
-            localStorage.setItem(`INVARIANT_RPC_AlephZero_${network}`, rpcAddress)
+      onNetworkSelect={(network, rpcAddress) => {
+        if (rpcAddress !== currentRpc) {
+          localStorage.setItem(`INVARIANT_RPC_AlephZero_${network}`, rpcAddress)
+          dispatch(actions.setRPCAddress(rpcAddress))
+        }
+
+        if (network !== currentNetwork) {
+          if (location.pathname.startsWith('/exchange')) {
+            navigate('/exchange')
           }
 
-          dispatch(actions.setNetwork({ networkType: network, rpcAddress, rpcName }))
+          if (location.pathname.startsWith('/newPosition')) {
+            navigate('/newPosition')
+          }
+
+          dispatch(actions.setNetwork(network))
         }
       }}
       onConnectWallet={async () => {
@@ -97,6 +117,8 @@ export const HeaderWrapper: React.FC = () => {
           window.location.replace(chain.address)
         }
       }}
+      network={currentNetwork}
+      defaultMainnetRPC={defaultMainnetRPC}
     />
   )
 }

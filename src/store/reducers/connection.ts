@@ -1,4 +1,4 @@
-import { Network, TESTNET_INVARIANT_ADDRESS, TESTNET_WAZERO_ADDRESS } from '@invariant-labs/a0-sdk'
+import { Network, INVARIANT_ADDRESS, WAZERO_ADDRESS } from '@invariant-labs/a0-sdk'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { RPC } from '@store/consts/static'
 import { PayloadType } from '@store/consts/types'
@@ -19,14 +19,18 @@ export interface IAlephZeroConnectionStore {
   wrappedAZEROAddress: string
 }
 
+const network =
+  Network[localStorage.getItem('INVARIANT_NETWORK_AlephZero') as keyof typeof Network] ??
+  Network.Testnet
+
 export const defaultState: IAlephZeroConnectionStore = {
   status: Status.Uninitialized,
   message: '',
-  networkType: Network.Testnet,
+  networkType: network,
   blockNumber: 0,
-  rpcAddress: localStorage.getItem(`INVARIANT_RPC_AlephZero_${Network.Testnet}`) || RPC.TEST,
-  invariantAddress: TESTNET_INVARIANT_ADDRESS,
-  wrappedAZEROAddress: TESTNET_WAZERO_ADDRESS
+  rpcAddress: localStorage.getItem(`INVARIANT_RPC_AlephZero_${network}`) ?? RPC.TEST,
+  invariantAddress: INVARIANT_ADDRESS[network],
+  wrappedAZEROAddress: WAZERO_ADDRESS[network]
 }
 export const connectionSliceName = 'connection'
 const connectionSlice = createSlice({
@@ -45,16 +49,10 @@ const connectionSlice = createSlice({
       state.message = action.payload
       return state
     },
-    setNetwork(
-      state,
-      action: PayloadAction<{
-        networkType: Network
-        rpcAddress: string
-        rpcName?: string
-      }>
-    ) {
-      state.networkType = action.payload.networkType
-      state.rpcAddress = action.payload.rpcAddress
+    setNetwork(state, action: PayloadAction<Network>) {
+      state.networkType = action.payload
+      state.invariantAddress = INVARIANT_ADDRESS[action.payload]
+      state.wrappedAZEROAddress = WAZERO_ADDRESS[action.payload]
       return state
     },
     updateSlot(state) {
@@ -62,6 +60,10 @@ const connectionSlice = createSlice({
     },
     setSlot(state, action: PayloadAction<number>) {
       state.blockNumber = action.payload
+      return state
+    },
+    setRPCAddress(state, action: PayloadAction<string>) {
+      state.rpcAddress = action.payload
       return state
     }
   }

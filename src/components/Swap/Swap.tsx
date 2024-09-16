@@ -3,7 +3,7 @@ import ChangeWalletButton from '@components/Header/HeaderButton/ChangeWalletButt
 import ExchangeAmountInput from '@components/Inputs/ExchangeAmountInput/ExchangeAmountInput'
 import Slippage from '@components/Modals/Slippage/Slippage'
 import Refresher from '@components/Refresher/Refresher'
-import { PoolKey, Price } from '@invariant-labs/a0-sdk'
+import { Network, PoolKey, Price } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
 import { Box, Button, Grid, Typography } from '@mui/material'
 import refreshIcon from '@static/svg/refresh.svg'
@@ -94,6 +94,7 @@ export interface ISwap {
   simulateResult: SimulateResult
   simulateSwap: (simulate: Simulate) => void
   copyTokenAddressHandler: (message: string, variant: VariantType) => void
+  network: Network
 }
 
 export const Swap: React.FC<ISwap> = ({
@@ -125,7 +126,8 @@ export const Swap: React.FC<ISwap> = ({
   swapData,
   simulateResult,
   simulateSwap,
-  copyTokenAddressHandler
+  copyTokenAddressHandler,
+  network
 }) => {
   const { classes } = useStyles()
   enum inputTarget {
@@ -158,7 +160,7 @@ export const Swap: React.FC<ISwap> = ({
 
   useEffect(() => {
     navigate(
-      `/exchange/${tokenFrom ? addressToTicker(tokenFrom) : '-'}/${tokenTo ? addressToTicker(tokenTo) : '-'}`,
+      `/exchange/${tokenFrom ? addressToTicker(network, tokenFrom) : '-'}/${tokenTo ? addressToTicker(network, tokenTo) : '-'}`,
       {
         replace: true
       }
@@ -176,7 +178,7 @@ export const Swap: React.FC<ISwap> = ({
 
   useEffect(() => {
     onSetPair(tokenFrom, tokenTo)
-  }, [tokenFrom, tokenTo, pools.length])
+  }, [tokenFrom, tokenTo])
 
   useEffect(() => {
     if (inputRef === inputTarget.FROM && !(amountFrom === '' && amountTo === '')) {

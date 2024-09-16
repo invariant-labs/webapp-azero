@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { fn } from '@storybook/test'
 import { MemoryRouter } from 'react-router-dom'
 import PositionDetails from './PositionDetails'
+import { Network } from '@invariant-labs/a0-sdk'
 
 const meta = {
   title: 'Components/PositionDetails',
@@ -77,7 +78,8 @@ export const Primary: Story = {
     tokenXAddress: '0x1234567890',
     tokenYAddress: '0x1234567890',
     onRefresh: fn(),
-    isBalanceLoading: false
+    isBalanceLoading: false,
+    network: Network.Testnet
   },
   render: args => {
     return (

@@ -18,6 +18,7 @@ import { useStyles } from './style'
 import { PositionOpeningMethod } from '@store/consts/types'
 import { SwapToken } from '@store/selectors/wallet'
 import { TooltipHover } from '@components/TooltipHover/TooltipHover'
+import { Network } from '@invariant-labs/a0-sdk'
 export interface InputState {
   value: string
   setValue: (value: string) => void
@@ -61,6 +62,7 @@ export interface IDepositSelector {
   isBalanceLoading: boolean
   isGetLiquidityError: boolean
   ticksLoading: boolean
+  network: Network
 }
 
 export const DepositSelector: React.FC<IDepositSelector> = ({
@@ -93,12 +95,25 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
   positionOpeningMethod,
   isBalanceLoading,
   isGetLiquidityError,
-  ticksLoading
+  ticksLoading,
+  network
 }) => {
   const { classes } = useStyles()
 
   const [tokenA, setTokenA] = useState<string | null>(null)
   const [tokenB, setTokenB] = useState<string | null>(null)
+  const [tokenAPrice, setTokenAPrice] = useState<number | undefined>(undefined)
+  const [tokenBPrice, setTokenBPrice] = useState<number | undefined>(undefined)
+
+  useEffect(() => {
+    if (!tokenAPrice) {
+      setTokenAPrice(priceA)
+    }
+
+    if (!tokenBPrice) {
+      setTokenBPrice(priceB)
+    }
+  }, [priceALoading, priceBLoading, priceA, priceB])
 
   const [hideUnknownTokens, setHideUnknownTokens] = useState<boolean>(initialHideUnknownTokensValue)
 
@@ -109,8 +124,8 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
       return
     }
 
-    const tokenAFromPath = tokens[tickerToAddress(initialTokenFrom)]?.assetAddress || null
-    const tokenBFromPath = tokens[tickerToAddress(initialTokenTo)]?.assetAddress || null
+    const tokenAFromPath = tokens[tickerToAddress(network, initialTokenFrom)]?.assetAddress || null
+    const tokenBFromPath = tokens[tickerToAddress(network, initialTokenTo)]?.assetAddress || null
     let feeTierIndexFromPath = 0
 
     const parsedFee = parsePathFeeToFeeString(initialFee)
@@ -189,13 +204,13 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
   const [wasRunTokenB, setWasRunTokenB] = useState(false)
 
   useEffect(() => {
-    if (!wasRunTokenA && tokens[tickerToAddress(initialTokenFrom)]) {
-      setTokenA(tickerToAddress(initialTokenFrom))
+    if (!wasRunTokenA && tokens[tickerToAddress(network, initialTokenFrom)]) {
+      setTokenA(tickerToAddress(network, initialTokenFrom))
       setWasRunTokenA(true)
     }
 
-    if (!wasRunTokenB && tokens[tickerToAddress(initialTokenTo)]) {
-      setTokenB(tickerToAddress(initialTokenTo))
+    if (!wasRunTokenB && tokens[tickerToAddress(network, initialTokenTo)]) {
+      setTokenB(tickerToAddress(network, initialTokenTo))
       setWasRunTokenB(true)
     }
   }, [wasRunTokenA, wasRunTokenB, tokens])
@@ -268,6 +283,9 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
                 const pom = tokenA
                 setTokenA(tokenB)
                 setTokenB(pom)
+                const pricePom = tokenAPrice
+                setTokenAPrice(tokenBPrice)
+                setTokenBPrice(pricePom)
                 onReverseTokens()
               }}
             />
@@ -310,7 +328,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
       <Typography className={classes.sectionTitle}>Deposit Amount</Typography>
       <Grid container className={classes.sectionWrapper}>
         <DepositAmountInput
-          tokenPrice={priceA}
+          tokenPrice={tokenAPrice}
           currency={tokenA !== null ? tokens[tokenA].symbol : null}
           currencyIconSrc={tokenA !== null ? tokens[tokenA].logoURI : undefined}
           placeholder='0.0'
@@ -338,7 +356,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
         />
 
         <DepositAmountInput
-          tokenPrice={priceB}
+          tokenPrice={tokenBPrice}
           currency={tokenB !== null ? tokens[tokenB].symbol : null}
           currencyIconSrc={tokenB !== null ? tokens[tokenB].logoURI : undefined}
           placeholder='0.0'

@@ -3,7 +3,7 @@ import { NightlyConnectAdapter } from '@nightlylabs/wallet-selector-polkadot'
 import { PayloadAction } from '@reduxjs/toolkit'
 import {
   FAUCET_SAFE_TRANSACTION_FEE,
-  FaucetTokenList,
+  getFaucetTokenList,
   TokenAirdropAmount
 } from '@store/consts/static'
 import { createLoaderKey, getTokenBalances } from '@utils/utils'
@@ -18,6 +18,7 @@ import {
   SagaGenerator,
   all,
   call,
+  delay,
   put,
   select,
   spawn,
@@ -28,6 +29,7 @@ import { Signer } from '@polkadot/api/types'
 import { positionsList } from '@store/selectors/positions'
 import { getApi, getPSP22 } from './connection'
 import { openWalletSelectorModal } from '@utils/web3/selector'
+import { networkType } from '@store/selectors/connection'
 
 export function* getWallet(): SagaGenerator<NightlyConnectAdapter> {
   const wallet = yield* call(getAlephZeroWallet)
@@ -100,15 +102,18 @@ export function* handleAirdrop(): Generator {
     )
 
     const connection = yield* getApi()
+    const network = yield* select(networkType)
     const adapter = yield* call(getAlephZeroWallet)
 
     const psp22 = yield* getPSP22()
 
     const txs = []
 
-    for (const ticker in FaucetTokenList) {
-      const address = FaucetTokenList[ticker as keyof typeof FaucetTokenList]
-      const airdropAmount = TokenAirdropAmount[ticker as keyof typeof FaucetTokenList]
+    const faucetTokenList = getFaucetTokenList(network)
+
+    for (const ticker in faucetTokenList) {
+      const address = faucetTokenList[ticker as keyof typeof faucetTokenList]
+      const airdropAmount = TokenAirdropAmount[ticker as keyof typeof faucetTokenList]
 
       const mintTx = psp22.mintTx(airdropAmount, address)
       txs.push(mintTx)
@@ -137,7 +142,7 @@ export function* handleAirdrop(): Generator {
     closeSnackbar(loaderAirdrop)
     yield put(snackbarsActions.remove(loaderAirdrop))
 
-    const tokenNames = Object.keys(FaucetTokenList).join(', ')
+    const tokenNames = Object.keys(faucetTokenList).join(', ')
 
     yield* put(
       snackbarsActions.add({
@@ -148,7 +153,7 @@ export function* handleAirdrop(): Generator {
       })
     )
 
-    yield* call(fetchBalances, [...Object.values(FaucetTokenList)])
+    yield* call(fetchBalances, [...Object.values(faucetTokenList)])
   } catch (error) {
     console.log(error)
 
@@ -162,6 +167,10 @@ export function* handleAirdrop(): Generator {
 export function* init(isEagerConnect: boolean): Generator {
   try {
     yield* put(actions.setStatus(Status.Init))
+
+    if (isEagerConnect) {
+      yield* delay(500)
+    }
 
     const walletAdapter = yield* call(getWallet)
     yield* call([walletAdapter, walletAdapter.connect])
@@ -251,15 +260,19 @@ export function* handleDisconnect(): Generator {
 }
 
 export function* fetchBalances(tokens: string[]): Generator {
+  console.log('fetchBalances', tokens)
   const walletAddress = yield* select(address)
   const psp22 = yield* getPSP22()
 
   yield* put(walletActions.setIsBalanceLoading(true))
 
-  const balance = yield* call(getBalance, walletAddress)
+  const { balance, tokenBalances } = yield* all({
+    balance: call(getBalance, walletAddress),
+    tokenBalances: call(getTokenBalances, tokens, psp22, walletAddress)
+  })
+
   yield* put(walletActions.setBalance(BigInt(balance)))
 
-  const tokenBalances = yield* call(getTokenBalances, tokens, psp22, walletAddress)
   yield* put(
     walletActions.addTokenBalances(
       tokenBalances.map(([address, balance]) => {
@@ -285,11 +298,11 @@ export function* handleGetBalances(action: PayloadAction<string[]>): Generator {
 }
 
 export function* connectHandler(): Generator {
-  yield takeLeading(actions.connect, handleConnect)
+  yield takeLatest(actions.connect, handleConnect)
 }
 
 export function* disconnectHandler(): Generator {
-  yield takeLeading(actions.disconnect, handleDisconnect)
+  yield takeLatest(actions.disconnect, handleDisconnect)
 }
 
 export function* airdropSaga(): Generator {

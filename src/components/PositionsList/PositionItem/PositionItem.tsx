@@ -6,6 +6,7 @@ import classNames from 'classnames'
 import { useMemo, useState } from 'react'
 import { useStyles } from './style'
 import { TooltipHover } from '@components/TooltipHover/TooltipHover'
+import { Network } from '@invariant-labs/a0-sdk'
 
 export interface IPositionItem {
   tokenXName: string
@@ -23,6 +24,7 @@ export interface IPositionItem {
   currentPrice: number
   tokenXLiq: number
   tokenYLiq: number
+  network: Network
 }
 
 export const PositionItem: React.FC<IPositionItem> = ({
@@ -38,7 +40,8 @@ export const PositionItem: React.FC<IPositionItem> = ({
   isActive = false,
   currentPrice,
   tokenXLiq,
-  tokenYLiq
+  tokenYLiq,
+  network
 }) => {
   const { classes } = useStyles()
 
@@ -46,7 +49,7 @@ export const PositionItem: React.FC<IPositionItem> = ({
   const isDesktop = useMediaQuery(theme.breakpoints.up('lg'))
 
   const [xToY, setXToY] = useState<boolean>(
-    initialXtoY(tickerToAddress(tokenXName), tickerToAddress(tokenYName))
+    initialXtoY(tickerToAddress(network, tokenXName), tickerToAddress(network, tokenYName))
   )
 
   const getPercentageRatio = () => {

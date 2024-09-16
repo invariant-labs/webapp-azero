@@ -1,14 +1,11 @@
 import clearIcon from './svg/clear.svg'
-import mainnet from './svg/mainnet.svg'
-import devnet from './svg/devnet.svg'
-import testnet from './svg/testnet.svg'
+import mainnetIcon from './svg/mainnet.svg'
+import devnetIcon from './svg/devnet.svg'
+import testnetIcon from './svg/testnet.svg'
 import logoTitle from './svg/Logo.svg'
 import logoShort from './svg/LogoShort.svg'
 import arrow from './svg/arrow.svg'
 import NoCon from './svg/no-connected.svg'
-import mainnetIcon from './svg/mainNet.svg'
-import devnetIcon from './svg/devNet.svg'
-import testnetIcon from './svg/testNet.svg'
 import githubIcon from './svg/githubCircle.svg'
 import telegramIcon from './svg/telegramCircle.svg'
 import mediumIcon from './svg/mediumCircle.svg'
@@ -35,9 +32,6 @@ import solanaLogo from './svg/solanaLogo.svg'
 
 const icons: { [key: string]: string } = {
   clear: clearIcon,
-  Mainnet: mainnet,
-  Devnet: devnet,
-  Testnet: testnet,
   LogoShort: logoShort,
   LogoTitle: logoTitle,
   ArrowIcon: arrow,

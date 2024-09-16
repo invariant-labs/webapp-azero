@@ -1,17 +1,27 @@
 import {
+  BTC_ADDRESS,
+  ETH_ADDRESS,
   FeeTier,
   LiquidityTick,
+  Network,
   Pool,
   PoolKey,
-  TESTNET_BTC_ADDRESS,
-  TESTNET_ETH_ADDRESS,
-  TESTNET_USDC_ADDRESS,
-  TESTNET_WAZERO_ADDRESS,
   Tick,
-  Tickmap
+  Tickmap,
+  USDC_ADDRESS,
+  WAZERO_ADDRESS
 } from '@invariant-labs/a0-sdk'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
-import { AZERO, BTC, ETH, USDC } from '@store/consts/static'
+import {
+  MAINNET_AZERO,
+  MAINNET_BTC,
+  MAINNET_ETH,
+  MAINNET_USDC,
+  TESTNET_AZERO,
+  TESTNET_BTC,
+  TESTNET_ETH,
+  TESTNET_USDC
+} from '@store/consts/static'
 import { PayloadType, Token } from '@store/consts/types'
 import { poolKeyToString } from '@utils/utils'
 
@@ -73,13 +83,25 @@ export interface FetchTicksAndTickMaps {
   allPools: PoolWithPoolKey[]
 }
 
+const network =
+  Network[localStorage.getItem('INVARIANT_NETWORK_AlephZero') as keyof typeof Network] ??
+  Network.Testnet
+
 export const defaultState: IPoolsStore = {
-  tokens: {
-    [TESTNET_BTC_ADDRESS]: BTC,
-    [TESTNET_ETH_ADDRESS]: ETH,
-    [TESTNET_USDC_ADDRESS]: USDC,
-    [TESTNET_WAZERO_ADDRESS]: AZERO
-  },
+  tokens:
+    network === Network.Mainnet
+      ? {
+          [BTC_ADDRESS[Network.Mainnet]]: MAINNET_BTC,
+          [ETH_ADDRESS[Network.Mainnet]]: MAINNET_ETH,
+          [USDC_ADDRESS[Network.Mainnet]]: MAINNET_USDC,
+          [WAZERO_ADDRESS[Network.Mainnet]]: MAINNET_AZERO
+        }
+      : {
+          [BTC_ADDRESS[Network.Testnet]]: TESTNET_BTC,
+          [ETH_ADDRESS[Network.Testnet]]: TESTNET_ETH,
+          [USDC_ADDRESS[Network.Testnet]]: TESTNET_USDC,
+          [WAZERO_ADDRESS[Network.Testnet]]: TESTNET_AZERO
+        },
   pools: {},
   poolKeys: {},
   poolTicks: {},
@@ -204,7 +226,6 @@ const poolsSlice = createSlice({
       state.isLoadingLatestPoolsForTransaction = true
       return state
     },
-    getPoolsDataForList(_state, _action: PayloadAction<ListPoolsRequest>) {},
     getTicksAndTickMaps(state, _action: PayloadAction<FetchTicksAndTickMaps>) {
       state.isLoadingTicksAndTickMaps = true
       return state
