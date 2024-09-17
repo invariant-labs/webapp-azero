@@ -348,9 +348,9 @@ export const DEFAULT_NEW_POSITION_SLIPPAGE = '0.50'
 
 export const CHAINS = [
   { name: Chain.Solana, address: 'https://invariant.app/swap' },
-  { name: Chain.AlephZero, address: 'https://azero.invariant.app/swap' },
+  { name: Chain.AlephZero, address: 'https://azero.invariant.app/exchange' },
   { name: Chain.Eclipse, address: 'https://eclipse.invariant.app/swap' },
-  { name: Chain.Vara, address: 'https://vara.invariant.app/swap' }
+  { name: Chain.Vara, address: 'https://vara.invariant.app/exchange' }
 ]
 
 export const enum SortTypePoolList {
