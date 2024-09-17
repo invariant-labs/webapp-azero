@@ -181,7 +181,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
     }
 
     if (azeroBalance < POOL_SAFE_TRANSACTION_FEE) {
-      return `Insufficient TZERO`
+      return `Insufficient AZERO`
     }
 
     if (

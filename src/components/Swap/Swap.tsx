@@ -340,7 +340,7 @@ export const Swap: React.FC<ISwap> = ({
     }
 
     if (azeroBalance < SWAP_SAFE_TRANSACTION_FEE) {
-      return `Insufficient TZERO`
+      return `Insufficient AZERO`
     }
 
     if (
