@@ -613,6 +613,10 @@ export function* handleGetRemainingPositions(): Generator {
   const walletAddress = yield* select(address)
   const { length, list, loadedPages } = yield* select(positionsList)
 
+  if (!walletAddress) {
+    return
+  }
+
   const invariant = yield* getInvariant()
 
   const pages = yield* call(
