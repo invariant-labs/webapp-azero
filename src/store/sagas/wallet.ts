@@ -166,11 +166,10 @@ export function* handleAirdrop(): Generator {
 
 export function* init(isEagerConnect: boolean): Generator {
   try {
-    yield* put(actions.setStatus(Status.Init))
-
     if (isEagerConnect) {
       yield* delay(500)
     }
+    yield* put(actions.setStatus(Status.Init))
 
     const walletAdapter = yield* call(getWallet)
     yield* call([walletAdapter, walletAdapter.connect])
