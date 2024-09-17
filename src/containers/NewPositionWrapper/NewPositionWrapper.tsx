@@ -42,13 +42,7 @@ import {
   poolsArraySortedByFees
 } from '@store/selectors/pools'
 import { initPosition, plotTicks, shouldNotUpdateRange } from '@store/selectors/positions'
-import {
-  address,
-  balanceLoading,
-  status,
-  swapTokens,
-  swapTokensDict
-} from '@store/selectors/wallet'
+import { address, balanceLoading, status, poolTokens, balance } from '@store/selectors/wallet'
 import SingletonPSP22 from '@store/services/psp22Singleton'
 import { openWalletSelectorModal } from '@utils/web3/selector'
 import { VariantType } from 'notistack'
@@ -69,7 +63,8 @@ export const NewPositionWrapper: React.FC<IProps> = ({
 }) => {
   const dispatch = useDispatch()
   const walletAddress = useSelector(address)
-  const tokens = useSelector(swapTokensDict)
+  const azeroBalance = useSelector(balance)
+  const tokens = useSelector(poolTokens)
   const walletStatus = useSelector(status)
   const allPools = useSelector(poolsArraySortedByFees)
   const allPoolKeys = useSelector(poolKeys)
@@ -92,8 +87,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
 
   const isFetchingNewPool = useSelector(isLoadingLatestPoolsForTransaction)
   const currentNetwork = useSelector(networkType)
-
-  const tokensList = useSelector(swapTokens)
 
   const [poolIndex, setPoolIndex] = useState<number | null>(null)
 
@@ -325,7 +318,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   const addTokenHandler = async (address: string) => {
     const psp22 = SingletonPSP22.getInstance()
 
-    if (psp22 && tokensList.findIndex(token => token.address.toString() === address) === -1) {
+    if (psp22 && !tokens[address]) {
       getNewTokenOrThrow(address, psp22, walletAddress)
         .then(data => {
           dispatch(poolsActions.addTokens(data))
@@ -681,6 +674,7 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       setOnlyUserPositions={setOnlyUserPositions}
       network={network}
       isLoadingTokens={isCurrentlyLoadingTokens}
+      azeroBalance={azeroBalance}
     />
   )
 }

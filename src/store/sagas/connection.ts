@@ -87,7 +87,6 @@ export function* initConnection(): Generator {
       })
     )
 
-    console.log('Aleph Zero network connected.')
     yield* put(actions.setStatus(Status.Initialized))
   } catch (error) {
     console.log(error)
