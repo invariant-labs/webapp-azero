@@ -727,6 +727,40 @@ export const Swap: React.FC<ISwap> = ({
             onDisconnect={onDisconnectWallet}
             className={classes.connectWalletButton}
           />
+        ) : getStateMessage() === 'Insufficient AZERO' ? (
+          <TooltipHover
+            text='AZERO is required to pay for transaction fees. Get more AZERO to proceed.'
+            top={-45}>
+            <div>
+              <AnimatedButton
+                content={getStateMessage()}
+                className={
+                  getStateMessage() === 'Connect a wallet'
+                    ? `${classes.swapButton}`
+                    : getStateMessage() === 'Exchange' && progress === 'none'
+                      ? `${classes.swapButton} ${classes.ButtonSwapActive}`
+                      : classes.swapButton
+                }
+                disabled={getStateMessage() !== 'Exchange' || progress !== 'none'}
+                onClick={() => {
+                  if (simulateResult.poolKey === null || tokenFrom === null || tokenTo === null)
+                    return
+
+                  onSwap(
+                    simulateResult.poolKey,
+                    BigInt((+slippTolerance * Number(PERCENTAGE_DENOMINATOR)) / 100),
+                    simulateResult.targetSqrtPrice,
+                    tokenFrom,
+                    tokenTo,
+                    convertBalanceToBigint(amountFrom, tokens[tokenFrom].decimals),
+                    convertBalanceToBigint(amountTo, tokens[tokenTo].decimals),
+                    inputRef === inputTarget.FROM
+                  )
+                }}
+                progress={progress}
+              />
+            </div>
+          </TooltipHover>
         ) : (
           <AnimatedButton
             content={getStateMessage()}
