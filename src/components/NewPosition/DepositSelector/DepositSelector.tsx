@@ -122,27 +122,28 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
   const [isLoaded, setIsLoaded] = useState<boolean>(false)
 
   useEffect(() => {
-    if (isLoaded || Object.keys(tokens).length === 0 || ALL_FEE_TIERS_DATA.length === 0) {
-      return
+    if (!isLoaded || Object.keys(tokens).length !== 0 || ALL_FEE_TIERS_DATA.length !== 0) {
+      const tokenAFromPath =
+        tokens[tickerToAddress(network, initialTokenFrom)]?.assetAddress || null
+      const tokenBFromPath = tokens[tickerToAddress(network, initialTokenTo)]?.assetAddress || null
+      let feeTierIndexFromPath = 0
+
+      const parsedFee = parsePathFeeToFeeString(initialFee)
+
+      ALL_FEE_TIERS_DATA.forEach((feeTierData, index) => {
+        if (feeTierData.tier.fee.toString() === parsedFee) {
+          feeTierIndexFromPath = index
+        }
+      })
+
+      setTokenA(tokenAFromPath)
+      setTokenB(tokenBFromPath)
+      setPositionTokens(tokenAFromPath, tokenBFromPath, feeTierIndexFromPath)
+
+      setIsLoaded(true)
+    } else {
+      setIsLoaded(false)
     }
-
-    const tokenAFromPath = tokens[tickerToAddress(network, initialTokenFrom)]?.assetAddress || null
-    const tokenBFromPath = tokens[tickerToAddress(network, initialTokenTo)]?.assetAddress || null
-    let feeTierIndexFromPath = 0
-
-    const parsedFee = parsePathFeeToFeeString(initialFee)
-
-    ALL_FEE_TIERS_DATA.forEach((feeTierData, index) => {
-      if (feeTierData.tier.fee.toString() === parsedFee) {
-        feeTierIndexFromPath = index
-      }
-    })
-
-    setTokenA(tokenAFromPath)
-    setTokenB(tokenBFromPath)
-    setPositionTokens(tokenAFromPath, tokenBFromPath, feeTierIndexFromPath)
-
-    setIsLoaded(true)
   }, [Object.keys(tokens).length])
 
   const getButtonMessage = useCallback(() => {

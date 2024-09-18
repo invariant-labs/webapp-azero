@@ -335,8 +335,8 @@ export const EMPTY_POSITION: Position = {
   lastBlockNumber: 0n,
   tokensOwedX: 0n,
   tokensOwedY: 0n,
-  createdAt: 0n,
-  secondsPerLiquidityInside: 0n
+  secondsPerLiquidityInside: 0n,
+  createdAt: 0n
 }
 
 export const POSITIONS_PER_QUERY =

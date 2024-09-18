@@ -228,7 +228,7 @@ export enum SwapError {
   InsufficientLiquidity,
   AmountIsZero,
   NoRouteFound,
-  MaxTicksCrossed,
+  MaxSwapStepsReached,
   StateOutdated,
   Unknown
 }
@@ -310,10 +310,10 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
           continue
         }
 
-        // if (result.maxTicksCrossed) {
-        //   errors.push(SwapError.MaxTicksCrossed)
-        //   continue
-        // }
+        if (result.maxSwapStepsReached) {
+          errors.push(SwapError.MaxSwapStepsReached)
+          continue
+        }
 
         if (result.stateOutdated) {
           errors.push(SwapError.StateOutdated)
