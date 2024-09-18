@@ -115,7 +115,7 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
   const addTokenHandler = async (address: string) => {
     const psp22 = SingletonPSP22.getInstance()
 
-    if (psp22 && api !== null && ![address]) {
+    if (psp22 && api !== null && !tokensList[address]) {
       getNewTokenOrThrow(address, psp22, walletAddress)
         .then(data => {
           dispatch(poolsActions.addTokens(data))

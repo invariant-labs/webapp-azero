@@ -302,7 +302,7 @@ export const Swap: React.FC<ISwap> = ({
   const isInsufficientLiquidityError = useMemo(
     () =>
       simulateResult.poolKey === null &&
-      (isError(SwapError.InsufficientLiquidity) || isError(SwapError.MaxTicksCrossed)),
+      (isError(SwapError.InsufficientLiquidity) || isError(SwapError.MaxSwapStepsReached)),
     [simulateResult]
   )
 
@@ -333,7 +333,7 @@ export const Swap: React.FC<ISwap> = ({
 
     if (
       convertBalanceToBigint(amountFrom, Number(tokens[tokenFrom]?.decimals) ?? 0n) >
-        tokens[tokenFrom]?.balance ??
+        tokens[tokenFrom]?.balance ||
       0n
     ) {
       return 'Insufficient balance'
