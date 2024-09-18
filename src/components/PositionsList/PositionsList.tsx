@@ -108,7 +108,7 @@ export const PositionsList: React.FC<IProps> = ({
         <Grid className={classes.searchRoot}>
           <Grid className={classes.titleBar}>
             <Typography className={classes.title}>Your Positions</Typography>
-            <TooltipHover text='Total number of you liquidity positions'>
+            <TooltipHover text='Total number of your liquidity positions'>
               <Typography className={classes.positionsNumber}>{String(length)}</Typography>
             </TooltipHover>
           </Grid>
