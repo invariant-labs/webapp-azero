@@ -310,10 +310,10 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
           continue
         }
 
-        if (result.maxTicksCrossed) {
-          errors.push(SwapError.MaxTicksCrossed)
-          continue
-        }
+        // if (result.maxTicksCrossed) {
+        //   errors.push(SwapError.MaxTicksCrossed)
+        //   continue
+        // }
 
         if (result.stateOutdated) {
           errors.push(SwapError.StateOutdated)
