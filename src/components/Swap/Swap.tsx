@@ -729,7 +729,7 @@ export const Swap: React.FC<ISwap> = ({
           />
         ) : getStateMessage() === 'Insufficient AZERO' ? (
           <TooltipHover
-            text='AZERO is required to pay for transaction fees. Get more AZERO to proceed.'
+            text='More AZERO is required to cover the transaction fee. Obtain more AZERO to complete this transaction.'
             top={-45}>
             <div>
               <AnimatedButton
