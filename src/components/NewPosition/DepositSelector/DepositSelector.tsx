@@ -389,7 +389,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
       </Grid>
       {getButtonMessage() === 'Insufficient AZERO' ? (
         <TooltipHover
-          text='AZERO is required to pay for transaction fees. Get more AZERO to proceed.'
+          text='More AZERO is required to cover the transaction fee. Obtain more AZERO to complete this transaction.'
           top={-10}>
           <div>
             <AnimatedButton
