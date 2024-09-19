@@ -59,6 +59,7 @@ export const useStyles = makeStyles()(theme => {
       }
     },
     addButton: {
+      height: '48px',
       width: '100%',
       margin: '30px 0',
       cursor: 'default'
@@ -84,11 +85,12 @@ export const useStyles = makeStyles()(theme => {
     },
     connectWalletButton: {
       height: '48px !important',
-      borderRadius: '16px !important',
+      borderRadius: '16px',
       width: '100%',
+      margin: '30px 0',
 
       [theme.breakpoints.down('sm')]: {
-        width: '100% !important'
+        width: '100%'
       }
     }
   }
