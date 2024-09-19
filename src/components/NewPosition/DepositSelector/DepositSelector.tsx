@@ -19,6 +19,8 @@ import { PositionOpeningMethod } from '@store/consts/types'
 import { SwapToken } from '@store/selectors/wallet'
 import { TooltipHover } from '@components/TooltipHover/TooltipHover'
 import { Network } from '@invariant-labs/a0-sdk'
+import { Status } from '@store/reducers/wallet'
+import ChangeWalletButton from '@components/Header/HeaderButton/ChangeWalletButton'
 export interface InputState {
   value: string
   setValue: (value: string) => void
@@ -64,6 +66,9 @@ export interface IDepositSelector {
   ticksLoading: boolean
   network: Network
   azeroBalance: bigint
+  walletStatus: Status
+  onConnectWallet: () => void
+  onDisconnectWallet: () => void
 }
 
 export const DepositSelector: React.FC<IDepositSelector> = ({
@@ -98,7 +103,10 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
   isGetLiquidityError,
   ticksLoading,
   network,
-  azeroBalance
+  azeroBalance,
+  walletStatus,
+  onConnectWallet,
+  onDisconnectWallet
 }) => {
   const { classes } = useStyles()
 
@@ -387,21 +395,30 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
           isBalanceLoading={isBalanceLoading}
         />
       </Grid>
-
-      <AnimatedButton
-        className={classNames(
-          classes.addButton,
-          progress === 'none' ? classes.hoverButton : undefined
-        )}
-        onClick={() => {
-          if (progress === 'none') {
-            onAddLiquidity()
-          }
-        }}
-        disabled={getButtonMessage() !== 'Add Position'}
-        content={getButtonMessage()}
-        progress={progress}
-      />
+      {walletStatus !== Status.Initialized && getButtonMessage() !== 'Loading' ? (
+        <ChangeWalletButton
+          name='Connect wallet'
+          onConnect={onConnectWallet}
+          connected={false}
+          onDisconnect={onDisconnectWallet}
+          className={classes.connectWalletButton}
+        />
+      ) : (
+        <AnimatedButton
+          className={classNames(
+            classes.addButton,
+            progress === 'none' ? classes.hoverButton : undefined
+          )}
+          onClick={() => {
+            if (progress === 'none') {
+              onAddLiquidity()
+            }
+          }}
+          disabled={getButtonMessage() !== 'Add Position'}
+          content={getButtonMessage()}
+          progress={progress}
+        />
+      )}
     </Grid>
   )
 }

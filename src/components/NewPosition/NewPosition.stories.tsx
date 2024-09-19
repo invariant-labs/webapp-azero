@@ -3,6 +3,7 @@ import { fn } from '@storybook/test'
 import { MemoryRouter } from 'react-router-dom'
 import NewPosition from './NewPosition'
 import { Network } from '@invariant-labs/a0-sdk'
+import { Status } from '@store/reducers/wallet'
 
 const meta = {
   title: 'PageComponent/NewPosition',
@@ -64,10 +65,6 @@ export const Primary: Story = {
     calcAmount: fn(),
     loadingTicksAndTickMaps: false,
     poolKey: '',
-    noConnectedBlockerProps: {
-      onConnect: fn(),
-      descCustomText: 'Cannot add any liquidity.'
-    },
     onRefresh: fn(),
     isBalanceLoading: false,
     shouldNotUpdatePriceRange: false,
@@ -77,7 +74,10 @@ export const Primary: Story = {
     setOnlyUserPositions: fn(),
     network: Network.Testnet,
     isLoadingTokens: false,
-    azeroBalance: 20000000000000 as any
+    azeroBalance: 20000000000000 as any,
+    walletStatus: Status.Initialized,
+    onConnectWallet: () => {},
+    onDisconnectWallet: () => {}
   },
   render: () => {
     return (
@@ -125,10 +125,6 @@ export const Primary: Story = {
         calcAmount={() => 1n}
         loadingTicksAndTickMaps={false}
         poolKey=''
-        noConnectedBlockerProps={{
-          onConnect: fn(),
-          descCustomText: 'Cannot add any liquidity.'
-        }}
         onRefresh={fn()}
         isBalanceLoading={false}
         shouldNotUpdatePriceRange={false}
@@ -139,6 +135,9 @@ export const Primary: Story = {
         network={Network.Testnet}
         isLoadingTokens={false}
         azeroBalance={20000000000000n}
+        walletStatus={Status.Initialized}
+        onConnectWallet={() => {}}
+        onDisconnectWallet={() => {}}
       />
     )
   }
