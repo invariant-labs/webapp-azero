@@ -387,21 +387,43 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
           isBalanceLoading={isBalanceLoading}
         />
       </Grid>
-
-      <AnimatedButton
-        className={classNames(
-          classes.addButton,
-          progress === 'none' ? classes.hoverButton : undefined
-        )}
-        onClick={() => {
-          if (progress === 'none') {
-            onAddLiquidity()
-          }
-        }}
-        disabled={getButtonMessage() !== 'Add Position'}
-        content={getButtonMessage()}
-        progress={progress}
-      />
+      {getButtonMessage() === 'Insufficient AZERO' ? (
+        <TooltipHover
+          text='More AZERO is required to cover the transaction fee. Obtain more AZERO to complete this transaction.'
+          top={-10}>
+          <div>
+            <AnimatedButton
+              className={classNames(
+                classes.addButton,
+                progress === 'none' ? classes.hoverButton : undefined
+              )}
+              onClick={() => {
+                if (progress === 'none') {
+                  onAddLiquidity()
+                }
+              }}
+              disabled={getButtonMessage() !== 'Add Position'}
+              content={getButtonMessage()}
+              progress={progress}
+            />
+          </div>
+        </TooltipHover>
+      ) : (
+        <AnimatedButton
+          className={classNames(
+            classes.addButton,
+            progress === 'none' ? classes.hoverButton : undefined
+          )}
+          onClick={() => {
+            if (progress === 'none') {
+              onAddLiquidity()
+            }
+          }}
+          disabled={getButtonMessage() !== 'Add Position'}
+          content={getButtonMessage()}
+          progress={progress}
+        />
+      )}
     </Grid>
   )
 }
