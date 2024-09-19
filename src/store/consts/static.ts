@@ -43,7 +43,7 @@ export const FAUCET_TOKEN_AMOUNT = 1000n
 
 export const TokenAirdropAmount = {
   BTC: 100000n,
-  ETH: 20000000000n,
+  ETH: 20000000000000000n,
   USDC: 50000000n
 }
 
