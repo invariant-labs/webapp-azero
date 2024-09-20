@@ -67,7 +67,8 @@ export const Primary: Story = {
     },
     simulateSwap: fn(),
     copyTokenAddressHandler: fn(),
-    network: Network.Testnet
+    network: Network.Testnet,
+    azeroBalance: 20000000000000 as any
   },
   render: args => {
     return (

@@ -3,7 +3,7 @@ import DepositAmountInput from '@components/Inputs/DepositAmountInput/DepositAmo
 import Select from '@components/Inputs/Select/Select'
 import { Grid, Typography } from '@mui/material'
 import SwapList from '@static/svg/swap-list.svg'
-import { ALL_FEE_TIERS_DATA } from '@store/consts/static'
+import { ALL_FEE_TIERS_DATA, POOL_SAFE_TRANSACTION_FEE } from '@store/consts/static'
 import {
   convertBalanceToBigint,
   getScaleFromString,
@@ -63,6 +63,7 @@ export interface IDepositSelector {
   isGetLiquidityError: boolean
   ticksLoading: boolean
   network: Network
+  azeroBalance: bigint
 }
 
 export const DepositSelector: React.FC<IDepositSelector> = ({
@@ -96,7 +97,8 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
   isBalanceLoading,
   isGetLiquidityError,
   ticksLoading,
-  network
+  network,
+  azeroBalance
 }) => {
   const { classes } = useStyles()
 
@@ -120,27 +122,28 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
   const [isLoaded, setIsLoaded] = useState<boolean>(false)
 
   useEffect(() => {
-    if (isLoaded || Object.keys(tokens).length === 0 || ALL_FEE_TIERS_DATA.length === 0) {
-      return
+    if (!isLoaded || Object.keys(tokens).length !== 0 || ALL_FEE_TIERS_DATA.length !== 0) {
+      const tokenAFromPath =
+        tokens[tickerToAddress(network, initialTokenFrom)]?.assetAddress || null
+      const tokenBFromPath = tokens[tickerToAddress(network, initialTokenTo)]?.assetAddress || null
+      let feeTierIndexFromPath = 0
+
+      const parsedFee = parsePathFeeToFeeString(initialFee)
+
+      ALL_FEE_TIERS_DATA.forEach((feeTierData, index) => {
+        if (feeTierData.tier.fee.toString() === parsedFee) {
+          feeTierIndexFromPath = index
+        }
+      })
+
+      setTokenA(tokenAFromPath)
+      setTokenB(tokenBFromPath)
+      setPositionTokens(tokenAFromPath, tokenBFromPath, feeTierIndexFromPath)
+
+      setIsLoaded(true)
+    } else {
+      setIsLoaded(false)
     }
-
-    const tokenAFromPath = tokens[tickerToAddress(network, initialTokenFrom)]?.assetAddress || null
-    const tokenBFromPath = tokens[tickerToAddress(network, initialTokenTo)]?.assetAddress || null
-    let feeTierIndexFromPath = 0
-
-    const parsedFee = parsePathFeeToFeeString(initialFee)
-
-    ALL_FEE_TIERS_DATA.forEach((feeTierData, index) => {
-      if (feeTierData.tier.fee.toString() === parsedFee) {
-        feeTierIndexFromPath = index
-      }
-    })
-
-    setTokenA(tokenAFromPath)
-    setTokenB(tokenBFromPath)
-    setPositionTokens(tokenAFromPath, tokenBFromPath, feeTierIndexFromPath)
-
-    setIsLoaded(true)
   }, [Object.keys(tokens).length])
 
   const getButtonMessage = useCallback(() => {
@@ -176,6 +179,10 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
         tokens[tokenB].balance
     ) {
       return `Not enough ${tokens[tokenB].symbol}`
+    }
+
+    if (azeroBalance < POOL_SAFE_TRANSACTION_FEE) {
+      return `Insufficient AZERO`
     }
 
     if (
@@ -380,21 +387,43 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
           isBalanceLoading={isBalanceLoading}
         />
       </Grid>
-
-      <AnimatedButton
-        className={classNames(
-          classes.addButton,
-          progress === 'none' ? classes.hoverButton : undefined
-        )}
-        onClick={() => {
-          if (progress === 'none') {
-            onAddLiquidity()
-          }
-        }}
-        disabled={getButtonMessage() !== 'Add Position'}
-        content={getButtonMessage()}
-        progress={progress}
-      />
+      {getButtonMessage() === 'Insufficient AZERO' ? (
+        <TooltipHover
+          text='More AZERO is required to cover the transaction fee. Obtain more AZERO to complete this transaction.'
+          top={-10}>
+          <div>
+            <AnimatedButton
+              className={classNames(
+                classes.addButton,
+                progress === 'none' ? classes.hoverButton : undefined
+              )}
+              onClick={() => {
+                if (progress === 'none') {
+                  onAddLiquidity()
+                }
+              }}
+              disabled={getButtonMessage() !== 'Add Position'}
+              content={getButtonMessage()}
+              progress={progress}
+            />
+          </div>
+        </TooltipHover>
+      ) : (
+        <AnimatedButton
+          className={classNames(
+            classes.addButton,
+            progress === 'none' ? classes.hoverButton : undefined
+          )}
+          onClick={() => {
+            if (progress === 'none') {
+              onAddLiquidity()
+            }
+          }}
+          disabled={getButtonMessage() !== 'Add Position'}
+          content={getButtonMessage()}
+          progress={progress}
+        />
+      )}
     </Grid>
   )
 }

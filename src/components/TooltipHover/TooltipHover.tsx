@@ -4,11 +4,12 @@ import { TooltipTransition } from './TooltipTransition/TooltipTransition'
 
 type Props = {
   text: string
+  top?: number
   children: React.ReactElement<any, any>
 }
 
-export const TooltipHover = ({ text, children }: Props) => {
-  const { classes } = useStyles()
+export const TooltipHover = ({ text, top, children }: Props) => {
+  const { classes } = useStyles({ top })
 
   return (
     <Tooltip

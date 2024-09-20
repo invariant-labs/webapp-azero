@@ -48,14 +48,19 @@ export const swapTokens = createSelector(
   tokens,
   balance,
   (allAccounts, tokens, a0Balance) => {
-    return Object.values(tokens).map(token => ({
-      ...token,
-      assetAddress: token.address,
-      balance:
-        token.address.toString() === WAZERO_ADDRESS[network ?? Network.Testnet]
-          ? BigInt(Math.max(Number(a0Balance - SWAP_SAFE_TRANSACTION_FEE), 0))
-          : allAccounts[token.address.toString()]?.balance ?? 0n
-    }))
+    const poolTokens: Record<string, SwapToken> = {}
+    Object.entries(tokens).forEach(([key, val]) => {
+      poolTokens[key] = {
+        ...val,
+        assetAddress: val.address,
+        balance:
+          val.address.toString() === WAZERO_ADDRESS[network ?? Network.Testnet]
+            ? BigInt(Math.max(Number(a0Balance - SWAP_SAFE_TRANSACTION_FEE), 0))
+            : allAccounts[val.address.toString()]?.balance ?? BigInt(0)
+      }
+    })
+
+    return poolTokens
   }
 )
 
@@ -64,18 +69,23 @@ export const poolTokens = createSelector(
   tokens,
   balance,
   (allAccounts, tokens, a0Balance) => {
-    return Object.values(tokens).map(token => ({
-      ...token,
-      assetAddress: token.address,
-      balance:
-        token.address.toString() === WAZERO_ADDRESS[network ?? Network.Testnet]
-          ? BigInt(Math.max(Number(a0Balance - POOL_SAFE_TRANSACTION_FEE), 0))
-          : allAccounts[token.address.toString()]?.balance ?? 0n
-    }))
+    const poolTokens: Record<string, SwapToken> = {}
+    Object.entries(tokens).forEach(([key, val]) => {
+      poolTokens[key] = {
+        ...val,
+        assetAddress: val.address,
+        balance:
+          val.address.toString() === WAZERO_ADDRESS[network ?? Network.Testnet]
+            ? BigInt(Math.max(Number(a0Balance - POOL_SAFE_TRANSACTION_FEE), 0))
+            : allAccounts[val.address.toString()]?.balance ?? BigInt(0)
+      }
+    })
+
+    return poolTokens
   }
 )
 
-export const swapTokensDict = createSelector(
+export const tokensDict = createSelector(
   tokensBalances,
   tokens,
   balance,

@@ -9,7 +9,11 @@ import { Box, Button, Grid, Typography } from '@mui/material'
 import refreshIcon from '@static/svg/refresh.svg'
 import settingIcon from '@static/svg/settings.svg'
 import SwapArrows from '@static/svg/swap-arrows.svg'
-import { DEFAULT_TOKEN_DECIMAL, REFRESHER_INTERVAL } from '@store/consts/static'
+import {
+  DEFAULT_TOKEN_DECIMAL,
+  REFRESHER_INTERVAL,
+  SWAP_SAFE_TRANSACTION_FEE
+} from '@store/consts/static'
 import {
   addressToTicker,
   convertBalanceToBigint,
@@ -95,6 +99,7 @@ export interface ISwap {
   simulateSwap: (simulate: Simulate) => void
   copyTokenAddressHandler: (message: string, variant: VariantType) => void
   network: Network
+  azeroBalance: bigint
 }
 
 export const Swap: React.FC<ISwap> = ({
@@ -127,7 +132,8 @@ export const Swap: React.FC<ISwap> = ({
   simulateResult,
   simulateSwap,
   copyTokenAddressHandler,
-  network
+  network,
+  azeroBalance
 }) => {
   const { classes } = useStyles()
   enum inputTarget {
@@ -296,7 +302,7 @@ export const Swap: React.FC<ISwap> = ({
   const isInsufficientLiquidityError = useMemo(
     () =>
       simulateResult.poolKey === null &&
-      (isError(SwapError.InsufficientLiquidity) || isError(SwapError.MaxTicksCrossed)),
+      (isError(SwapError.InsufficientLiquidity) || isError(SwapError.MaxSwapStepsReached)),
     [simulateResult]
   )
 
@@ -327,10 +333,14 @@ export const Swap: React.FC<ISwap> = ({
 
     if (
       convertBalanceToBigint(amountFrom, Number(tokens[tokenFrom]?.decimals) ?? 0n) >
-        tokens[tokenFrom]?.balance ??
+        tokens[tokenFrom]?.balance ||
       0n
     ) {
       return 'Insufficient balance'
+    }
+
+    if (azeroBalance < SWAP_SAFE_TRANSACTION_FEE) {
+      return `Insufficient AZERO`
     }
 
     if (
@@ -717,6 +727,40 @@ export const Swap: React.FC<ISwap> = ({
             onDisconnect={onDisconnectWallet}
             className={classes.connectWalletButton}
           />
+        ) : getStateMessage() === 'Insufficient AZERO' ? (
+          <TooltipHover
+            text='More AZERO is required to cover the transaction fee. Obtain more AZERO to complete this transaction.'
+            top={-45}>
+            <div>
+              <AnimatedButton
+                content={getStateMessage()}
+                className={
+                  getStateMessage() === 'Connect a wallet'
+                    ? `${classes.swapButton}`
+                    : getStateMessage() === 'Exchange' && progress === 'none'
+                      ? `${classes.swapButton} ${classes.ButtonSwapActive}`
+                      : classes.swapButton
+                }
+                disabled={getStateMessage() !== 'Exchange' || progress !== 'none'}
+                onClick={() => {
+                  if (simulateResult.poolKey === null || tokenFrom === null || tokenTo === null)
+                    return
+
+                  onSwap(
+                    simulateResult.poolKey,
+                    BigInt((+slippTolerance * Number(PERCENTAGE_DENOMINATOR)) / 100),
+                    simulateResult.targetSqrtPrice,
+                    tokenFrom,
+                    tokenTo,
+                    convertBalanceToBigint(amountFrom, tokens[tokenFrom].decimals),
+                    convertBalanceToBigint(amountTo, tokens[tokenTo].decimals),
+                    inputRef === inputTarget.FROM
+                  )
+                }}
+                progress={progress}
+              />
+            </div>
+          </TooltipHover>
         ) : (
           <AnimatedButton
             content={getStateMessage()}

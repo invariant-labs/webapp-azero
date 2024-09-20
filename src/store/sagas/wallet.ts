@@ -77,11 +77,11 @@ export function* handleAirdrop(): Generator {
   if (FAUCET_SAFE_TRANSACTION_FEE > walletBalance) {
     return yield* put(
       snackbarsActions.add({
-        message: 'Insufficient TZERO balance.',
+        message: 'Insufficient AZERO balance.',
         variant: 'error',
         persist: false,
         link: {
-          label: 'GET TZERO',
+          label: 'GET AZERO',
           href: 'https://faucet.test.azero.dev/'
         }
       })
@@ -166,11 +166,10 @@ export function* handleAirdrop(): Generator {
 
 export function* init(isEagerConnect: boolean): Generator {
   try {
-    yield* put(actions.setStatus(Status.Init))
-
     if (isEagerConnect) {
       yield* delay(500)
     }
+    yield* put(actions.setStatus(Status.Init))
 
     const walletAdapter = yield* call(getWallet)
     yield* call([walletAdapter, walletAdapter.connect])
@@ -260,7 +259,6 @@ export function* handleDisconnect(): Generator {
 }
 
 export function* fetchBalances(tokens: string[]): Generator {
-  console.log('fetchBalances', tokens)
   const walletAddress = yield* select(address)
   const psp22 = yield* getPSP22()
 

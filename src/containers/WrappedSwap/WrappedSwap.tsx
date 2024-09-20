@@ -20,7 +20,7 @@ import {
   tickMaps
 } from '@store/selectors/pools'
 import { simulateResult, swap as swapPool } from '@store/selectors/swap'
-import { address, balanceLoading, status, swapTokensDict } from '@store/selectors/wallet'
+import { address, balance, balanceLoading, status, swapTokens } from '@store/selectors/wallet'
 import apiSingleton from '@store/services/apiSingleton'
 import SingletonPSP22 from '@store/services/psp22Singleton'
 import { openWalletSelectorModal } from '@utils/web3/selector'
@@ -38,10 +38,11 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
 
   const walletAddress = useSelector(address)
   const walletStatus = useSelector(status)
+  const azeroBalance = useSelector(balance)
   const swap = useSelector(swapPool)
   const tickmap = useSelector(tickMaps)
   const allPools = useSelector(poolsArraySortedByFees)
-  const tokensDict = useSelector(swapTokensDict)
+  const tokensList = useSelector(swapTokens)
   const isBalanceLoading = useSelector(balanceLoading)
   const { success, inProgress } = useSelector(swapPool)
   const isFetchingNewPool = useSelector(isLoadingLatestPoolsForTransaction)
@@ -98,11 +99,11 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
   useEffect(() => {
     const tokens = []
 
-    if (lastTokenFrom && !tokensDict[lastTokenFrom]) {
+    if (lastTokenFrom && !tokensList[lastTokenFrom]) {
       tokens.push(lastTokenFrom)
     }
 
-    if (lastTokenTo && !tokensDict[lastTokenTo]) {
+    if (lastTokenTo && !tokensList[lastTokenTo]) {
       tokens.push(lastTokenTo)
     }
 
@@ -114,7 +115,7 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
   const addTokenHandler = async (address: string) => {
     const psp22 = SingletonPSP22.getInstance()
 
-    if (psp22 && api !== null && !tokensDict[address]) {
+    if (psp22 && api !== null && !tokensList[address]) {
       getNewTokenOrThrow(address, psp22, walletAddress)
         .then(data => {
           dispatch(poolsActions.addTokens(data))
@@ -165,7 +166,7 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
       return
     }
 
-    const id = tokensDict[tokenFrom.toString()]?.coingeckoId || ''
+    const id = tokensList[tokenFrom.toString()]?.coingeckoId || ''
 
     if (id.length) {
       setPriceFromLoading(true)
@@ -173,7 +174,7 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
         .then(data => setTokenFromPriceData({ price: data ?? 0 }))
         .catch(() =>
           setTokenFromPriceData(
-            getMockedTokenPrice(tokensDict[tokenFrom.toString()].symbol, network)
+            getMockedTokenPrice(tokensList[tokenFrom.toString()].symbol, network)
           )
         )
         .finally(() => setPriceFromLoading(false))
@@ -189,13 +190,13 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
       return
     }
 
-    const id = tokensDict[tokenTo.toString()]?.coingeckoId || ''
+    const id = tokensList[tokenTo.toString()]?.coingeckoId || ''
     if (id.length) {
       setPriceToLoading(true)
       getCoinGeckoTokenPrice(id)
         .then(data => setTokenToPriceData({ price: data ?? 0 }))
         .catch(() =>
-          setTokenToPriceData(getMockedTokenPrice(tokensDict[tokenTo.toString()].symbol, network))
+          setTokenToPriceData(getMockedTokenPrice(tokensList[tokenTo.toString()].symbol, network))
         )
         .finally(() => setPriceToLoading(false))
     } else {
@@ -227,21 +228,21 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
       return
     }
 
-    const idTo = tokensDict[tokenTo].coingeckoId ?? ''
+    const idTo = tokensList[tokenTo].coingeckoId ?? ''
 
     if (idTo.length) {
       setPriceToLoading(true)
       getCoinGeckoTokenPrice(idTo)
         .then(data => setTokenToPriceData({ price: data ?? 0 }))
         .catch(() =>
-          setTokenToPriceData(getMockedTokenPrice(tokensDict[tokenTo.toString()].symbol, network))
+          setTokenToPriceData(getMockedTokenPrice(tokensList[tokenTo.toString()].symbol, network))
         )
         .finally(() => setPriceToLoading(false))
     } else {
       setTokenToPriceData(undefined)
     }
 
-    const idFrom = tokensDict[tokenFrom].coingeckoId ?? ''
+    const idFrom = tokensList[tokenFrom].coingeckoId ?? ''
 
     if (idFrom.length) {
       setPriceFromLoading(true)
@@ -249,7 +250,7 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
         .then(data => setTokenFromPriceData({ price: data ?? 0 }))
         .catch(() =>
           setTokenFromPriceData(
-            getMockedTokenPrice(tokensDict[tokenFrom.toString()].symbol, network)
+            getMockedTokenPrice(tokensList[tokenFrom.toString()].symbol, network)
           )
         )
         .finally(() => setPriceFromLoading(false))
@@ -334,7 +335,7 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
         dispatch(walletActions.disconnect())
       }}
       walletStatus={walletStatus}
-      tokens={tokensDict}
+      tokens={tokensList}
       pools={allPools}
       swapData={swap}
       progress={progress}
@@ -357,6 +358,7 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
       simulateSwap={simulateSwap}
       copyTokenAddressHandler={copyTokenAddressHandler}
       network={network}
+      azeroBalance={azeroBalance}
     />
   )
 }

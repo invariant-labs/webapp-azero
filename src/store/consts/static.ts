@@ -43,7 +43,7 @@ export const FAUCET_TOKEN_AMOUNT = 1000n
 
 export const TokenAirdropAmount = {
   BTC: 100000n,
-  ETH: 20000000000n,
+  ETH: 20000000000000000n,
   USDC: 50000000n
 }
 
@@ -68,7 +68,7 @@ export const TESTNET_BTC: Token = {
 export const TESTNET_ETH: Token = {
   symbol: 'ETH',
   address: ETH_ADDRESS[Network.Testnet],
-  decimals: 12n,
+  decimals: 18n,
   name: 'Ether',
   logoURI:
     'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk/logo.png',
@@ -107,7 +107,7 @@ export const MAINNET_BTC: Token = {
 export const MAINNET_ETH: Token = {
   symbol: 'ETH',
   address: ETH_ADDRESS[Network.Mainnet],
-  decimals: 12n,
+  decimals: 18n,
   name: 'Ether',
   logoURI:
     'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk/logo.png',
@@ -236,8 +236,8 @@ export const ALL_FEE_TIERS_DATA = FEE_TIERS.map((tier, index) => ({
 
 export const U128MAX = 2n ** 128n - 1n
 
-export const SWAP_SAFE_TRANSACTION_FEE = BigInt(Math.ceil(0.05 * 10 ** 12))
-export const POOL_SAFE_TRANSACTION_FEE = BigInt(Math.ceil(0.05 * 10 ** 12))
+export const SWAP_SAFE_TRANSACTION_FEE = BigInt(Math.ceil(0.1 * 10 ** 12))
+export const POOL_SAFE_TRANSACTION_FEE = BigInt(Math.ceil(0.2 * 10 ** 12))
 export const FAUCET_SAFE_TRANSACTION_FEE = BigInt(Math.ceil(0.001 * 10 ** 12))
 
 export enum ErrorMessage {
@@ -335,6 +335,7 @@ export const EMPTY_POSITION: Position = {
   lastBlockNumber: 0n,
   tokensOwedX: 0n,
   tokensOwedY: 0n,
+  secondsPerLiquidityInside: 0n,
   createdAt: 0n
 }
 
@@ -348,8 +349,9 @@ export const DEFAULT_NEW_POSITION_SLIPPAGE = '0.50'
 
 export const CHAINS = [
   { name: Chain.Solana, address: 'https://invariant.app/swap' },
-  { name: Chain.AlephZero, address: 'https://azero.invariant.app/swap' },
-  { name: Chain.Eclipse, address: 'https://eclipse.invariant.app/swap' }
+  { name: Chain.AlephZero, address: 'https://azero.invariant.app/exchange' },
+  { name: Chain.Eclipse, address: 'https://eclipse.invariant.app/swap' },
+  { name: Chain.Vara, address: 'https://vara.invariant.app/exchange' }
 ]
 
 export const enum SortTypePoolList {
@@ -370,8 +372,8 @@ export const enum SortTypeTokenList {
   NAME_DESC,
   PRICE_ASC,
   PRICE_DESC,
-  CHANGE_ASC,
-  CHANGE_DESC,
+  // CHANGE_ASC,
+  // CHANGE_DESC,
   VOLUME_ASC,
   VOLUME_DESC,
   TVL_ASC,
