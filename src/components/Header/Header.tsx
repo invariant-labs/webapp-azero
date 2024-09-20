@@ -55,8 +55,8 @@ export const Header: React.FC<IHeader> = ({
   onChangeWallet,
   activeChain,
   onChainSelect,
-  network,
-  defaultMainnetRPC
+  network
+  // defaultMainnetRPC
 }) => {
   const { classes } = useStyles()
   const buttonStyles = useButtonStyles()
