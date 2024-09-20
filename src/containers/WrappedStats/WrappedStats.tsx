@@ -85,7 +85,6 @@ export const WrappedStats: React.FC = () => {
                 symbol: tokenData.tokenDetails?.symbol,
                 price: tokenData.price,
                 // priceChange: tokenData.priceChange,
-                priceChange: 0,
                 volume: tokenData.volume24,
                 TVL: tokenData.tvl
               }))}

@@ -5,7 +5,7 @@ import { makeStyles } from 'tss-react/mui'
 export const useStyles = makeStyles()((theme: Theme) => ({
   container: {
     display: 'grid',
-    gridTemplateColumns: '5% 35% 15% 15% 15% 15%',
+    gridTemplateColumns: '5% 35% 20% 20% 20%',
     padding: '18px 0 ',
     backgroundColor: colors.invariant.component,
     borderBottom: `1px solid ${colors.invariant.light}`,
