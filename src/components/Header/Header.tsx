@@ -193,13 +193,13 @@ export const Header: React.FC<IHeader> = ({
                   rpc: defaultTestnetRPC,
                   rpcName:
                     testnetRPCs.find(data => data.rpc === defaultTestnetRPC)?.rpcName ?? 'Custom'
-                },
-                {
-                  networkType: Network.Mainnet,
-                  rpc: defaultMainnetRPC,
-                  rpcName:
-                    mainnetRPCs.find(data => data.rpc === defaultMainnetRPC)?.rpcName ?? 'Custom'
                 }
+                // {
+                //   networkType: Network.Mainnet,
+                //   rpc: defaultMainnetRPC,
+                //   rpcName:
+                //     mainnetRPCs.find(data => data.rpc === defaultMainnetRPC)?.rpcName ?? 'Custom'
+                // }
               ]}
               onSelect={onNetworkSelect}
             />
