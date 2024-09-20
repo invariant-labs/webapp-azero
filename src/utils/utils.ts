@@ -617,7 +617,7 @@ function safeConvertToBigInt(value: string): bigint {
 
     const adjustedExponent = exponent - decimalPlaces
 
-    return baseBigInt * BigInt(10) ** BigInt(adjustedExponent)
+    return baseBigInt * 10n ** BigInt(adjustedExponent)
   } else {
     return BigInt(value)
   }
