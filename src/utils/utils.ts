@@ -603,6 +603,26 @@ export const nearestTickIndex = (
   return BigInt(nearestSpacingMultiplicity(tick, Number(spacing)))
 }
 
+function safeConvertToBigInt(value: string): bigint {
+  if (value.toLowerCase().includes('e')) {
+    const [baseStr, exponentStr] = value.toLowerCase().split('e')
+
+    const baseBigInt = BigInt(baseStr.replace('.', ''))
+    const exponent = parseInt(exponentStr)
+    if (Math.abs(exponent) > 10000) {
+      return 0n
+    }
+
+    const decimalPlaces = (baseStr.split('.')[1] || '').length
+
+    const adjustedExponent = exponent - decimalPlaces
+
+    return baseBigInt * 10n ** BigInt(adjustedExponent)
+  } else {
+    return BigInt(value)
+  }
+}
+
 export const convertBalanceToBigint = (amount: string, decimals: bigint | number): bigint => {
   const balanceString = amount.split('.')
   if (balanceString.length !== 2) {
@@ -610,7 +630,7 @@ export const convertBalanceToBigint = (amount: string, decimals: bigint | number
   }
 
   if (balanceString[1].length <= decimals) {
-    return BigInt(
+    return safeConvertToBigInt(
       balanceString[0] + balanceString[1] + '0'.repeat(Number(decimals) - balanceString[1].length)
     )
   }
