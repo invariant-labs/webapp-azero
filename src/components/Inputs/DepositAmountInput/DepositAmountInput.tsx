@@ -22,6 +22,7 @@ interface IProps {
   disabled?: boolean
   priceLoading?: boolean
   isBalanceLoading: boolean
+  maxDisabled: boolean
 }
 
 export const DepositAmountInput: React.FC<IProps> = ({
@@ -40,7 +41,8 @@ export const DepositAmountInput: React.FC<IProps> = ({
   balanceValue,
   disabled = false,
   priceLoading = false,
-  isBalanceLoading
+  isBalanceLoading,
+  maxDisabled
 }) => {
   const { classes } = useStyles({ isSelected: !!currency })
 
@@ -145,7 +147,11 @@ export const DepositAmountInput: React.FC<IProps> = ({
               {isBalanceLoading ? (
                 <img src={loadingAnimation} className={classes.loadingBalance} alt='loading' />
               ) : balanceValue ? (
-                formatNumber(balanceValue || 0)
+                !maxDisabled ? (
+                  formatNumber(balanceValue || 0)
+                ) : (
+                  '-'
+                )
               ) : (
                 <span style={{ marginLeft: '8px' }}>-</span>
               )}{' '}
@@ -153,14 +159,16 @@ export const DepositAmountInput: React.FC<IProps> = ({
             </Typography>
             <Button
               className={
-                currency ? classes.maxButton : `${classes.maxButton} ${classes.maxButtonNotActive}`
+                currency && !maxDisabled
+                  ? classes.maxButton
+                  : `${classes.maxButton} ${classes.maxButtonNotActive}`
               }
               onClick={onMaxClick}>
               Max
             </Button>
           </Grid>
           <Grid className={classes.percentages} container alignItems='center' wrap='nowrap'>
-            {currency ? (
+            {currency && !maxDisabled ? (
               priceLoading ? (
                 <img src={loadingAnimation} className={classes.loading} alt='loading' />
               ) : tokenPrice ? (
