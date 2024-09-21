@@ -395,7 +395,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
           isBalanceLoading={isBalanceLoading}
         />
       </Grid>
-      {walletStatus !== Status.Initialized && getButtonMessage() !== 'Loading' ? (
+      {walletStatus !== Status.Initialized ? (
         <ChangeWalletButton
           name='Connect wallet'
           onConnect={onConnectWallet}
@@ -403,8 +403,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
           onDisconnect={onDisconnectWallet}
           className={classes.connectWalletButton}
         />
-      ) : null}
-      {getButtonMessage() === 'Insufficient AZERO' ? (
+      ) : getButtonMessage() === 'Insufficient AZERO' ? (
         <TooltipHover
           text='More AZERO is required to cover the transaction fee. Obtain more AZERO to complete this transaction.'
           top={-10}>
