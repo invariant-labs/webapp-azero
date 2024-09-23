@@ -29,7 +29,7 @@ export const Null: Story = {
     style: {},
     disabled: false,
     isBalanceLoading: false,
-    maxDisabled: true
+    walletUninitialized: true
   }
 }
 
@@ -51,6 +51,6 @@ export const BTC: Story = {
     style: {},
     disabled: false,
     isBalanceLoading: false,
-    maxDisabled: false
+    walletUninitialized: false
   }
 }
