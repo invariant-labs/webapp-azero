@@ -25,6 +25,7 @@ export interface IPositionItem {
   tokenXLiq: number
   tokenYLiq: number
   network: Network
+  isFullRange: boolean
 }
 
 export const PositionItem: React.FC<IPositionItem> = ({
@@ -41,7 +42,8 @@ export const PositionItem: React.FC<IPositionItem> = ({
   currentPrice,
   tokenXLiq,
   tokenYLiq,
-  network
+  network,
+  isFullRange
 }) => {
   const { classes } = useStyles()
 
@@ -209,15 +211,21 @@ export const PositionItem: React.FC<IPositionItem> = ({
           justifyContent='space-between'
           alignItems='center'
           wrap='nowrap'>
-          <Typography className={classNames(classes.greenText, classes.label)}>
-            MIN - MAX
-          </Typography>
-          <Grid className={classes.infoCenter} container item justifyContent='center'>
-            <Typography className={classes.infoText}>
-              {formatNumber(xToY ? min : 1 / max)} - {formatNumber(xToY ? max : 1 / min)}{' '}
-              {xToY ? tokenYName : tokenXName} per {xToY ? tokenXName : tokenYName}
+          <>
+            <Typography className={classNames(classes.greenText, classes.label)}>
+              MIN - MAX
             </Typography>
-          </Grid>
+            <Grid className={classes.infoCenter} container item justifyContent='center'>
+              {isFullRange ? (
+                <Typography className={classes.infoText}>FULL RANGE</Typography>
+              ) : (
+                <Typography className={classes.infoText}>
+                  {formatNumber(xToY ? min : 1 / max)} - {formatNumber(xToY ? max : 1 / min)}{' '}
+                  {xToY ? tokenYName : tokenXName} per {xToY ? tokenXName : tokenYName}
+                </Typography>
+              )}
+            </Grid>
+          </>
         </Grid>
 
         <Hidden mdDown>{valueFragment}</Hidden>

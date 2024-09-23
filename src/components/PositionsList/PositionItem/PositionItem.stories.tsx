@@ -27,6 +27,7 @@ export const Primary: Story = {
     tokenXLiq: 5000,
     tokenYLiq: 300.2,
     currentPrice: 10000,
-    network: Network.Testnet
+    network: Network.Testnet,
+    isFullRange: false
   }
 }
