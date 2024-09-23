@@ -38,10 +38,10 @@ export const useStyles = makeStyles()(() => ({
     lineHeight: '20px',
     color: colors.invariant.lightHover
   },
-  button: {
+  buttonPrimary: {
     height: 40,
     width: 200,
-    marginTop: 20,
+    marginTop: 16,
     color: colors.invariant.componentBcg,
     ...typography.body1,
     textTransform: 'none',
@@ -53,6 +53,27 @@ export const useStyles = makeStyles()(() => ({
       boxShadow: '0px 0px 16px rgba(239, 132, 245, 0.35)',
       '@media (hover: none)': {
         background: colors.invariant.pinkLinearGradientOpacity,
+        boxShadow: 'none'
+      }
+    }
+  },
+  buttonSecondary: {
+    width: 200,
+    height: 40,
+    marginTop: 12,
+    ...typography.body2,
+    color: colors.white.main,
+    textTransform: 'none',
+    backgroundColor: colors.invariant.light,
+    borderRadius: 14,
+
+    transition: '0.1s',
+    '&:hover': {
+      //
+      boxShadow: '0px 0px 16px rgba(255, 255, 255, 0.1)',
+      backgroundColor: colors.invariant.light,
+      filter: 'brightness(1.2)',
+      '@media (hover: none)': {
         boxShadow: 'none'
       }
     }
