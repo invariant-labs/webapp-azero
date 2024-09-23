@@ -44,7 +44,7 @@ export const DepositAmountInput: React.FC<IProps> = ({
   isBalanceLoading,
   maxDisabled
 }) => {
-  const { classes } = useStyles({ isSelected: !!currency })
+  const { classes } = useStyles({ isSelected: !!currency && !maxDisabled })
 
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -141,19 +141,15 @@ export const DepositAmountInput: React.FC<IProps> = ({
             container
             alignItems='center'
             wrap='nowrap'
-            onClick={onMaxClick}>
+            onClick={maxDisabled ? () => {} : onMaxClick}>
             <Typography className={classes.caption2}>
               Balance:{' '}
-              {isBalanceLoading ? (
+              {maxDisabled ? (
+                <>-</>
+              ) : isBalanceLoading ? (
                 <img src={loadingAnimation} className={classes.loadingBalance} alt='loading' />
-              ) : balanceValue ? (
-                !maxDisabled ? (
-                  formatNumber(balanceValue || 0)
-                ) : (
-                  '-'
-                )
               ) : (
-                <span style={{ marginLeft: '8px' }}>-</span>
+                <>{formatNumber(balanceValue || 0)}</>
               )}{' '}
               {currency}
             </Typography>
@@ -162,8 +158,7 @@ export const DepositAmountInput: React.FC<IProps> = ({
                 currency && !maxDisabled
                   ? classes.maxButton
                   : `${classes.maxButton} ${classes.maxButtonNotActive}`
-              }
-              onClick={onMaxClick}>
+              }>
               Max
             </Button>
           </Grid>
