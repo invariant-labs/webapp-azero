@@ -368,7 +368,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
           {...tokenAInputState}
           priceLoading={priceALoading}
           isBalanceLoading={isBalanceLoading}
-          maxDisabled={walletStatus !== Status.Initialized}
+          walletUninitialized={walletStatus !== Status.Initialized}
         />
 
         <DepositAmountInput
@@ -394,7 +394,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
           {...tokenBInputState}
           priceLoading={priceBLoading}
           isBalanceLoading={isBalanceLoading}
-          maxDisabled={walletStatus !== Status.Initialized}
+          walletUninitialized={walletStatus !== Status.Initialized}
         />
       </Grid>
       {walletStatus !== Status.Initialized ? (

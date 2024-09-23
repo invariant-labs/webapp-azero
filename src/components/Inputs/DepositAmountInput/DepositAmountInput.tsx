@@ -22,7 +22,7 @@ interface IProps {
   disabled?: boolean
   priceLoading?: boolean
   isBalanceLoading: boolean
-  maxDisabled: boolean
+  walletUninitialized: boolean
 }
 
 export const DepositAmountInput: React.FC<IProps> = ({
@@ -42,9 +42,9 @@ export const DepositAmountInput: React.FC<IProps> = ({
   disabled = false,
   priceLoading = false,
   isBalanceLoading,
-  maxDisabled
+  walletUninitialized
 }) => {
-  const { classes } = useStyles({ isSelected: !!currency && !maxDisabled })
+  const { classes } = useStyles({ isSelected: !!currency && !walletUninitialized })
 
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -141,10 +141,10 @@ export const DepositAmountInput: React.FC<IProps> = ({
             container
             alignItems='center'
             wrap='nowrap'
-            onClick={maxDisabled ? () => {} : onMaxClick}>
+            onClick={walletUninitialized ? () => {} : onMaxClick}>
             <Typography className={classes.caption2}>
               Balance:{' '}
-              {maxDisabled ? (
+              {walletUninitialized ? (
                 <>-</>
               ) : isBalanceLoading ? (
                 <img src={loadingAnimation} className={classes.loadingBalance} alt='loading' />
@@ -155,7 +155,7 @@ export const DepositAmountInput: React.FC<IProps> = ({
             </Typography>
             <Button
               className={
-                currency && !maxDisabled
+                currency && !walletUninitialized
                   ? classes.maxButton
                   : `${classes.maxButton} ${classes.maxButtonNotActive}`
               }>
@@ -163,7 +163,7 @@ export const DepositAmountInput: React.FC<IProps> = ({
             </Button>
           </Grid>
           <Grid className={classes.percentages} container alignItems='center' wrap='nowrap'>
-            {currency && !maxDisabled ? (
+            {currency && !walletUninitialized ? (
               priceLoading ? (
                 <img src={loadingAnimation} className={classes.loading} alt='loading' />
               ) : tokenPrice ? (
