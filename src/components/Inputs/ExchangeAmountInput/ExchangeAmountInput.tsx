@@ -1,6 +1,6 @@
 import Select from '@components/Inputs/Select/Select'
 import { OutlinedButton } from '@components/OutlinedButton/OutlinedButton'
-import { Grid, Input, Tooltip, Typography } from '@mui/material'
+import { Box, Grid, Input, Tooltip, Typography } from '@mui/material'
 import loadingAnimation from '@static/gif/loading.gif'
 import { formatNumber } from '@utils/utils'
 import { SwapToken } from '@store/selectors/wallet'
@@ -65,7 +65,7 @@ export const AmountInput: React.FC<IProps> = ({
   hiddenUnknownTokens
 }) => {
   const hideBalance = balance === '- -' || !balance || hideBalances
-  const { classes } = useStyles({ walletDisconnected: hideBalance })
+  const { classes } = useStyles()
   const inputRef = useRef<HTMLInputElement>(null)
 
   const allowOnlyDigitsAndTrimUnnecessaryZeros: React.ChangeEventHandler<HTMLInputElement> = e => {
@@ -144,79 +144,82 @@ export const AmountInput: React.FC<IProps> = ({
           />
         )}
       </Grid>
-      {!hideBalance && (
+
+      <Grid
+        container
+        justifyContent='space-between'
+        alignItems='center'
+        direction='row'
+        wrap='nowrap'
+        className={classes.bottom}>
         <Grid
-          container
-          justifyContent='space-between'
-          alignItems='center'
-          direction='row'
-          wrap='nowrap'
-          className={classes.bottom}>
-          <Grid
-            className={classNames(classes.balanceContainer, {
-              [classes.showMaxButton]: showMaxButton
-            })}
-            onClick={showMaxButton ? onMaxClick : () => {}}>
-            <Typography className={classes.BalanceTypography}>
-              Balance:{' '}
-              {isBalanceLoading ? (
-                <img src={loadingAnimation} className={classes.loadingBalance} alt='loading' />
-              ) : (
-                formatNumber(balance || 0)
-              )}{' '}
-              {tokenIcon.slice(0, 8)}
-              {tokenIcon.length > 8 ? '...' : ''}
-            </Typography>
-            {showMaxButton && (
-              <OutlinedButton
-                name='Max'
-                color='primary'
-                onClick={onMaxClick}
-                className={classes.maxButton}
-                labelClassName={classes.label}
-                disabled={
-                  disabled && isNaN(Number(balance))
-                    ? disabled
-                    : isNaN(Number(balance)) || hideBalances
-                }
-              />
-            )}
-          </Grid>
-          <Grid className={classes.percentages} container alignItems='center' wrap='nowrap'>
-            {current ? (
-              priceLoading ? (
-                <img src={loadingAnimation} className={classes.loading} alt='loading' />
-              ) : tokenPrice ? (
-                <Tooltip
-                  enterTouchDelay={0}
-                  leaveTouchDelay={Number.MAX_SAFE_INTEGER}
-                  title='Estimated USD Value of the Selected Tokens in Your Wallet'
-                  placement='bottom'
-                  classes={{
-                    tooltip: classes.tooltip
-                  }}>
-                  <Typography className={classes.caption2}>
-                    ~${formatNumber(usdBalance.toFixed(2))}
-                  </Typography>
-                </Tooltip>
-              ) : (
-                <Tooltip
-                  enterTouchDelay={0}
-                  leaveTouchDelay={Number.MAX_SAFE_INTEGER}
-                  title='Cannot fetch price of token'
-                  placement='bottom'
-                  classes={{
-                    tooltip: classes.tooltip
-                  }}>
-                  <Typography className={classes.noData}>
-                    <span className={classes.noDataIcon}>?</span>No data
-                  </Typography>
-                </Tooltip>
-              )
-            ) : null}
-          </Grid>
+          className={classNames(classes.balanceContainer, {
+            [classes.showMaxButton]: showMaxButton
+          })}
+          onClick={showMaxButton ? onMaxClick : () => {}}>
+          <Typography className={classes.BalanceTypography}>
+            Balance:{' '}
+            {isBalanceLoading ? (
+              <img src={loadingAnimation} className={classes.loadingBalance} alt='loading' />
+            ) : hideBalance ? (
+              <Box ml={1} mr={1}>
+                -
+              </Box>
+            ) : (
+              formatNumber(balance || 0)
+            )}{' '}
+            {tokenIcon.slice(0, 8)}
+            {tokenIcon.length > 8 ? '...' : ''}
+          </Typography>
+          {showMaxButton && (
+            <OutlinedButton
+              name='Max'
+              color='primary'
+              onClick={onMaxClick}
+              className={classes.maxButton}
+              labelClassName={classes.label}
+              disabled={
+                disabled && isNaN(Number(balance))
+                  ? disabled
+                  : isNaN(Number(balance)) || hideBalances
+              }
+            />
+          )}
         </Grid>
-      )}
+        <Grid className={classes.percentages} container alignItems='center' wrap='nowrap'>
+          {current ? (
+            priceLoading ? (
+              <img src={loadingAnimation} className={classes.loading} alt='loading' />
+            ) : tokenPrice ? (
+              <Tooltip
+                enterTouchDelay={0}
+                leaveTouchDelay={Number.MAX_SAFE_INTEGER}
+                title='Estimated USD Value of the Selected Tokens in Your Wallet'
+                placement='bottom'
+                classes={{
+                  tooltip: classes.tooltip
+                }}>
+                <Typography className={classes.caption2}>
+                  ~${formatNumber(usdBalance.toFixed(2))}
+                </Typography>
+              </Tooltip>
+            ) : (
+              <Tooltip
+                enterTouchDelay={0}
+                leaveTouchDelay={Number.MAX_SAFE_INTEGER}
+                title='Cannot fetch price of token'
+                placement='bottom'
+                classes={{
+                  tooltip: classes.tooltip
+                }}>
+                <Typography className={classes.noData}>
+                  <span className={classes.noDataIcon}>?</span>No data
+                </Typography>
+              </Tooltip>
+            )
+          ) : null}
+        </Grid>
+      </Grid>
     </>
   )
 }
