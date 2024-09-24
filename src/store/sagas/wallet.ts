@@ -262,6 +262,10 @@ export function* fetchBalances(tokens: string[]): Generator {
   const walletAddress = yield* select(address)
   const psp22 = yield* getPSP22()
 
+  if (!walletAddress) {
+    return
+  }
+
   yield* put(walletActions.setIsBalanceLoading(true))
 
   const { balance, tokenBalances } = yield* all({
