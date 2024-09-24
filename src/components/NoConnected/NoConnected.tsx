@@ -35,7 +35,7 @@ export const NoConnected: React.FC<INoConnected> = ({ onConnect, descCustomText 
               navigate('/newPosition/0_01')
             }}
             variant='contained'>
-            Explore liquidity pools
+            Explore pools
           </Button>
 
           <Button className={classes.buttonSecondary} onClick={onConnect} variant='contained'>
