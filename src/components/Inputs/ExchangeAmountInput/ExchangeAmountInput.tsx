@@ -156,7 +156,7 @@ export const AmountInput: React.FC<IProps> = ({
           className={classNames(classes.balanceContainer, {
             [classes.showMaxButton]: showMaxButton
           })}
-          onClick={showMaxButton ? onMaxClick : () => {}}>
+          onClick={showMaxButton && !hideBalance ? onMaxClick : () => {}}>
           <Typography className={classes.BalanceTypography}>
             Balance:{' '}
             {isBalanceLoading ? (
@@ -186,39 +186,41 @@ export const AmountInput: React.FC<IProps> = ({
             />
           )}
         </Grid>
-        <Grid className={classes.percentages} container alignItems='center' wrap='nowrap'>
-          {current ? (
-            priceLoading ? (
-              <img src={loadingAnimation} className={classes.loading} alt='loading' />
-            ) : tokenPrice ? (
-              <Tooltip
-                enterTouchDelay={0}
-                leaveTouchDelay={Number.MAX_SAFE_INTEGER}
-                title='Estimated USD Value of the Selected Tokens in Your Wallet'
-                placement='bottom'
-                classes={{
-                  tooltip: classes.tooltip
-                }}>
-                <Typography className={classes.caption2}>
-                  ~${formatNumber(usdBalance.toFixed(2))}
-                </Typography>
-              </Tooltip>
-            ) : (
-              <Tooltip
-                enterTouchDelay={0}
-                leaveTouchDelay={Number.MAX_SAFE_INTEGER}
-                title='Cannot fetch price of token'
-                placement='bottom'
-                classes={{
-                  tooltip: classes.tooltip
-                }}>
-                <Typography className={classes.noData}>
-                  <span className={classes.noDataIcon}>?</span>No data
-                </Typography>
-              </Tooltip>
-            )
-          ) : null}
-        </Grid>
+        {!hideBalance && (
+          <Grid className={classes.percentages} container alignItems='center' wrap='nowrap'>
+            {current ? (
+              priceLoading ? (
+                <img src={loadingAnimation} className={classes.loading} alt='loading' />
+              ) : tokenPrice ? (
+                <Tooltip
+                  enterTouchDelay={0}
+                  leaveTouchDelay={Number.MAX_SAFE_INTEGER}
+                  title='Estimated USD Value of the Selected Tokens in Your Wallet'
+                  placement='bottom'
+                  classes={{
+                    tooltip: classes.tooltip
+                  }}>
+                  <Typography className={classes.caption2}>
+                    ~${formatNumber(usdBalance.toFixed(2))}
+                  </Typography>
+                </Tooltip>
+              ) : (
+                <Tooltip
+                  enterTouchDelay={0}
+                  leaveTouchDelay={Number.MAX_SAFE_INTEGER}
+                  title='Cannot fetch price of token'
+                  placement='bottom'
+                  classes={{
+                    tooltip: classes.tooltip
+                  }}>
+                  <Typography className={classes.noData}>
+                    <span className={classes.noDataIcon}>?</span>No data
+                  </Typography>
+                </Tooltip>
+              )
+            ) : null}
+          </Grid>
+        )}
       </Grid>
     </>
   )
