@@ -55,8 +55,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   },
   rangeGrid: {
     display: 'flex',
-    flexDirection: 'row',
-    paddingRight: 4
+    flexDirection: 'row'
   },
   header: {
     display: 'flex',
@@ -71,18 +70,32 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     flexDirection: 'row',
     alignItems: 'center',
     columnGap: 10,
+    flexBasis: '41%',
+    justifyContent: 'space-between',
+    flexGrow: 0.6,
+    [theme.breakpoints.down('md')]: {
+      justifyContent: 'flex-end',
+      flexBasis: 'auto',
+      flexGrow: 'auto'
+    },
+
     [theme.breakpoints.down('sm')]: {
       justifyContent: 'space-between',
+      flexBasis: 'auto',
       marginTop: 16
     }
   },
   feeText: {
-    marginLeft: 8,
     paddingInline: 6,
     minWidth: 66,
 
     [theme.breakpoints.down('md')]: {
-      minWidth: 84
+      minWidth: 84,
+      marginLeft: 16
+    },
+    [theme.breakpoints.down('md')]: {
+      minWidth: 84,
+      marginInline: 12
     }
   },
   closedText: {

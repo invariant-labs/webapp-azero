@@ -7,6 +7,7 @@ import { Provider } from 'react-redux'
 import { store } from '@store/index'
 import { MemoryRouter } from 'react-router-dom'
 import { Network } from '@invariant-labs/a0-sdk'
+import { Status } from '@store/reducers/wallet'
 
 const tokens: Record<string, SwapToken> = {
   So11111111111111111111111111111111111111112: {
@@ -116,7 +117,10 @@ export const Primary: Story = {
     isGetLiquidityError: false,
     ticksLoading: false,
     network: Network.Testnet,
-    azeroBalance: 20000000000000 as any
+    azeroBalance: 20000000000000 as any,
+    walletStatus: Status.Initialized,
+    onConnectWallet: () => {},
+    onDisconnectWallet: () => {}
   },
   render: args => <PrimaryComponent {...args} />
 }

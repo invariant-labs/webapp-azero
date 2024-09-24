@@ -1,6 +1,5 @@
 import { ProgressState } from '@components/AnimatedButton/AnimatedButton'
 import Slippage from '@components/Modals/Slippage/Slippage'
-import { INoConnected, NoConnected } from '@components/NoConnected/NoConnected'
 import Refresher from '@components/Refresher/Refresher'
 import { getMaxTick, getMinTick, Network } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
@@ -34,6 +33,7 @@ import useStyles from './style'
 import { BestTier, PositionOpeningMethod, TokenPriceData } from '@store/consts/types'
 import { getConcentrationArray } from '@invariant-labs/a0-sdk/target/utils'
 import { TooltipHover } from '@components/TooltipHover/TooltipHover'
+import { Status } from '@store/reducers/wallet'
 
 export interface INewPosition {
   initialTokenFrom: string
@@ -68,8 +68,6 @@ export interface INewPosition {
   }>
   ticksLoading: boolean
   loadingTicksAndTickMaps: boolean
-  showNoConnected?: boolean
-  noConnectedBlockerProps: INoConnected
   progress: ProgressState
   isXtoY: boolean
   xDecimal: bigint
@@ -106,6 +104,9 @@ export interface INewPosition {
   network: Network
   isLoadingTokens: boolean
   azeroBalance: bigint
+  walletStatus: Status
+  onConnectWallet: () => void
+  onDisconnectWallet: () => void
 }
 
 export const NewPosition: React.FC<INewPosition> = ({
@@ -124,8 +125,6 @@ export const NewPosition: React.FC<INewPosition> = ({
   calcAmount,
   feeTiers,
   ticksLoading,
-  showNoConnected,
-  noConnectedBlockerProps,
   isXtoY,
   xDecimal,
   yDecimal,
@@ -160,7 +159,10 @@ export const NewPosition: React.FC<INewPosition> = ({
   setOnlyUserPositions,
   network,
   isLoadingTokens,
-  azeroBalance
+  azeroBalance,
+  walletStatus,
+  onConnectWallet,
+  onDisconnectWallet
 }) => {
   const { classes } = useStyles()
   const navigate = useNavigate()
@@ -553,7 +555,6 @@ export const NewPosition: React.FC<INewPosition> = ({
       />
 
       <Grid container className={classes.row} alignItems='stretch'>
-        {showNoConnected && <NoConnected {...noConnectedBlockerProps} />}
         <DepositSelector
           initialTokenFrom={initialTokenFrom}
           initialTokenTo={initialTokenTo}
@@ -685,6 +686,9 @@ export const NewPosition: React.FC<INewPosition> = ({
           ticksLoading={ticksLoading}
           network={network}
           azeroBalance={azeroBalance}
+          walletStatus={walletStatus}
+          onConnectWallet={onConnectWallet}
+          onDisconnectWallet={onDisconnectWallet}
         />
         <Hidden mdUp>
           <Grid container justifyContent='end' mb={2}>

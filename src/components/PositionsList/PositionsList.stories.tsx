@@ -34,7 +34,8 @@ const data = [
     tokenXLiq: 5000,
     tokenYLiq: 300.2,
     currentPrice: 1000,
-    network: Network.Testnet
+    network: Network.Testnet,
+    isFullRange: false
   },
   {
     tokenXName: 'BTC',
@@ -51,7 +52,8 @@ const data = [
     tokenXLiq: 5000,
     tokenYLiq: 300.2,
     currentPrice: 1000,
-    network: Network.Testnet
+    network: Network.Testnet,
+    isFullRange: false
   },
   {
     tokenXName: 'BTC',
@@ -68,7 +70,8 @@ const data = [
     tokenXLiq: 5000,
     tokenYLiq: 300.2,
     currentPrice: 1000,
-    network: Network.Testnet
+    network: Network.Testnet,
+    isFullRange: false
   },
   {
     tokenXName: 'BTC',
@@ -85,7 +88,8 @@ const data = [
     tokenXLiq: 5000,
     tokenYLiq: 300.2,
     currentPrice: 1000,
-    network: Network.Testnet
+    network: Network.Testnet,
+    isFullRange: false
   }
 ]
 

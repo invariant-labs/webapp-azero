@@ -12,7 +12,7 @@ import {
 import { actions as poolsActions } from '@store/reducers/pools'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Simulate, actions } from '@store/reducers/swap'
-import { actions as walletActions } from '@store/reducers/wallet'
+import { Status, actions as walletActions } from '@store/reducers/wallet'
 import { networkType } from '@store/selectors/connection'
 import {
   isLoadingLatestPoolsForTransaction,
@@ -215,7 +215,9 @@ export const WrappedSwap = ({ initialTokenFrom, initialTokenTo }: Props) => {
       return
     }
 
-    dispatch(walletActions.getBalances([tokenFromAddress, tokenToAddress]))
+    if (walletStatus === Status.Initialized) {
+      dispatch(walletActions.getBalances([tokenFromAddress, tokenToAddress]))
+    }
 
     dispatch(
       poolsActions.getAllPoolsForPairData({

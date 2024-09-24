@@ -884,7 +884,6 @@ export const createLiquidityPlot = (
 
   return isXtoY ? ticksData : ticksData.reverse()
 }
-
 export const formatNumber = (
   number: number | bigint | string,
   noDecimals?: boolean,
@@ -892,7 +891,14 @@ export const formatNumber = (
 ): string => {
   const numberAsNumber = Number(number)
   const isNegative = numberAsNumber < 0
-  const absNumberAsString = numberToString(Math.abs(numberAsNumber))
+  const absNumberAsNumber = Math.abs(numberAsNumber)
+
+  if (absNumberAsNumber.toString().includes('e')) {
+    const exponential = absNumberAsNumber.toExponential(decimalsAfterDot)
+    return isNegative ? `-${exponential}` : exponential
+  }
+
+  const absNumberAsString = numberToString(absNumberAsNumber)
 
   if (containsOnlyZeroes(absNumberAsString)) {
     return '0'
@@ -902,7 +908,7 @@ export const formatNumber = (
 
   let formattedNumber
 
-  if (Math.abs(numberAsNumber) > FormatConfig.B) {
+  if (Math.abs(numberAsNumber) >= FormatConfig.B) {
     const formattedDecimals = noDecimals
       ? ''
       : (FormatConfig.DecimalsAfterDot ? '.' : '') +
@@ -910,9 +916,10 @@ export const formatNumber = (
           0,
           FormatConfig.DecimalsAfterDot
         )
+
     formattedNumber =
       beforeDot.slice(0, -FormatConfig.BDecimals) + (noDecimals ? '' : formattedDecimals) + 'B'
-  } else if (Math.abs(numberAsNumber) > FormatConfig.M) {
+  } else if (Math.abs(numberAsNumber) >= FormatConfig.M) {
     const formattedDecimals = noDecimals
       ? ''
       : (FormatConfig.DecimalsAfterDot ? '.' : '') +
@@ -922,7 +929,7 @@ export const formatNumber = (
         )
     formattedNumber =
       beforeDot.slice(0, -FormatConfig.MDecimals) + (noDecimals ? '' : formattedDecimals) + 'M'
-  } else if (Math.abs(numberAsNumber) > FormatConfig.K) {
+  } else if (Math.abs(numberAsNumber) >= FormatConfig.K) {
     const formattedDecimals = noDecimals
       ? ''
       : (FormatConfig.DecimalsAfterDot ? '.' : '') +
