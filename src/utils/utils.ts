@@ -962,7 +962,6 @@ export const formatNumber = (
     )
   }
 
-  console.log('formattedNumber', formattedNumber)
   return isNegative ? '-' + formattedNumber : formattedNumber
 }
 
