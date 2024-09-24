@@ -95,7 +95,7 @@ const SinglePositionInfo: React.FC<IProp> = ({
               {xToY ? tokenX.name : tokenY.name} - {xToY ? tokenY.name : tokenX.name}
             </Typography>
           </Grid>
-          <Grid className={classes.rangeGrid}>
+          <Grid className={classes.rangeGrid} sx={{ display: { xs: 'flex', md: 'none' } }}>
             <Tooltip
               title={
                 isActive ? (
@@ -127,6 +127,35 @@ const SinglePositionInfo: React.FC<IProp> = ({
         </Grid>
 
         <Grid className={classes.headerButtons}>
+          <Grid className={classes.rangeGrid} sx={{ display: { xs: 'none', md: 'flex' } }}>
+            <Tooltip
+              title={
+                isActive ? (
+                  <>
+                    The position is <b>active</b> and currently <b>earning a fee</b> as long as the
+                    current price is <b>within</b> the position's price range.
+                  </>
+                ) : (
+                  <>
+                    The position is <b>inactive</b> and <b>not earning a fee</b> as long as the
+                    current price is <b>outside</b> the position's price range.
+                  </>
+                )
+              }
+              placement='top'
+              classes={{
+                tooltip: classes.tooltip
+              }}>
+              <Typography
+                className={classNames(
+                  classes.text,
+                  classes.feeText,
+                  isActive ? classes.active : null
+                )}>
+                {fee.toString()}% fee
+              </Typography>
+            </Tooltip>
+          </Grid>
           <TooltipHover
             text={
               tokenX.claimValue > 0 || tokenY.claimValue > 0

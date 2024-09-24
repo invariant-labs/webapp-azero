@@ -6,8 +6,7 @@ export const useStyles = makeStyles()(theme => {
     wrapper: {
       borderRadius: 10,
       backgroundColor: colors.invariant.component,
-      padding: 24,
-      paddingTop: 16,
+      padding: '16px 24px 16px 24px',
       flex: '1 1 0%',
 
       [theme.breakpoints.down('sm')]: {
