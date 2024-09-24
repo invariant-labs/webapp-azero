@@ -126,8 +126,15 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     padding: 3,
     borderRadius: 5,
     marginInline: 'auto',
-    overflow: 'scroll',
-    scrollbarWidth: 'none'
+    overflowX: 'auto',
+    overflowY: 'hidden',
+    scrollbarWidth: 'none',
+
+    '&::-webkit-scrollbar': {
+      display: 'none',
+      scrollbarWidth: 'none',
+      msOverflowStyle: 'none'
+    }
   }
 }))
 
