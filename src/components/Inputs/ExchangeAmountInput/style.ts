@@ -78,7 +78,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   BalanceTypography: {
     color: colors.invariant.lightGrey,
     ...typography.caption2,
-    marginRight: 3,
+    marginRight: 6,
     overflow: 'hidden',
     whiteSpace: 'nowrap',
     textOverflow: 'ellipsis',

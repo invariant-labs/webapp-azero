@@ -1,6 +1,6 @@
 import Select from '@components/Inputs/Select/Select'
 import { OutlinedButton } from '@components/OutlinedButton/OutlinedButton'
-import { Box, Grid, Input, Tooltip, Typography } from '@mui/material'
+import { Grid, Input, Tooltip, Typography } from '@mui/material'
 import loadingAnimation from '@static/gif/loading.gif'
 import { formatNumber } from '@utils/utils'
 import { SwapToken } from '@store/selectors/wallet'
@@ -162,9 +162,7 @@ export const AmountInput: React.FC<IProps> = ({
             {isBalanceLoading ? (
               <img src={loadingAnimation} className={classes.loadingBalance} alt='loading' />
             ) : hideBalance ? (
-              <Box ml={1} mr={1}>
-                -
-              </Box>
+              <>-</>
             ) : (
               formatNumber(balance || 0)
             )}{' '}

@@ -30,7 +30,7 @@ import {
 import { actions as poolsActions } from '@store/reducers/pools'
 import { actions, InitMidPrice, actions as positionsActions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
-import { Status, actions as walletActions } from '@store/reducers/wallet'
+import { actions as walletActions } from '@store/reducers/wallet'
 import { networkType } from '@store/selectors/connection'
 import {
   isLoadingLatestPoolsForTransaction,
@@ -656,14 +656,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
           })
         )
       }}
-      showNoConnected={walletStatus !== Status.Initialized}
-      noConnectedBlockerProps={{
-        onConnect: async () => {
-          await openWalletSelectorModal()
-          dispatch(walletActions.connect(false))
-        },
-        descCustomText: 'Cannot add any liquidity.'
-      }}
       poolKey={poolKey}
       onRefresh={onRefresh}
       isBalanceLoading={isBalanceLoading}
@@ -675,6 +667,14 @@ export const NewPositionWrapper: React.FC<IProps> = ({
       network={network}
       isLoadingTokens={isCurrentlyLoadingTokens}
       azeroBalance={azeroBalance}
+      walletStatus={walletStatus}
+      onConnectWallet={async () => {
+        await openWalletSelectorModal()
+        dispatch(walletActions.connect(false))
+      }}
+      onDisconnectWallet={() => {
+        dispatch(walletActions.disconnect())
+      }}
     />
   )
 }
