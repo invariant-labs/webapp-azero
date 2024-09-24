@@ -40,7 +40,8 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     justifyContent: 'center',
     fontSize: 16,
     width: '100%',
-    padding: '0 4px'
+    padding: '0 4px',
+    textWrap: 'nowrap'
   },
   infoAmount: {
     color: colors.invariant.text,

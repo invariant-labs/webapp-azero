@@ -108,6 +108,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   diffLabelWrapper: {
     borderRadius: 11,
     height: 36,
+    flex: '0 0 auto',
     backgroundColor: colors.invariant.light,
     display: 'flex',
     alignItems: 'center',
@@ -116,7 +117,6 @@ export const useStyles = makeStyles()((theme: Theme) => ({
   diffLabel: {
     ...typography.caption2,
     color: colors.invariant.text,
-    width: 'fit-content',
     textOverflow: 'ellipsis',
     overflow: 'hidden',
     whiteSpace: 'nowrap'
@@ -126,7 +126,8 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     padding: 3,
     borderRadius: 5,
     marginInline: 'auto',
-    flex: '0 0 auto'
+    overflow: 'scroll',
+    scrollbarWidth: 'none'
   }
 }))
 
