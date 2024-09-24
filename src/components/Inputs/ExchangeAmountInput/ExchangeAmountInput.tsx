@@ -156,7 +156,7 @@ export const AmountInput: React.FC<IProps> = ({
           className={classNames(classes.balanceContainer, {
             [classes.showMaxButton]: showMaxButton
           })}
-          onClick={showMaxButton ? onMaxClick : () => {}}>
+          onClick={showMaxButton && !hideBalance ? onMaxClick : () => {}}>
           <Typography className={classes.BalanceTypography}>
             Balance:{' '}
             {isBalanceLoading ? (
