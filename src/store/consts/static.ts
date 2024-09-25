@@ -20,8 +20,6 @@ import { bestTiersCreator } from '@utils/utils'
 import { POSITIONS_ENTRIES_LIMIT } from '@invariant-labs/a0-sdk/target/consts'
 import mainnetListJson from '@store/consts/tokenLists/mainnet.json'
 
-export const mainnetList = mainnetListJson as unknown as Record<string, Token>
-
 export const WAZERO_ADDRESS = {
   ...WAZERO_ADDRESS_SDK,
   [Network.Mainnet]: '5CtuFVgEUz13SFPVY6s2cZrnLDEkxQXc19aXrNARwEBeCXgg'
@@ -138,6 +136,36 @@ export const commonTokensForNetworks: Record<Network, string[]> = {
   ],
   [Network.Local]: []
 }
+
+const commonTokensLogos = {
+  [BTC_ADDRESS[Network.Mainnet]]:
+    'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E/logo.png',
+  [ETH_ADDRESS[Network.Mainnet]]:
+    'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk/logo.png',
+  [USDC_ADDRESS[Network.Mainnet]]:
+    'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
+  [WAZERO_ADDRESS[Network.Mainnet]]:
+    'https://assets.coingecko.com/coins/images/17212/standard/azero-logo_coingecko.png'
+}
+
+export const mainnetList = (() => {
+  const parsedMainnetList: Record<string, Token> = {}
+
+  const mainnetList = mainnetListJson as unknown as Record<string, Token>
+
+  Object.keys(mainnetList).forEach(token => {
+    if (commonTokensLogos[token]) {
+      parsedMainnetList[token] = {
+        ...mainnetList[token],
+        logoURI: commonTokensLogos[token]
+      }
+    } else {
+      parsedMainnetList[token] = mainnetList[token]
+    }
+  })
+
+  return parsedMainnetList
+})()
 
 export const DEFAULT_INVARIANT_OPTIONS = {
   storageDepositLimit: null,
