@@ -997,7 +997,6 @@ export const getNewTokenOrThrow = async (
 ): Promise<Record<string, Token>> => {
   const tokenData = await getTokenDataByAddresses([address], psp22, walletAddress)
 
-  console.log('tokenData', tokenData)
   if (tokenData) {
     return tokenData
   } else {
