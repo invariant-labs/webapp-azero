@@ -2,10 +2,10 @@ import {
   FEE_TIERS,
   Network,
   Position,
-  BTC_ADDRESS,
-  ETH_ADDRESS,
-  USDC_ADDRESS,
-  WAZERO_ADDRESS
+  BTC_ADDRESS as BTC_ADDRESS_SDK,
+  ETH_ADDRESS as ETH_ADDRESS_SDK,
+  USDC_ADDRESS as USDC_ADDRESS_SDK,
+  WAZERO_ADDRESS as WAZERO_ADDRESS_SDK
 } from '@invariant-labs/a0-sdk'
 import { Keyring } from '@polkadot/api'
 import {
@@ -18,6 +18,27 @@ import {
 } from './types'
 import { bestTiersCreator } from '@utils/utils'
 import { POSITIONS_ENTRIES_LIMIT } from '@invariant-labs/a0-sdk/target/consts'
+import mainnetListJson from '@store/consts/tokenLists/mainnet.json'
+
+export const mainnetList = mainnetListJson as unknown as Record<string, Token>
+
+export const WAZERO_ADDRESS = {
+  ...WAZERO_ADDRESS_SDK,
+  [Network.Mainnet]: '5CtuFVgEUz13SFPVY6s2cZrnLDEkxQXc19aXrNARwEBeCXgg'
+}
+
+export const BTC_ADDRESS = {
+  ...BTC_ADDRESS_SDK,
+  [Network.Mainnet]: '5EEtCdKLyyhQnNQWWWPM1fMDx1WdVuiaoR9cA6CWttgyxtuJ'
+}
+export const ETH_ADDRESS = {
+  ...ETH_ADDRESS_SDK,
+  [Network.Mainnet]: '5EoFQd36196Duo6fPTz2MWHXRzwTJcyETHyCyaB3rb61Xo2u'
+}
+export const USDC_ADDRESS = {
+  ...USDC_ADDRESS_SDK,
+  [Network.Mainnet]: '5FYFojNCJVFR2bBNKfAePZCa72ZcVX5yeTv8K9bzeUo8D83Z'
+}
 
 export enum RPC {
   TEST = 'wss://ws.test.azero.dev',
@@ -94,45 +115,6 @@ export const TESTNET_AZERO: Token = {
   coingeckoId: 'aleph-zero'
 }
 
-export const MAINNET_BTC: Token = {
-  symbol: 'BTC',
-  address: BTC_ADDRESS[Network.Mainnet],
-  decimals: 8n,
-  name: 'Bitcoin',
-  logoURI:
-    'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E/logo.png',
-  coingeckoId: 'bitcoin'
-}
-
-export const MAINNET_ETH: Token = {
-  symbol: 'ETH',
-  address: ETH_ADDRESS[Network.Mainnet],
-  decimals: 18n,
-  name: 'Ether',
-  logoURI:
-    'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk/logo.png',
-  coingeckoId: 'ethereum'
-}
-
-export const MAINNET_USDC: Token = {
-  symbol: 'USDC',
-  address: USDC_ADDRESS[Network.Mainnet],
-  decimals: 6n,
-  name: 'USDC',
-  logoURI:
-    'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
-  coingeckoId: 'usd-coin'
-}
-
-export const MAINNET_AZERO: Token = {
-  symbol: 'AZERO',
-  address: WAZERO_ADDRESS[Network.Mainnet],
-  decimals: 12n,
-  name: 'Aleph Zero',
-  logoURI: 'https://assets.coingecko.com/coins/images/17212/standard/azero-logo_coingecko.png',
-  coingeckoId: 'aleph-zero'
-}
-
 export const DEFAULT_TOKENS = ['bitcoin', 'ethereum', 'usd-coin', 'aleph-zero']
 
 export const bestTiers: Record<Network, BestTier[]> = {
@@ -149,10 +131,10 @@ export const commonTokensForNetworks: Record<Network, string[]> = {
     TESTNET_AZERO.address
   ],
   [Network.Mainnet]: [
-    MAINNET_BTC.address,
-    MAINNET_ETH.address,
-    MAINNET_USDC.address,
-    MAINNET_AZERO.address
+    WAZERO_ADDRESS[Network.Mainnet],
+    BTC_ADDRESS[Network.Mainnet],
+    ETH_ADDRESS[Network.Mainnet],
+    USDC_ADDRESS[Network.Mainnet]
   ],
   [Network.Local]: []
 }
@@ -303,11 +285,23 @@ export const defaultPrefixConfig: PrefixConfig = {
 }
 
 export const getAddressTickerMap = (network: Network): { [k: string]: string } => {
-  return {
-    BTC: BTC_ADDRESS[network],
-    ETH: ETH_ADDRESS[network],
-    USDC: USDC_ADDRESS[network],
-    AZERO: WAZERO_ADDRESS[network]
+  if (network !== Network.Mainnet) {
+    return {
+      BTC: BTC_ADDRESS[network],
+      ETH: ETH_ADDRESS[network],
+      USDC: USDC_ADDRESS[network],
+      AZERO: WAZERO_ADDRESS[network]
+    }
+  } else {
+    const parsedMainnetList = mainnetList as unknown as Record<string, Token>
+    const result: { [k: string]: string } = {}
+
+    Object.keys(parsedMainnetList).forEach((key: string) => {
+      const token = parsedMainnetList[key]
+      result[token.symbol] = token.address
+    })
+
+    return result
   }
 }
 

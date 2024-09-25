@@ -30,7 +30,7 @@ export const defaultState: IAlephZeroConnectionStore = {
   blockNumber: 0,
   rpcAddress: localStorage.getItem(`INVARIANT_RPC_AlephZero_${network}`) ?? RPC.TEST,
   invariantAddress: INVARIANT_ADDRESS[network],
-  wrappedAZEROAddress: WAZERO_ADDRESS[network]
+  wrappedAZEROAddress: network === Network.Testnet ? WAZERO_ADDRESS[network] : ''
 }
 export const connectionSliceName = 'connection'
 const connectionSlice = createSlice({

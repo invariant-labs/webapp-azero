@@ -53,9 +53,7 @@ import {
   TESTNET_USDC,
   TESTNET_BTC,
   TESTNET_ETH,
-  MAINNET_USDC,
-  MAINNET_BTC,
-  MAINNET_ETH
+  mainnetList
 } from '@store/consts/static'
 import { sleep } from '@store/sagas/wallet'
 import {
@@ -367,6 +365,14 @@ export const getTokenDataByAddresses = async (
   psp22: PSP22,
   address: string
 ): Promise<Record<string, Token>> => {
+  const knownTokens: Record<string, Token> = {}
+
+  tokens.forEach(token => {
+    if (mainnetList[token]) {
+      knownTokens[token] = mainnetList[token]
+    }
+  })
+
   const promises = tokens.flatMap(token => {
     return [
       psp22.tokenSymbol(token),
@@ -379,6 +385,9 @@ export const getTokenDataByAddresses = async (
 
   const newTokens: Record<string, Token> = {}
   tokens.forEach((token, index) => {
+    if (knownTokens[token]) {
+      return
+    }
     const baseIndex = index * 4
     newTokens[token] = {
       symbol: results[baseIndex] ? (results[baseIndex] as string) : 'UNKNOWN',
@@ -390,7 +399,7 @@ export const getTokenDataByAddresses = async (
       isUnknown: true
     }
   })
-  return newTokens
+  return { ...knownTokens, ...newTokens }
 }
 
 export const getTokenBalances = async (
@@ -440,13 +449,8 @@ export const poolKeyToString = (poolKey: PoolKey): string => {
 
 export const getNetworkTokensList = (networkType: Network): Record<string, Token> => {
   switch (networkType) {
-    case Network.Mainnet: {
-      return {
-        [MAINNET_USDC.address.toString()]: MAINNET_USDC,
-        [MAINNET_BTC.address.toString()]: MAINNET_BTC,
-        [MAINNET_ETH.address.toString()]: MAINNET_ETH
-      }
-    }
+    case Network.Mainnet:
+      return mainnetList
     case Network.Testnet:
       return {
         [TESTNET_USDC.address.toString()]: TESTNET_USDC,
@@ -993,6 +997,7 @@ export const getNewTokenOrThrow = async (
 ): Promise<Record<string, Token>> => {
   const tokenData = await getTokenDataByAddresses([address], psp22, walletAddress)
 
+  console.log('tokenData', tokenData)
   if (tokenData) {
     return tokenData
   } else {
