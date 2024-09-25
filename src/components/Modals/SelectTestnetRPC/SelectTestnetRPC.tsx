@@ -1,10 +1,13 @@
 import { Network } from '@invariant-labs/a0-sdk'
 import DotIcon from '@mui/icons-material/FiberManualRecord'
-import { Button, Grid, Input, Popover, Typography } from '@mui/material'
+import { Box, Button, Grid, Input, Popover, Typography } from '@mui/material'
 import { ISelectNetwork } from '@store/consts/types'
 import classNames from 'classnames'
 import React, { useEffect, useRef, useState } from 'react'
 import useStyles from './styles'
+import { RpcStatus } from '@store/reducers/connection'
+import { RECOMMENDED_RPC_ADDRESS } from '@store/consts/static'
+import icons from '@static/icons'
 
 export interface ISelectTestnetRPC {
   networks: ISelectNetwork[]
@@ -13,6 +16,7 @@ export interface ISelectTestnetRPC {
   onSelect: (networkType: Network, rpcAddress: string, rpcName?: string) => void
   handleClose: () => void
   activeRPC: string
+  rpcStatus: RpcStatus
 }
 export const SelectTestnetRPC: React.FC<ISelectTestnetRPC> = ({
   networks,
@@ -20,7 +24,8 @@ export const SelectTestnetRPC: React.FC<ISelectTestnetRPC> = ({
   open,
   onSelect,
   handleClose,
-  activeRPC
+  activeRPC,
+  rpcStatus
 }) => {
   const { classes } = useStyles()
 
@@ -50,8 +55,13 @@ export const SelectTestnetRPC: React.FC<ISelectTestnetRPC> = ({
       setButtonApplied(true)
       setActiveCustom(true)
       setAddress(activeRPC)
+    } else {
+      setCustomApplied(false)
+      setButtonApplied(false)
+      setActiveCustom(false)
+      setAddress('')
     }
-  }, [])
+  }, [activeRPC])
 
   return (
     <Popover
@@ -72,6 +82,15 @@ export const SelectTestnetRPC: React.FC<ISelectTestnetRPC> = ({
       }}>
       <Grid className={classes.root}>
         <Typography className={classes.title}>Select testnet RPC to use</Typography>
+        {rpcStatus === RpcStatus.IgnoredWithError &&
+          activeRPC !== RECOMMENDED_RPC_ADDRESS[Network.Testnet] && (
+            <div className={classes.warningContainer}>
+              <img className={classes.warningIcon} src={icons.warningIcon} alt='Warning icon' />
+              <Typography className={classes.warningText}>
+                Current RPC might not work properly
+              </Typography>
+            </div>
+          )}
         <Grid className={classes.list} container alignContent='space-around' direction='column'>
           {networks.map(({ networkType, rpc, rpcName }) => (
             <Grid
@@ -89,7 +108,12 @@ export const SelectTestnetRPC: React.FC<ISelectTestnetRPC> = ({
                 setButtonApplied(false)
                 handleClose()
               }}>
-              <Typography className={classes.name}>{rpcName}</Typography>
+              <Box width='100%' display='flex' justifyContent='space-between' alignItems='center'>
+                <Typography className={classes.name}>{rpcName} </Typography>
+                <Typography className={classes.recommendedText}>
+                  {RECOMMENDED_RPC_ADDRESS[Network.Testnet] === rpc && 'RECOMMENDED'}
+                </Typography>
+              </Box>
               <DotIcon className={classes.dotIcon} />
             </Grid>
           ))}
@@ -105,7 +129,9 @@ export const SelectTestnetRPC: React.FC<ISelectTestnetRPC> = ({
               setActiveCustom(true)
               inputRef.current?.focus()
             }}>
-            <Typography className={classes.name}>Custom RPC</Typography>
+            <Box width='100%' display='flex' justifyContent='space-between' alignItems='center'>
+              <Typography className={classes.name}>Custom RPC</Typography>
+            </Box>
             <DotIcon className={classes.dotIcon} />
           </Grid>
         </Grid>

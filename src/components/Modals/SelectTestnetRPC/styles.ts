@@ -47,7 +47,7 @@ const useStyles = makeStyles()(() => {
     },
     dotIcon: {
       width: 12,
-      marginLeft: 'auto',
+      marginLeft: 8,
       color: colors.invariant.green,
       visibility: 'hidden'
     },
@@ -149,6 +149,28 @@ const useStyles = makeStyles()(() => {
         color: colors.invariant.text,
         cursor: 'default'
       }
+    },
+    warningIcon: {
+      height: 16,
+      marginRight: 4
+    },
+    warningText: {
+      ...typography.caption2,
+      color: colors.invariant.yellow
+    },
+    recommendedText: {
+      ...typography.caption3,
+      color: colors.white.main
+    },
+    warningContainer: {
+      padding: '0 8px',
+      display: 'flex'
+    },
+    rpcContainer: {
+      width: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between'
     }
   }
 })

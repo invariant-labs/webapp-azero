@@ -9,14 +9,16 @@ export const {
   blockNumber,
   rpcAddress,
   invariantAddress,
-  wrappedAZEROAddress
+  wrappedAZEROAddress,
+  rpcStatus
 } = keySelectors(store, [
   'networkType',
   'status',
   'blockNumber',
   'rpcAddress',
   'invariantAddress',
-  'wrappedAZEROAddress'
+  'wrappedAZEROAddress',
+  'rpcStatus'
 ])
 
 export const alephZeroConnectionSelectors = {
@@ -25,7 +27,8 @@ export const alephZeroConnectionSelectors = {
   blockNumber,
   rpcAddress,
   invariantAddress,
-  wrappedAZEROAddress
+  wrappedAZEROAddress,
+  rpcStatus
 }
 
 export default alephZeroConnectionSelectors

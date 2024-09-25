@@ -97,6 +97,10 @@ const useStyles = makeStyles()((theme: Theme) => {
     innerEndIcon: {
       marginLeft: 0,
       marginBottom: 3
+    },
+    warningIcon: {
+      height: 16,
+      marginRight: 4
     }
   }
 })

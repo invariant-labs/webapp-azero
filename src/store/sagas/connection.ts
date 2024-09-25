@@ -1,11 +1,12 @@
 import { all, call, put, SagaGenerator, select, takeLeading, spawn } from 'typed-redux-saga'
-import { actions, Status } from '@store/reducers/connection'
+import { actions, RpcStatus, Status } from '@store/reducers/connection'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import {
   rpcAddress,
   networkType,
   invariantAddress,
-  wrappedAZEROAddress
+  wrappedAZEROAddress,
+  rpcStatus
 } from '@store/selectors/connection'
 import { PayloadAction } from '@reduxjs/toolkit'
 import { ApiPromise } from '@polkadot/api'
@@ -14,6 +15,16 @@ import invariantSingleton from '@store/services/invariantSingleton'
 import { Invariant, Network, PSP22, WrappedAZERO } from '@invariant-labs/a0-sdk'
 import SingletonPSP22 from '@store/services/psp22Singleton'
 import SingletonWrappedAZERO from '@store/services/wrappedAZEROSingleton'
+
+export function* handleRpcError(_action: PayloadAction): Generator {
+  const currentRpcStatus = yield* select(rpcStatus)
+
+  if (currentRpcStatus === RpcStatus.Uninitialized) {
+    yield* put(actions.setRpcStatus(RpcStatus.Error))
+  } else if (currentRpcStatus === RpcStatus.Ignored) {
+    yield* put(actions.setRpcStatus(RpcStatus.IgnoredWithError))
+  }
+}
 
 export function* getApi(): SagaGenerator<ApiPromise> {
   let api = yield* call([apiSingleton, apiSingleton.getInstance])
@@ -120,6 +131,11 @@ export function* networkChangeSaga(): Generator {
 export function* initConnectionSaga(): Generator {
   yield takeLeading(actions.initAlephZeroConnection, initConnection)
 }
+
+export function* handleRpcErrorSaga(): Generator {
+  yield takeLeading(actions.handleRpcError, handleRpcError)
+}
+
 export function* connectionSaga(): Generator {
-  yield* all([networkChangeSaga, initConnectionSaga].map(spawn))
+  yield* all([networkChangeSaga, initConnectionSaga, handleRpcErrorSaga].map(spawn))
 }

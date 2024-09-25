@@ -7,6 +7,9 @@ import SelectTestnetRPC from '@components/Modals/SelectTestnetRPC/SelectTestnetR
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import { Network } from '@invariant-labs/a0-sdk'
 import SelectMainnetRPC from '@components/Modals/SelectMainnetRPC/SelectMainnetRPC'
+import { RpcStatus } from '@store/reducers/connection'
+import { RECOMMENDED_RPC_ADDRESS } from '@store/consts/static'
+import icons from '@static/icons'
 
 export interface IProps {
   rpc: string
@@ -14,13 +17,15 @@ export interface IProps {
   onSelect: (networkType: Network, rpcAddress: string, rpcName?: string) => void
   disabled?: boolean
   network: Network
+  rpcStatus: RpcStatus
 }
 export const SelectRPCButton: React.FC<IProps> = ({
   rpc,
   networks,
   onSelect,
   disabled = false,
-  network
+  network,
+  rpcStatus
 }) => {
   const { classes } = useStyles()
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
@@ -46,6 +51,9 @@ export const SelectRPCButton: React.FC<IProps> = ({
         disabled={disabled}
         endIcon={<KeyboardArrowDownIcon id='downIcon' />}
         onClick={handleClick}>
+        {rpcStatus === RpcStatus.IgnoredWithError && rpc !== RECOMMENDED_RPC_ADDRESS[network] && (
+          <img className={classes.warningIcon} src={icons.warningIcon} alt='Warning icon' />
+        )}
         RPC
       </Button>
       {network === Network.Testnet ? (
@@ -56,6 +64,7 @@ export const SelectRPCButton: React.FC<IProps> = ({
           onSelect={onSelect}
           handleClose={handleClose}
           activeRPC={rpc}
+          rpcStatus={rpcStatus}
         />
       ) : (
         <SelectMainnetRPC
@@ -65,6 +74,7 @@ export const SelectRPCButton: React.FC<IProps> = ({
           onSelect={onSelect}
           handleClose={handleClose}
           activeRPC={rpc}
+          rpcStatus={rpcStatus}
         />
       )}
     </>
