@@ -6,6 +6,7 @@ import { Network } from '@invariant-labs/a0-sdk'
 import { Chain } from '@store/consts/types'
 import { Provider } from 'react-redux'
 import { store } from '@store/index'
+import { RpcStatus } from '@store/reducers/connection'
 
 const meta = {
   title: 'Layout/Header',
@@ -45,6 +46,7 @@ export const Primary: Story = {
     },
     onChainSelect: fn(),
     network: Network.Testnet,
-    defaultMainnetRPC: 'https://rpc.moonbeam.network'
+    defaultMainnetRPC: 'https://rpc.moonbeam.network',
+    rpcStatus: RpcStatus.Uninitialized
   }
 }

@@ -141,10 +141,7 @@ export const PositionsList: React.FC<IProps> = ({
                   </Button>
                 </Grid>
               </TooltipHover>
-              <Button
-                className={showNoConnected ? classes.buttonSelectDisabled : classes.button}
-                variant='contained'
-                onClick={showNoConnected ? () => {} : onAddPositionClick}>
+              <Button className={classes.button} variant='contained' onClick={onAddPositionClick}>
                 <span className={classes.buttonText}>+ Add Position</span>
               </Button>
             </Grid>

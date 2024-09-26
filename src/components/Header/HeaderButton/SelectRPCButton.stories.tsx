@@ -3,6 +3,7 @@ import SelectRPCButton from './SelectRPCButton'
 import { Network } from '@invariant-labs/a0-sdk'
 import { RPC } from '@store/consts/static'
 import { action } from '@storybook/addon-actions'
+import { RpcStatus } from '@store/reducers/connection'
 
 const meta = {
   title: 'Buttons/SelectRPCButton',
@@ -23,6 +24,7 @@ export const Primary: Story = {
       }
     ],
     onSelect: (networkType, rpc) => action('chosen: ' + networkType + ' ' + rpc)(),
-    network: Network.Testnet
+    network: Network.Testnet,
+    rpcStatus: RpcStatus.Uninitialized
   }
 }

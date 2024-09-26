@@ -8,7 +8,8 @@ const useStyles = makeStyles()(theme => {
       maxWidth: '100%'
     },
     headerContainer: {
-      columnGap: 24
+      columnGap: 24,
+      height: 46
     },
     back: {
       height: 24,

@@ -1,9 +1,9 @@
 import Header from '@components/Header/Header'
 import { Network } from '@invariant-labs/a0-sdk'
-import { RPC, CHAINS } from '@store/consts/static'
-import { actions } from '@store/reducers/connection'
+import { RPC, CHAINS, RECOMMENDED_RPC_ADDRESS } from '@store/consts/static'
+import { actions, RpcStatus } from '@store/reducers/connection'
 import { Status, actions as walletActions } from '@store/reducers/wallet'
-import { networkType, rpcAddress } from '@store/selectors/connection'
+import { networkType, rpcAddress, rpcStatus } from '@store/selectors/connection'
 import { address, status } from '@store/selectors/wallet'
 import { openWalletSelectorModal } from '@utils/web3/selector'
 import { getAlephZeroWallet } from '@utils/web3/wallet'
@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Chain } from '@store/consts/types'
+import { RpcErrorModal } from '@components/RpcErrorModal/RpcErrorModal'
 
 export const HeaderWrapper: React.FC = () => {
   const dispatch = useDispatch()
@@ -63,63 +64,93 @@ export const HeaderWrapper: React.FC = () => {
 
   const activeChain = CHAINS.find(chain => chain.name === Chain.AlephZero) ?? CHAINS[0]
 
+  const currentRpcStatus = useSelector(rpcStatus)
+
+  const useDefaultRpc = () => {
+    localStorage.setItem(
+      `INVARIANT_RPC_AlephZero_${currentNetwork}`,
+      RECOMMENDED_RPC_ADDRESS[currentNetwork]
+    )
+    dispatch(actions.setRPCAddress(RECOMMENDED_RPC_ADDRESS[currentNetwork]))
+    dispatch(actions.setRpcStatus(RpcStatus.Uninitialized))
+    localStorage.setItem('IS_RPC_WARNING_IGNORED', 'false')
+  }
+
+  const useCurrentRpc = () => {
+    dispatch(actions.setRpcStatus(RpcStatus.IgnoredWithError))
+    localStorage.setItem('IS_RPC_WARNING_IGNORED', 'true')
+  }
+
   return (
-    <Header
-      address={walletAddress}
-      onNetworkSelect={(network, rpcAddress) => {
-        if (rpcAddress !== currentRpc) {
-          localStorage.setItem(`INVARIANT_RPC_AlephZero_${network}`, rpcAddress)
-          dispatch(actions.setRPCAddress(rpcAddress))
-        }
-
-        if (network !== currentNetwork) {
-          if (location.pathname.startsWith('/exchange')) {
-            navigate('/exchange')
+    <>
+      {currentRpcStatus === RpcStatus.Error &&
+        currentRpc !== RECOMMENDED_RPC_ADDRESS[currentNetwork] && (
+          <RpcErrorModal
+            rpcAddress={currentRpc}
+            useDefaultRpc={useDefaultRpc}
+            useCurrentRpc={useCurrentRpc}
+          />
+        )}
+      <Header
+        address={walletAddress}
+        onNetworkSelect={(network, rpcAddress) => {
+          if (rpcAddress !== currentRpc) {
+            localStorage.setItem(`INVARIANT_RPC_AlephZero_${network}`, rpcAddress)
+            dispatch(actions.setRPCAddress(rpcAddress))
+            dispatch(actions.setRpcStatus(RpcStatus.Uninitialized))
+            localStorage.setItem('IS_RPC_WARNING_IGNORED', 'false')
           }
 
-          if (location.pathname.startsWith('/newPosition')) {
-            navigate('/newPosition')
+          if (network !== currentNetwork) {
+            if (location.pathname.startsWith('/exchange')) {
+              navigate('/exchange')
+            }
+
+            if (location.pathname.startsWith('/newPosition')) {
+              navigate('/newPosition')
+            }
+
+            dispatch(actions.setNetwork(network))
           }
+        }}
+        onConnectWallet={async () => {
+          await openWalletSelectorModal()
+          dispatch(walletActions.connect(false))
+        }}
+        landing={location.pathname.substring(1)}
+        walletConnected={walletStatus === Status.Initialized}
+        onDisconnectWallet={() => {
+          dispatch(walletActions.disconnect())
+        }}
+        onFaucet={() => dispatch(walletActions.airdrop())}
+        typeOfNetwork={currentNetwork}
+        rpc={currentRpc}
+        defaultTestnetRPC={defaultTestnetRPC}
+        onCopyAddress={() => {
+          navigator.clipboard.writeText(walletAddress)
 
-          dispatch(actions.setNetwork(network))
-        }
-      }}
-      onConnectWallet={async () => {
-        await openWalletSelectorModal()
-        dispatch(walletActions.connect(false))
-      }}
-      landing={location.pathname.substring(1)}
-      walletConnected={walletStatus === Status.Initialized}
-      onDisconnectWallet={() => {
-        dispatch(walletActions.disconnect())
-      }}
-      onFaucet={() => dispatch(walletActions.airdrop())}
-      typeOfNetwork={currentNetwork}
-      rpc={currentRpc}
-      defaultTestnetRPC={defaultTestnetRPC}
-      onCopyAddress={() => {
-        navigator.clipboard.writeText(walletAddress)
-
-        dispatch(
-          snackbarsActions.add({
-            message: 'Wallet address copied.',
-            variant: 'success',
-            persist: false
-          })
-        )
-      }}
-      onChangeWallet={() => {
-        dispatch(walletActions.reconnect())
-      }}
-      activeChain={activeChain}
-      onChainSelect={chain => {
-        if (chain.name !== activeChain.name) {
-          window.location.replace(chain.address)
-        }
-      }}
-      network={currentNetwork}
-      defaultMainnetRPC={defaultMainnetRPC}
-    />
+          dispatch(
+            snackbarsActions.add({
+              message: 'Wallet address copied.',
+              variant: 'success',
+              persist: false
+            })
+          )
+        }}
+        onChangeWallet={() => {
+          dispatch(walletActions.reconnect())
+        }}
+        activeChain={activeChain}
+        onChainSelect={chain => {
+          if (chain.name !== activeChain.name) {
+            window.location.replace(chain.address)
+          }
+        }}
+        network={currentNetwork}
+        defaultMainnetRPC={defaultMainnetRPC}
+        rpcStatus={currentRpcStatus}
+      />
+    </>
   )
 }
 

@@ -1,6 +1,6 @@
-import { Network, INVARIANT_ADDRESS, WAZERO_ADDRESS } from '@invariant-labs/a0-sdk'
+import { Network, INVARIANT_ADDRESS } from '@invariant-labs/a0-sdk'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
-import { RPC } from '@store/consts/static'
+import { RPC, WAZERO_ADDRESS } from '@store/consts/static'
 import { PayloadType } from '@store/consts/types'
 
 export enum Status {
@@ -9,6 +9,19 @@ export enum Status {
   Error = 'error',
   Initialized = 'initalized'
 }
+
+export enum RpcStatus {
+  Uninitialized,
+  Error,
+  Ignored,
+  IgnoredWithError
+}
+
+const RPC_STATUS =
+  localStorage.getItem('IS_RPC_WARNING_IGNORED') === 'true'
+    ? RpcStatus.Ignored
+    : RpcStatus.Uninitialized
+
 export interface IAlephZeroConnectionStore {
   status: Status
   message: string
@@ -17,6 +30,7 @@ export interface IAlephZeroConnectionStore {
   rpcAddress: string
   invariantAddress: string
   wrappedAZEROAddress: string
+  rpcStatus: RpcStatus
 }
 
 const network =
@@ -30,7 +44,8 @@ export const defaultState: IAlephZeroConnectionStore = {
   blockNumber: 0,
   rpcAddress: localStorage.getItem(`INVARIANT_RPC_AlephZero_${network}`) ?? RPC.TEST,
   invariantAddress: INVARIANT_ADDRESS[network],
-  wrappedAZEROAddress: WAZERO_ADDRESS[network]
+  wrappedAZEROAddress: WAZERO_ADDRESS[network],
+  rpcStatus: RPC_STATUS
 }
 export const connectionSliceName = 'connection'
 const connectionSlice = createSlice({
@@ -64,6 +79,13 @@ const connectionSlice = createSlice({
     },
     setRPCAddress(state, action: PayloadAction<string>) {
       state.rpcAddress = action.payload
+      return state
+    },
+    setRpcStatus(state, action: PayloadAction<RpcStatus>) {
+      state.rpcStatus = action.payload
+      return state
+    },
+    handleRpcError(state, _action: PayloadAction) {
       return state
     }
   }

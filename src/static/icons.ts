@@ -30,6 +30,7 @@ import a0Logo from './svg/a0Logo.svg'
 import eclipseLogo from './svg/eclipseLogo.svg'
 import solanaLogo from './svg/solanaLogo.svg'
 import varaLogo from './svg/VaraLogo.svg'
+import warningIcon from './svg/Warning.svg'
 
 const icons: { [key: string]: string } = {
   clear: clearIcon,
@@ -63,7 +64,8 @@ const icons: { [key: string]: string } = {
   AlephZero: a0Logo,
   Eclipse: eclipseLogo,
   Solana: solanaLogo,
-  Vara: varaLogo
+  Vara: varaLogo,
+  warningIcon
 }
 
 export default icons

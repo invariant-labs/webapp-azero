@@ -22,6 +22,7 @@ interface IProps {
   disabled?: boolean
   priceLoading?: boolean
   isBalanceLoading: boolean
+  walletUninitialized: boolean
 }
 
 export const DepositAmountInput: React.FC<IProps> = ({
@@ -40,9 +41,10 @@ export const DepositAmountInput: React.FC<IProps> = ({
   balanceValue,
   disabled = false,
   priceLoading = false,
-  isBalanceLoading
+  isBalanceLoading,
+  walletUninitialized
 }) => {
-  const { classes } = useStyles({ isSelected: !!currency })
+  const { classes } = useStyles({ isSelected: !!currency && !walletUninitialized })
 
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -139,28 +141,29 @@ export const DepositAmountInput: React.FC<IProps> = ({
             container
             alignItems='center'
             wrap='nowrap'
-            onClick={onMaxClick}>
+            onClick={walletUninitialized ? () => {} : onMaxClick}>
             <Typography className={classes.caption2}>
               Balance:{' '}
-              {isBalanceLoading ? (
+              {walletUninitialized ? (
+                <>-</>
+              ) : isBalanceLoading ? (
                 <img src={loadingAnimation} className={classes.loadingBalance} alt='loading' />
-              ) : balanceValue ? (
-                formatNumber(balanceValue || 0)
               ) : (
-                <span style={{ marginLeft: '8px' }}>-</span>
+                <>{formatNumber(balanceValue || 0)}</>
               )}{' '}
               {currency}
             </Typography>
             <Button
               className={
-                currency ? classes.maxButton : `${classes.maxButton} ${classes.maxButtonNotActive}`
-              }
-              onClick={onMaxClick}>
+                currency && !walletUninitialized
+                  ? classes.maxButton
+                  : `${classes.maxButton} ${classes.maxButtonNotActive}`
+              }>
               Max
             </Button>
           </Grid>
           <Grid className={classes.percentages} container alignItems='center' wrap='nowrap'>
-            {currency ? (
+            {currency && !walletUninitialized ? (
               priceLoading ? (
                 <img src={loadingAnimation} className={classes.loading} alt='loading' />
               ) : tokenPrice ? (
