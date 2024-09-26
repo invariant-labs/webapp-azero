@@ -28,7 +28,8 @@ export const Null: Story = {
     onBlur: fn(),
     style: {},
     disabled: false,
-    isBalanceLoading: false
+    isBalanceLoading: false,
+    walletUninitialized: true
   }
 }
 
@@ -49,6 +50,7 @@ export const BTC: Story = {
     onBlur: fn(),
     style: {},
     disabled: false,
-    isBalanceLoading: false
+    isBalanceLoading: false,
+    walletUninitialized: false
   }
 }

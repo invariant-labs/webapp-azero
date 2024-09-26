@@ -10,6 +10,7 @@ import icons from '@static/icons'
 import { SortTypePoolList } from '@store/consts/static'
 import { Network } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
+import { TooltipHover } from '@components/TooltipHover/TooltipHover'
 
 interface IProps {
   TVL?: number
@@ -139,12 +140,16 @@ const PoolListItem: React.FC<IProps> = ({
           <Typography>{`$${formatNumbers()(volume.toString())}${showPrefix(volume)}`}</Typography>
           <Typography>{`$${formatNumbers()(TVL.toString())}${showPrefix(TVL)}`}</Typography>
           <Box className={classes.action}>
-            <button className={classes.actionButton} onClick={handleOpenSwap}>
-              <img width={32} height={32} src={icons.horizontalSwapIcon} alt={'Exchange'} />
-            </button>
-            <button className={classes.actionButton} onClick={handleOpenPosition}>
-              <img width={32} height={32} src={icons.plusIcon} alt={'Open'} />
-            </button>
+            <TooltipHover text='Exchange'>
+              <button className={classes.actionButton} onClick={handleOpenSwap}>
+                <img width={32} height={32} src={icons.horizontalSwapIcon} alt={'Exchange'} />
+              </button>
+            </TooltipHover>
+            <TooltipHover text='Add position'>
+              <button className={classes.actionButton} onClick={handleOpenPosition}>
+                <img width={32} height={32} src={icons.plusIcon} alt={'Open'} />
+              </button>
+            </TooltipHover>
           </Box>
         </Grid>
       ) : (

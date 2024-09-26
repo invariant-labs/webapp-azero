@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import SelectMainnetRPC from './SelectMainnetRPC'
 import { Network } from '@invariant-labs/a0-sdk'
+import { RpcStatus } from '@store/reducers/connection'
 
 const meta = {
   title: 'Modals/SelectRPC',
@@ -17,7 +18,8 @@ const meta = {
       }
     ],
     onSelect: () => {},
-    open: true
+    open: true,
+    rpcStatus: RpcStatus.Uninitialized
   }
 } satisfies Meta<typeof SelectMainnetRPC>
 

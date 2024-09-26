@@ -65,7 +65,7 @@ export const AmountInput: React.FC<IProps> = ({
   hiddenUnknownTokens
 }) => {
   const hideBalance = balance === '- -' || !balance || hideBalances
-  const { classes } = useStyles({ walletDisconnected: hideBalance })
+  const { classes } = useStyles()
   const inputRef = useRef<HTMLInputElement>(null)
 
   const allowOnlyDigitsAndTrimUnnecessaryZeros: React.ChangeEventHandler<HTMLInputElement> = e => {
@@ -144,44 +144,47 @@ export const AmountInput: React.FC<IProps> = ({
           />
         )}
       </Grid>
-      {!hideBalance && (
+
+      <Grid
+        container
+        justifyContent='space-between'
+        alignItems='center'
+        direction='row'
+        wrap='nowrap'
+        className={classes.bottom}>
         <Grid
-          container
-          justifyContent='space-between'
-          alignItems='center'
-          direction='row'
-          wrap='nowrap'
-          className={classes.bottom}>
-          <Grid
-            className={classNames(classes.balanceContainer, {
-              [classes.showMaxButton]: showMaxButton
-            })}
-            onClick={showMaxButton ? onMaxClick : () => {}}>
-            <Typography className={classes.BalanceTypography}>
-              Balance:{' '}
-              {isBalanceLoading ? (
-                <img src={loadingAnimation} className={classes.loadingBalance} alt='loading' />
-              ) : (
-                formatNumber(balance || 0)
-              )}{' '}
-              {tokenIcon.slice(0, 8)}
-              {tokenIcon.length > 8 ? '...' : ''}
-            </Typography>
-            {showMaxButton && (
-              <OutlinedButton
-                name='Max'
-                color='primary'
-                onClick={onMaxClick}
-                className={classes.maxButton}
-                labelClassName={classes.label}
-                disabled={
-                  disabled && isNaN(Number(balance))
-                    ? disabled
-                    : isNaN(Number(balance)) || hideBalances
-                }
-              />
-            )}
-          </Grid>
+          className={classNames(classes.balanceContainer, {
+            [classes.showMaxButton]: showMaxButton
+          })}
+          onClick={showMaxButton && !hideBalance ? onMaxClick : () => {}}>
+          <Typography className={classes.BalanceTypography}>
+            Balance:{' '}
+            {isBalanceLoading ? (
+              <img src={loadingAnimation} className={classes.loadingBalance} alt='loading' />
+            ) : hideBalance ? (
+              <>-</>
+            ) : (
+              formatNumber(balance || 0)
+            )}{' '}
+            {tokenIcon.slice(0, 8)}
+            {tokenIcon.length > 8 ? '...' : ''}
+          </Typography>
+          {showMaxButton && (
+            <OutlinedButton
+              name='Max'
+              color='primary'
+              onClick={onMaxClick}
+              className={classes.maxButton}
+              labelClassName={classes.label}
+              disabled={
+                disabled && isNaN(Number(balance))
+                  ? disabled
+                  : isNaN(Number(balance)) || hideBalances
+              }
+            />
+          )}
+        </Grid>
+        {!hideBalance && (
           <Grid className={classes.percentages} container alignItems='center' wrap='nowrap'>
             {current ? (
               priceLoading ? (
@@ -215,8 +218,8 @@ export const AmountInput: React.FC<IProps> = ({
               )
             ) : null}
           </Grid>
-        </Grid>
-      )}
+        )}
+      </Grid>
     </>
   )
 }

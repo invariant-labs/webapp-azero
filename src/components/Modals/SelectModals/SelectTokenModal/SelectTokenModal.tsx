@@ -99,10 +99,6 @@ export const SelectTokenModal: React.FC<ISelectTokenModal> = ({
   }, [tokens, commonTokens])
 
   const filteredTokens = useMemo(() => {
-    if (!open) {
-      return []
-    }
-
     const filteredTokens: SwapToken[] = []
     for (const [assetAddress, token] of Object.entries(tokens)) {
       if (

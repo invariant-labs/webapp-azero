@@ -19,11 +19,7 @@ import {
   PERCENTAGE_DENOMINATOR,
   PERCENTAGE_SCALE,
   PRICE_SCALE,
-  SQRT_PRICE_SCALE,
-  BTC_ADDRESS,
-  ETH_ADDRESS,
-  USDC_ADDRESS,
-  WAZERO_ADDRESS
+  SQRT_PRICE_SCALE
 } from '@invariant-labs/a0-sdk/target/consts'
 import {
   calculateLiquidityBreakpoints,
@@ -53,9 +49,11 @@ import {
   TESTNET_USDC,
   TESTNET_BTC,
   TESTNET_ETH,
-  MAINNET_USDC,
-  MAINNET_BTC,
-  MAINNET_ETH
+  mainnetList,
+  USDC_ADDRESS,
+  BTC_ADDRESS,
+  ETH_ADDRESS,
+  WAZERO_ADDRESS
 } from '@store/consts/static'
 import { sleep } from '@store/sagas/wallet'
 import {
@@ -367,6 +365,14 @@ export const getTokenDataByAddresses = async (
   psp22: PSP22,
   address: string
 ): Promise<Record<string, Token>> => {
+  const knownTokens: Record<string, Token> = {}
+
+  tokens.forEach(token => {
+    if (mainnetList[token]) {
+      knownTokens[token] = mainnetList[token]
+    }
+  })
+
   const promises = tokens.flatMap(token => {
     return [
       psp22.tokenSymbol(token),
@@ -379,6 +385,9 @@ export const getTokenDataByAddresses = async (
 
   const newTokens: Record<string, Token> = {}
   tokens.forEach((token, index) => {
+    if (knownTokens[token]) {
+      return
+    }
     const baseIndex = index * 4
     newTokens[token] = {
       symbol: results[baseIndex] ? (results[baseIndex] as string) : 'UNKNOWN',
@@ -390,7 +399,7 @@ export const getTokenDataByAddresses = async (
       isUnknown: true
     }
   })
-  return newTokens
+  return { ...knownTokens, ...newTokens }
 }
 
 export const getTokenBalances = async (
@@ -440,13 +449,8 @@ export const poolKeyToString = (poolKey: PoolKey): string => {
 
 export const getNetworkTokensList = (networkType: Network): Record<string, Token> => {
   switch (networkType) {
-    case Network.Mainnet: {
-      return {
-        [MAINNET_USDC.address.toString()]: MAINNET_USDC,
-        [MAINNET_BTC.address.toString()]: MAINNET_BTC,
-        [MAINNET_ETH.address.toString()]: MAINNET_ETH
-      }
-    }
+    case Network.Mainnet:
+      return mainnetList
     case Network.Testnet:
       return {
         [TESTNET_USDC.address.toString()]: TESTNET_USDC,
@@ -884,7 +888,6 @@ export const createLiquidityPlot = (
 
   return isXtoY ? ticksData : ticksData.reverse()
 }
-
 export const formatNumber = (
   number: number | bigint | string,
   noDecimals?: boolean,
@@ -892,7 +895,14 @@ export const formatNumber = (
 ): string => {
   const numberAsNumber = Number(number)
   const isNegative = numberAsNumber < 0
-  const absNumberAsString = numberToString(Math.abs(numberAsNumber))
+  const absNumberAsNumber = Math.abs(numberAsNumber)
+
+  if (absNumberAsNumber.toString().includes('e')) {
+    const exponential = absNumberAsNumber.toExponential(decimalsAfterDot)
+    return isNegative ? `-${exponential}` : exponential
+  }
+
+  const absNumberAsString = numberToString(absNumberAsNumber)
 
   if (containsOnlyZeroes(absNumberAsString)) {
     return '0'
@@ -902,7 +912,7 @@ export const formatNumber = (
 
   let formattedNumber
 
-  if (Math.abs(numberAsNumber) > FormatConfig.B) {
+  if (Math.abs(numberAsNumber) >= FormatConfig.B) {
     const formattedDecimals = noDecimals
       ? ''
       : (FormatConfig.DecimalsAfterDot ? '.' : '') +
@@ -910,9 +920,10 @@ export const formatNumber = (
           0,
           FormatConfig.DecimalsAfterDot
         )
+
     formattedNumber =
       beforeDot.slice(0, -FormatConfig.BDecimals) + (noDecimals ? '' : formattedDecimals) + 'B'
-  } else if (Math.abs(numberAsNumber) > FormatConfig.M) {
+  } else if (Math.abs(numberAsNumber) >= FormatConfig.M) {
     const formattedDecimals = noDecimals
       ? ''
       : (FormatConfig.DecimalsAfterDot ? '.' : '') +
@@ -922,7 +933,7 @@ export const formatNumber = (
         )
     formattedNumber =
       beforeDot.slice(0, -FormatConfig.MDecimals) + (noDecimals ? '' : formattedDecimals) + 'M'
-  } else if (Math.abs(numberAsNumber) > FormatConfig.K) {
+  } else if (Math.abs(numberAsNumber) >= FormatConfig.K) {
     const formattedDecimals = noDecimals
       ? ''
       : (FormatConfig.DecimalsAfterDot ? '.' : '') +

@@ -19,6 +19,8 @@ import { PositionOpeningMethod } from '@store/consts/types'
 import { SwapToken } from '@store/selectors/wallet'
 import { TooltipHover } from '@components/TooltipHover/TooltipHover'
 import { Network } from '@invariant-labs/a0-sdk'
+import { Status } from '@store/reducers/wallet'
+import ChangeWalletButton from '@components/Header/HeaderButton/ChangeWalletButton'
 export interface InputState {
   value: string
   setValue: (value: string) => void
@@ -64,6 +66,9 @@ export interface IDepositSelector {
   ticksLoading: boolean
   network: Network
   azeroBalance: bigint
+  walletStatus: Status
+  onConnectWallet: () => void
+  onDisconnectWallet: () => void
 }
 
 export const DepositSelector: React.FC<IDepositSelector> = ({
@@ -98,7 +103,10 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
   isGetLiquidityError,
   ticksLoading,
   network,
-  azeroBalance
+  azeroBalance,
+  walletStatus,
+  onConnectWallet,
+  onDisconnectWallet
 }) => {
   const { classes } = useStyles()
 
@@ -360,6 +368,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
           {...tokenAInputState}
           priceLoading={priceALoading}
           isBalanceLoading={isBalanceLoading}
+          walletUninitialized={walletStatus !== Status.Initialized}
         />
 
         <DepositAmountInput
@@ -385,9 +394,18 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
           {...tokenBInputState}
           priceLoading={priceBLoading}
           isBalanceLoading={isBalanceLoading}
+          walletUninitialized={walletStatus !== Status.Initialized}
         />
       </Grid>
-      {getButtonMessage() === 'Insufficient AZERO' ? (
+      {walletStatus !== Status.Initialized ? (
+        <ChangeWalletButton
+          name='Connect wallet'
+          onConnect={onConnectWallet}
+          connected={false}
+          onDisconnect={onDisconnectWallet}
+          className={classes.connectWalletButton}
+        />
+      ) : getButtonMessage() === 'Insufficient AZERO' ? (
         <TooltipHover
           text='More AZERO is required to cover the transaction fee. Obtain more AZERO to complete this transaction.'
           top={-10}>
