@@ -379,3 +379,9 @@ export const enum SortTypeTokenList {
   TVL_ASC,
   TVL_DESC
 }
+
+export const RECOMMENDED_RPC_ADDRESS = {
+  [Network.Testnet]: RPC.TEST,
+  [Network.Mainnet]: RPC.MAIN,
+  [Network.Local]: ''
+}

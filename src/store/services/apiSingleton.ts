@@ -1,5 +1,8 @@
-import { Network, initPolkadotApi } from '@invariant-labs/a0-sdk'
-import { ApiPromise } from '@polkadot/api'
+import { Network } from '@invariant-labs/a0-sdk'
+import { ApiPromise, WsProvider } from '@polkadot/api'
+import { actions as connectionActions } from '@store/reducers/connection'
+import { store } from '..'
+import { RECOMMENDED_RPC_ADDRESS } from '@store/consts/static'
 
 class SingletonApi {
   static api: ApiPromise | null = null
@@ -19,6 +22,24 @@ class SingletonApi {
 
     return this.api
   }
+}
+
+const initPolkadotApi = async (network: Network, ws?: string): Promise<ApiPromise> => {
+  const wsProvider = new WsProvider(ws ?? RECOMMENDED_RPC_ADDRESS[network], false)
+
+  const unsubscribe = wsProvider.on('error', () => {
+    store.dispatch(connectionActions.handleRpcError())
+  })
+
+  try {
+    await wsProvider.connect()
+  } catch (e) {
+    unsubscribe()
+  }
+
+  const api = await ApiPromise.create({ provider: wsProvider })
+  await api.isReady
+  return api
 }
 
 export default SingletonApi
