@@ -1,6 +1,11 @@
 import { PoolKey, newPoolKey } from '@invariant-labs/a0-sdk'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { findPairs, getTokenBalances, getTokenDataByAddresses } from '@utils/utils'
+import {
+  findPairs,
+  getTokenBalances,
+  getTokenDataByAddresses,
+  promiseAllUntilFulfilled
+} from '@utils/utils'
 import { FetchTicksAndTickMaps, PairTokens, PoolWithPoolKey, actions } from '@store/reducers/pools'
 import { actions as walletActions } from '@store/reducers/wallet'
 import { tokens } from '@store/selectors/pools'
@@ -83,10 +88,12 @@ export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMa
     const invariant = yield* getInvariant()
     const pools = findPairs(tokenFrom.toString(), tokenTo.toString(), allPools)
 
-    const tickmapCalls = pools.map(pool =>
-      call([invariant, invariant.getFullTickmap], pool.poolKey)
+    const tickmapCalls = pools.map(pool => () => invariant.getFullTickmap(pool.poolKey))
+    const allTickMaps = yield* call(
+      tickmapCalls => promiseAllUntilFulfilled(tickmapCalls),
+      tickmapCalls
     )
-    const allTickMaps = yield* all(tickmapCalls)
+    console.log(1, allTickMaps)
 
     for (const [index, pool] of pools.entries()) {
       yield* put(

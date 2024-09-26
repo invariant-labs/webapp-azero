@@ -1237,3 +1237,81 @@ export const getFullSnap = async (name: string): Promise<FullSnap> => {
 
   return data
 }
+
+export const containsFailedPromise = <T>(promises: PromiseSettledResult<T>[]): boolean => {
+  return (
+    promises.findIndex(promise => {
+      if (promise.status !== 'fulfilled') {
+        return true
+      }
+
+      if (
+        promise.status === 'fulfilled' &&
+        typeof promise.value === 'string' &&
+        promise.value.startsWith('RpcError')
+      ) {
+        return true
+      }
+
+      return false
+    }) !== -1
+  )
+}
+
+export const getFailedPromisesWithIndexes = <T>(
+  promises: Promise<T>[],
+  settledPromises: PromiseSettledResult<T>[]
+): [Promise<T>, number][] => {
+  const result: ([Promise<T>, number] | null)[] = settledPromises.map((promise, index) => {
+    if (promise.status !== 'fulfilled') {
+      return [promises[index], index]
+    }
+
+    if (
+      promise.status === 'fulfilled' &&
+      typeof promise.value === 'string' &&
+      promise.value.startsWith('RpcError')
+    ) {
+      return [promises[index], index]
+    }
+
+    return null
+  })
+
+  return result.filter(result => result !== null)
+}
+
+const RETRIES_LIMIT = 10
+
+export const promiseAllUntilFulfilled = async <T>(
+  promiseFunctions: (() => Promise<T>)[]
+): Promise<T[]> => {
+  const promises = promiseFunctions.map(promiseFunction => promiseFunction())
+  const results = await Promise.allSettled(promises)
+
+  let retries = 0
+  let failedPromiseExist = containsFailedPromise(results)
+
+  while (retries < RETRIES_LIMIT && failedPromiseExist) {
+    const promises = promiseFunctions.map(promiseFunction => promiseFunction())
+    const failedPromises = getFailedPromisesWithIndexes(promises, results)
+
+    const newPromises = await Promise.allSettled(
+      failedPromises.map(failedPromise => failedPromise[0])
+    )
+
+    newPromises.forEach((newPromise, index) => {
+      results[failedPromises[index][1]] = newPromise
+    })
+
+    failedPromiseExist = containsFailedPromise(results)
+
+    retries++
+  }
+
+  if (containsFailedPromise(results)) {
+    throw new Error('Failed to fetch data. Retry limit exceeded.')
+  }
+
+  return (results as PromiseFulfilledResult<T>[]).map(result => result.value)
+}
