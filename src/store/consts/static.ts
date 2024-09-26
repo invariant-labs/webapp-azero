@@ -37,6 +37,7 @@ export const USDC_ADDRESS = {
   ...USDC_ADDRESS_SDK,
   [Network.Mainnet]: '5FYFojNCJVFR2bBNKfAePZCa72ZcVX5yeTv8K9bzeUo8D83Z'
 }
+export const USDT_MAINNET_ADDRESS = '5Et3dDcXUiThrBCot7g65k3oDSicGy4qC82cq9f911izKNtE'
 
 export enum RPC {
   TEST = 'wss://ws.test.azero.dev',
@@ -132,7 +133,8 @@ export const commonTokensForNetworks: Record<Network, string[]> = {
     WAZERO_ADDRESS[Network.Mainnet],
     BTC_ADDRESS[Network.Mainnet],
     ETH_ADDRESS[Network.Mainnet],
-    USDC_ADDRESS[Network.Mainnet]
+    USDC_ADDRESS[Network.Mainnet],
+    USDT_MAINNET_ADDRESS
   ],
   [Network.Local]: []
 }
@@ -145,7 +147,9 @@ const commonTokensLogos = {
   [USDC_ADDRESS[Network.Mainnet]]:
     'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
   [WAZERO_ADDRESS[Network.Mainnet]]:
-    'https://assets.coingecko.com/coins/images/17212/standard/azero-logo_coingecko.png'
+    'https://assets.coingecko.com/coins/images/17212/standard/azero-logo_coingecko.png',
+  [USDT_MAINNET_ADDRESS]:
+    'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB/logo.svg'
 }
 
 export const mainnetList = (() => {
