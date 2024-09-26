@@ -96,7 +96,7 @@ export const useStyles = makeStyles<{ isSelected: boolean }>()((theme: Theme, { 
     backgroundColor: `${colors.invariant.Error}40`
   },
   currencyIcon: {
-    minWidth: 20,
+    width: 20,
     height: 20,
     marginRight: 8,
     borderRadius: '100%'
