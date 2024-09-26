@@ -93,7 +93,6 @@ export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMa
       tickmapCalls => promiseAllUntilFulfilled(tickmapCalls),
       tickmapCalls
     )
-    console.log(1, allTickMaps)
 
     for (const [index, pool] of pools.entries()) {
       yield* put(
