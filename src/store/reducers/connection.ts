@@ -1,6 +1,6 @@
-import { Network, INVARIANT_ADDRESS, WAZERO_ADDRESS } from '@invariant-labs/a0-sdk'
+import { Network, INVARIANT_ADDRESS } from '@invariant-labs/a0-sdk'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
-import { RPC } from '@store/consts/static'
+import { RPC, WAZERO_ADDRESS } from '@store/consts/static'
 import { PayloadType } from '@store/consts/types'
 
 export enum Status {

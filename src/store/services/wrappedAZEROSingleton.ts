@@ -1,6 +1,6 @@
-import { Network, WAZERO_ADDRESS, WrappedAZERO } from '@invariant-labs/a0-sdk'
+import { Network, WrappedAZERO } from '@invariant-labs/a0-sdk'
 import { ApiPromise } from '@polkadot/api'
-import { DEFAULT_WAZERO_OPTIONS } from '@store/consts/static'
+import { DEFAULT_WAZERO_OPTIONS, WAZERO_ADDRESS } from '@store/consts/static'
 
 class SingletonWrappedAZERO {
   static wrappedAZERO: WrappedAZERO | null = null

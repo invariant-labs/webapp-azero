@@ -1,18 +1,23 @@
 import {
-  BTC_ADDRESS,
-  ETH_ADDRESS,
   FeeTier,
   LiquidityTick,
   Network,
   Pool,
   PoolKey,
   Tick,
-  Tickmap,
-  USDC_ADDRESS,
-  WAZERO_ADDRESS
+  Tickmap
 } from '@invariant-labs/a0-sdk'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
-import { TESTNET_AZERO, TESTNET_BTC, TESTNET_ETH, TESTNET_USDC } from '@store/consts/static'
+import {
+  BTC_ADDRESS,
+  ETH_ADDRESS,
+  TESTNET_AZERO,
+  TESTNET_BTC,
+  TESTNET_ETH,
+  TESTNET_USDC,
+  USDC_ADDRESS,
+  WAZERO_ADDRESS
+} from '@store/consts/static'
 import { PayloadType, Token } from '@store/consts/types'
 import { poolKeyToString } from '@utils/utils'
 

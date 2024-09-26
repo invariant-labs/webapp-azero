@@ -19,11 +19,7 @@ import {
   PERCENTAGE_DENOMINATOR,
   PERCENTAGE_SCALE,
   PRICE_SCALE,
-  SQRT_PRICE_SCALE,
-  BTC_ADDRESS,
-  ETH_ADDRESS,
-  USDC_ADDRESS,
-  WAZERO_ADDRESS
+  SQRT_PRICE_SCALE
 } from '@invariant-labs/a0-sdk/target/consts'
 import {
   calculateLiquidityBreakpoints,
@@ -53,7 +49,11 @@ import {
   TESTNET_USDC,
   TESTNET_BTC,
   TESTNET_ETH,
-  mainnetList
+  mainnetList,
+  USDC_ADDRESS,
+  BTC_ADDRESS,
+  ETH_ADDRESS,
+  WAZERO_ADDRESS
 } from '@store/consts/static'
 import { sleep } from '@store/sagas/wallet'
 import {
