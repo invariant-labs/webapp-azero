@@ -21,7 +21,7 @@
     "@invariant-labs/a0-sdk": "^0.2.24",
     "@mui/icons-material": "^5.15.15",
     "@mui/material": "^5.15.15",
-    "@nightlylabs/wallet-selector-polkadot": "^0.2.5",
+    "@nightlylabs/wallet-selector-polkadot": "^0.2.6",
     "@nivo/bar": "^0.87.0",
     "@nivo/line": "^0.86.0",
     "@polkadot/api": "^10.11.2",
