@@ -89,11 +89,12 @@ export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMa
     const pools = findPairs(tokenFrom.toString(), tokenTo.toString(), allPools)
 
     const tickmapCalls = pools.map(pool => () => invariant.getFullTickmap(pool.poolKey))
+    const performanceBefore = performance.now()
     const allTickMaps = yield* call(
       tickmapCalls => promiseAllUntilFulfilled(tickmapCalls),
       tickmapCalls
     )
-    console.log(allTickMaps)
+    console.log(performanceBefore, performance.now(), allTickMaps)
 
     for (const [index, pool] of pools.entries()) {
       yield* put(

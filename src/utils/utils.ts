@@ -1281,7 +1281,7 @@ export const getFailedPromisesWithIndexes = <T>(
   return result.filter(result => result !== null)
 }
 
-const RETRY_LIMIT_PER_PROMISE = 3
+const RETRY_LIMIT = 30
 
 export const promiseAllUntilFulfilled = async <T>(
   promiseFunctions: (() => Promise<T>)[]
@@ -1292,7 +1292,7 @@ export const promiseAllUntilFulfilled = async <T>(
   let retries = 0
   let failedPromiseExist = containsFailedPromise(results)
 
-  while (retries < RETRY_LIMIT_PER_PROMISE * results.length && failedPromiseExist) {
+  while (retries < RETRY_LIMIT && failedPromiseExist) {
     const promises = promiseFunctions.map(promiseFunction => promiseFunction())
     const failedPromises = getFailedPromisesWithIndexes(promises, results)
 
@@ -1307,8 +1307,6 @@ export const promiseAllUntilFulfilled = async <T>(
     failedPromiseExist = containsFailedPromise(results)
 
     retries++
-
-    await sleep(100)
   }
 
   if (containsFailedPromise(results)) {
