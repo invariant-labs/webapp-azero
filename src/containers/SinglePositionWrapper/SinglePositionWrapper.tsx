@@ -427,8 +427,8 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
             await openWalletSelectorModal()
             dispatch(walletActions.connect(false))
           }}
-          title='Connect a wallet to see your position.'
-          descCustomText='Or, Start exploring liquidity pools right now!'
+          title='Connect a wallet to view your position,'
+          descCustomText='or start exploring liquidity pools now!'
         />
       </Grid>
     )
