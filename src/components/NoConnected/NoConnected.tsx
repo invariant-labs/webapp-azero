@@ -6,10 +6,11 @@ import { useNavigate } from 'react-router-dom'
 
 export interface INoConnected {
   onConnect: () => void
+  title?: string
   descCustomText?: string
 }
 
-export const NoConnected: React.FC<INoConnected> = ({ onConnect, descCustomText }) => {
+export const NoConnected: React.FC<INoConnected> = ({ onConnect, title, descCustomText }) => {
   const { classes } = useStyles()
 
   const navigate = useNavigate()
@@ -20,14 +21,10 @@ export const NoConnected: React.FC<INoConnected> = ({ onConnect, descCustomText 
       <Grid className={classNames(classes.container, 'blurLayer')}>
         <Grid className={classNames(classes.root, 'blurInfo')}>
           <img className={classes.img} src={icons.NoConnected} alt='Not connected' />
-          <Typography className={classes.desc}>
-            Start exploring liquidity pools right now!
-          </Typography>
+          {!!title && <Typography className={classes.desc}>{title}</Typography>}
 
           {descCustomText?.length && (
-            <Typography className={classes.desc}>
-              Or, connect your wallet to see existing positions, and create a new one!
-            </Typography>
+            <Typography className={classes.desc}>{descCustomText}</Typography>
           )}
           <Button
             className={classes.buttonPrimary}

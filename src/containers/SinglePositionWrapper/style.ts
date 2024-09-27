@@ -14,7 +14,11 @@ const useStyles = makeStyles()(() => {
       margin: 'auto'
     },
     fullHeightContainer: {
-      height: '100%'
+      height: '100%',
+      marginTop: 104,
+      width: 1122,
+      display: 'flex',
+      maxWidth: '100%'
     }
   }
 })
