@@ -311,10 +311,13 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
         }
 
         if (result.maxSwapStepsReached) {
-          if (byAmountIn ? result.amountOut > amountOut : result.amountIn < amountOut) {
-            amountOut = byAmountIn ? result.amountOut : result.amountIn
-            priceImpact = 1
-            targetSqrtPrice = result.targetSqrtPrice
+          if (
+            byAmountIn
+              ? result.amountOut > insufficientLiquidityAmountOut
+              : result.amountIn < insufficientLiquidityAmountOut
+          ) {
+            insufficientLiquidityAmountOut = byAmountIn ? result.amountOut : result.amountIn
+            fee = pool.poolKey.feeTier.fee
           }
           errors.push(SwapError.MaxSwapStepsReached)
           continue
