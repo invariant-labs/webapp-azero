@@ -93,13 +93,14 @@ export const Header: React.FC<IHeader> = ({
     }
   ]
 
-  // const mainnetRPCs = [
-  //   // {
-  //   //   networkType: Network.Mainnet,
-  //   //   rpc: RPC.MAIN,
-  //   //   rpcName: 'Aleph Zero Mainnet'
-  //   // }
-  // ]
+  const mainnetRPCs = [
+    {}
+    // {
+    //   networkType: Network.Mainnet,
+    //   rpc: RPC.MAIN,
+    //   rpcName: 'Aleph Zero Mainnet'
+    // }
+  ]
 
   return (
     <Grid container>
