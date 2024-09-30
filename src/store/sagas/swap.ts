@@ -313,7 +313,6 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
         if (result.maxSwapStepsReached) {
           if (byAmountIn ? result.amountOut > amountOut : result.amountIn < amountOut) {
             amountOut = byAmountIn ? result.amountOut : result.amountIn
-            poolKey = pool.poolKey
             priceImpact = 1
             targetSqrtPrice = result.targetSqrtPrice
           }
