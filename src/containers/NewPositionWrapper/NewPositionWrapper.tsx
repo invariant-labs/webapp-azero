@@ -255,7 +255,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
   }, [isWaitingForNewPool, tokenA, tokenB, feeIndex, poolKey, allPoolKeys, allPools.length])
 
   useEffect(() => {
-    console.log(poolKey)
     if (poolKey !== '') {
       console.log('get ticks')
       dispatch(
