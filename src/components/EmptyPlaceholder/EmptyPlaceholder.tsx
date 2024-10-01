@@ -10,12 +10,14 @@ export interface IEmptyPlaceholder {
   className?: string
   style?: React.CSSProperties
   withButton?: boolean
+  buttonName?: string
 }
 
 export const EmptyPlaceholder: React.FC<IEmptyPlaceholder> = ({
   desc,
   onAction,
-  withButton = true
+  withButton = true,
+  buttonName
 }) => {
   const { classes } = useStyles()
 
@@ -29,7 +31,7 @@ export const EmptyPlaceholder: React.FC<IEmptyPlaceholder> = ({
           {desc?.length && <Typography className={classes.desc}>{desc}</Typography>}
           {withButton && (
             <Button className={classes.button} onClick={onAction} variant='contained'>
-              Add a position
+              {!!buttonName ? buttonName : 'Add a position'}
             </Button>
           )}
         </Grid>
