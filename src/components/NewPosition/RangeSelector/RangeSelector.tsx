@@ -175,6 +175,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   }
 
   const resetPlot = () => {
+    console.log('resetPlot')
     if (positionOpeningMethod === 'range') {
       const initSideDist = Math.abs(
         midPrice.x -
