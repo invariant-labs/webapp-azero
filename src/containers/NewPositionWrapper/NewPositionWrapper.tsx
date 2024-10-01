@@ -256,7 +256,6 @@ export const NewPositionWrapper: React.FC<IProps> = ({
 
   useEffect(() => {
     if (poolKey !== '') {
-      console.log('get ticks')
       dispatch(
         positionsActions.getCurrentPlotTicks({
           poolKey: allPoolKeys[poolKey],

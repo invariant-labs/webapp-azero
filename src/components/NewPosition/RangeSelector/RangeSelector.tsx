@@ -175,8 +175,6 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
   }
 
   const resetPlot = () => {
-    console.log('resetPlot')
-    console.log('data', data)
     if (positionOpeningMethod === 'range') {
       const initSideDist = Math.abs(
         midPrice.x -
@@ -278,8 +276,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
       isMountedRef.current &&
       poolKey !== '' &&
       currentMidPrice !== midPrice &&
-      !shouldReversePlot &&
-      Object.keys(data).length > 0
+      !shouldReversePlot
     ) {
       if (!shouldNotUpdatePriceRange) {
         setTriggerReset(prev => !prev)
@@ -287,7 +284,7 @@ export const RangeSelector: React.FC<IRangeSelector> = ({
 
       unblockUpdatePriceRange()
     }
-  }, [ticksLoading, isMountedRef, midPrice.index, poolKey, data])
+  }, [ticksLoading, isMountedRef, midPrice.index, poolKey])
 
   useEffect(() => {
     setCachedConcentrationArray(concentrationArray)
