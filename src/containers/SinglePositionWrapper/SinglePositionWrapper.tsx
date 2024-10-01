@@ -18,7 +18,7 @@ import { actions } from '@store/reducers/positions'
 import { actions as snackbarsActions } from '@store/reducers/snackbars'
 import { Status, actions as walletActions } from '@store/reducers/wallet'
 import { networkType } from '@store/selectors/connection'
-import { tickMaps } from '@store/selectors/pools'
+import { poolsArraySortedByFees, tickMaps } from '@store/selectors/pools'
 import {
   currentPositionTicks,
   isLoadingPositionsList,
@@ -29,9 +29,11 @@ import { balanceLoading, status } from '@store/selectors/wallet'
 import { VariantType } from 'notistack'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import useStyles from './style'
 import { TokenPriceData } from '@store/consts/types'
+import { NoConnected } from '@components/NoConnected/NoConnected'
+import { openWalletSelectorModal } from '@utils/web3/selector'
 
 export interface IProps {
   address: string
@@ -61,6 +63,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   } = useSelector(currentPositionTicks)
   const walletStatus = useSelector(status)
   const isBalanceLoading = useSelector(balanceLoading)
+  const poolsArray = useSelector(poolsArraySortedByFees)
 
   const [waitingForTicksData, setWaitingForTicksData] = useState<boolean | null>(null)
 
@@ -269,6 +272,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   }
 
   useEffect(() => {
+    dispatch(actions.getRemainingPositions())
     const timer = setTimeout(() => {
       setIsFinishedDelayRender(true)
     }, 1000)
@@ -279,13 +283,16 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   }, [walletStatus])
 
   useEffect(() => {
+    if (!position && walletStatus === Status.Initialized) {
+      dispatch(actions.getSinglePosition(id))
+    }
     if (isFinishedDelayRender) {
       setIsFinishedDelayRender(false)
     }
   }, [walletStatus])
 
   useEffect(() => {
-    if (position) {
+    if (position && poolsArray.length !== 0) {
       dispatch(
         actions.getCurrentPlotTicks({
           poolKey: position.poolKey,
@@ -294,7 +301,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
         })
       )
     }
-  }, [])
+  }, [poolsArray])
 
   const onRefresh = () => {
     setShowFeesLoader(true)
@@ -397,10 +404,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
       />
     )
   }
-  if (
-    (isLoadingList && walletStatus === Status.Initialized) ||
-    (!position && walletStatus === Status.Uninitialized && !isFinishedDelayRender)
-  ) {
+  if ((isLoadingList && walletStatus === Status.Initialized) || !isFinishedDelayRender) {
     return (
       <Grid
         container
@@ -411,16 +415,36 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
       </Grid>
     )
   }
-  if (!position && walletStatus !== Status.Initialized) {
-    return <Navigate to='/liquidity' />
+  if (walletStatus !== Status.Initialized) {
+    return (
+      <Grid
+        display='flex'
+        position='relative'
+        justifyContent='center'
+        className={classes.fullHeightContainer}>
+        <NoConnected
+          onConnect={async () => {
+            await openWalletSelectorModal()
+            dispatch(walletActions.connect(false))
+          }}
+          title='Connect a wallet to view your position,'
+          descCustomText='or start exploring liquidity pools now!'
+        />
+      </Grid>
+    )
   }
+
   return (
     <Grid
-      container
+      display='flex'
+      position='relative'
       justifyContent='center'
-      alignItems='center'
       className={classes.fullHeightContainer}>
-      <EmptyPlaceholder desc='Position does not exist in your list!' />
+      <EmptyPlaceholder
+        desc='The position does not exist in your list! '
+        onAction={() => navigate('/liquidity')}
+        buttonName='Back to positions'
+      />
     </Grid>
   )
 }
