@@ -3,7 +3,7 @@ import { configureStore, isPlain } from '@reduxjs/toolkit'
 import combinedReducers from './reducers'
 import rootSaga from './sagas'
 
-const isLocalhost = window.location.hostname === 'localhost'
+// const isLocalhost = window.location.hostname === 'localhost'
 
 const isSerializable = (value: unknown) => {
   return typeof value === 'bigint' || isPlain(value)
