@@ -487,6 +487,8 @@ export function* handleGetSinglePosition(action: PayloadAction<bigint>) {
     )
   } catch (e) {
     console.log(e)
+    yield* put(actions.setCurrentPositionTickLoading(false))
+    yield* put(actions.setPositionsList([]))
   }
 }
 
@@ -615,32 +617,37 @@ export function* handleGetRemainingPositions(): Generator {
     return
   }
 
-  const invariant = yield* getInvariant()
+  try {
+    const invariant = yield* getInvariant()
 
-  const pages = yield* call(
-    [invariant, invariant.getAllPositions],
-    walletAddress,
-    length,
-    Object.entries(loadedPages)
-      .filter(([_, isLoaded]) => isLoaded)
-      .map(([index]) => Number(index)),
-    BigInt(POSITIONS_PER_QUERY)
-  )
+    const pages = yield* call(
+      [invariant, invariant.getAllPositions],
+      walletAddress,
+      length,
+      Object.entries(loadedPages)
+        .filter(([_, isLoaded]) => isLoaded)
+        .map(([index]) => Number(index)),
+      BigInt(POSITIONS_PER_QUERY)
+    )
 
-  const allList = [...list]
-  for (const { index, entries } of pages) {
-    for (let i = 0; i < entries.length; i++) {
-      allList[i + index * Number(POSITIONS_PER_QUERY)] = entries[i][0]
+    const allList = [...list]
+    for (const { index, entries } of pages) {
+      for (let i = 0; i < entries.length; i++) {
+        allList[i + index * Number(POSITIONS_PER_QUERY)] = entries[i][0]
+      }
     }
-  }
 
-  yield* put(actions.setPositionsList(allList))
-  yield* put(
-    actions.setPositionsListLoadedStatus({
-      indexes: pages.map(({ index }: { index: number }) => index),
-      isLoaded: true
-    })
-  )
+    yield* put(actions.setPositionsList(allList))
+    yield* put(
+      actions.setPositionsListLoadedStatus({
+        indexes: pages.map(({ index }: { index: number }) => index),
+        isLoaded: true
+      })
+    )
+  } catch (error) {
+    console.log(error)
+    yield* put(actions.setPositionsList([]))
+  }
 }
 
 export function* handleGetPositionsListPage(
@@ -651,53 +658,26 @@ export function* handleGetPositionsListPage(
   const walletAddress = yield* select(address)
   const { length, list, loadedPages } = yield* select(positionsList)
 
-  const invariant = yield* getInvariant()
+  try {
+    const invariant = yield* getInvariant()
 
-  let entries: [Position, Pool][] = []
-  let positionsLength = 0n
+    let entries: [Position, Pool][] = []
+    let positionsLength = 0n
 
-  if (refresh) {
-    yield* put(
-      actions.setPositionsListLoadedStatus({
-        indexes: Object.keys(loadedPages)
-          .map(key => Number(key))
-          .filter(keyIndex => keyIndex !== index),
-        isLoaded: false
-      })
-    )
-  }
+    if (refresh) {
+      yield* put(
+        actions.setPositionsListLoadedStatus({
+          indexes: Object.keys(loadedPages)
+            .map(key => Number(key))
+            .filter(keyIndex => keyIndex !== index),
+          isLoaded: false
+        })
+      )
+    }
 
-  const poolsWithTokensToFetch = []
+    const poolsWithTokensToFetch = []
 
-  if (!length || refresh) {
-    const result = yield* call(
-      [invariant, invariant.getPositions],
-      walletAddress,
-      BigInt(POSITIONS_PER_QUERY),
-      BigInt(index * POSITIONS_PER_QUERY)
-    )
-    entries = result[0]
-    positionsLength = result[1]
-
-    const poolsWithPoolKeys = entries.map(entry => ({
-      poolKey: entry[0].poolKey,
-      ...entry[1]
-    }))
-
-    yield* put(
-      poolsActions.addPoolsForList({ data: poolsWithPoolKeys, listType: ListType.POSITIONS })
-    )
-    poolsWithTokensToFetch.push(...poolsWithPoolKeys)
-
-    yield* put(actions.setPositionsListLength(positionsLength))
-  }
-
-  const allList = length ? [...list] : Array(Number(positionsLength)).fill(EMPTY_POSITION)
-
-  const isPageLoaded = loadedPages[index]
-
-  if (!isPageLoaded || refresh) {
-    if (length && !refresh) {
+    if (!length || refresh) {
       const result = yield* call(
         [invariant, invariant.getPositions],
         walletAddress,
@@ -715,24 +695,57 @@ export function* handleGetPositionsListPage(
       yield* put(
         poolsActions.addPoolsForList({ data: poolsWithPoolKeys, listType: ListType.POSITIONS })
       )
-
       poolsWithTokensToFetch.push(...poolsWithPoolKeys)
+
+      yield* put(actions.setPositionsListLength(positionsLength))
     }
 
-    yield* call(fetchTokens, poolsWithTokensToFetch)
+    const allList = length ? [...list] : Array(Number(positionsLength)).fill(EMPTY_POSITION)
 
-    for (let i = 0; i < entries.length; i++) {
-      allList[i + index * POSITIONS_PER_QUERY] = entries[i][0]
+    const isPageLoaded = loadedPages[index]
+
+    if (!isPageLoaded || refresh) {
+      if (length && !refresh) {
+        const result = yield* call(
+          [invariant, invariant.getPositions],
+          walletAddress,
+          BigInt(POSITIONS_PER_QUERY),
+          BigInt(index * POSITIONS_PER_QUERY)
+        )
+        entries = result[0]
+        positionsLength = result[1]
+
+        const poolsWithPoolKeys = entries.map(entry => ({
+          poolKey: entry[0].poolKey,
+          ...entry[1]
+        }))
+
+        yield* put(
+          poolsActions.addPoolsForList({ data: poolsWithPoolKeys, listType: ListType.POSITIONS })
+        )
+
+        poolsWithTokensToFetch.push(...poolsWithPoolKeys)
+      }
+
+      yield* call(fetchTokens, poolsWithTokensToFetch)
+
+      for (let i = 0; i < entries.length; i++) {
+        allList[i + index * POSITIONS_PER_QUERY] = entries[i][0]
+      }
+
+      allList.splice(
+        entries.length + index * POSITIONS_PER_QUERY,
+        POSITIONS_PER_QUERY - entries.length
+      )
     }
 
-    allList.splice(
-      entries.length + index * POSITIONS_PER_QUERY,
-      POSITIONS_PER_QUERY - entries.length
-    )
+    yield* put(actions.setPositionsList(allList))
+    yield* put(actions.setPositionsListLoadedStatus({ indexes: [index], isLoaded: true }))
+  } catch (error) {
+    console.log(error)
+    yield* put(actions.setPositionsList([]))
+    yield* put(actions.setPositionsListLoadedStatus({ indexes: [index], isLoaded: true }))
   }
-
-  yield* put(actions.setPositionsList(allList))
-  yield* put(actions.setPositionsListLoadedStatus({ indexes: [index], isLoaded: true }))
 }
 
 export function* initPositionHandler(): Generator {

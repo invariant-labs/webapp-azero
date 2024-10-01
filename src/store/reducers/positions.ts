@@ -215,6 +215,10 @@ const positionsSlice = createSlice({
       }
       return state
     },
+    setCurrentPositionTickLoading(state, action: PayloadAction<boolean>) {
+      state.currentPositionTicks.loading = action.payload
+      return state
+    },
     claimFee(state, _action: PayloadAction<HandleClaimFee>) {
       return state
     },
