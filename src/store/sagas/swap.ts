@@ -310,6 +310,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
             insufficientLiquidityAmountOut = byAmountIn ? result.amountOut : result.amountIn
             fee = pool.poolKey.feeTier.fee
             insufficientLiquidityPoolKey = pool.poolKey
+            priceImpact = 1
             errors.push(SwapError.MaxSwapStepsReached)
           }
 
