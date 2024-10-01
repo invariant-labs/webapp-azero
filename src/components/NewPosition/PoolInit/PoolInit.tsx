@@ -407,7 +407,7 @@ export const PoolInit: React.FC<IPoolInit> = ({
             />
           </Grid>
         ) : (
-          <Grid container className={classes.buttons}>
+          <Grid container className={classes.buttons} justifyContent='center' alignItems='center'>
             <Button className={classes.button} onClick={resetRange}>
               Reset range
             </Button>
