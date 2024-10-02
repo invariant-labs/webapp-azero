@@ -5,7 +5,7 @@ import { FetchTicksAndTickMaps, PairTokens, PoolWithPoolKey, actions } from '@st
 import { actions as walletActions } from '@store/reducers/wallet'
 import { poolsArraySortedByFees, tokens } from '@store/selectors/pools'
 import { address } from '@store/selectors/wallet'
-import { all, call, delay, put, select, spawn, takeEvery, takeLatest } from 'typed-redux-saga'
+import { all, call, put, select, spawn, take, takeEvery, takeLatest } from 'typed-redux-saga'
 import { MAX_POOL_KEYS_RETURNED } from '@invariant-labs/a0-sdk/target/consts'
 import { getInvariant, getPSP22 } from './connection'
 
@@ -82,13 +82,11 @@ export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMa
 
   if (poolKey) {
     let pools = poolsData.filter(pool => poolKeyToString(pool.poolKey) === poolKeyToString(poolKey))
-    let i = 0
 
-    while (pools.length === 0 && i < 20) {
-      yield* delay(50)
+    if (pools.length === 0) {
+      yield* take(actions.addPool)
+
       poolsData = yield* select(poolsArraySortedByFees)
-      pools = poolsData.filter(pool => poolKeyToString(pool.poolKey) === poolKeyToString(poolKey))
-      i++
     }
   }
 
