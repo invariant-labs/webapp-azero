@@ -327,7 +327,8 @@ export function* handleGetCurrentPlotTicks(action: PayloadAction<GetCurrentTicks
             yDecimal
           )
 
-    yield* call(handleGetRemainingPositions)
+    yield* put(actions.getRemainingPositions({ setLoaded: false }))
+
     const { list } = yield* select(positionsList)
     const userRawTicks = getLiquidityTicksByPositionsList(poolKey, list)
 
@@ -609,7 +610,9 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
   }
 }
 
-export function* handleGetRemainingPositions(): Generator {
+export function* handleGetRemainingPositions(
+  action: PayloadAction<{ setLoaded: boolean }>
+): Generator {
   const walletAddress = yield* select(address)
   const { length, list, loadedPages } = yield* select(positionsList)
 
@@ -641,7 +644,7 @@ export function* handleGetRemainingPositions(): Generator {
     yield* put(
       actions.setPositionsListLoadedStatus({
         indexes: pages.map(({ index }: { index: number }) => index),
-        isLoaded: true
+        isLoaded: action.payload.setLoaded
       })
     )
   } catch (error) {

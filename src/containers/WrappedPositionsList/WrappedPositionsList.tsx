@@ -187,7 +187,7 @@ export const WrappedPositionsList: React.FC = () => {
       length={length}
       loadedPages={loadedPages}
       getRemainingPositions={() => {
-        dispatch(actions.getRemainingPositions())
+        dispatch(actions.getRemainingPositions({ setLoaded: true }))
       }}
       noInitialPositions={list.length === 0}
     />
