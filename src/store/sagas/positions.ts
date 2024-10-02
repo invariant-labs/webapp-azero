@@ -275,7 +275,8 @@ export function* handleGetCurrentPlotTicks(action: PayloadAction<GetCurrentTicks
         payload: {
           tokenFrom: allTokens[poolKey.tokenX].address,
           tokenTo: allTokens[poolKey.tokenY].address,
-          allPools
+          allPools,
+          poolKey
         }
       }
 

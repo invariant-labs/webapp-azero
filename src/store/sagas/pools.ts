@@ -1,6 +1,6 @@
 import { PoolKey, newPoolKey } from '@invariant-labs/a0-sdk'
 import { PayloadAction } from '@reduxjs/toolkit'
-import { findPairs, getTokenBalances, getTokenDataByAddresses } from '@utils/utils'
+import { findPairs, getTokenBalances, getTokenDataByAddresses, poolKeyToString } from '@utils/utils'
 import { FetchTicksAndTickMaps, PairTokens, PoolWithPoolKey, actions } from '@store/reducers/pools'
 import { actions as walletActions } from '@store/reducers/wallet'
 import { poolsArraySortedByFees, tokens } from '@store/selectors/pools'
@@ -77,16 +77,21 @@ export function* fetchAllPoolsForPairData(action: PayloadAction<PairTokens>) {
 }
 
 export function* fetchTicksAndTickMaps(action: PayloadAction<FetchTicksAndTickMaps>) {
-  const { tokenFrom, tokenTo } = action.payload
+  const { tokenFrom, tokenTo, poolKey } = action.payload
   let poolsData = yield* select(poolsArraySortedByFees)
 
-  let i = 0
-  while (Object.keys(poolsData).length === 0 && i < 30) {
-    console.log('no poolsData')
-    yield* delay(100)
-    i++
-    poolsData = yield* select(poolsArraySortedByFees)
+  if (poolKey) {
+    let pools = poolsData.filter(pool => poolKeyToString(pool.poolKey) === poolKeyToString(poolKey))
+    let i = 0
+
+    while (pools.length === 0 && i < 20) {
+      yield* delay(50)
+      poolsData = yield* select(poolsArraySortedByFees)
+      pools = poolsData.filter(pool => poolKeyToString(pool.poolKey) === poolKeyToString(poolKey))
+      i++
+    }
   }
+
   try {
     const invariant = yield* getInvariant()
     const pools = findPairs(tokenFrom.toString(), tokenTo.toString(), poolsData)
