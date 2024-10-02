@@ -9,6 +9,7 @@ import {
   INVARIANT_CREATE_POSITION_OPTIONS,
   INVARIANT_REMOVE_POSITION_OPTIONS,
   INVARIANT_WITHDRAW_ALL_WAZERO,
+  POOL_SAFE_TRANSACTION_FEE,
   POSITIONS_PER_QUERY,
   PSP22_APPROVE_OPTIONS,
   U128MAX,
@@ -122,8 +123,13 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       (tokenY === wazeroAddress && tokenYAmount !== 0n)
     ) {
       const isTokenX = tokenX === wazeroAddress
+      const azeroInputAmount = isTokenX ? tokenXAmount : tokenYAmount
+
       const slippageAmount = isTokenX ? xAmountWithSlippage : yAmountWithSlippage
-      const azeroAmount = azeroBalance > slippageAmount ? slippageAmount : azeroBalance
+      const azeroAmount =
+        azeroBalance - POOL_SAFE_TRANSACTION_FEE > slippageAmount
+          ? slippageAmount
+          : azeroInputAmount
 
       const depositTx = wazero.depositTx(azeroAmount, WAZERO_DEPOSIT_OPTIONS)
       txs.push(depositTx)
