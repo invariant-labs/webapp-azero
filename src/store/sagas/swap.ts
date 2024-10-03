@@ -15,6 +15,7 @@ import {
   ErrorMessage,
   INVARIANT_SWAP_OPTIONS,
   PSP22_APPROVE_OPTIONS,
+  SWAP_SAFE_TRANSACTION_FEE,
   U128MAX,
   WAZERO_DEPOSIT_OPTIONS,
   WAZERO_WITHDRAW_OPTIONS
@@ -98,7 +99,10 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
     if ((xToY && poolKey.tokenX === wazeroAddress) || (!xToY && poolKey.tokenY === wazeroAddress)) {
       const azeroBalance = yield* select(balance)
       const azeroAmountInWithSlippage =
-        azeroBalance > calculatedAmountIn ? calculatedAmountIn : azeroBalance
+        azeroBalance - SWAP_SAFE_TRANSACTION_FEE > calculatedAmountIn
+          ? calculatedAmountIn
+          : amountIn
+
       const depositTx = wazero.depositTx(azeroAmountInWithSlippage, WAZERO_DEPOSIT_OPTIONS)
       txs.push(depositTx)
     }
