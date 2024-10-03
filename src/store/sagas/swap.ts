@@ -303,7 +303,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
           byAmountIn,
           xToY ? MIN_SQRT_PRICE : MAX_SQRT_PRICE
         )
-        console.log(result)
+
         if (result.maxSwapStepsReached || result.globalInsufficientLiquidity) {
           if (
             byAmountIn
@@ -312,7 +312,6 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
           ) {
             insufficientLiquidityAmountOut = byAmountIn ? result.amountOut : result.amountIn
             fee = pool.poolKey.feeTier.fee
-            priceImpact = 1
             errors.push(SwapError.MaxSwapStepsReached)
           }
 
@@ -351,7 +350,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
       actions.setSimulateResult({
         poolKey: swapPossible ? poolKey : null,
         amountOut: validatedAmountOut,
-        priceImpact,
+        priceImpact: swapPossible ? priceImpact : 1,
         targetSqrtPrice,
         fee,
         errors
