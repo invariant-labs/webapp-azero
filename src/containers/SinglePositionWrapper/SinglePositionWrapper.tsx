@@ -272,7 +272,7 @@ export const SinglePositionWrapper: React.FC<IProps> = ({ id }) => {
   }
 
   useEffect(() => {
-    dispatch(actions.getRemainingPositions())
+    dispatch(actions.getRemainingPositions({ setLoaded: false }))
     const timer = setTimeout(() => {
       setIsFinishedDelayRender(true)
     }, 1000)
