@@ -9,6 +9,7 @@ import {
   INVARIANT_CREATE_POSITION_OPTIONS,
   INVARIANT_REMOVE_POSITION_OPTIONS,
   INVARIANT_WITHDRAW_ALL_WAZERO,
+  POOL_SAFE_TRANSACTION_FEE,
   POSITIONS_PER_QUERY,
   PSP22_APPROVE_OPTIONS,
   U128MAX,
@@ -122,8 +123,13 @@ function* handleInitPosition(action: PayloadAction<InitPositionData>): Generator
       (tokenY === wazeroAddress && tokenYAmount !== 0n)
     ) {
       const isTokenX = tokenX === wazeroAddress
+      const azeroInputAmount = isTokenX ? tokenXAmount : tokenYAmount
+
       const slippageAmount = isTokenX ? xAmountWithSlippage : yAmountWithSlippage
-      const azeroAmount = azeroBalance > slippageAmount ? slippageAmount : azeroBalance
+      const azeroAmount =
+        azeroBalance - POOL_SAFE_TRANSACTION_FEE > slippageAmount
+          ? slippageAmount
+          : azeroInputAmount
 
       const depositTx = wazero.depositTx(azeroAmount, WAZERO_DEPOSIT_OPTIONS)
       txs.push(depositTx)
@@ -275,7 +281,8 @@ export function* handleGetCurrentPlotTicks(action: PayloadAction<GetCurrentTicks
         payload: {
           tokenFrom: allTokens[poolKey.tokenX].address,
           tokenTo: allTokens[poolKey.tokenY].address,
-          allPools
+          allPools,
+          poolKey
         }
       }
 
@@ -327,7 +334,8 @@ export function* handleGetCurrentPlotTicks(action: PayloadAction<GetCurrentTicks
             yDecimal
           )
 
-    yield* call(handleGetRemainingPositions)
+    yield* put(actions.getRemainingPositions({ setLoaded: false }))
+
     const { list } = yield* select(positionsList)
     const userRawTicks = getLiquidityTicksByPositionsList(poolKey, list)
 
@@ -609,7 +617,9 @@ export function* handleClosePosition(action: PayloadAction<ClosePositionData>) {
   }
 }
 
-export function* handleGetRemainingPositions(): Generator {
+export function* handleGetRemainingPositions(
+  action: PayloadAction<{ setLoaded: boolean }>
+): Generator {
   const walletAddress = yield* select(address)
   const { length, list, loadedPages } = yield* select(positionsList)
 
@@ -641,7 +651,7 @@ export function* handleGetRemainingPositions(): Generator {
     yield* put(
       actions.setPositionsListLoadedStatus({
         indexes: pages.map(({ index }: { index: number }) => index),
-        isLoaded: true
+        isLoaded: action.payload.setLoaded
       })
     )
   } catch (error) {

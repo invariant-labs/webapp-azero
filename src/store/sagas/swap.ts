@@ -15,6 +15,7 @@ import {
   ErrorMessage,
   INVARIANT_SWAP_OPTIONS,
   PSP22_APPROVE_OPTIONS,
+  SWAP_SAFE_TRANSACTION_FEE,
   U128MAX,
   WAZERO_DEPOSIT_OPTIONS,
   WAZERO_WITHDRAW_OPTIONS
@@ -98,7 +99,10 @@ export function* handleSwap(action: PayloadAction<Omit<Swap, 'txid'>>): Generato
     if ((xToY && poolKey.tokenX === wazeroAddress) || (!xToY && poolKey.tokenY === wazeroAddress)) {
       const azeroBalance = yield* select(balance)
       const azeroAmountInWithSlippage =
-        azeroBalance > calculatedAmountIn ? calculatedAmountIn : azeroBalance
+        azeroBalance - SWAP_SAFE_TRANSACTION_FEE > calculatedAmountIn
+          ? calculatedAmountIn
+          : amountIn
+
       const depositTx = wazero.depositTx(azeroAmountInWithSlippage, WAZERO_DEPOSIT_OPTIONS)
       txs.push(depositTx)
     }
@@ -282,7 +286,6 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
     let fee = 0n
 
     let swapPossible = false
-    let insufficientLiquidityPoolKey = null
 
     const errors = []
 
@@ -300,7 +303,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
           byAmountIn,
           xToY ? MIN_SQRT_PRICE : MAX_SQRT_PRICE
         )
-
+        console.log(result)
         if (result.maxSwapStepsReached || result.globalInsufficientLiquidity) {
           if (
             byAmountIn
@@ -309,7 +312,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
           ) {
             insufficientLiquidityAmountOut = byAmountIn ? result.amountOut : result.amountIn
             fee = pool.poolKey.feeTier.fee
-            insufficientLiquidityPoolKey = pool.poolKey
+            priceImpact = 1
             errors.push(SwapError.MaxSwapStepsReached)
           }
 
@@ -346,7 +349,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
 
     yield put(
       actions.setSimulateResult({
-        poolKey: swapPossible ? poolKey : insufficientLiquidityPoolKey,
+        poolKey: swapPossible ? poolKey : null,
         amountOut: validatedAmountOut,
         priceImpact,
         targetSqrtPrice,

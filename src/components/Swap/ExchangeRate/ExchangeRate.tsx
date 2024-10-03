@@ -29,7 +29,12 @@ const ExchangeRate: React.FC<iProps> = ({
       </Box>
     ) : (
       <Typography className={classes.rateText}>
-        1 {tokenFromSymbol} = {isNaN(amount) ? 0 : formatNumber(amount.toFixed(tokenToDecimals))}{' '}
+        1 {tokenFromSymbol} ={' '}
+        {isNaN(amount)
+          ? 0
+          : formatNumber(amount.toFixed(tokenToDecimals)) === '0'
+            ? '~0'
+            : formatNumber(amount.toFixed(tokenToDecimals))}{' '}
         {tokenToSymbol}
       </Typography>
     )

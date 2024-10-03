@@ -6,6 +6,8 @@ export const messagesToHide: string[] = [
   '<path> attribute d: Expected moveto path command'
 ]
 
+if (process.env.NODE_ENV === 'production') console.log = () => {}
+
 export function filterConsoleMessages(hideMessages: string[]): void {
   if (typeof window === 'undefined') {
     return
