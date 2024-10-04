@@ -39,7 +39,7 @@ const TokenListItem: React.FC<IProps> = ({
   const { classes } = useStyles()
   // const isNegative = priceChange < 0
 
-  const isXDown = useMediaQuery(theme.breakpoints.down('sm'))
+  const isSm = useMediaQuery(theme.breakpoints.down('sm'))
   const hideName = useMediaQuery(theme.breakpoints.down('xs'))
 
   return (
@@ -49,9 +49,9 @@ const TokenListItem: React.FC<IProps> = ({
           container
           classes={{ container: classes.container, root: classes.tokenList }}
           style={hideBottomLine ? { border: 'none' } : undefined}>
-          {!hideName && <Typography component='p'>{itemNumber}</Typography>}
+          {!hideName && !isSm && <Typography component='p'>{itemNumber}</Typography>}
           <Grid className={classes.tokenName}>
-            {!isXDown && <img src={icon} alt='Token icon'></img>}
+            {!isSm && <img src={icon} alt='Token icon'></img>}
             <Typography>
               {hideName ? symbol : name}
               {!hideName && <span className={classes.tokenSymbol}>{` (${symbol})`}</span>}
@@ -71,7 +71,7 @@ const TokenListItem: React.FC<IProps> = ({
           container
           style={{ color: colors.invariant.textGrey, fontWeight: 400 }}
           classes={{ container: classes.container, root: classes.header }}>
-          {!hideName && (
+          {!hideName && !isSm && (
             <Typography style={{ lineHeight: '12px' }}>
               N<sup>o</sup>
             </Typography>
