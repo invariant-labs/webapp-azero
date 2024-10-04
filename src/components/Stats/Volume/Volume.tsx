@@ -7,7 +7,7 @@ import { useStyles } from './style'
 import { TimeData } from '@store/reducers/stats'
 import { Grid, Typography, useMediaQuery } from '@mui/material'
 import { Box } from '@mui/system'
-import { formatNumber, formatNumbers, showPrefix } from '@utils/utils'
+import { formatNumber } from '@utils/utils'
 
 interface StatsInterface {
   percentVolume: number
@@ -38,10 +38,7 @@ const Volume: React.FC<StatsInterface> = ({ percentVolume, volume, data, classNa
       <Box className={classes.volumeContainer}>
         <Typography className={classes.volumeHeader}>Volume</Typography>
         <div className={classes.volumePercentContainer}>
-          <Typography className={classes.volumePercentHeader}>
-            ${formatNumbers()(volume.toString())}
-            {showPrefix(volume)}
-          </Typography>
+          <Typography className={classes.volumePercentHeader}>${formatNumber(volume)}</Typography>
           <Box className={classes.volumeStatusContainer}>
             <Box
               className={classNames(

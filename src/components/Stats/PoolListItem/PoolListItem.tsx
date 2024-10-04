@@ -2,7 +2,7 @@ import React from 'react'
 import { theme } from '@static/theme'
 import { useStyles } from './style'
 import { Box, Grid, Typography, useMediaQuery } from '@mui/material'
-import { addressToTicker, formatNumbers, parseFeeToPathFee, showPrefix } from '@utils/utils'
+import { addressToTicker, formatNumber, parseFeeToPathFee } from '@utils/utils'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
 import { useNavigate } from 'react-router-dom'
@@ -137,8 +137,8 @@ const PoolListItem: React.FC<IProps> = ({
             </Typography>
           ) : null} */}
           <Typography>{fee}%</Typography>
-          <Typography>{`$${formatNumbers()(volume.toString())}${showPrefix(volume)}`}</Typography>
-          <Typography>{`$${formatNumbers()(TVL.toString())}${showPrefix(TVL)}`}</Typography>
+          <Typography>{`$${formatNumber(volume)}`}</Typography>
+          <Typography>{`$${formatNumber(TVL)}`}</Typography>
           {!isSm && (
             <Box className={classes.action}>
               <TooltipHover text='Exchange'>
