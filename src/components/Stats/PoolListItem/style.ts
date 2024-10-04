@@ -23,13 +23,12 @@ export const useStyles = makeStyles()(() => ({
     },
 
     [theme.breakpoints.down('sm')]: {
+      gridTemplateColumns: '32.5% 17.5% 35% 15% ',
+
       '& p': {
+        justifyContent: 'flex-start',
         ...typography.caption1
       }
-    },
-
-    [theme.breakpoints.down('xs')]: {
-      gridTemplateColumns: '28% 15% 30% 25%'
     }
   },
 
@@ -72,8 +71,9 @@ export const useStyles = makeStyles()(() => ({
       display: 'block'
     },
 
-    [theme.breakpoints.down('xs')]: {
-      marginLeft: 0
+    [theme.breakpoints.down('sm')]: {
+      marginLeft: 0,
+      justifyContent: 'flex-start'
     }
   },
   icon: {
