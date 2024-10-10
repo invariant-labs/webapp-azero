@@ -16,7 +16,7 @@ import {
   INVARIANT_SWAP_OPTIONS,
   PSP22_APPROVE_OPTIONS,
   SWAP_SAFE_TRANSACTION_FEE,
-  U128MAX,
+  MAX,
   WAZERO_DEPOSIT_OPTIONS,
   WAZERO_WITHDRAW_OPTIONS
 } from '@store/consts/static'
@@ -279,7 +279,7 @@ export function* handleGetSimulateResult(action: PayloadAction<Simulate>) {
     }
 
     let poolKey = null
-    let amountOut = byAmountIn ? 0n : U128MAX
+    let amountOut = byAmountIn ? 0n : MAX
     let insufficientLiquidityAmountOut = 0n
     let priceImpact = 0
     let targetSqrtPrice = 0n

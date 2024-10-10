@@ -11,6 +11,7 @@ import settingIcon from '@static/svg/settings.svg'
 import SwapArrows from '@static/svg/swap-arrows.svg'
 import {
   DEFAULT_TOKEN_DECIMAL,
+  MAX,
   REFRESHER_INTERVAL,
   SWAP_SAFE_TRANSACTION_FEE
 } from '@store/consts/static'
@@ -353,7 +354,7 @@ export const Swap: React.FC<ISwap> = ({
     if (
       tokenFrom !== null &&
       convertBalanceToBigint(amountFrom, Number(tokens[tokenFrom]?.decimals ?? 0n)) !== 0n &&
-      amountTo === ''
+      (amountFrom.replace('.', '') == MAX.toString() || amountTo === '')
     ) {
       return 'Not enough liquidity'
     }
