@@ -4,7 +4,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
 import { useStyles } from './style'
 import { Grid, Typography, useMediaQuery } from '@mui/material'
-import { formatNumbers, showPrefix } from '@utils/utils'
+import { formatNumber } from '@utils/utils'
 import { SortTypeTokenList } from '@store/consts/static'
 
 interface IProps {
@@ -39,7 +39,7 @@ const TokenListItem: React.FC<IProps> = ({
   const { classes } = useStyles()
   // const isNegative = priceChange < 0
 
-  const isXDown = useMediaQuery(theme.breakpoints.down('sm'))
+  const isSm = useMediaQuery(theme.breakpoints.down('sm'))
   const hideName = useMediaQuery(theme.breakpoints.down('xs'))
 
   return (
@@ -49,29 +49,30 @@ const TokenListItem: React.FC<IProps> = ({
           container
           classes={{ container: classes.container, root: classes.tokenList }}
           style={hideBottomLine ? { border: 'none' } : undefined}>
-          {!hideName && <Typography component='p'>{itemNumber}</Typography>}
+          {!hideName && !isSm && <Typography component='p'>{itemNumber}</Typography>}
           <Grid className={classes.tokenName}>
-            {!isXDown && <img src={icon} alt='Token icon'></img>}
+            {!isSm && <img src={icon} alt='Token icon'></img>}
             <Typography>
               {hideName ? symbol : name}
               {!hideName && <span className={classes.tokenSymbol}>{` (${symbol})`}</span>}
             </Typography>
           </Grid>
-          <Typography>{`~$${formatNumbers()(price.toString())}${showPrefix(price)}`}</Typography>
+          <Typography>{`~$${formatNumber(price)}`}</Typography>
+
           {/* {!hideName && (
             <Typography style={{ color: isNegative ? colors.invariant.Error : colors.green.main }}>
               {isNegative ? `${priceChange.toFixed(2)}%` : `+${priceChange.toFixed(2)}%`}
             </Typography>
           )} */}
-          <Typography>{`$${formatNumbers()(volume.toString())}${showPrefix(volume)}`}</Typography>
-          <Typography>{`$${formatNumbers()(TVL.toString())}${showPrefix(TVL)}`}</Typography>
+          <Typography>{`$${formatNumber(volume)}`}</Typography>
+          <Typography>{`$${formatNumber(TVL)}`}</Typography>
         </Grid>
       ) : (
         <Grid
           container
           style={{ color: colors.invariant.textGrey, fontWeight: 400 }}
           classes={{ container: classes.container, root: classes.header }}>
-          {!hideName && (
+          {!hideName && !isSm && (
             <Typography style={{ lineHeight: '12px' }}>
               N<sup>o</sup>
             </Typography>

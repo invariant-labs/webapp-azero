@@ -6,7 +6,7 @@ import { colors, typography } from '@static/theme'
 import { useStyles } from './style'
 import { TimeData } from '@store/reducers/stats'
 import { Grid, Typography } from '@mui/material'
-import { formatNumber, formatNumbers, showPrefix } from '@utils/utils'
+import { formatNumber } from '@utils/utils'
 
 interface LiquidityInterface {
   liquidityPercent: number
@@ -31,8 +31,7 @@ const Liquidity: React.FC<LiquidityInterface> = ({
         <Typography className={classes.liquidityHeader}>Liquidity</Typography>
         <Grid className={classes.volumePercentHeader}>
           <Typography className={classes.volumeLiquidityHeader}>
-            ${formatNumbers()(liquidityVolume.toString())}
-            {showPrefix(liquidityVolume)}
+            ${formatNumber(liquidityVolume)}
           </Typography>
           <Grid className={classes.volumeStatusContainer}>
             <Grid
