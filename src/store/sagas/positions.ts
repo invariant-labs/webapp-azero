@@ -12,7 +12,7 @@ import {
   POOL_SAFE_TRANSACTION_FEE,
   POSITIONS_PER_QUERY,
   PSP22_APPROVE_OPTIONS,
-  U128MAX,
+  MAX,
   WAZERO_DEPOSIT_OPTIONS
 } from '@store/consts/static'
 import {
@@ -56,7 +56,7 @@ export function getWithdrawAllWAZEROTxs(
 ): SubmittableExtrinsic[] {
   const txs: SubmittableExtrinsic[] = []
 
-  const approveTx = psp22.approveTx(invariantAddress, U128MAX, wazeroAddress, PSP22_APPROVE_OPTIONS)
+  const approveTx = psp22.approveTx(invariantAddress, MAX, wazeroAddress, PSP22_APPROVE_OPTIONS)
   txs.push(approveTx)
 
   const unwrapTx = invariant.withdrawAllWAZEROTx(wazeroAddress, INVARIANT_WITHDRAW_ALL_WAZERO)

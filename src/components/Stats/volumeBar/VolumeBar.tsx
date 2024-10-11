@@ -3,7 +3,7 @@ import classNames from 'classnames'
 import { theme } from '@static/theme'
 import { useStyles } from './style'
 import { Box, Grid, Typography, useMediaQuery } from '@mui/material'
-import { formatNumbers, showPrefix } from '@utils/utils'
+import { formatNumber } from '@utils/utils'
 
 interface Iprops {
   percentVolume: number
@@ -30,10 +30,7 @@ const VolumeBar: React.FC<Iprops> = ({
     <Grid container classes={{ container: classes.container }}>
       <Box className={classes.tokenName}>
         <Typography className={classes.tokenHeader}>Volume 24H:</Typography>
-        <Typography className={classes.tokenContent}>
-          ${formatNumbers()(volume.toString())}
-          {showPrefix(volume)}
-        </Typography>
+        <Typography className={classes.tokenContent}>${formatNumber(volume)}</Typography>
         {!isXDown && (
           <Typography
             className={classNames(
@@ -48,10 +45,7 @@ const VolumeBar: React.FC<Iprops> = ({
       </Box>
       <Box className={classes.tokenName}>
         <Typography className={classes.tokenHeader}>TVL 24H:</Typography>
-        <Typography className={classes.tokenContent}>
-          ${formatNumbers()(tvlVolume.toString())}
-          {showPrefix(tvlVolume)}
-        </Typography>
+        <Typography className={classes.tokenContent}>${formatNumber(tvlVolume)}</Typography>
         {!isXDown && (
           <Typography
             className={classNames(
@@ -64,10 +58,7 @@ const VolumeBar: React.FC<Iprops> = ({
       </Box>
       <Box className={classes.tokenName}>
         <Typography className={classes.tokenHeader}>Fees 24H:</Typography>
-        <Typography className={classes.tokenContent}>
-          ${formatNumbers()(feesVolume.toString())}
-          {showPrefix(feesVolume)}
-        </Typography>
+        <Typography className={classes.tokenContent}>${formatNumber(feesVolume)}</Typography>
         {!isXDown && (
           <Typography
             className={classNames(
