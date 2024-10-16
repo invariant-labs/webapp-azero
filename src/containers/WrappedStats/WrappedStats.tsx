@@ -41,6 +41,8 @@ export const WrappedStats: React.FC = () => {
     dispatch(actions.getCurrentStats())
   }, [])
 
+  console.log(poolsList)
+
   return (
     <Grid container className={classes.wrapper} direction='column'>
       {isLoadingStats ? (
@@ -86,7 +88,8 @@ export const WrappedStats: React.FC = () => {
                 price: tokenData.price,
                 // priceChange: tokenData.priceChange,
                 volume: tokenData.volume24,
-                TVL: tokenData.tvl
+                TVL: tokenData.tvl,
+                isUnknown: tokenData.tokenDetails?.isUnknown ?? false
               }))}
             />
           </Grid>
@@ -101,7 +104,7 @@ export const WrappedStats: React.FC = () => {
               TVL: poolData.tvl,
               fee: poolData.fee,
               addressFrom: poolData.tokenX,
-              addressTo: poolData.tokenY
+              addressTo: poolData.tokenY,
               // apy: poolData.apy,
               // apyData: {
               //   fees: poolData.apy,
@@ -115,7 +118,9 @@ export const WrappedStats: React.FC = () => {
               //   accumulatedFarmsSingleTick:
               //     accumulatedSingleTickAPY?.[poolData.poolAddress.toString()] ?? 0,
               //   accumulatedFarmsAvg: accumulatedAverageAPY?.[poolData.poolAddress.toString()] ?? 0
-              // }
+              // },
+              isUnknownFrom: poolData.tokenXDetails?.isUnknown ?? false,
+              isUnknownTo: poolData.tokenYDetails?.isUnknown ?? false
             }))}
             network={currentNetwork}
           />

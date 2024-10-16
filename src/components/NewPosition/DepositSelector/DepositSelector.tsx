@@ -346,6 +346,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
           tokenPrice={tokenAPrice}
           currency={tokenA !== null ? tokens[tokenA].symbol : null}
           currencyIconSrc={tokenA !== null ? tokens[tokenA].logoURI : undefined}
+          currencyIsUnknown={tokenA !== null ? tokens[tokenA].isUnknown ?? false : false}
           placeholder='0.0'
           onMaxClick={() => {
             if (tokenA === null) {
@@ -375,6 +376,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
           tokenPrice={tokenBPrice}
           currency={tokenB !== null ? tokens[tokenB].symbol : null}
           currencyIconSrc={tokenB !== null ? tokens[tokenB].logoURI : undefined}
+          currencyIsUnknown={tokenB !== null ? tokens[tokenB].isUnknown ?? false : false}
           placeholder='0.0'
           onMaxClick={() => {
             if (tokenB === null) {
