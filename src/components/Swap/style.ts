@@ -333,6 +333,16 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     ...typography.caption1,
     color: colors.invariant.lightGrey,
     marginBottom: 8
+  },
+  unknownWarning: {
+    width: 'fit-content',
+    background: colors.invariant.yellow,
+    color: colors.invariant.black,
+    marginTop: 12,
+    padding: 4,
+    paddingInline: 8,
+    borderRadius: 8,
+    fontSize: 12
   }
 }))
 

@@ -5,7 +5,7 @@ import Slippage from '@components/Modals/Slippage/Slippage'
 import Refresher from '@components/Refresher/Refresher'
 import { Network, PoolKey, Price } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_DENOMINATOR } from '@invariant-labs/a0-sdk/target/consts'
-import { Box, Button, Grid, Typography } from '@mui/material'
+import { Box, Button, Grid, Tooltip, Typography } from '@mui/material'
 import refreshIcon from '@static/svg/refresh.svg'
 import settingIcon from '@static/svg/settings.svg'
 import SwapArrows from '@static/svg/swap-arrows.svg'
@@ -635,6 +635,22 @@ export const Swap: React.FC<ISwap> = ({
             hiddenUnknownTokens={hideUnknownTokens}
           />
         </Box>
+        {tokens[tokenFrom ?? '']?.isUnknown && (
+          <TooltipHover
+            text={`${tokens[tokenFrom ?? ''].symbol} is unknown, make sure address is correct before trading`}>
+            <Box className={classes.unknownWarning}>
+              {tokens[tokenFrom ?? ''].symbol} is not verified
+            </Box>
+          </TooltipHover>
+        )}
+        {tokens[tokenTo ?? '']?.isUnknown && (
+          <TooltipHover
+            text={`${tokens[tokenTo ?? ''].symbol} is unknown, make sure address is correct before trading`}>
+            <Box className={classes.unknownWarning}>
+              {tokens[tokenTo ?? ''].symbol} is not verified
+            </Box>
+          </TooltipHover>
+        )}
         <Box className={classes.transactionDetails}>
           <Box className={classes.transactionDetailsInner}>
             <button
