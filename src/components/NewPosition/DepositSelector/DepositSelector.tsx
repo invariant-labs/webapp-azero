@@ -9,7 +9,8 @@ import {
   getScaleFromString,
   parsePathFeeToFeeString,
   printBigint,
-  tickerToAddress
+  tickerToAddress,
+  trimZeros
 } from '@utils/utils'
 import classNames from 'classnames'
 import React, { useCallback, useEffect, useState } from 'react'
@@ -364,6 +365,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
             if (tokenA !== null && tokenB !== null && tokenAInputState.value.length === 0) {
               tokenAInputState.setValue('0.0')
             }
+            tokenAInputState.setValue(trimZeros(tokenAInputState.value))
           }}
           {...tokenAInputState}
           priceLoading={priceALoading}
@@ -390,6 +392,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
             if (tokenA !== null && tokenB !== null && tokenBInputState.value.length === 0) {
               tokenBInputState.setValue('0.0')
             }
+            tokenBInputState.setValue(trimZeros(tokenBInputState.value))
           }}
           {...tokenBInputState}
           priceLoading={priceBLoading}

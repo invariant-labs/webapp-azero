@@ -46,6 +46,7 @@ const useStyles = makeStyles()(() => {
       position: 'relative',
       overflow: 'hidden',
       zIndex: 4,
+
       '&:disabled': {
         background: colors.invariant.light,
         color: colors.invariant.componentBcg,
@@ -64,6 +65,7 @@ const useStyles = makeStyles()(() => {
 
     buttonRelease: {
       background: `${colors.invariant.component} !important`,
+      border: '1px solid' + colors.invariant.pink,
       '&:hover': {
         background: `${colors.invariant.component} !important`
       }
