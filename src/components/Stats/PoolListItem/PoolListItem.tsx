@@ -1,16 +1,16 @@
-import React from 'react'
-import { theme } from '@static/theme'
-import { useStyles } from './style'
-import { Box, Grid, Typography, useMediaQuery } from '@mui/material'
-import { addressToTicker, formatNumber, parseFeeToPathFee } from '@utils/utils'
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
-import { useNavigate } from 'react-router-dom'
-import icons from '@static/icons'
-import { SortTypePoolList } from '@store/consts/static'
+import { TooltipHover } from '@components/TooltipHover/TooltipHover'
 import { Network } from '@invariant-labs/a0-sdk'
 import { PERCENTAGE_SCALE } from '@invariant-labs/a0-sdk/target/consts'
-import { TooltipHover } from '@components/TooltipHover/TooltipHover'
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
+import { Box, Grid, Typography, useMediaQuery } from '@mui/material'
+import icons from '@static/icons'
+import { theme } from '@static/theme'
+import { SortTypePoolList } from '@store/consts/static'
+import { addressToTicker, formatNumber, parseFeeToPathFee } from '@utils/utils'
+import React from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useStyles } from './style'
 
 interface IProps {
   TVL?: number
@@ -79,8 +79,6 @@ const PoolListItem: React.FC<IProps> = ({
       `/exchange/${addressToTicker(network ?? Network.Testnet, addressFrom ?? '')}/${addressToTicker(network ?? Network.Testnet, addressTo ?? '')}`
     )
   }
-
-  console.log(isUnknownFrom, isUnknownTo)
 
   return (
     <Grid maxWidth='100%'>
