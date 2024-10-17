@@ -29,7 +29,8 @@ export const Null: Story = {
     style: {},
     disabled: false,
     isBalanceLoading: false,
-    walletUninitialized: true
+    walletUninitialized: true,
+    currencyIsUnknown: true
   }
 }
 
@@ -51,6 +52,7 @@ export const BTC: Story = {
     style: {},
     disabled: false,
     isBalanceLoading: false,
-    walletUninitialized: false
+    walletUninitialized: false,
+    currencyIsUnknown: true
   }
 }

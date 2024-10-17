@@ -635,6 +635,24 @@ export const Swap: React.FC<ISwap> = ({
             hiddenUnknownTokens={hideUnknownTokens}
           />
         </Box>
+        <Box className={classes.unknownWarningContainer}>
+          {tokens[tokenFrom ?? '']?.isUnknown && (
+            <TooltipHover
+              text={`${tokens[tokenFrom ?? ''].symbol} is unknown, make sure address is correct before trading`}>
+              <Box className={classes.unknownWarning}>
+                {tokens[tokenFrom ?? ''].symbol} is not verified
+              </Box>
+            </TooltipHover>
+          )}
+          {tokens[tokenTo ?? '']?.isUnknown && (
+            <TooltipHover
+              text={`${tokens[tokenTo ?? ''].symbol} is unknown, make sure address is correct before trading`}>
+              <Box className={classes.unknownWarning}>
+                {tokens[tokenTo ?? ''].symbol} is not verified
+              </Box>
+            </TooltipHover>
+          )}
+        </Box>
         <Box className={classes.transactionDetails}>
           <Box className={classes.transactionDetailsInner}>
             <button

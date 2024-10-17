@@ -1,5 +1,5 @@
 import React from 'react'
-import { Grid, Typography } from '@mui/material'
+import { Box, Grid, Typography } from '@mui/material'
 import { useStyles } from './../styles'
 import { SwapToken } from '@store/selectors/wallet'
 import icons from '@static/icons'
@@ -31,12 +31,15 @@ const SingleToken: React.FC<IProps> = ({ token, tokenPrice, copyTokenAddressHand
     <Grid className={classes.token}>
       <Grid container direction='row' justifyContent='flex-start' alignItems='center' wrap='nowrap'>
         {token?.logoURI ? (
-          <img
-            className={classes.tokenIcon}
-            src={token.logoURI}
-            loading='lazy'
-            alt={token.name + 'logo'}
-          />
+          <Box className={classes.imageContainer}>
+            <img
+              className={classes.tokenIcon}
+              src={token.logoURI}
+              loading='lazy'
+              alt={token.name + 'logo'}
+            />
+            {token.isUnknown && <img className={classes.warningIcon} src={icons.warningIcon} />}
+          </Box>
         ) : (
           <img className={classes.tokenIcon} src={icons.selectToken} alt={'Select token'} />
         )}
