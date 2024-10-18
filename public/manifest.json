@@ -23,7 +23,7 @@
       "type": "image/png"
     },
     {
-      "src": "/logoV2small.png",
+      "src": "/logoV2.png",
       "sizes": "320x180",
       "type": "image/png",
       "purpose": "any maskable"
