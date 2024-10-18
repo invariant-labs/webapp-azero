@@ -1,9 +1,13 @@
-import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import loader from '@static/gif/loader.gif'
-import useStyles from './styles'
-import { Grid, Typography } from '@mui/material'
 import { EmptyPlaceholder } from '@components/EmptyPlaceholder/EmptyPlaceholder'
+import Liquidity from '@components/Stats/Liquidity/Liquidity'
+import PoolList from '@components/Stats/PoolList/PoolList'
+import TokensList from '@components/Stats/TokensList/TokensList'
+import Volume from '@components/Stats/Volume/Volume'
+import VolumeBar from '@components/Stats/volumeBar/VolumeBar'
+import { Grid, Typography } from '@mui/material'
+import loader from '@static/gif/loader.gif'
+import { actions } from '@store/reducers/stats'
+import { networkType } from '@store/selectors/connection'
 import {
   fees24,
   isLoading,
@@ -14,13 +18,9 @@ import {
   volume24,
   volumePlot
 } from '@store/selectors/stats'
-import { networkType } from '@store/selectors/connection'
-import { actions } from '@store/reducers/stats'
-import Volume from '@components/Stats/Volume/Volume'
-import Liquidity from '@components/Stats/Liquidity/Liquidity'
-import VolumeBar from '@components/Stats/volumeBar/VolumeBar'
-import TokensList from '@components/Stats/TokensList/TokensList'
-import PoolList from '@components/Stats/PoolList/PoolList'
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import useStyles from './styles'
 
 export const WrappedStats: React.FC = () => {
   const { classes } = useStyles()
@@ -86,7 +86,8 @@ export const WrappedStats: React.FC = () => {
                 price: tokenData.price,
                 // priceChange: tokenData.priceChange,
                 volume: tokenData.volume24,
-                TVL: tokenData.tvl
+                TVL: tokenData.tvl,
+                isUnknown: tokenData.tokenDetails?.isUnknown ?? false
               }))}
             />
           </Grid>
@@ -101,7 +102,7 @@ export const WrappedStats: React.FC = () => {
               TVL: poolData.tvl,
               fee: poolData.fee,
               addressFrom: poolData.tokenX,
-              addressTo: poolData.tokenY
+              addressTo: poolData.tokenY,
               // apy: poolData.apy,
               // apyData: {
               //   fees: poolData.apy,
@@ -115,7 +116,9 @@ export const WrappedStats: React.FC = () => {
               //   accumulatedFarmsSingleTick:
               //     accumulatedSingleTickAPY?.[poolData.poolAddress.toString()] ?? 0,
               //   accumulatedFarmsAvg: accumulatedAverageAPY?.[poolData.poolAddress.toString()] ?? 0
-              // }
+              // },
+              isUnknownFrom: poolData.tokenXDetails?.isUnknown ?? false,
+              isUnknownTo: poolData.tokenYDetails?.isUnknown ?? false
             }))}
             network={currentNetwork}
           />
