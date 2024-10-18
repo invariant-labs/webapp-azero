@@ -2,7 +2,7 @@ import Select from '@components/Inputs/Select/Select'
 import { OutlinedButton } from '@components/OutlinedButton/OutlinedButton'
 import { Grid, Input, Tooltip, Typography } from '@mui/material'
 import loadingAnimation from '@static/gif/loading.gif'
-import { formatNumber } from '@utils/utils'
+import { formatNumber, trimZeros } from '@utils/utils'
 import { SwapToken } from '@store/selectors/wallet'
 import classNames from 'classnames'
 import React, { CSSProperties, useRef } from 'react'
@@ -140,6 +140,11 @@ export const AmountInput: React.FC<IProps> = ({
             onChange={allowOnlyDigitsAndTrimUnnecessaryZeros}
             inputProps={{
               inputMode: 'decimal'
+            }}
+            onBlur={() => {
+              if (value) {
+                setValue(trimZeros(value))
+              }
             }}
           />
         )}

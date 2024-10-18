@@ -20,7 +20,8 @@ import {
   convertBalanceToBigint,
   printBigint,
   stringToFixed,
-  trimLeadingZeros
+  trimLeadingZeros,
+  trimZeros
 } from '@utils/utils'
 import { PoolWithPoolKey } from '@store/reducers/pools'
 import { Swap as SwapData } from '@store/reducers/swap'
@@ -518,7 +519,9 @@ export const Swap: React.FC<ISwap> = ({
             onMaxClick={() => {
               if (tokenFrom !== null) {
                 setInputRef(inputTarget.FROM)
-                setAmountFrom(printBigint(tokens[tokenFrom].balance, tokens[tokenFrom].decimals))
+                setAmountFrom(
+                  trimZeros(printBigint(tokens[tokenFrom].balance, tokens[tokenFrom].decimals))
+                )
               }
             }}
             tokens={tokens}
@@ -607,7 +610,9 @@ export const Swap: React.FC<ISwap> = ({
             onMaxClick={() => {
               if (tokenFrom !== null) {
                 setInputRef(inputTarget.FROM)
-                setAmountFrom(printBigint(tokens[tokenFrom].balance, tokens[tokenFrom].decimals))
+                setAmountFrom(
+                  trimZeros(printBigint(tokens[tokenFrom].balance, tokens[tokenFrom].decimals))
+                )
               }
             }}
             tokens={tokens}
