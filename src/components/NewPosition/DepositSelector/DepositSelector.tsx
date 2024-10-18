@@ -353,7 +353,9 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
               return
             }
 
-            tokenAInputState.setValue(printBigint(tokens[tokenA].balance, tokens[tokenA].decimals))
+            tokenAInputState.setValue(
+              trimZeros(printBigint(tokens[tokenA].balance, tokens[tokenA].decimals))
+            )
           }}
           balanceValue={
             tokenA !== null ? printBigint(tokens[tokenA].balance, tokens[tokenA].decimals) : ''
@@ -383,7 +385,9 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
               return
             }
 
-            tokenBInputState.setValue(printBigint(tokens[tokenB].balance, tokens[tokenB].decimals))
+            tokenBInputState.setValue(
+              trimZeros(printBigint(tokens[tokenB].balance, tokens[tokenB].decimals))
+            )
           }}
           balanceValue={
             tokenB !== null ? printBigint(tokens[tokenB].balance, tokens[tokenB].decimals) : ''
