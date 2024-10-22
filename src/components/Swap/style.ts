@@ -197,7 +197,7 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     justifyContent: 'space-between',
     flexFlow: 'row',
     flexWrap: 'wrap',
-    marginTop: 24,
+    marginTop: 12,
     marginBottom: 12,
     cursor: 'default',
     filter: 'brightness(0.9)',
@@ -333,6 +333,20 @@ export const useStyles = makeStyles()((theme: Theme) => ({
     ...typography.caption1,
     color: colors.invariant.lightGrey,
     marginBottom: 8
+  },
+  unknownWarningContainer: {
+    marginTop: 12,
+    display: 'flex',
+    gap: 12
+  },
+  unknownWarning: {
+    width: 'fit-content',
+    background: colors.invariant.yellow,
+    color: colors.invariant.black,
+    padding: 4,
+    paddingInline: 8,
+    borderRadius: 8,
+    fontSize: 12
   }
 }))
 

@@ -9,7 +9,8 @@ import {
   getScaleFromString,
   parsePathFeeToFeeString,
   printBigint,
-  tickerToAddress
+  tickerToAddress,
+  trimZeros
 } from '@utils/utils'
 import classNames from 'classnames'
 import React, { useCallback, useEffect, useState } from 'react'
@@ -346,13 +347,16 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
           tokenPrice={tokenAPrice}
           currency={tokenA !== null ? tokens[tokenA].symbol : null}
           currencyIconSrc={tokenA !== null ? tokens[tokenA].logoURI : undefined}
+          currencyIsUnknown={tokenA !== null ? tokens[tokenA].isUnknown ?? false : false}
           placeholder='0.0'
           onMaxClick={() => {
             if (tokenA === null) {
               return
             }
 
-            tokenAInputState.setValue(printBigint(tokens[tokenA].balance, tokens[tokenA].decimals))
+            tokenAInputState.setValue(
+              trimZeros(printBigint(tokens[tokenA].balance, tokens[tokenA].decimals))
+            )
           }}
           balanceValue={
             tokenA !== null ? printBigint(tokens[tokenA].balance, tokens[tokenA].decimals) : ''
@@ -364,6 +368,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
             if (tokenA !== null && tokenB !== null && tokenAInputState.value.length === 0) {
               tokenAInputState.setValue('0.0')
             }
+            tokenAInputState.setValue(trimZeros(tokenAInputState.value))
           }}
           {...tokenAInputState}
           priceLoading={priceALoading}
@@ -375,13 +380,16 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
           tokenPrice={tokenBPrice}
           currency={tokenB !== null ? tokens[tokenB].symbol : null}
           currencyIconSrc={tokenB !== null ? tokens[tokenB].logoURI : undefined}
+          currencyIsUnknown={tokenB !== null ? tokens[tokenB].isUnknown ?? false : false}
           placeholder='0.0'
           onMaxClick={() => {
             if (tokenB === null) {
               return
             }
 
-            tokenBInputState.setValue(printBigint(tokens[tokenB].balance, tokens[tokenB].decimals))
+            tokenBInputState.setValue(
+              trimZeros(printBigint(tokens[tokenB].balance, tokens[tokenB].decimals))
+            )
           }}
           balanceValue={
             tokenB !== null ? printBigint(tokens[tokenB].balance, tokens[tokenB].decimals) : ''
@@ -390,6 +398,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
             if (tokenA !== null && tokenB !== null && tokenBInputState.value.length === 0) {
               tokenBInputState.setValue('0.0')
             }
+            tokenBInputState.setValue(trimZeros(tokenBInputState.value))
           }}
           {...tokenBInputState}
           priceLoading={priceBLoading}
