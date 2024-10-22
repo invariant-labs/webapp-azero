@@ -118,6 +118,19 @@ export const trimZeros = (numStr: string): string => {
     .replace(/\.$/, '')
 }
 
+export const trimDecimalZeros = (numStr: string): string => {
+  const withoutTrailingDot = numStr.replace(/\.$/, '')
+
+  if (!withoutTrailingDot.includes('.')) {
+    return withoutTrailingDot
+  }
+
+  const [integerPart, decimalPart] = withoutTrailingDot.split('.')
+
+  const trimmedDecimal = decimalPart.replace(/0+$/, '')
+  return trimmedDecimal ? `${integerPart}.${trimmedDecimal}` : integerPart
+}
+
 export const calcYPerXPriceByTickIndex = (
   tickIndex: bigint,
   xDecimal: bigint,
