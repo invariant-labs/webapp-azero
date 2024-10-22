@@ -23,13 +23,13 @@
       "type": "image/png"
     },
     {
-      "src": "/favicon-192x192.png",
-      "sizes": "192x192",
+      "src": "/logoV2.png",
+      "sizes": "320x180",
       "type": "image/png",
       "purpose": "any maskable"
     }
   ],
-  "orientation": "portrait",
+  "orientation": "landscape",
   "lang": "en-US",
   "dir": "ltr",
   "prefer_related_applications": false,

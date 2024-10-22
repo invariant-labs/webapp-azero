@@ -23,7 +23,9 @@ interface PoolListInterface {
     //   fees: number
     //   accumulatedFarmsAvg: number
     //   accumulatedFarmsSingleTick: number
-    // }
+    // },
+    isUnknownFrom: boolean
+    isUnknownTo: boolean
   }>
   network: Network
 }
@@ -99,6 +101,8 @@ const PoolList: React.FC<PoolListInterface> = ({ data, network }) => {
           addressFrom={element.addressFrom}
           addressTo={element.addressTo}
           network={network}
+          isUnknownFrom={element.isUnknownFrom}
+          isUnknownTo={element.isUnknownTo}
         />
       ))}
       {pages > 1 ? (
