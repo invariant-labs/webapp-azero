@@ -119,6 +119,10 @@ export const trimZeros = (numStr: string): string => {
 }
 
 export const trimDecimalZeros = (numStr: string): string => {
+  if (/^[0.]+$/.test(numStr)) {
+    return '0'
+  }
+
   const withoutTrailingDot = numStr.replace(/\.$/, '')
 
   if (!withoutTrailingDot.includes('.')) {
