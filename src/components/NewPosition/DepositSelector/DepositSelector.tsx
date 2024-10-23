@@ -10,7 +10,7 @@ import {
   parsePathFeeToFeeString,
   printBigint,
   tickerToAddress,
-  trimZeros
+  trimDecimalZeros
 } from '@utils/utils'
 import classNames from 'classnames'
 import React, { useCallback, useEffect, useState } from 'react'
@@ -355,7 +355,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
             }
 
             tokenAInputState.setValue(
-              trimZeros(printBigint(tokens[tokenA].balance, tokens[tokenA].decimals))
+              trimDecimalZeros(printBigint(tokens[tokenA].balance, tokens[tokenA].decimals))
             )
           }}
           balanceValue={
@@ -368,7 +368,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
             if (tokenA !== null && tokenB !== null && tokenAInputState.value.length === 0) {
               tokenAInputState.setValue('0.0')
             }
-            tokenAInputState.setValue(trimZeros(tokenAInputState.value))
+            tokenAInputState.setValue(trimDecimalZeros(tokenAInputState.value))
           }}
           {...tokenAInputState}
           priceLoading={priceALoading}
@@ -388,7 +388,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
             }
 
             tokenBInputState.setValue(
-              trimZeros(printBigint(tokens[tokenB].balance, tokens[tokenB].decimals))
+              trimDecimalZeros(printBigint(tokens[tokenB].balance, tokens[tokenB].decimals))
             )
           }}
           balanceValue={
@@ -398,7 +398,7 @@ export const DepositSelector: React.FC<IDepositSelector> = ({
             if (tokenA !== null && tokenB !== null && tokenBInputState.value.length === 0) {
               tokenBInputState.setValue('0.0')
             }
-            tokenBInputState.setValue(trimZeros(tokenBInputState.value))
+            tokenBInputState.setValue(trimDecimalZeros(tokenBInputState.value))
           }}
           {...tokenBInputState}
           priceLoading={priceBLoading}
